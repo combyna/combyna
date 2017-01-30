@@ -1,0 +1,27 @@
+{
+    "name": "combyna/combyna",
+    "description": "Combyna - build things.",
+    "autoload": {
+        "psr-4": {
+            "Combyna\\": "php/src/Combyna/"
+        }
+    },
+    "require": {
+        "symfony/event-dispatcher": "^3.1",
+        "symfony/http-foundation": "^3.1"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.6",
+        "elliotchance/concise": "^2.1"
+    },
+    "scripts": {
+        "server": "php ./php/src/server.php"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dan Phillimore",
+            "email": "dan@ovms.co"
+        }
+    ]
+}
