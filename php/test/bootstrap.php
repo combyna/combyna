@@ -10,5 +10,6 @@
  */
 
 $autoloader = require __DIR__ . '/../../vendor/autoload.php';
-$autoloader->add('Combyna\\Integration\\', __DIR__ . '/Integration');
-$autoloader->add('Combyna\\Unit\\', __DIR__ . '/Unit');
+$autoloader->addPsr4('Combyna\\Harness\\', __DIR__ . '/Combyna/Harness');
+$autoloader->addPsr4('Combyna\\Integration\\', __DIR__ . '/Combyna/Integration');
+$autoloader->addPsr4('Combyna\\Unit\\', __DIR__ . '/Combyna/Unit');
