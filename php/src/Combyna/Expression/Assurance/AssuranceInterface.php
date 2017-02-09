@@ -11,8 +11,8 @@
 
 namespace Combyna\Expression\Assurance;
 
+use Combyna\Bag\StaticBagInterface;
 use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\StaticInterface;
 use Combyna\Expression\Validation\ValidationContextInterface;
 use Combyna\Type\TypeInterface;
 
@@ -31,6 +31,24 @@ interface AssuranceInterface
     const NON_ZERO_NUMBER = 'non-zero-number';
 
     /**
+     * Determines whether this assurance defines a static with the given name
+     *
+     * @param string $staticName
+     * @return bool
+     */
+    public function definesStatic($staticName);
+
+    /**
+     * Evaluates this assurance to a set of zero or more static results.
+     * If it meets its constraint then it will return true, otherwise false
+     *
+     * @param EvaluationContextInterface $evaluationContext
+     * @param StaticBagInterface $staticBag
+     * @return bool
+     */
+    public function evaluate(EvaluationContextInterface $evaluationContext, StaticBagInterface $staticBag);
+
+    /**
      * Fetches the constraint for this assurance type (one of the constants)
      *
      * @return string
@@ -38,28 +56,13 @@ interface AssuranceInterface
     public function getConstraint();
 
     /**
-     * Fetches the unique name for this assured value
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Fetches the type that this static must evaluate to
+     * Fetches the type that a static this assurance defines must evaluate to
      *
      * @param ValidationContextInterface $validationContext
+     * @param string $assuredStaticName
      * @return TypeInterface
      */
-    public function getType(ValidationContextInterface $validationContext);
-
-    /**
-     * Evaluates this assurance to a static result. If it meets its constraint
-     * then it will be returned, otherwise null
-     *
-     * @param EvaluationContextInterface $evaluationContext
-     * @return StaticInterface|null
-     */
-    public function toStatic(EvaluationContextInterface $evaluationContext);
+    public function getStaticType(ValidationContextInterface $validationContext, $assuredStaticName);
 
     /**
      * Checks that all operands for this assurance validate recursively and that they will only

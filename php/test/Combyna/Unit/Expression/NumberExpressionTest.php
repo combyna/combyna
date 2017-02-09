@@ -51,7 +51,7 @@ class NumberExpressionTest extends TestCase
     }
 
     /**
-     * @dataProvider numberProviderProvider
+     * @dataProvider numberProvider
      * @param number $number
      */
     public function testConstructorAllowsValidNumbers($number)
@@ -62,7 +62,7 @@ class NumberExpressionTest extends TestCase
     /**
      * @return array
      */
-    public function numberProviderProvider()
+    public function numberProvider()
     {
         return [
             'integer' => [21],
@@ -71,7 +71,7 @@ class NumberExpressionTest extends TestCase
     }
 
     /**
-     * @dataProvider nonNumberProviderWithTypeProvider
+     * @dataProvider nonNumberWithTypeProvider
      * @param mixed $nonNumber
      * @param string $type
      */
@@ -88,7 +88,7 @@ class NumberExpressionTest extends TestCase
     /**
      * @return array
      */
-    public function nonNumberProviderWithTypeProvider()
+    public function nonNumberWithTypeProvider()
     {
         return [
             'string' => ['hello', 'string'],

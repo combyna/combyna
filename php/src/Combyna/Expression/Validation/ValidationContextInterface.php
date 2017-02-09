@@ -62,20 +62,6 @@ interface ValidationContextInterface
     public function assertAssuredStaticExists($assuredStaticName);
 
     /**
-     * Checks that all specified expressions can only ever evaluate to the same types of expression.
-     * This allows expressions to know ahead of time what type of result they can have
-     *
-     * @param ExpressionInterface $firstExpression
-     * @param ExpressionInterface $secondExpression
-     * @param string $contextDescription A description of the context: eg. 'left operand'
-     */
-    public function assertIdenticalResultTypes(
-        ExpressionInterface $firstExpression,
-        ExpressionInterface $secondExpression,
-        $contextDescription
-    );
-
-    /**
      * Checks that the specified expression can only ever evaluate to match the static type
      * specified. If the expression is able to evaluate to a static type that doesn't match,
      * then a validation violation will be logged

@@ -11,6 +11,7 @@
 
 namespace Combyna\Unit\Expression\Assurance;
 
+use Combyna\Bag\StaticBagInterface;
 use Combyna\Evaluation\EvaluationContextInterface;
 use Combyna\Expression\Assurance\AssuranceInterface;
 use Combyna\Expression\Assurance\NonZeroNumberAssurance;
@@ -54,6 +55,11 @@ class NonZeroNumberAssuranceTest extends TestCase
     private $resultStatic;
 
     /**
+     * @var ObjectProphecy|StaticBagInterface
+     */
+    private $staticBag;
+
+    /**
      * @var ObjectProphecy|ValidationContextInterface
      */
     private $validationContext;
@@ -63,6 +69,7 @@ class NonZeroNumberAssuranceTest extends TestCase
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->inputExpression = $this->prophesize(ExpressionInterface::class);
         $this->resultStatic = $this->prophesize(NumberExpression::class);
+        $this->staticBag = $this->prophesize(StaticBagInterface::class);
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->inputExpression->toStatic(Argument::is($this->evaluationContext->reveal()))
@@ -74,43 +81,74 @@ class NonZeroNumberAssuranceTest extends TestCase
         $this->assurance = new NonZeroNumberAssurance($this->inputExpression->reveal(), 'my-static');
     }
 
+    public function testDefinesStaticReturnsTrueForTheSpecifiedName()
+    {
+        $this->assert($this->assurance->definesStatic('my-static'))->isTrue;
+    }
+
+    public function testDefinesStaticReturnsFalseForAnotherName()
+    {
+        $this->assert($this->assurance->definesStatic('not-my-static'))->isFalse;
+    }
+
     public function testGetConstraintReturnsCorrectValue()
     {
         $this->assert($this->assurance->getConstraint())->exactlyEquals(AssuranceInterface::NON_ZERO_NUMBER);
     }
 
-    public function testGetNameReturnsTheNameOfTheAssuredStatic()
-    {
-        $this->assert($this->assurance->getName())->exactlyEquals('my-static');
-    }
-
-    public function testGetTypeReturnsTheResultTypeOfTheExpression()
+    public function testGetTypeReturnsTheResultTypeOfTheExpressionWhenGivenTheCorrectStaticName()
     {
         $type = $this->prophesize(TypeInterface::class);
         $this->inputExpression->getResultType(Argument::is($this->validationContext->reveal()))
             ->willReturn($type);
 
-        $this->assert($this->assurance->getType($this->validationContext->reveal()))
+        $this->assert($this->assurance->getStaticType($this->validationContext->reveal(), 'my-static'))
             ->exactlyEquals($type->reveal());
     }
 
-    public function testToStaticReturnsTheStaticWhenItEvaluatesToANonZeroNumber()
+    public function testGetTypeThrowsExceptionWhenGivenTheWrongStaticName()
     {
-        $this->assert(
-            $this->assurance->toStatic($this->evaluationContext->reveal())
-        )->exactlyEquals($this->resultStatic->reveal());
+        $this->setExpectedException(
+            LogicException::class,
+            'NonZeroNumberAssurance only defines static "my-static" but was asked about "not-my-static"'
+        );
+
+        $this->assurance->getStaticType($this->validationContext->reveal(), 'not-my-static');
     }
 
-    public function testToStaticReturnsNullWhenItEvaluatesToZero()
+    public function testEvaluateReturnsTrueWhenTheExpressionEvaluatesToANonZeroNumber()
+    {
+        $this->assert(
+            $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
+        )->isTrue;
+    }
+
+    public function testEvaluateStoresTheStaticInTheBagWhenItEvaluatesToANonZeroNumber()
+    {
+        $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
+
+        $this->staticBag->setStatic('my-static', Argument::is($this->resultStatic->reveal()))->shouldHaveBeenCalled();
+    }
+
+    public function testEvaluateReturnsFalseWhenTheExpressionEvaluatesToZero()
     {
         $this->resultStatic->toNative()->willReturn(0);
 
         $this->assert(
-            $this->assurance->toStatic($this->evaluationContext->reveal())
-        )->isNull;
+            $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
+        )->isFalse;
     }
 
-    public function testToStaticThrowsExceptionWhenExpressionEvaluatesToANonNumber()
+    public function testEvaluateDoesNotStoreAnyStaticInTheBagWhenTheExpressionEvaluatesToZero()
+    {
+        $this->resultStatic->toNative()->willReturn(0);
+
+        $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
+
+        $this->staticBag->setStatic('my-static', Argument::any())->shouldNotHaveBeenCalled();
+    }
+
+    public function testEvaluateThrowsExceptionWhenExpressionEvaluatesToANonNumber()
     {
         $textStatic = $this->prophesize(TextExpression::class);
         $textStatic->getType()->willReturn('text');
@@ -122,7 +160,7 @@ class NonZeroNumberAssuranceTest extends TestCase
             'NonZeroNumberAssurance should receive a number, but got "text"'
         );
 
-        $this->assurance->toStatic($this->evaluationContext->reveal());
+        $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
     }
 
     public function testValidateValidatesTheExpression()

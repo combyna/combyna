@@ -11,6 +11,7 @@
 
 namespace Combyna\Expression\Assurance;
 
+use Combyna\Bag\StaticBagInterface;
 use Combyna\Evaluation\EvaluationContextInterface;
 use Combyna\Expression\ExpressionInterface;
 use Combyna\Expression\NumberExpression;
@@ -50,32 +51,15 @@ class NonZeroNumberAssurance implements AssuranceInterface
     /**
      * {@inheritdoc}
      */
-    public function getConstraint()
+    public function definesStatic($staticName)
     {
-        return self::NON_ZERO_NUMBER;
+        return $this->name === $staticName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getType(ValidationContextInterface $validationContext)
-    {
-        // The only possible type this assured static can evaluate to is the result type of its expression
-        return $this->inputExpression->getResultType($validationContext);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toStatic(EvaluationContextInterface $evaluationContext)
+    public function evaluate(EvaluationContextInterface $evaluationContext, StaticBagInterface $staticBag)
     {
         $resultStatic = $this->inputExpression->toStatic($evaluationContext);
 
@@ -88,10 +72,36 @@ class NonZeroNumberAssurance implements AssuranceInterface
 
         if ($resultStatic->toNative() === 0) {
             // Constraint not met
-            return null;
+            return false;
         }
 
-        return $resultStatic;
+        $staticBag->setStatic($this->name, $resultStatic);
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstraint()
+    {
+        return self::NON_ZERO_NUMBER;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticType(ValidationContextInterface $validationContext, $assuredStaticName)
+    {
+        if ($assuredStaticName !== $this->name) {
+            throw new LogicException(
+                'NonZeroNumberAssurance only defines static "' . $this->name .
+                '" but was asked about "' . $assuredStaticName . '"'
+            );
+        }
+
+        // The only possible type this assured static can evaluate to is the result type of its expression
+        return $this->inputExpression->getResultType($validationContext);
     }
 
     /**
