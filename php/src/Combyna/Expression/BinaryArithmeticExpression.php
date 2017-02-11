@@ -82,16 +82,6 @@ class BinaryArithmeticExpression extends AbstractExpression
         $leftOperandStatic = $this->leftOperandExpression->toStatic($subEvaluationContext);
         $rightOperandStatic = $this->rightOperandExpression->toStatic($subEvaluationContext);
 
-        if ($leftOperandStatic instanceof ErrorExpression) {
-            // A failure occurred just evaluating the operand, so just return that
-            return $leftOperandStatic;
-        }
-
-        if ($rightOperandStatic instanceof ErrorExpression) {
-            // A failure occurred just evaluating the operand, so just return that
-            return $rightOperandStatic;
-        }
-
         switch ($this->operator) {
             case self::ADD:
                 $result = $leftOperandStatic->toNative() + $rightOperandStatic->toNative();

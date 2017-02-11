@@ -22,6 +22,7 @@ use Combyna\Type\StaticType;
 use InvalidArgumentException;
 use LogicException;
 use Prophecy\Argument;
+use Prophecy\Call\Call;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
