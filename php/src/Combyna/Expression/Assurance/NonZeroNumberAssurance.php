@@ -36,7 +36,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
     /**
      * @var string
      */
-    private $name;
+    private $staticName;
 
     /**
      * @param ExpressionInterface $inputExpression
@@ -45,7 +45,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
     public function __construct(ExpressionInterface $inputExpression, $name)
     {
         $this->inputExpression = $inputExpression;
-        $this->name = $name;
+        $this->staticName = $name;
     }
 
     /**
@@ -53,7 +53,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
      */
     public function definesStatic($staticName)
     {
-        return $this->name === $staticName;
+        return $this->staticName === $staticName;
     }
 
     /**
@@ -75,7 +75,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
             return false;
         }
 
-        $staticBag->setStatic($this->name, $resultStatic);
+        $staticBag->setStatic($this->staticName, $resultStatic);
 
         return true;
     }
@@ -91,11 +91,19 @@ class NonZeroNumberAssurance implements AssuranceInterface
     /**
      * {@inheritdoc}
      */
+    public function getRequiredAssuredStaticNames()
+    {
+        return [$this->staticName];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStaticType(ValidationContextInterface $validationContext, $assuredStaticName)
     {
-        if ($assuredStaticName !== $this->name) {
+        if ($assuredStaticName !== $this->staticName) {
             throw new LogicException(
-                'NonZeroNumberAssurance only defines static "' . $this->name .
+                'NonZeroNumberAssurance only defines static "' . $this->staticName .
                 '" but was asked about "' . $assuredStaticName . '"'
             );
         }
