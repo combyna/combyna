@@ -66,6 +66,17 @@ interface ValidationContextInterface
     );
 
     /**
+     * Checks that the provided operator is included in the allowed set
+     *
+     * @param string $operator
+     * @param string[] $allowedOperators
+     */
+    public function assertOperator(
+        $operator,
+        array $allowedOperators
+    );
+
+    /**
      * Checks that the specified expression can only ever evaluate to match the static type
      * specified. If the expression is able to evaluate to a static type that doesn't match,
      * then a validation violation will be logged
