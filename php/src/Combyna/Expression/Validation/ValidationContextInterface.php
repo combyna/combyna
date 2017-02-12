@@ -58,8 +58,12 @@ interface ValidationContextInterface
      * Checks that an assured static exists with the given name in the hierarchy,
      *
      * @param string $assuredStaticName
+     * @param ValidationContextInterface $currentValidationContext
      */
-    public function assertAssuredStaticExists($assuredStaticName);
+    public function assertAssuredStaticExists(
+        $assuredStaticName,
+        ValidationContextInterface $currentValidationContext
+    );
 
     /**
      * Checks that the specified expression can only ever evaluate to match the static type
@@ -106,14 +110,6 @@ interface ValidationContextInterface
      * @return string
      */
     public function getPath();
-
-    /**
-     * Determines whether an assured static is defined in this context or one of its ancestors
-     *
-     * @param string $assuredStaticName
-     * @return bool
-     */
-    public function hasAssuredStaticDefinedInHierarchy($assuredStaticName);
 
     /**
      * Throws if any violations have been added to this context, does nothing otherwise

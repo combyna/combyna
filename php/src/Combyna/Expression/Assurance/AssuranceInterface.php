@@ -56,6 +56,14 @@ interface AssuranceInterface
     public function getConstraint();
 
     /**
+     * Fetches the names of any and all assured statics that this assurance will define
+     * that must be referenced by an AssuredExpression
+     *
+     * @return string[]
+     */
+    public function getRequiredAssuredStaticNames();
+
+    /**
      * Fetches the type that a static this assurance defines must evaluate to
      *
      * @param ValidationContextInterface $validationContext
