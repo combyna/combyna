@@ -30,7 +30,7 @@ class PegExpressionParser extends Basic
     NumberLiteral: value:/[0-9]+/ >
     StringLiteral: "\'" value:/[^']* / "\'" >
     Variable: variableName:/[\w_]+/ > !/[.(:]/ >
-    Value: (NumberLiteral | BooleanLiteral | StringLiteral | Variable) > | '(' > Expr > ')' >
+    Value: (NumberLiteral | BooleanLiteral | StringLiteral | Variable) > | '(' > Expression > ')' >
         function NumberLiteral( &$result, $sub ) {
             $result['node'] = [
                 'type' => 'number',
@@ -55,7 +55,7 @@ class PegExpressionParser extends Basic
                 'variable' => $sub['variableName']['text']
             ];
         }
-        function Expr( &$result, $sub ) {
+        function Expression( &$result, $sub ) {
             $result['node'] = $sub['node'] ;
         }
     Multiplication: '*' > operand:Value >

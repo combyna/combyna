@@ -192,6 +192,29 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
+            'overriding operator precedence with parentheses' => [
+                'first_var * (second_var + 4)',
+                [
+                    'type' => 'binary-arithmetic',
+                    'left' => [
+                        'type' => 'variable',
+                        'variable' => 'first_var'
+                    ],
+                    'operator' => '*',
+                    'right' => [
+                        'type' => 'binary-arithmetic',
+                        'left' => [
+                            'type' => 'variable',
+                            'variable' => 'second_var'
+                        ],
+                        'operator' => '+',
+                        'right' => [
+                            'type' => 'number',
+                            'number' => 4
+                        ]
+                    ]
+                ]
+            ],
             'all arithmetic operations nested' => [
                 '1 + 2 - 3 * 4 / 5',
                 [
