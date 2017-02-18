@@ -31,47 +31,47 @@ class PegExpressionParser extends Basic
     StringLiteral: "\'" value:/[^']* / "\'" >
     Variable: variableName:/[\w_]+/ > !/[.(:]/ >
     Value: (NumberLiteral | BooleanLiteral | StringLiteral | Variable) > | '(' > Expression > ')' >
-        function NumberLiteral( &$result, $sub ) {
+        function NumberLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'number',
                 'number' => (float) $sub['value']['text']
             ];
         }
-        function BooleanLiteral( &$result, $sub ) {
+        function BooleanLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'boolean',
                 'boolean' => ($sub['value']['text'] === 'true')
             ];
         }
-        function StringLiteral( &$result, $sub ) {
+        function StringLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'string',
                 'string' => $sub['value']['text']
             ];
         }
-        function Variable( &$result, $sub ) {
+        function Variable(&$result, $sub) {
             $result['node'] = [
                 'type' => 'variable',
                 'variable' => $sub['variableName']['text']
             ];
         }
-        function Expression( &$result, $sub ) {
-            $result['node'] = $sub['node'] ;
+        function Expression(&$result, $sub) {
+            $result['node'] = $sub['node'];
         }
     Multiplication: '*' > operand:Value >
     Division: '/' > operand:Value >
     Product: Value > ( Multiplication | Division ) *
-        function Value( &$result, $sub ) {
-            $result['node'] = $sub['node'] ;
+        function Value(&$result, $sub) {
+            $result['node'] = $sub['node'];
         }
-        function Multiplication( &$result, $sub ) {
+        function Multiplication(&$result, $sub) {
             $result['node'] = $this->buildBinaryArithmeticExpression(
                 $result['node'],
                 '*',
                 $sub['operand']['node']
             );
         }
-        function Division( &$result, $sub ) {
+        function Division(&$result, $sub) {
             $result['node'] = $this->buildBinaryArithmeticExpression(
                 $result['node'],
                 '/',
@@ -81,17 +81,17 @@ class PegExpressionParser extends Basic
     Addition: '+' > operand:Product >
     Subtraction: '-' > operand:Product >
     Sum: Product > ( Addition | Subtraction ) *
-        function Product( &$result, $sub ) {
-            $result['node'] = $sub['node'] ;
+        function Product(&$result, $sub) {
+            $result['node'] = $sub['node'];
         }
-        function Addition( &$result, $sub ) {
+        function Addition(&$result, $sub) {
             $result['node'] = $this->buildBinaryArithmeticExpression(
                 $result['node'],
                 '+',
                 $sub['operand']['node']
             );
         }
-        function Subtraction( &$result, $sub ) {
+        function Subtraction(&$result, $sub) {
             $result['node'] = $this->buildBinaryArithmeticExpression(
                 $result['node'],
                 '-',
@@ -103,31 +103,31 @@ class PegExpressionParser extends Basic
     CaseInsensitivelyEqual: '~=' > operand:Sum >
     CaseInsensitivelyUnequal: '~<>' > operand:Sum >
     Comparison: Sum > ( Equal | Unequal | CaseInsensitivelyEqual | CaseInsensitivelyUnequal ) *
-        function Sum( &$result, $sub ) {
-            $result['node'] = $sub['node'] ;
+        function Sum(&$result, $sub) {
+            $result['node'] = $sub['node'];
         }
-        function Equal( &$result, $sub ) {
+        function Equal(&$result, $sub) {
             $result['node'] = $this->buildComparisonExpression(
                 $result['node'],
                 '=',
                 $sub['operand']['node']
             );
         }
-        function Unequal( &$result, $sub ) {
+        function Unequal(&$result, $sub) {
             $result['node'] = $this->buildComparisonExpression(
                 $result['node'],
                 '<>',
                 $sub['operand']['node']
             );
         }
-        function CaseInsensitivelyEqual( &$result, $sub ) {
+        function CaseInsensitivelyEqual(&$result, $sub) {
             $result['node'] = $this->buildComparisonExpression(
                 $result['node'],
                 '~=',
                 $sub['operand']['node']
             );
         }
-        function CaseInsensitivelyUnequal( &$result, $sub ) {
+        function CaseInsensitivelyUnequal(&$result, $sub) {
             $result['node'] = $this->buildComparisonExpression(
                 $result['node'],
                 '~<>',
@@ -200,16 +200,16 @@ class PegExpressionParser extends Basic
             $result['node']['arguments'] = $sub['arguments'];
         }
     Expression: > (Comparison | StringLiteral | Builtin | Function)
-        function Comparison( &$result, $sub ) {
+        function Comparison(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
-        function StringLiteral( &$result, $sub ) {
+        function StringLiteral(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
-        function Builtin( &$result, $sub ) {
+        function Builtin(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
-        function Function( &$result, $sub ) {
+        function Function(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
     */
@@ -245,47 +245,4 @@ class PegExpressionParser extends Basic
             'right' => $right
         ];
     }
-
-
-
-
-
-    /*DIS!* Calculator
-    Number: /[0-9]+/
-    Value: Number > | '(' > Expr > ')' >
-        function Number( &$result, $sub ) {
-            $result['val'] = $sub['text'] ;
-        }
-        function Expr( &$result, $sub ) {
-            $result['val'] = $sub['val'] ;
-        }
-    Times: '*' > operand:Value >
-    Div: '/' > operand:Value >
-    Product: Value > ( Times | Div ) *
-        function Value( &$result, $sub ) {
-            $result['val'] = $sub['val'] ;
-        }
-        function Times( &$result, $sub ) {
-            $result['val'] *= $sub['operand']['val'] ;
-        }
-        function Div( &$result, $sub ) {
-            $result['val'] /= $sub['operand']['val'] ;
-        }
-    Plus: '+' > operand:Product >
-    Minus: '-' > operand:Product >
-    Sum: Product > ( Plus | Minus ) *
-        function Product( &$result, $sub ) {
-            $result['val'] = $sub['val'] ;
-        }
-        function Plus( &$result, $sub ) {
-            $result['val'] += $sub['operand']['val'] ;
-        }
-        function Minus( &$result, $sub ) {
-            $result['val'] -= $sub['operand']['val'] ;
-        }
-    Expr: Sum
-        function Sum( &$result, $sub ) {
-            $result['val'] = $sub['val'] ;
-        }
-    */
 }
