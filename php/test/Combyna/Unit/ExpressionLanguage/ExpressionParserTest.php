@@ -214,15 +214,17 @@ class ExpressionParserTest extends TestCase
                 [
                     'type' => 'builtin',
                     'name' => 'my_builtin',
-                    'arguments' => []
+                    'positional-arguments' => [],
+                    'named-arguments' => []
                 ]
             ],
-            'builtin call with one argument' => [
+            'builtin call with one named argument' => [
                 'my_builtin(only: 101)',
                 [
                     'type' => 'builtin',
                     'name' => 'my_builtin',
-                    'arguments' => [
+                    'positional-arguments' => [],
+                    'named-arguments' => [
                         'only' => [
                             'type' => 'number',
                             'number' => 101
@@ -230,12 +232,36 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
-            'builtin call with two arguments' => [
-                'my_builtin(first: 27, second: \'hello\')',
+            'builtin call with one positional argument' => [
+                'my_builtin(\'my stuff\')',
                 [
                     'type' => 'builtin',
                     'name' => 'my_builtin',
-                    'arguments' => [
+                    'positional-arguments' => [
+                        [
+                            'type' => 'string',
+                            'string' => 'my stuff'
+                        ]
+                    ],
+                    'named-arguments' => []
+                ]
+            ],
+            'builtin call with two positional and two named arguments' => [
+                'my_builtin(101, 9999, first: 27, second: \'hello\')',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'positional-arguments' => [
+                        [
+                            'type' => 'number',
+                            'number' => 101
+                        ],
+                        [
+                            'type' => 'number',
+                            'number' => 9999
+                        ]
+                    ],
+                    'named-arguments' => [
                         'first' => [
                             'type' => 'number',
                             'number' => 27
@@ -247,12 +273,13 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
-            'builtin call with three arguments' => [
+            'builtin call with three named arguments' => [
                 'my_builtin(firstArg: 27, secondArg: 100, thirdArg: \'hello\')',
                 [
                     'type' => 'builtin',
                     'name' => 'my_builtin',
-                    'arguments' => [
+                    'positional-arguments' => [],
+                    'named-arguments' => [
                         'firstArg' => [
                             'type' => 'number',
                             'number' => 27
@@ -268,12 +295,13 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
-            'builtin call with expression nested inside argument' => [
+            'builtin call with expression nested inside named arguments' => [
                 'my_builtin(arg1: 10 * 2, arg2: \'hello\')',
                 [
                     'type' => 'builtin',
                     'name' => 'my_builtin',
-                    'arguments' => [
+                    'positional-arguments' => [],
+                    'named-arguments' => [
                         'arg1' => [
                             'type' => 'binary-arithmetic',
                             'left' => [

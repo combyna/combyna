@@ -136,37 +136,49 @@ class PegExpressionParser extends Basic
         {
             $result['argument'] = $sub['node'];
         }
-    SingleArgument: NamedArgument >
-        function NamedArgument(&$result, $sub)
+    PositionalArgument: Expression >
+        function Expression(&$result, $sub)
         {
-            $result['arguments'] = [
-                $sub['parameterName'] => $sub['argument']
-            ];
+            $result['argument'] = $sub['node'];
         }
-    ArgumentList: NamedArgument > ("," > NamedArgument >)+
+    PositionalArgumentList: PositionalArgument > ("," > PositionalArgument >)*
+        function PositionalArgument(&$result, $sub)
+        {
+            // Called for each matched argument
+            $result['arguments'][] = $sub['argument'];
+        }
+    NamedArgumentList: NamedArgument > ("," > NamedArgument >)*
         function NamedArgument(&$result, $sub)
         {
             // Called for each matched argument
             $result['arguments'][$sub['parameterName']] = $sub['argument'];
         }
-    Builtin: (builtinName:/[\w_]+/) > "(" > (ArgumentList | SingleArgument)? ")" >
+    Builtin: (builtinName:/[\w_]+/) >
+            "(" >
+            (
+                (PositionalArgumentList > "," > NamedArgumentList) |
+                NamedArgumentList |
+                PositionalArgumentList
+            )? >
+            ")" >
         function builtinName(&$result, $sub)
         {
             $result['node'] = [
                 'type' => 'builtin',
                 'name' => $sub['text'],
-                'arguments' => []
+                'positional-arguments' => [],
+                'named-arguments' => []
             ];
         }
-        function ArgumentList(&$result, $sub)
+        function PositionalArgumentList(&$result, $sub)
         {
-            $result['node']['arguments'] = $sub['arguments'];
+            $result['node']['positional-arguments'] = $sub['arguments'];
         }
-        function SingleArgument(&$result, $sub)
+        function NamedArgumentList(&$result, $sub)
         {
-            $result['node']['arguments'] = $sub['arguments'];
+            $result['node']['named-arguments'] = $sub['arguments'];
         }
-    Function: locator:((libraryName:/[\w_]+/) "." (functionName:/[\w_]+/)) > "(" > (ArgumentList | SingleArgument)? ")" >
+    Function: locator:((libraryName:/[\w_]+/) "." (functionName:/[\w_]+/)) > "(" > NamedArgumentList? ")" >
         function locator(&$result, $sub)
         {
             $result['node'] = [
@@ -176,11 +188,7 @@ class PegExpressionParser extends Basic
                 'arguments' => []
             ];
         }
-        function ArgumentList(&$result, $sub)
-        {
-            $result['node']['arguments'] = $sub['arguments'];
-        }
-        function SingleArgument(&$result, $sub)
+        function NamedArgumentList(&$result, $sub)
         {
             $result['node']['arguments'] = $sub['arguments'];
         }
