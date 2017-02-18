@@ -45,8 +45,8 @@ class PegExpressionParser extends Basic
         }
         function StringLiteral(&$result, $sub) {
             $result['node'] = [
-                'type' => 'string',
-                'string' => $sub['value']['text']
+                'type' => 'text',
+                'text' => $sub['value']['text']
             ];
         }
         function Variable(&$result, $sub) {

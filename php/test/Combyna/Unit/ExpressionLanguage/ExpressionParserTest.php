@@ -66,11 +66,11 @@ class ExpressionParserTest extends TestCase
                     'number' => 21
                 ]
             ],
-            'plain string' => [
+            'plain text' => [
                 '\'Hello world\'',
                 [
-                    'type' => 'string',
-                    'string' => 'Hello world'
+                    'type' => 'text',
+                    'text' => 'Hello world'
                 ]
             ],
             'plain boolean true' => [
@@ -284,8 +284,8 @@ class ExpressionParserTest extends TestCase
                     'name' => 'my_builtin',
                     'positional-arguments' => [
                         [
-                            'type' => 'string',
-                            'string' => 'my stuff'
+                            'type' => 'text',
+                            'text' => 'my stuff'
                         ]
                     ],
                     'named-arguments' => []
@@ -312,8 +312,8 @@ class ExpressionParserTest extends TestCase
                             'number' => 27
                         ],
                         'second' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -334,8 +334,8 @@ class ExpressionParserTest extends TestCase
                             'number' => 100
                         ],
                         'thirdArg' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -360,8 +360,8 @@ class ExpressionParserTest extends TestCase
                             ]
                         ],
                         'arg2' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -401,8 +401,8 @@ class ExpressionParserTest extends TestCase
                             'number' => 27
                         ],
                         'second' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -423,8 +423,8 @@ class ExpressionParserTest extends TestCase
                             'number' => 100
                         ],
                         'thirdArg' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -449,8 +449,8 @@ class ExpressionParserTest extends TestCase
                             ]
                         ],
                         'arg2' => [
-                            'type' => 'string',
-                            'string' => 'hello'
+                            'type' => 'text',
+                            'text' => 'hello'
                         ]
                     ]
                 ]
@@ -470,63 +470,63 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
-            'comparing whether two strings are equal, case-sensitively' => [
+            'comparing whether two texts are equal, case-sensitively' => [
                 '\'hello\' = \'world\'',
                 [
                     'type' => 'comparison',
                     'left' => [
-                        'type' => 'string',
-                        'string' => 'hello'
+                        'type' => 'text',
+                        'text' => 'hello'
                     ],
                     'operator' => '=',
                     'right' => [
-                        'type' => 'string',
-                        'string' => 'world'
+                        'type' => 'text',
+                        'text' => 'world'
                     ]
                 ]
             ],
-            'comparing whether two strings are equal, case-insensitively' => [
+            'comparing whether two texts are equal, case-insensitively' => [
                 '\'hello\' ~= \'world\'',
                 [
                     'type' => 'comparison',
                     'left' => [
-                        'type' => 'string',
-                        'string' => 'hello'
+                        'type' => 'text',
+                        'text' => 'hello'
                     ],
                     'operator' => '~=',
                     'right' => [
-                        'type' => 'string',
-                        'string' => 'world'
+                        'type' => 'text',
+                        'text' => 'world'
                     ]
                 ]
             ],
-            'comparing whether two strings are unequal, case-sensitively' => [
+            'comparing whether two texts are unequal, case-sensitively' => [
                 '\'hello\' <> \'world\'',
                 [
                     'type' => 'comparison',
                     'left' => [
-                        'type' => 'string',
-                        'string' => 'hello'
+                        'type' => 'text',
+                        'text' => 'hello'
                     ],
                     'operator' => '<>',
                     'right' => [
-                        'type' => 'string',
-                        'string' => 'world'
+                        'type' => 'text',
+                        'text' => 'world'
                     ]
                 ]
             ],
-            'comparing whether two strings are unequal, case-insensitively' => [
+            'comparing whether two texts are unequal, case-insensitively' => [
                 '\'hello\' ~<> \'world\'',
                 [
                     'type' => 'comparison',
                     'left' => [
-                        'type' => 'string',
-                        'string' => 'hello'
+                        'type' => 'text',
+                        'text' => 'hello'
                     ],
                     'operator' => '~<>',
                     'right' => [
-                        'type' => 'string',
-                        'string' => 'world'
+                        'type' => 'text',
+                        'text' => 'world'
                     ]
                 ]
             ]
