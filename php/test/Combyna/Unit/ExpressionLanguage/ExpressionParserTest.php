@@ -87,6 +87,13 @@ class ExpressionParserTest extends TestCase
                     'boolean' => false
                 ]
             ],
+            'plain variable reference' => [
+                'my_var',
+                [
+                    'type' => 'variable',
+                    'variable' => 'my_var'
+                ]
+            ],
             'adding two numbers' => [
                 '12 + 4',
                 [
@@ -167,6 +174,21 @@ class ExpressionParserTest extends TestCase
                     'right' => [
                         'type' => 'number',
                         'number' => 3
+                    ]
+                ]
+            ],
+            'adding a number to a variable' => [
+                'a_var + 21',
+                [
+                    'type' => 'binary-arithmetic',
+                    'left' => [
+                        'type' => 'variable',
+                        'variable' => 'a_var'
+                    ],
+                    'operator' => '+',
+                    'right' => [
+                        'type' => 'number',
+                        'number' => 21
                     ]
                 ]
             ],

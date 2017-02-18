@@ -26,26 +26,33 @@ use hafriedlander\Peg\Parser\Basic;
 class PegExpressionParser extends Basic
 {
     /*!* PegExpressionParser
-    BooleanLiteral: /\b(true|false)\b/ >
-    NumberLiteral: /[0-9]+/ >
-    StringLiteral: "\'" inside:/[^']* / "\'" >
-    Value: (NumberLiteral | BooleanLiteral | StringLiteral) > | '(' > Expr > ')' >
+    BooleanLiteral: value:/\b(true|false)\b/ >
+    NumberLiteral: value:/[0-9]+/ >
+    StringLiteral: "\'" value:/[^']* / "\'" >
+    Variable: variableName:/[\w_]+/ > !/[.(:]/ >
+    Value: (NumberLiteral | BooleanLiteral | StringLiteral | Variable) > | '(' > Expr > ')' >
         function NumberLiteral( &$result, $sub ) {
             $result['node'] = [
                 'type' => 'number',
-                'number' => (float) $sub['text']
+                'number' => (float) $sub['value']['text']
             ];
         }
         function BooleanLiteral( &$result, $sub ) {
             $result['node'] = [
                 'type' => 'boolean',
-                'boolean' => ($sub['text'] === 'true')
+                'boolean' => ($sub['value']['text'] === 'true')
             ];
         }
         function StringLiteral( &$result, $sub ) {
             $result['node'] = [
                 'type' => 'string',
-                'string' => $sub['inside']['text']
+                'string' => $sub['value']['text']
+            ];
+        }
+        function Variable( &$result, $sub ) {
+            $result['node'] = [
+                'type' => 'variable',
+                'variable' => $sub['variableName']['text']
             ];
         }
         function Expr( &$result, $sub ) {
