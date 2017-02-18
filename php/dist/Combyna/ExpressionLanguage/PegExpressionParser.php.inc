@@ -93,7 +93,9 @@ class PegExpressionParser extends Basic
         }
     Equal: '=' > operand:Sum >
     Unequal: '<>' > operand:Sum >
-    Comparison: Sum > ( Equal | Unequal ) *
+    CaseInsensitivelyEqual: '~=' > operand:Sum >
+    CaseInsensitivelyUnequal: '~<>' > operand:Sum >
+    Comparison: Sum > ( Equal | Unequal | CaseInsensitivelyEqual | CaseInsensitivelyUnequal ) *
         function Sum( &$result, $sub ) {
             $result['node'] = $sub['node'] ;
         }
@@ -108,6 +110,20 @@ class PegExpressionParser extends Basic
             $result['node'] = $this->buildComparisonExpression(
                 $result['node'],
                 '<>',
+                $sub['operand']['node']
+            );
+        }
+        function CaseInsensitivelyEqual( &$result, $sub ) {
+            $result['node'] = $this->buildComparisonExpression(
+                $result['node'],
+                '~=',
+                $sub['operand']['node']
+            );
+        }
+        function CaseInsensitivelyUnequal( &$result, $sub ) {
+            $result['node'] = $this->buildComparisonExpression(
+                $result['node'],
+                '~<>',
                 $sub['operand']['node']
             );
         }
@@ -133,11 +149,11 @@ class PegExpressionParser extends Basic
             // Called for each matched argument
             $result['arguments'][$sub['parameterName']] = $sub['argument'];
         }
-    Function: (functionName:/[\w_]+/) > "(" > (ArgumentList | SingleArgument)? ")" >
-        function functionName(&$result, $sub)
+    Builtin: (builtinName:/[\w_]+/) > "(" > (ArgumentList | SingleArgument)? ")" >
+        function builtinName(&$result, $sub)
         {
             $result['node'] = [
-                'type' => 'function',
+                'type' => 'builtin',
                 'name' => $sub['text'],
                 'arguments' => []
             ];
@@ -150,11 +166,32 @@ class PegExpressionParser extends Basic
         {
             $result['node']['arguments'] = $sub['arguments'];
         }
-    Expression: > (Comparison | StringLiteral | Function)
+    Function: locator:((libraryName:/[\w_]+/) "." (functionName:/[\w_]+/)) > "(" > (ArgumentList | SingleArgument)? ")" >
+        function locator(&$result, $sub)
+        {
+            $result['node'] = [
+                'type' => 'function',
+                'library' => $sub['libraryName']['text'],
+                'name' => $sub['functionName']['text'],
+                'arguments' => []
+            ];
+        }
+        function ArgumentList(&$result, $sub)
+        {
+            $result['node']['arguments'] = $sub['arguments'];
+        }
+        function SingleArgument(&$result, $sub)
+        {
+            $result['node']['arguments'] = $sub['arguments'];
+        }
+    Expression: > (Comparison | StringLiteral | Builtin | Function)
         function Comparison( &$result, $sub ) {
             $result['node'] = $sub['node'];
         }
         function StringLiteral( &$result, $sub ) {
+            $result['node'] = $sub['node'];
+        }
+        function Builtin( &$result, $sub ) {
             $result['node'] = $sub['node'];
         }
         function Function( &$result, $sub ) {

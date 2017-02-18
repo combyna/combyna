@@ -209,18 +209,104 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
+            'builtin call with no arguments' => [
+                'my_builtin()',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'arguments' => []
+                ]
+            ],
+            'builtin call with one argument' => [
+                'my_builtin(only: 101)',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'arguments' => [
+                        'only' => [
+                            'type' => 'number',
+                            'number' => 101
+                        ]
+                    ]
+                ]
+            ],
+            'builtin call with two arguments' => [
+                'my_builtin(first: 27, second: \'hello\')',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'arguments' => [
+                        'first' => [
+                            'type' => 'number',
+                            'number' => 27
+                        ],
+                        'second' => [
+                            'type' => 'string',
+                            'string' => 'hello'
+                        ]
+                    ]
+                ]
+            ],
+            'builtin call with three arguments' => [
+                'my_builtin(firstArg: 27, secondArg: 100, thirdArg: \'hello\')',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'arguments' => [
+                        'firstArg' => [
+                            'type' => 'number',
+                            'number' => 27
+                        ],
+                        'secondArg' => [
+                            'type' => 'number',
+                            'number' => 100
+                        ],
+                        'thirdArg' => [
+                            'type' => 'string',
+                            'string' => 'hello'
+                        ]
+                    ]
+                ]
+            ],
+            'builtin call with expression nested inside argument' => [
+                'my_builtin(arg1: 10 * 2, arg2: \'hello\')',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'arguments' => [
+                        'arg1' => [
+                            'type' => 'binary-arithmetic',
+                            'left' => [
+                                'type' => 'number',
+                                'number' => 10
+                            ],
+                            'operator' => '*',
+                            'right' => [
+                                'type' => 'number',
+                                'number' => 2
+                            ]
+                        ],
+                        'arg2' => [
+                            'type' => 'string',
+                            'string' => 'hello'
+                        ]
+                    ]
+                ]
+            ],
             'function call with no arguments' => [
-                'my_func()',
+                'my_lib.my_func()',
                 [
                     'type' => 'function',
+                    'library' => 'my_lib',
                     'name' => 'my_func',
                     'arguments' => []
                 ]
             ],
             'function call with one argument' => [
-                'my_func(only: 101)',
+                'my_lib.my_func(only: 101)',
                 [
                     'type' => 'function',
+                    'library' => 'my_lib',
                     'name' => 'my_func',
                     'arguments' => [
                         'only' => [
@@ -231,9 +317,10 @@ class ExpressionParserTest extends TestCase
                 ]
             ],
             'function call with two arguments' => [
-                'my_func(first: 27, second: \'hello\')',
+                'my_lib.my_func(first: 27, second: \'hello\')',
                 [
                     'type' => 'function',
+                    'library' => 'my_lib',
                     'name' => 'my_func',
                     'arguments' => [
                         'first' => [
@@ -248,9 +335,10 @@ class ExpressionParserTest extends TestCase
                 ]
             ],
             'function call with three arguments' => [
-                'my_func(firstArg: 27, secondArg: 100, thirdArg: \'hello\')',
+                'my_lib.my_func(firstArg: 27, secondArg: 100, thirdArg: \'hello\')',
                 [
                     'type' => 'function',
+                    'library' => 'my_lib',
                     'name' => 'my_func',
                     'arguments' => [
                         'firstArg' => [
@@ -269,9 +357,10 @@ class ExpressionParserTest extends TestCase
                 ]
             ],
             'function call with expression nested inside argument' => [
-                'my_func(arg1: 10 * 2, arg2: \'hello\')',
+                'my_lib.my_func(arg1: 10 * 2, arg2: \'hello\')',
                 [
                     'type' => 'function',
+                    'library' => 'my_lib',
                     'name' => 'my_func',
                     'arguments' => [
                         'arg1' => [
@@ -308,6 +397,36 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
+            'comparing whether two strings are equal, case-sensitively' => [
+                '\'hello\' = \'world\'',
+                [
+                    'type' => 'comparison',
+                    'left' => [
+                        'type' => 'string',
+                        'string' => 'hello'
+                    ],
+                    'operator' => '=',
+                    'right' => [
+                        'type' => 'string',
+                        'string' => 'world'
+                    ]
+                ]
+            ],
+            'comparing whether two strings are equal, case-insensitively' => [
+                '\'hello\' ~= \'world\'',
+                [
+                    'type' => 'comparison',
+                    'left' => [
+                        'type' => 'string',
+                        'string' => 'hello'
+                    ],
+                    'operator' => '~=',
+                    'right' => [
+                        'type' => 'string',
+                        'string' => 'world'
+                    ]
+                ]
+            ],
             'comparing whether two strings are unequal, case-sensitively' => [
                 '\'hello\' <> \'world\'',
                 [
@@ -317,6 +436,21 @@ class ExpressionParserTest extends TestCase
                         'string' => 'hello'
                     ],
                     'operator' => '<>',
+                    'right' => [
+                        'type' => 'string',
+                        'string' => 'world'
+                    ]
+                ]
+            ],
+            'comparing whether two strings are unequal, case-insensitively' => [
+                '\'hello\' ~<> \'world\'',
+                [
+                    'type' => 'comparison',
+                    'left' => [
+                        'type' => 'string',
+                        'string' => 'hello'
+                    ],
+                    'operator' => '~<>',
                     'right' => [
                         'type' => 'string',
                         'string' => 'world'
