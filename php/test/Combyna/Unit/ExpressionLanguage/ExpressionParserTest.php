@@ -94,6 +94,33 @@ class ExpressionParserTest extends TestCase
                     'variable' => 'my_var'
                 ]
             ],
+            'empty list expression' => [
+                '[]',
+                [
+                    'type' => 'list',
+                    'elements' => []
+                ]
+            ],
+            'plain list expression' => [
+                '[21, \'my text\', 101]',
+                [
+                    'type' => 'list',
+                    'elements' => [
+                        [
+                            'type' => 'number',
+                            'number' => 21
+                        ],
+                        [
+                            'type' => 'text',
+                            'text' => 'my text'
+                        ],
+                        [
+                            'type' => 'number',
+                            'number' => 101
+                        ]
+                    ]
+                ]
+            ],
             'adding two numbers' => [
                 '12 + 4',
                 [
@@ -286,6 +313,25 @@ class ExpressionParserTest extends TestCase
                         [
                             'type' => 'text',
                             'text' => 'my stuff'
+                        ]
+                    ],
+                    'named-arguments' => []
+                ]
+            ],
+            'builtin call with one positional argument passing a list' => [
+                'my_builtin([21])',
+                [
+                    'type' => 'builtin',
+                    'name' => 'my_builtin',
+                    'positional-arguments' => [
+                        [
+                            'type' => 'list',
+                            'elements' => [
+                                [
+                                    'type' => 'number',
+                                    'number' => 21
+                                ]
+                            ]
                         ]
                     ],
                     'named-arguments' => []

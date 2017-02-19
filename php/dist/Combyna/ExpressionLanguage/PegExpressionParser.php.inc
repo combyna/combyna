@@ -30,7 +30,18 @@ class PegExpressionParser extends Basic
     NumberLiteral: value:/[0-9]+/ >
     StringLiteral: "\'" value:/[^']* / "\'" >
     Variable: variableName:/[\w_]+/ > !/[.(:]/ >
-    Value: (NumberLiteral | BooleanLiteral | StringLiteral | Variable) > | '(' > Expression > ')' >
+    ElementList: Expression > ("," > Expression >)*
+        function Expression(&$result, $sub)
+        {
+            // Called for each matched element
+            $result['elements'][] = $sub['node'];
+        }
+    List: "[" > elements:(:ElementList?) > "]" >
+        function elements(&$result, $sub)
+        {
+            $result['elements'] = isset($sub['ElementList']) ? $sub['ElementList']['elements'] : [];
+        }
+    Value: (NumberLiteral | BooleanLiteral | List | StringLiteral | Variable) > | '(' > Expression > ')' >
         function NumberLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'number',
@@ -41,6 +52,12 @@ class PegExpressionParser extends Basic
             $result['node'] = [
                 'type' => 'boolean',
                 'boolean' => ($sub['value']['text'] === 'true')
+            ];
+        }
+        function List(&$result, $sub) {
+            $result['node'] = [
+                'type' => 'list',
+                'elements' => $sub['elements']
             ];
         }
         function StringLiteral(&$result, $sub) {
