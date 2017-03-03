@@ -59,11 +59,18 @@ class ExpressionParserTest extends TestCase
     public function expressionToExpectedAstProvider()
     {
         return [
-            'plain number' => [
+            'plain integer' => [
                 '21',
                 [
                     'type' => 'number',
                     'number' => 21
+                ]
+            ],
+            'plain float' => [
+                '101.123',
+                [
+                    'type' => 'number',
+                    'number' => 101.123
                 ]
             ],
             'plain text' => [
@@ -573,6 +580,50 @@ class ExpressionParserTest extends TestCase
                     'right' => [
                         'type' => 'text',
                         'text' => 'world'
+                    ]
+                ]
+            ],
+            'concatenating a variable with a string (static concatenation)' => [
+                'my_prefix_string ~ \' my suffix\'',
+                [
+                    'type' => 'concatenation',
+                    'list' => [
+                        // List operand is implicit in this static version
+                        'type' => 'list',
+                        'elements' => [
+                            [
+                                'type' => 'variable',
+                                'variable' => 'my_prefix_string'
+                            ],
+                            [
+                                'type' => 'text',
+                                'text' => ' my suffix'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'concatenating a sequence of expressions (static concatenation)' => [
+                'my_prefix_string ~ 21.2 ~ \' my suffix\'',
+                [
+                    'type' => 'concatenation',
+                    'list' => [
+                        // List operand is implicit in this static version
+                        'type' => 'list',
+                        'elements' => [
+                            [
+                                'type' => 'variable',
+                                'variable' => 'my_prefix_string'
+                            ],
+                            [
+                                'type' => 'number',
+                                'number' => 21.2
+                            ],
+                            [
+                                'type' => 'text',
+                                'text' => ' my suffix'
+                            ]
+                        ]
                     ]
                 ]
             ]

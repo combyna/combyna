@@ -27,7 +27,7 @@ class PegExpressionParser extends Basic
 {
     /*!* PegExpressionParser
     BooleanLiteral: value:/\b(true|false)\b/ >
-    NumberLiteral: value:/[0-9]+/ >
+    NumberLiteral: value:/\d+(\.\d+)?/ >
     StringLiteral: "\'" value:/[^']* / "\'" >
     Variable: variableName:/[\w_]+/ > !/[.(:]/ >
     ElementList: Expression > ("," > Expression >)*
@@ -41,7 +41,17 @@ class PegExpressionParser extends Basic
         {
             $result['elements'] = isset($sub['ElementList']) ? $sub['ElementList']['elements'] : [];
         }
-    Value: (NumberLiteral | BooleanLiteral | List | StringLiteral | Variable) > | '(' > Expression > ')' >
+    Value:
+            (
+                NumberLiteral |
+                BooleanLiteral |
+                List |
+                StringLiteral |
+                Builtin |
+                Function |
+                Variable
+            ) > |
+            '(' > Expression > ')' >
         function NumberLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'number',
@@ -65,6 +75,12 @@ class PegExpressionParser extends Basic
                 'type' => 'text',
                 'text' => $sub['value']['text']
             ];
+        }
+        function Builtin(&$result, $sub) {
+            $result['node'] = $sub['node'];
+        }
+        function Function(&$result, $sub) {
+            $result['node'] = $sub['node'];
         }
         function Variable(&$result, $sub) {
             $result['node'] = [
@@ -115,12 +131,33 @@ class PegExpressionParser extends Basic
                 $sub['operand']['node']
             );
         }
-    Equal: '=' > operand:Sum >
-    Unequal: '<>' > operand:Sum >
-    CaseInsensitivelyEqual: '~=' > operand:Sum >
-    CaseInsensitivelyUnequal: '~<>' > operand:Sum >
-    Comparison: Sum > ( Equal | Unequal | CaseInsensitivelyEqual | CaseInsensitivelyUnequal ) *
+    Append: '~' > operand:Sum >
+    Concatenation: Sum > ( Append ) *
         function Sum(&$result, $sub) {
+            $result['node'] = $sub['node'];
+        }
+        function Append(&$result, $sub) {
+            if (isset($result['node']['type']) && $result['node']['type'] === 'concatenation') {
+                $result['node']['list']['elements'][] = $sub['operand']['node'];
+            } else {
+                $result['node'] = [
+                    'type' => 'concatenation',
+                    'list' => [
+                        'type' => 'list',
+                        'elements' => [
+                            $result['node'],
+                            $sub['operand']['node']
+                        ]
+                    ]
+                ];
+            }
+        }
+    Equal: '=' > operand:Concatenation >
+    Unequal: '<>' > operand:Concatenation >
+    CaseInsensitivelyEqual: '~=' > operand:Concatenation >
+    CaseInsensitivelyUnequal: '~<>' > operand:Concatenation >
+    Comparison: Concatenation > ( Equal | Unequal | CaseInsensitivelyEqual | CaseInsensitivelyUnequal ) *
+        function Concatenation(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
         function Equal(&$result, $sub) {
@@ -216,20 +253,14 @@ class PegExpressionParser extends Basic
         {
             $result['node']['arguments'] = $sub['arguments'];
         }
-    Expression: > (Comparison | StringLiteral | Builtin | Function)
+    Expression: > Comparison
         function Comparison(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
-        function StringLiteral(&$result, $sub) {
-            $result['node'] = $sub['node'];
-        }
-        function Builtin(&$result, $sub) {
-            $result['node'] = $sub['node'];
-        }
-        function Function(&$result, $sub) {
-            $result['node'] = $sub['node'];
-        }
     */
+
+    // Comparison just happens to currently be the expression with the highest precedence,
+    // which is why the top-level Expression references it
 
     /**
      * @param string $left
