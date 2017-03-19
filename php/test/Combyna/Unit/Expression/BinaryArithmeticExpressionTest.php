@@ -11,14 +11,14 @@
 
 namespace Combyna\Unit\Expression;
 
-use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\BinaryArithmeticExpression;
-use Combyna\Expression\ExpressionFactoryInterface;
-use Combyna\Expression\ExpressionInterface;
-use Combyna\Expression\NumberExpression;
-use Combyna\Expression\Validation\ValidationContextInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\BinaryArithmeticExpression;
+use Combyna\Component\Expression\ExpressionFactoryInterface;
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Type\StaticType;
+use Combyna\Component\Type\StaticType;
 use InvalidArgumentException;
 use LogicException;
 use Prophecy\Argument;
@@ -287,7 +287,7 @@ class BinaryArithmeticExpressionTest extends TestCase
             $this->rightOperandExpression->reveal()
         );
 
-        $this->evaluationContext->createSubContext(Argument::is($this->expression))
+        $this->evaluationContext->createSubScopeContext(Argument::is($this->expression))
             ->willReturn($this->subEvaluationContext->reveal());
         $this->validationContext->createSubContext(Argument::is($this->expression))
             ->willReturn($this->subValidationContext->reveal());

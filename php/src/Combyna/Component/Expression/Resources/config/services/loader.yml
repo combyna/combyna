@@ -1,0 +1,91 @@
+services:
+    combyna.expression.loader.assured:
+        class: Combyna\Component\Expression\Config\Loader\AssuredExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.expression.loader.binary_arithmetic:
+        class: Combyna\Component\Expression\Config\Loader\BinaryArithmeticExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.boolean:
+        class: Combyna\Component\Expression\Config\Loader\BooleanExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.builtin:
+        class: Combyna\Component\Expression\Config\Loader\BuiltinExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.comparison:
+        class: Combyna\Component\Expression\Config\Loader\ComparisonExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.concatenation:
+        class: Combyna\Component\Expression\Config\Loader\ConcatenationExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.conditional:
+        class: Combyna\Component\Expression\Config\Loader\ConditionalExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader:
+        class: Combyna\Component\Expression\Config\Loader\DelegatingExpressionLoader
+        autowire: true
+        # Ensure autowiring picks the DelegatingExpressionLoader when typehinting for this interface,
+        # rather than its sub-interfaces/classes like BooleanExpressionLoader etc.
+        autowiring_types: Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface
+
+    combyna.expression.loader.function:
+        class: Combyna\Component\Expression\Config\Loader\FunctionExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.list:
+        class: Combyna\Component\Expression\Config\Loader\ListExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.number_conversion:
+        class: Combyna\Component\Expression\Config\Loader\NumberConversionExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.expression.loader.number:
+        class: Combyna\Component\Expression\Config\Loader\NumberExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.text_conversion:
+        class: Combyna\Component\Expression\Config\Loader\TextConversionExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.expression.loader.text:
+        class: Combyna\Component\Expression\Config\Loader\TextExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
+    combyna.expression.loader.variable:
+        class: Combyna\Component\Expression\Config\Loader\VariableExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}

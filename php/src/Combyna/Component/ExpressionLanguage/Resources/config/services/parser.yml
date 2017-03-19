@@ -1,0 +1,4 @@
+services:
+    combyna.expression_language.parser:
+        class: Combyna\Component\ExpressionLanguage\ExpressionParser
+        autowire: true

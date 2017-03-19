@@ -1,0 +1,6 @@
+services:
+    combyna.expression_language.expression_node_visitor:
+        class: Combyna\Component\ExpressionLanguage\ExpressionNodeVisitor
+        autowire: true
+        tags:
+            - {name: combyna.config_node_visitor}

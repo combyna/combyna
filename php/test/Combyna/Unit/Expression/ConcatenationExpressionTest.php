@@ -11,17 +11,17 @@
 
 namespace Combyna\Unit\Expression;
 
-use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\ConcatenationExpression;
-use Combyna\Expression\ExpressionFactoryInterface;
-use Combyna\Expression\ExpressionInterface;
-use Combyna\Expression\NumberExpression;
-use Combyna\Expression\StaticListExpression;
-use Combyna\Expression\TextExpression;
-use Combyna\Expression\Validation\ValidationContextInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\ConcatenationExpression;
+use Combyna\Component\Expression\ExpressionFactoryInterface;
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StaticListExpression;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Type\StaticListType;
-use Combyna\Type\StaticType;
+use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Type\StaticType;
 use LogicException;
 use Prophecy\Argument;
 use Prophecy\Call\Call;
@@ -86,7 +86,7 @@ class ConcatenationExpressionTest extends TestCase
             $this->operandListExpression->reveal()
         );
 
-        $this->evaluationContext->createSubContext(Argument::is($this->expression))
+        $this->evaluationContext->createSubScopeContext(Argument::is($this->expression))
             ->willReturn($this->subEvaluationContext->reveal());
         $this->validationContext->createSubContext(Argument::is($this->expression))
             ->willReturn($this->subValidationContext->reveal());
@@ -112,7 +112,7 @@ class ConcatenationExpressionTest extends TestCase
         $concatenatedText->toNative()->willReturn('my concatenated text');
         /** @var ObjectProphecy|StaticListExpression $operandListStatic */
         $operandListStatic = $this->prophesize(StaticListExpression::class);
-        $operandListStatic->concatenate()->willReturn($concatenatedText);
+        $operandListStatic->concatenate('')->willReturn($concatenatedText);
         $this->operandListExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
             ->willReturn($operandListStatic->reveal());
 

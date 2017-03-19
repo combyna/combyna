@@ -1,0 +1,15 @@
+services:
+    combyna.expression.factory:
+        class: Combyna\Component\Expression\ExpressionFactory
+        autowire: true
+        # Ensure autowiring picks the ExpressionFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes like UiExpressionFactory
+        autowiring_types: Combyna\Component\Expression\ExpressionFactoryInterface
+
+    combyna.expression.static_factory:
+        class: Combyna\Component\Expression\StaticExpressionFactory
+        autowire: true
+
+    combyna.expression.validation.factory:
+        class: Combyna\Component\Expression\Validation\ValidationFactory
+        autowire: true

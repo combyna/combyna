@@ -1,0 +1,16 @@
+services:
+    combyna.expression.act.promoter:
+        class: Combyna\Component\Expression\Config\Act\ExpressionNodePromoter
+        autowire: true
+
+    combyna.expression.act.basic_promoter:
+        class: Combyna\Component\Expression\Config\Act\BasicExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
+    combyna.expression.act.guard_promoter:
+        class: Combyna\Component\Expression\Config\Act\GuardExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

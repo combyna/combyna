@@ -12,10 +12,10 @@
 namespace Combyna\Unit\Type;
 
 use Combyna\Harness\TestCase;
-use Combyna\Type\MultipleType;
-use Combyna\Type\StaticListType;
-use Combyna\Type\StaticType;
-use Combyna\Type\TypeInterface;
+use Combyna\Component\Type\MultipleType;
+use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\TypeInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

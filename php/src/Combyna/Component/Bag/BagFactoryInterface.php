@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * Combyna
+ * Copyright (c) Dan Phillimore (asmblah)
+ * https://github.com/combyna/combyna
+ *
+ * Released under the MIT license
+ * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
+ */
+
+namespace Combyna\Component\Bag;
+
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\TypeInterface;
+
+/**
+ * Interface BagFactoryInterface
+ *
+ * Creates objects related to bags and lists
+ *
+ * @author Dan Phillimore <dan@ovms.co>
+ */
+interface BagFactoryInterface
+{
+    /**
+     * Creates an ExpressionBag
+     *
+     * @param ExpressionInterface[] $expressions
+     * @return ExpressionBagInterface
+     */
+    public function createExpressionBag(array $expressions);
+
+    /**
+     * Creates an ExpressionList
+     *
+     * @param ExpressionInterface[] $expressions
+     * @return ExpressionListInterface
+     */
+    public function createExpressionList(array $expressions);
+
+    /**
+     * Creates a FixedStaticDefinition
+     *
+     * @param string $name
+     * @param TypeInterface $type
+     * @param StaticInterface|null $defaultStatic
+     * @return FixedStaticDefinition
+     */
+    public function createFixedStaticDefinition(
+        $name,
+        TypeInterface $type,
+        StaticInterface $defaultStatic = null
+    );
+
+    /**
+     * Creates a FixedStaticBagModel
+     *
+     * @param FixedStaticDefinition[] $staticDefinitions
+     * @return FixedStaticBagModelInterface
+     */
+    public function createFixedStaticBagModel(array $staticDefinitions);
+
+    /**
+     * Creates a MutableStaticBag
+     *
+     * @param StaticInterface[] $statics
+     * @return MutableStaticBagInterface
+     */
+    public function createMutableStaticBag(array $statics = []);
+
+    /**
+     * Creates a StaticBag
+     *
+     * @param StaticInterface[] $statics
+     * @return StaticBagInterface
+     */
+    public function createStaticBag(array $statics);
+
+    /**
+     * Creates a StaticList
+     *
+     * @param StaticInterface[] $statics
+     * @return StaticListInterface
+     */
+    public function createStaticList(array $statics);
+}

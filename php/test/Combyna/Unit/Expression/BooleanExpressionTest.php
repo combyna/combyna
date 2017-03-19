@@ -11,11 +11,11 @@
 
 namespace Combyna\Unit\Expression;
 
-use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\BooleanExpression;
-use Combyna\Expression\Validation\ValidationContextInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\BooleanExpression;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Type\StaticType;
+use Combyna\Component\Type\StaticType;
 use InvalidArgumentException;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

@@ -11,15 +11,15 @@
 
 namespace Combyna\Unit\Type;
 
-use Combyna\Expression\ExpressionInterface;
-use Combyna\Expression\NumberExpression;
-use Combyna\Expression\StaticListExpression;
-use Combyna\Expression\TextExpression;
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StaticListExpression;
+use Combyna\Component\Expression\TextExpression;
 use Combyna\Harness\TestCase;
-use Combyna\Type\MultipleType;
-use Combyna\Type\StaticListType;
-use Combyna\Type\StaticType;
-use Combyna\Type\TypeInterface;
+use Combyna\Component\Type\MultipleType;
+use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

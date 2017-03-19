@@ -1,0 +1,4 @@
+services:
+    combyna.config.node_visitor:
+        class: Combyna\Component\Config\NodeVisitor
+        autowire: true

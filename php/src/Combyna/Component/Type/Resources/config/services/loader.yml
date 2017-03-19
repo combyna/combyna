@@ -1,0 +1,16 @@
+services:
+    combyna.type.loader:
+        class: Combyna\Component\Type\Config\Loader\DelegatingTypeLoader
+        autowire: true
+
+    combyna.type.loader.static_list:
+        class: Combyna\Component\Type\Config\Loader\StaticListTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}
+
+    combyna.type.loader.static:
+        class: Combyna\Component\Type\Config\Loader\StaticTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}

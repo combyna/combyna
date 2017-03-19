@@ -1,0 +1,26 @@
+services:
+    combyna.renderer.html:
+        class: Combyna\Component\Renderer\Html\HtmlRenderer
+        autowire: true
+
+    combyna.renderer.html.widget:
+        class: Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer
+        autowire: true
+
+    combyna.renderer.html.widget.core.text:
+        class: Combyna\Component\Renderer\Html\WidgetRenderer\Core\TextWidgetRenderer
+        autowire: true
+        tags:
+            - {name: combyna.html_widget_renderer}
+
+    combyna.renderer.html.widget.gui.box:
+        class: Combyna\Component\Renderer\Html\WidgetRenderer\Gui\BoxWidgetRenderer
+        autowire: true
+        tags:
+            - {name: combyna.html_widget_renderer}
+
+    combyna.renderer.html.widget.gui.button:
+        class: Combyna\Component\Renderer\Html\WidgetRenderer\Gui\ButtonWidgetRenderer
+        autowire: true
+        tags:
+            - {name: combyna.html_widget_renderer}

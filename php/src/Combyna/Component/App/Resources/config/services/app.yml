@@ -1,0 +1,4 @@
+services:
+    combyna.app.factory:
+        class: Combyna\Component\App\AppFactory
+        autowire: true

@@ -1,0 +1,8 @@
+services:
+    combyna.validator.factory:
+        class: Combyna\Component\Validator\ValidationFactory
+        autowire: true
+
+    combyna.validator:
+        class: Combyna\Component\Validator\Validator
+        autowire: true

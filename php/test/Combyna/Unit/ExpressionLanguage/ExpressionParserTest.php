@@ -11,7 +11,7 @@
 
 namespace Combyna\Unit\ExpressionLanguage;
 
-use Combyna\ExpressionLanguage\ExpressionParser;
+use Combyna\Component\ExpressionLanguage\ExpressionParser;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Prophecy\Argument;

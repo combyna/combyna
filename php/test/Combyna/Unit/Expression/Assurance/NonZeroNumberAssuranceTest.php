@@ -11,17 +11,17 @@
 
 namespace Combyna\Unit\Expression\Assurance;
 
-use Combyna\Bag\StaticBagInterface;
-use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\Assurance\AssuranceInterface;
-use Combyna\Expression\Assurance\NonZeroNumberAssurance;
-use Combyna\Expression\ExpressionInterface;
-use Combyna\Expression\NumberExpression;
-use Combyna\Expression\TextExpression;
-use Combyna\Expression\Validation\ValidationContextInterface;
+use Combyna\Component\Bag\MutableStaticBagInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Type\StaticType;
-use Combyna\Type\TypeInterface;
+use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\TypeInterface;
 use LogicException;
 use Prophecy\Argument;
 use Prophecy\Call\Call;
@@ -55,7 +55,7 @@ class NonZeroNumberAssuranceTest extends TestCase
     private $resultStatic;
 
     /**
-     * @var ObjectProphecy|StaticBagInterface
+     * @var ObjectProphecy|MutableStaticBagInterface
      */
     private $staticBag;
 
@@ -69,7 +69,7 @@ class NonZeroNumberAssuranceTest extends TestCase
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->inputExpression = $this->prophesize(ExpressionInterface::class);
         $this->resultStatic = $this->prophesize(NumberExpression::class);
-        $this->staticBag = $this->prophesize(StaticBagInterface::class);
+        $this->staticBag = $this->prophesize(MutableStaticBagInterface::class);
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->inputExpression->toStatic(Argument::is($this->evaluationContext->reveal()))

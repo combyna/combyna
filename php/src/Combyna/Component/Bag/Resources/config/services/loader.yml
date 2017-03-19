@@ -1,0 +1,8 @@
+services:
+    combyna.bag.loader.expression_bag:
+        class: Combyna\Component\Bag\Config\Loader\ExpressionBagLoader
+        autowire: true
+
+    combyna.bag.loader.fixed_static_bag_model:
+        class: Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoader
+        autowire: true

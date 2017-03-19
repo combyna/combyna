@@ -1,0 +1,4 @@
+services:
+    combyna.app.loader:
+        class: Combyna\Component\App\Config\Loader\AppLoader
+        autowire: true

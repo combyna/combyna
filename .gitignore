@@ -3,5 +3,5 @@
 /.idea
 /draft
 /node_modules
-/php/dist/**/*.php
+/php/dist
 /vendor

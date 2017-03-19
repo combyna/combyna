@@ -1,0 +1,8 @@
+services:
+    combyna.environment.promoter:
+        class: Combyna\Component\Environment\Config\Act\EnvironmentPromoter
+        autowire: true
+
+    combyna.environment.promoter.library:
+        class: Combyna\Component\Environment\Config\Act\LibraryPromoter
+        autowire: true

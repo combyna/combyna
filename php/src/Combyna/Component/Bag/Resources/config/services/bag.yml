@@ -1,0 +1,4 @@
+services:
+    combyna.bag.factory:
+        class: Combyna\Component\Bag\BagFactory
+        autowire: true

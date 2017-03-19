@@ -1,0 +1,33 @@
+{
+  "version": "1.0.0",
+  "name": "combyna",
+  "browserify": {
+    "transform": [
+      "phpify"
+    ]
+  },
+  "phpify": {
+    "phpToJS": {
+      "include": [
+        "php/src/**/*.php",
+        "vendor/autoload.php",
+        "vendor/composer/**/*.php",
+        "vendor/symfony/event-dispatcher/**/*.php"
+      ],
+      "sync": true
+    }
+  },
+  "dependencies": {
+    "dotphp": "~2"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "phpify": "^3.0.1"
+  },
+  "scripts": {
+    "build:release:client": "mkdir -p dist && cd dist && browserify ../js/client --outfile ./client.js",
+    "build:debug:client": "mkdir -p dist && cd dist && browserify --debug ../js/client --outfile ./client.js",
+    "server:node": "dotphp php/server.php",
+    "server:zend": "php php/server.php"
+  }
+}

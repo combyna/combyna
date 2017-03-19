@@ -11,15 +11,15 @@
 
 namespace Combyna\Unit\Expression;
 
-use Combyna\Bag\StaticListInterface;
-use Combyna\Evaluation\EvaluationContextInterface;
-use Combyna\Expression\ExpressionFactoryInterface;
-use Combyna\Expression\StaticListExpression;
-use Combyna\Expression\TextExpression;
-use Combyna\Expression\Validation\ValidationContextInterface;
+use Combyna\Component\Bag\StaticListInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
+use Combyna\Component\Expression\StaticListExpression;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Type\StaticListType;
-use Combyna\Type\TypeInterface;
+use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Type\TypeInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -41,7 +41,7 @@ class StaticListExpressionTest extends TestCase
     private $expression;
 
     /**
-     * @var ObjectProphecy|ExpressionFactoryInterface
+     * @var ObjectProphecy|StaticExpressionFactoryInterface
      */
     private $expressionFactory;
 
@@ -58,7 +58,7 @@ class StaticListExpressionTest extends TestCase
     public function setUp()
     {
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
-        $this->expressionFactory = $this->prophesize(ExpressionFactoryInterface::class);
+        $this->expressionFactory = $this->prophesize(StaticExpressionFactoryInterface::class);
         $this->staticList = $this->prophesize(StaticListInterface::class);
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
@@ -75,7 +75,7 @@ class StaticListExpressionTest extends TestCase
 
     public function testConcatenateReturnsATextExpressionWithTheConcatenatedElementTexts()
     {
-        $this->staticList->concatenate()->willReturn('concatenated element contents');
+        $this->staticList->concatenate('')->willReturn('concatenated element contents');
 
         $result = $this->expression->concatenate();
 

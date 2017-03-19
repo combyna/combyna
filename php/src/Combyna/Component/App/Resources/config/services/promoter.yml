@@ -1,0 +1,4 @@
+services:
+    combyna.app.act.promoter:
+        class: Combyna\Component\App\Config\Act\AppNodePromoter
+        autowire: true

@@ -1,0 +1,7 @@
+services:
+    combyna.expression.evaluation_context_factory:
+        class: Combyna\Component\Expression\Evaluation\EvaluationContextFactory
+        autowire: true
+        # Ensure autowiring picks the ExpressionFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes like UiExpressionFactory
+        autowiring_types: Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface

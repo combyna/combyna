@@ -1,0 +1,8 @@
+services:
+    combyna.environment.loader.environment:
+        class: Combyna\Component\Environment\Config\Loader\EnvironmentLoader
+        autowire: true
+
+    combyna.environment.loader.library:
+        class: Combyna\Component\Environment\Config\Loader\Library\LibraryLoader
+        autowire: true

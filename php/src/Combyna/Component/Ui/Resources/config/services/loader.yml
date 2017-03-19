@@ -1,0 +1,20 @@
+services:
+    combyna.ui.loader:
+        class: Combyna\Component\Ui\Config\Loader\ViewLoader
+        autowire: true
+
+    combyna.ui.loader.view_collection:
+        class: Combyna\Component\Ui\Config\Loader\ViewCollectionLoader
+        autowire: true
+
+    combyna.ui.loader.widget:
+        class: Combyna\Component\Ui\Config\Loader\WidgetLoader
+        autowire: true
+
+    combyna.ui.loader.widget_collection:
+        class: Combyna\Component\Ui\Config\Loader\WidgetCollectionLoader
+        autowire: true
+
+    combyna.ui.loader.widget_definition:
+        class: Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoader
+        autowire: true

@@ -1,0 +1,4 @@
+services:
+    combyna.bag.act.promoter:
+        class: Combyna\Component\Bag\Config\Act\BagNodePromoter
+        autowire: true

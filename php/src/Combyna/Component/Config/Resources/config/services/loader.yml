@@ -1,0 +1,12 @@
+services:
+    combyna.config.loader.array_walker:
+        class: Combyna\Component\Config\Loader\ArrayWalker
+        autowire: true
+
+    combyna.config.loader.config_parser:
+        class: Combyna\Component\Config\Loader\ConfigParser
+        autowire: true
+
+    combyna.config.loader.expression_config_parser:
+        class: Combyna\Component\Config\Loader\ExpressionConfigParser
+        autowire: true

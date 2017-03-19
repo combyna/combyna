@@ -1,0 +1,4 @@
+services:
+    combyna.config.yaml_parser:
+        class: Combyna\Component\Config\YamlParser
+        autowire: true

@@ -1,0 +1,23 @@
+services:
+    combyna.ui.evaluation_context_factory:
+        class: Combyna\Component\Ui\Evaluation\UiEvaluationContextFactory
+        autowire: true
+        # Ensure autowiring picks the UiEvaluationContextFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface
+
+    combyna.ui.expression.factory:
+        class: Combyna\Component\Ui\Expression\ViewExpressionFactory
+        autowire: true
+
+    combyna.ui.rendered_widget_factory:
+        class: Combyna\Component\Ui\RenderedWidgetFactory
+        autowire: true
+
+    combyna.ui.view_factory:
+        class: Combyna\Component\Ui\ViewFactory
+        autowire: true
+
+    combyna.ui.widget_definition_factory:
+        class: Combyna\Component\Ui\WidgetDefinitionFactory
+        autowire: true
