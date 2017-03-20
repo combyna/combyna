@@ -13,7 +13,7 @@
         "php/src/**/*.php",
         "vendor/autoload.php",
         "vendor/composer/**/*.php",
-        "vendor/symfony/event-dispatcher/**/*.php"
+        "vendor/symfony/event-dispatcher/(!Tests)**/*.php"
       ],
       "sync": true
     }
