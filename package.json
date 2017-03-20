@@ -9,6 +9,7 @@
   "phpify": {
     "phpToJS": {
       "include": [
+        "php/dist/**/*.php",
         "php/src/**/*.php",
         "vendor/autoload.php",
         "vendor/composer/**/*.php",
