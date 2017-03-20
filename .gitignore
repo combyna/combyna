@@ -1,6 +1,7 @@
 .DS_Store
 ._.DS_Store
 /.idea
+/dist
 /draft
 /node_modules
 /php/dist
