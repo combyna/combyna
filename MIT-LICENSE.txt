@@ -1,4 +1,4 @@
-Copyright 2016 Dan Phillimore (asmblah)
+Copyright 2017 Dan Phillimore (asmblah)
 https://github.com/combyna/combyna/
 
 Permission is hereby granted, free of charge, to any person obtaining
