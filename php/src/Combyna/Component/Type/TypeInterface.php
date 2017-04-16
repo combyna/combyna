@@ -23,7 +23,7 @@ interface TypeInterface
     /**
      * Returns true if this type is equivalent to or is a supertype of the specified type, false otherwise
      *
-     * @param TypeInterface $otherType
+     * @param TypeInterface $candidateType
      * @return bool
      */
     public function allows(TypeInterface $candidateType);
@@ -73,7 +73,7 @@ interface TypeInterface
     /**
      * Returns true if this type is equivalent to the specified multiple type, false otherwise
      *
-     * @param TypeInterface $otherType
+     * @param MultipleType $otherType
      * @return bool
      */
     public function isAllowedByMultipleType(MultipleType $otherType);

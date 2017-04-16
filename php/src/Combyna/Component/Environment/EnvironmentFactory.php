@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Environment;
 
+use Symfony\Component\Translation\Translator;
+
 /**
  * Class EnvironmentFactory
  *
@@ -19,10 +21,23 @@ namespace Combyna\Component\Environment;
 class EnvironmentFactory implements EnvironmentFactoryInterface
 {
     /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
+     * @param Translator $translator
+     */
+    public function __construct(Translator $translator)
+    {
+        $this->translator = $translator;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function create(array $libraries = [])
     {
-        return new Environment($libraries);
+        return new Environment($this->translator, $libraries);
     }
 }

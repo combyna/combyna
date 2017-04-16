@@ -58,4 +58,18 @@ class StaticBag implements StaticBagInterface
     {
         return array_key_exists($name, $this->statics);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toNativeArray()
+    {
+        $nativeArray = [];
+
+        foreach ($this->statics as $name => $static) {
+            $nativeArray[$name] = $static->toNative();
+        }
+
+        return $nativeArray;
+    }
 }

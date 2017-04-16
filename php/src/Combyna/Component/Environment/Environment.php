@@ -14,6 +14,7 @@ namespace Combyna\Component\Environment;
 use Combyna\Component\Environment\Exception\LibraryAlreadyInstalledException;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Environment\Library\LibraryInterface;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class Environment
@@ -28,14 +29,22 @@ class Environment implements EnvironmentInterface
     private $libraries = [];
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
+     * @param Translator $translator
      * @param LibraryInterface[] $libraries
      */
-    public function __construct(array $libraries = [])
+    public function __construct(Translator $translator, array $libraries = [])
     {
         // Index the libraries by name to simplify lookups
         foreach ($libraries as $library) {
             $this->libraries[$library->getName()] = $library;
         }
+
+        $this->translator = $translator;
     }
 
     /**
@@ -72,5 +81,17 @@ class Environment implements EnvironmentInterface
         }
 
         $this->libraries[$library->getName()] = $library;
+
+        foreach ($library->getTranslations() as $locale => $messages) {
+            $this->translator->addResource('yaml', $messages, $locale);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function translate($key, array $parameters = [])
+    {
+        return $this->translator->trans($key, $parameters);
     }
 }

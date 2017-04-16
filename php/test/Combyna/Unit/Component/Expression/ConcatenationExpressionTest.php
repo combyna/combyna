@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression;
+namespace Combyna\Unit\Component\Expression;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ConcatenationExpression;
@@ -59,45 +59,20 @@ class ConcatenationExpressionTest extends TestCase
      */
     private $subEvaluationContext;
 
-    /**
-     * @var ObjectProphecy|ValidationContextInterface
-     */
-    private $subValidationContext;
-
-    /**
-     * @var ObjectProphecy|ValidationContextInterface
-     */
-    private $validationContext;
-
     public function setUp()
     {
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->expressionFactory = $this->prophesize(ExpressionFactoryInterface::class);
         $this->operandListExpression = $this->prophesize(ExpressionInterface::class);
         $this->subEvaluationContext = $this->prophesize(EvaluationContextInterface::class);
-        $this->subValidationContext = $this->prophesize(ValidationContextInterface::class);
-        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
-
-        $this->operandListExpression->validate(Argument::is($this->subValidationContext->reveal()))
-            ->willReturn(null);
 
         $this->expression = new ConcatenationExpression(
             $this->expressionFactory->reveal(),
             $this->operandListExpression->reveal()
         );
 
-        $this->evaluationContext->createSubScopeContext(Argument::is($this->expression))
+        $this->evaluationContext->createSubExpressionContext(Argument::is($this->expression))
             ->willReturn($this->subEvaluationContext->reveal());
-        $this->validationContext->createSubContext(Argument::is($this->expression))
-            ->willReturn($this->subValidationContext->reveal());
-    }
-
-    public function testGetResultTypeReturnsAStaticTextType()
-    {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('text');
     }
 
     public function testGetType()
@@ -137,32 +112,5 @@ class ConcatenationExpressionTest extends TestCase
         );
 
         $this->expression->toStatic($this->evaluationContext->reveal());
-    }
-
-    public function testValidateValidatesTheOperandListExpressionInASubValidationContext()
-    {
-        $this->expression->validate($this->validationContext->reveal());
-
-        $this->operandListExpression->validate(Argument::is($this->subValidationContext))
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateChecksTheOperandListExpressionCanOnlyEvaluateToAListOfNumbersOrTexts()
-    {
-        $this->expression->validate($this->validationContext->reveal());
-
-        $this->subValidationContext->assertResultType(
-            Argument::is($this->operandListExpression->reveal()),
-            Argument::any(),
-            'operand list'
-        )
-            ->shouldHaveBeenCalled()
-            ->shouldHave($this->noBind(function (array $calls) {
-                /** @var Call[] $calls */
-                list(, $type) = $calls[0]->getArguments();
-                /** @var StaticType $type */
-                $this->assert($type)->isAnInstanceOf(StaticListType::class);
-                $this->assert($type->getSummary())->exactlyEquals('list<text|number>');
-            }));
     }
 }

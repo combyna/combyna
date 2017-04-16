@@ -107,4 +107,12 @@ class WidgetEvaluationContext implements WidgetEvaluationContextInterface
     {
         return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function translate($translationKey, array $parameters = [])
+    {
+        return $this->parentContext->translate($translationKey, $parameters);
+    }
 }

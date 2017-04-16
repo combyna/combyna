@@ -37,6 +37,7 @@ use Combyna\Component\Expression\Config\Act\ListExpressionNode;
 use Combyna\Component\Expression\Config\Act\MapExpressionNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
+use Combyna\Component\Expression\Config\Act\TranslationExpressionNode;
 use Combyna\Component\Expression\Config\Act\VariableExpressionNode;
 use Combyna\Component\Expression\ConversionExpression;
 use Combyna\Component\Expression\NumberExpression;
@@ -157,6 +158,12 @@ class ValidationIntegratedTest extends TestCase
                             'my_var',
                             'my_index',
                             new VariableExpressionNode('my_var')
+                        ),
+                        new TranslationExpressionNode(
+                            'my.key',
+                            new ExpressionBagNode([
+                                'my_param' => new TextExpressionNode('1001')
+                            ])
                         )
                     ])
                 )
@@ -174,7 +181,7 @@ class ValidationIntegratedTest extends TestCase
             'Expression [conditional].[concatenation].[list].[expression-list].[binary-arithmetic]' .
             ' - right operand would get [text], expects [number]. :: ' .
             'Expression [conditional].[concatenation]' .
-            ' - operand list would get [list<boolean|number|text|list<text>>], ' .
+            ' - operand list would get [list<boolean|number|text|list<text>|text>], ' .
             'expects [list<text|number>]'
         );
 

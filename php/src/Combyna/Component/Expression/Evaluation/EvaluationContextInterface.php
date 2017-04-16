@@ -76,4 +76,13 @@ interface EvaluationContextInterface
      * @throws InvalidArgumentException Throws when the specified variable is not defined in this or a parent
      */
     public function getVariable($variableName);
+
+    /**
+     * Translates a translation key and optional parameters to a message
+     *
+     * @param string $translationKey
+     * @param array $parameters
+     * @return string
+     */
+    public function translate($translationKey, array $parameters = []);
 }

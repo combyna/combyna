@@ -9,8 +9,9 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\Expression\Config\Loader;
 
+use Combyna\Component\Expression\Config\Act\TextExpressionNode;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Harness\TestCase;
@@ -65,7 +66,7 @@ class TextExpressionLoaderTest extends TestCase
      * @dataProvider textProvider
      * @param string $text
      */
-    public function testLoadReturnsATextExpressionWithTheCorrectNativeValue($text)
+    public function testLoadReturnsATextExpressionNodeWithTheCorrectNativeValue($text)
     {
         $config = [
             'type' => 'text',
@@ -74,10 +75,10 @@ class TextExpressionLoaderTest extends TestCase
         $this->configParser->getElement($config, 'text', Argument::any())
             ->willReturn($text);
 
-        $textExpression = $this->loader->load($config);
+        $textExpressionNode = $this->loader->load($config);
 
-        $this->assert($textExpression)->isAnInstanceOf(TextExpression::class);
-        $this->assert($textExpression->toNative())->exactlyEquals($text);
+        $this->assert($textExpressionNode)->isAnInstanceOf(TextExpressionNode::class);
+        $this->assert($textExpressionNode->toNative())->exactlyEquals($text);
     }
 
     /**

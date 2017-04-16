@@ -12,13 +12,13 @@
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodePromoter;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use LogicException;
 
 /**

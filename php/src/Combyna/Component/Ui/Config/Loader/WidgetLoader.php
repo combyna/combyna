@@ -60,7 +60,11 @@ class WidgetLoader implements WidgetLoaderInterface
     public function loadWidget(array $widgetConfig, EnvironmentNode $environmentNode)
     {
         $type = $widgetConfig['type'];
-        $attributeExpressionBag = $this->expressionBagLoader->load($widgetConfig['attributes']);
+        $attributeExpressionBag = $this->expressionBagLoader->load(
+            array_key_exists('attributes', $widgetConfig) ?
+                $widgetConfig['attributes'] :
+                []
+        );
         $childWidgets = $widgetConfig['children'] !== null ?
             $this->widgetCollectionLoader->loadWidgets(
                 $widgetConfig['children'],

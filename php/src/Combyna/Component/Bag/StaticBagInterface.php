@@ -39,4 +39,11 @@ interface StaticBagInterface
      * @return bool
      */
     public function hasStatic($name);
+
+    /**
+     * Builds a native associative array of native values with the static names as the keys
+     *
+     * @return array
+     */
+    public function toNativeArray();
 }

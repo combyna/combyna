@@ -1,4 +1,8 @@
 services:
+    combyna.environment.array_translation_loader:
+        class: Symfony\Component\Translation\Loader\ArrayLoader
+        autowire: true
+
     combyna.environment.factory:
         class: Combyna\Component\Environment\EnvironmentFactory
         autowire: true
@@ -6,3 +10,10 @@ services:
     combyna.environment.library.factory:
         class: Combyna\Component\Environment\Library\LibraryFactory
         autowire: true
+
+    combyna.environment.translator:
+        class: Symfony\Component\Translation\Translator
+        arguments:
+            - en
+        calls:
+            - [addLoader, ['array', '@combyna.environment.array_translation_loader']]

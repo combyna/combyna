@@ -19,6 +19,13 @@ namespace Combyna\Component\Renderer\Html;
 interface HtmlNodeInterface
 {
     /**
+     * Returns an array representation of this node
+     *
+     * @return array
+     */
+    public function toArray();
+
+    /**
      * Returns a HTML representation of this node
      *
      * @return string

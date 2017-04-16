@@ -41,4 +41,22 @@ class ConfigParser
 
         return $config[$key];
     }
+
+    /**
+     * Fetches the value of the specified config element by its key
+     *
+     * @param array $config
+     * @param string $key
+     * @param string $context
+     * @param mixed $defaultValue Result to return if the element is not defined
+     * @return mixed
+     */
+    public function getOptionalElement(array $config, $key, $context, $defaultValue = null)
+    {
+        if (!array_key_exists($key, $config)) {
+            return $defaultValue;
+        }
+
+        return $config[$key];
+    }
 }

@@ -99,7 +99,7 @@ class LibraryNode extends AbstractActNode
      * then an UnknownWidgetDefinitionNode will be returned
      *
      * @param string $widgetDefinitionName
-     * @return FunctionNodeInterface
+     * @return WidgetDefinitionNodeInterface
      */
     public function getWidgetDefinition($widgetDefinitionName)
     {

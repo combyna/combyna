@@ -105,6 +105,7 @@ class EnvironmentNode extends AbstractActNode
      * @param string $libraryName
      * @param string $functionName
      * @param NativeFunction $nativeFunction
+     * @throws LibraryNotInstalledException
      */
     public function installNativeFunction($libraryName, $functionName, NativeFunction $nativeFunction)
     {

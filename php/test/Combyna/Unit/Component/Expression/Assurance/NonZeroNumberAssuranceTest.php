@@ -9,22 +9,18 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression\Assurance;
+namespace Combyna\Unit\Component\Expression\Assurance;
 
 use Combyna\Component\Bag\MutableStaticBagInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\TypeInterface;
 use LogicException;
 use Prophecy\Argument;
-use Prophecy\Call\Call;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -59,23 +55,15 @@ class NonZeroNumberAssuranceTest extends TestCase
      */
     private $staticBag;
 
-    /**
-     * @var ObjectProphecy|ValidationContextInterface
-     */
-    private $validationContext;
-
     public function setUp()
     {
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->inputExpression = $this->prophesize(ExpressionInterface::class);
         $this->resultStatic = $this->prophesize(NumberExpression::class);
         $this->staticBag = $this->prophesize(MutableStaticBagInterface::class);
-        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->inputExpression->toStatic(Argument::is($this->evaluationContext->reveal()))
             ->willReturn($this->resultStatic->reveal());
-        $this->inputExpression->validate(Argument::is($this->validationContext->reveal()))
-            ->willReturn(null);
         $this->resultStatic->toNative()->willReturn(2);
 
         $this->assurance = new NonZeroNumberAssurance($this->inputExpression->reveal(), 'my-static');
@@ -94,26 +82,6 @@ class NonZeroNumberAssuranceTest extends TestCase
     public function testGetConstraintReturnsCorrectValue()
     {
         $this->assert($this->assurance->getConstraint())->exactlyEquals(AssuranceInterface::NON_ZERO_NUMBER);
-    }
-
-    public function testGetTypeReturnsTheResultTypeOfTheExpressionWhenGivenTheCorrectStaticName()
-    {
-        $type = $this->prophesize(TypeInterface::class);
-        $this->inputExpression->getResultType(Argument::is($this->validationContext->reveal()))
-            ->willReturn($type);
-
-        $this->assert($this->assurance->getStaticType($this->validationContext->reveal(), 'my-static'))
-            ->exactlyEquals($type->reveal());
-    }
-
-    public function testGetTypeThrowsExceptionWhenGivenTheWrongStaticName()
-    {
-        $this->setExpectedException(
-            LogicException::class,
-            'NonZeroNumberAssurance only defines static "my-static" but was asked about "not-my-static"'
-        );
-
-        $this->assurance->getStaticType($this->validationContext->reveal(), 'not-my-static');
     }
 
     public function testEvaluateReturnsTrueWhenTheExpressionEvaluatesToANonZeroNumber()
@@ -161,32 +129,5 @@ class NonZeroNumberAssuranceTest extends TestCase
         );
 
         $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
-    }
-
-    public function testValidateValidatesTheExpression()
-    {
-        $this->assurance->validate($this->validationContext->reveal());
-
-        $this->inputExpression->validate(Argument::is($this->validationContext->reveal()))
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateAssertsThatTheExpressionCanOnlyEvaluateToANumber()
-    {
-        $this->assurance->validate($this->validationContext->reveal());
-
-        $this->validationContext->assertResultType(
-            Argument::is($this->inputExpression->reveal()),
-            Argument::any(),
-            'non-zero assurance'
-        )
-            ->shouldHaveBeenCalled()
-            ->shouldHave($this->noBind(function (array $calls) {
-                /** @var Call[] $calls */
-                list(, $type) = $calls[0]->getArguments();
-                /** @var StaticType $type */
-                $this->assert($type)->isAnInstanceOf(StaticType::class);
-                $this->assert($type->getSummary())->exactlyEquals('number');
-            }));
     }
 }

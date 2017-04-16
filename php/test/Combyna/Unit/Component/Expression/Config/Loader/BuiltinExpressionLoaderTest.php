@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\Expression\Config\Loader;
 
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Harness\TestCase;

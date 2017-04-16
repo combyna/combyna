@@ -9,15 +9,12 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression;
+namespace Combyna\Unit\Component\Expression;
 
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\BooleanExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticType;
 use InvalidArgumentException;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -37,15 +34,9 @@ class BooleanExpressionTest extends TestCase
      */
     private $expression;
 
-    /**
-     * @var ObjectProphecy|ValidationContextInterface
-     */
-    private $validationContext;
-
     public function setUp()
     {
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
-        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->expression = new BooleanExpression(true);
     }
@@ -96,14 +87,6 @@ class BooleanExpressionTest extends TestCase
             'int' => [21, 'integer'],
             'float' => [27.7, 'double']
         ];
-    }
-
-    public function testGetResultTypeReturnsAStaticBooleanType()
-    {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('boolean');
     }
 
     public function testGetTypeReturnsTheBooleanType()

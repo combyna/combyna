@@ -94,4 +94,12 @@ class EntityStorage implements EntityStorageInterface
     {
         $this->attributeBag->setStatic($name, $value);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toNativeArray()
+    {
+        return $this->attributeBag->toNativeArray();
+    }
 }

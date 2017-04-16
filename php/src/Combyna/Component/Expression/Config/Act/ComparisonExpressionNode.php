@@ -15,14 +15,15 @@ use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\ComparisonExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use InvalidArgumentException;
 
 /**
  * Class ComparisonExpressionNode
  *
- * Compares two expressions with the specified operator and returns the result
+ * Compares two expressions with the specified operator and returns the result.
+ * For text expressions, two additional operators are provided for case-insensitive comparisons
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -124,6 +125,8 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                 );
                 break;
             case ComparisonExpression::EQUAL_CASE_INSENSITIVE:
+                // Case-insensitive comparison - only makes sense for text expressions,
+                // so only text expressions may use it
                 $subValidationContext->assertPossibleMatchingResultTypes(
                     $this->leftOperandExpression,
                     'left operand',
@@ -171,6 +174,8 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                 );
                 break;
             case ComparisonExpression::UNEQUAL_CASE_INSENSITIVE:
+                // Case-insensitive comparison - only makes sense for text expressions,
+                // so only text expressions may use it
                 $subValidationContext->assertPossibleMatchingResultTypes(
                     $this->leftOperandExpression,
                     'left operand',

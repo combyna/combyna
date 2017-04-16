@@ -73,4 +73,12 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
 
         $this->looseBag->setStatic($name, $value);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toNativeArray()
+    {
+        return $this->looseBag->toNativeArray();
+    }
 }

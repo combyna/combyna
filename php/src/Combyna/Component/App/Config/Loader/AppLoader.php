@@ -15,6 +15,7 @@ use Combyna\Component\App\AppFactoryInterface;
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Ui\Config\Loader\ViewCollectionLoaderInterface;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class AppLoader
@@ -29,6 +30,11 @@ class AppLoader implements AppLoaderInterface
     private $appFactory;
 
     /**
+     * @var Translator
+     */
+    private $translator;
+
+    /**
      * @var ViewCollectionLoaderInterface
      */
     private $viewCollectionLoader;
@@ -36,12 +42,15 @@ class AppLoader implements AppLoaderInterface
     /**
      * @param AppFactoryInterface $appFactory
      * @param ViewCollectionLoaderInterface $viewCollectionLoader
+     * @param Translator $translator
      */
     public function __construct(
         AppFactoryInterface $appFactory,
-        ViewCollectionLoaderInterface $viewCollectionLoader
+        ViewCollectionLoaderInterface $viewCollectionLoader,
+        Translator $translator
     ) {
         $this->appFactory = $appFactory;
+        $this->translator = $translator;
         $this->viewCollectionLoader = $viewCollectionLoader;
     }
 
@@ -50,6 +59,14 @@ class AppLoader implements AppLoaderInterface
      */
     public function loadApp(EnvironmentNode $environmentNode, array $appConfig)
     {
+        // Load any translations from the app config into Symfony's translator
+        // so that they will be available later
+        if (array_key_exists('translations', $appConfig)) {
+            foreach ($appConfig['translations'] as $locale => $messages) {
+                $this->translator->addResource('array', $messages, $locale);
+            }
+        }
+
         $viewCollectionNode = $this->viewCollectionLoader->loadViews(
             $appConfig['views'],
             $environmentNode

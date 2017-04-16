@@ -59,4 +59,13 @@ interface EnvironmentInterface
      * @throws LibraryAlreadyInstalledException
      */
     public function installLibrary(LibraryInterface $library);
+
+    /**
+     * Translates a key for the current locale
+     *
+     * @param string $key
+     * @param array $parameters
+     * @return string
+     */
+    public function translate($key, array $parameters = []);
 }

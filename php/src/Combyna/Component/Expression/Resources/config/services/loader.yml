@@ -84,6 +84,12 @@ services:
         tags:
             - {name: combyna.expression_loader}
 
+    combyna.expression.loader.translation:
+        class: Combyna\Component\Expression\Config\Loader\TranslationExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.variable:
         class: Combyna\Component\Expression\Config\Loader\VariableExpressionLoader
         autowire: true

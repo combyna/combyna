@@ -15,8 +15,6 @@ use Combyna\Component\Bag\MutableStaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\StaticType;
 use LogicException;
 
 /**
@@ -94,36 +92,5 @@ class NonZeroNumberAssurance implements AssuranceInterface
     public function getRequiredAssuredStaticNames()
     {
         return [$this->staticName];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getStaticType(ValidationContextInterface $validationContext, $assuredStaticName)
-    {
-        if ($assuredStaticName !== $this->staticName) {
-            throw new LogicException(
-                'NonZeroNumberAssurance only defines static "' . $this->staticName .
-                '" but was asked about "' . $assuredStaticName . '"'
-            );
-        }
-
-        // The only possible type this assured static can evaluate to is the result type of its expression
-        return $this->inputExpression->getResultType($validationContext);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $this->inputExpression->validate($validationContext);
-
-        // Check at compile-time that the expression can only resolve to a number
-        $validationContext->assertResultType(
-            $this->inputExpression,
-            new StaticType(NumberExpression::class),
-            'non-zero assurance'
-        );
     }
 }

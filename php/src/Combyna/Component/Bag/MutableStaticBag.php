@@ -66,4 +66,18 @@ class MutableStaticBag implements MutableStaticBagInterface
     {
         $this->statics[$name] = $value;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toNativeArray()
+    {
+        $nativeArray = [];
+
+        foreach ($this->statics as $name => $static) {
+            $nativeArray[$name] = $static->toNative();
+        }
+
+        return $nativeArray;
+    }
 }

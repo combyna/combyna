@@ -55,6 +55,25 @@ class HtmlElement implements HtmlNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function toArray()
+    {
+        $childNodeArrays = [];
+
+        foreach ($this->childNodes as $childNode) {
+            $childNodeArrays[] = $childNode->toArray();
+        }
+
+        return [
+            'type' => 'element',
+            'tag' => $this->tagName,
+            'attributes' => $this->attributes,
+            'children' => $childNodeArrays
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toHtml()
     {
         $childHtml = '';

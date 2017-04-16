@@ -94,4 +94,12 @@ class RootEvaluationContext implements EvaluationContextInterface
     {
         throw new LogicException('No variable is defined with name "' . $variableName . '"');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function translate($translationKey, array $parameters = [])
+    {
+        return $this->environment->translate($translationKey, $parameters);
+    }
 }

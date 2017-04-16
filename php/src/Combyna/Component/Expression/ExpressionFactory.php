@@ -286,6 +286,18 @@ class ExpressionFactory implements ExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createTranslationExpression($translationKey, ExpressionBagInterface $parameterExpressionBag = null)
+    {
+        if ($parameterExpressionBag === null) {
+            $parameterExpressionBag = $this->bagFactory->createExpressionBag([]);
+        }
+
+        return new TranslationExpression($this, $translationKey, $parameterExpressionBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createVariableExpression($variableName)
     {
         return new VariableExpression($variableName);

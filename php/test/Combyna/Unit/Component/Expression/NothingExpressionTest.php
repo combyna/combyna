@@ -9,14 +9,11 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression;
+namespace Combyna\Unit\Component\Expression;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\NothingExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticType;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -36,25 +33,11 @@ class NothingExpressionTest extends TestCase
      */
     private $expression;
 
-    /**
-     * @var ObjectProphecy|ValidationContextInterface
-     */
-    private $validationContext;
-
     public function setUp()
     {
         $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
-        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->expression = new NothingExpression();
-    }
-
-    public function testGetResultTypeReturnsAStaticNothingType()
-    {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('nothing');
     }
 
     public function testGetTypeReturnsTheNothingType()

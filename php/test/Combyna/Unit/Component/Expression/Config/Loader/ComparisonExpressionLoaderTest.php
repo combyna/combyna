@@ -9,9 +9,11 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\Expression\Config\Loader;
 
 use Combyna\Component\Expression\ComparisonExpression;
+use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
+use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Harness\TestCase;
@@ -29,19 +31,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 class ComparisonExpressionLoaderTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|ComparisonExpression
-     */
-    private $comparisonExpression;
-
-    /**
      * @var ObjectProphecy|ConfigParser
      */
     private $configParser;
-
-    /**
-     * @var ObjectProphecy|ExpressionFactoryInterface
-     */
-    private $expressionFactory;
 
     /**
      * @var ObjectProphecy|ExpressionLoaderInterface
@@ -55,9 +47,7 @@ class ComparisonExpressionLoaderTest extends TestCase
 
     public function setUp()
     {
-        $this->comparisonExpression = $this->prophesize(ComparisonExpression::class);
         $this->configParser = $this->prophesize(ConfigParser::class);
-        $this->expressionFactory = $this->prophesize(ExpressionFactoryInterface::class);
         $this->expressionLoader = $this->prophesize(ExpressionLoaderInterface::class);
 
         $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any())
@@ -67,12 +57,11 @@ class ComparisonExpressionLoaderTest extends TestCase
 
         $this->loader = new ComparisonExpressionLoader(
             $this->configParser->reveal(),
-            $this->expressionFactory->reveal(),
             $this->expressionLoader->reveal()
         );
     }
 
-    public function testLoadReturnsACorrectlyBuiltComparisonExpression()
+    public function testLoadReturnsACorrectlyBuiltComparisonExpressionNode()
     {
         $config = [
             'type' => 'comparison',
@@ -86,20 +75,17 @@ class ComparisonExpressionLoaderTest extends TestCase
                 'number' => 101.99
             ]
         ];
-        $leftOperandExpression = $this->prophesize(ExpressionInterface::class);
-        $rightOperandExpression = $this->prophesize(ExpressionInterface::class);
+        $leftOperandExpression = $this->prophesize(ExpressionNodeInterface::class);
+        $rightOperandExpression = $this->prophesize(ExpressionNodeInterface::class);
         $this->expressionLoader->load($config['left'])->willReturn($leftOperandExpression->reveal());
         $this->expressionLoader->load($config['right'])->willReturn($rightOperandExpression->reveal());
-        $this->expressionFactory->createComparisonExpression(
-            Argument::is($leftOperandExpression->reveal()),
-            '<>',
-            Argument::is($rightOperandExpression->reveal())
-        )->willReturn($this->comparisonExpression->reveal());
 
-        $resultExpression = $this->loader->load($config);
+        $resultExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultExpression)->exactlyEquals($this->comparisonExpression->reveal());
-
+        $this->assert($resultExpressionNode)->isAnInstanceOf(ComparisonExpressionNode::class);
+        $this->assert($resultExpressionNode->getLeftOperandExpression())->isTheSameAs($leftOperandExpression->reveal());
+        $this->assert($resultExpressionNode->getOperator())->isTheSameAs('<>');
+        $this->assert($resultExpressionNode->getRightOperandExpression())->isTheSameAs($rightOperandExpression->reveal());
     }
 
     public function testGetTypeReturnsTheCorrectType()

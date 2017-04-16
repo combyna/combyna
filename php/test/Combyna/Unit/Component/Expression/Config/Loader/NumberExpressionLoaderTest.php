@@ -9,13 +9,12 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Harness\TestCase;
-use Combyna\Component\Expression\Config\Loader\NumberExpressionLoader;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
+use Combyna\Component\Expression\Config\Loader\NumberExpressionLoader;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -32,11 +31,6 @@ class NumberExpressionLoaderTest extends TestCase
     private $configParser;
 
     /**
-     * @var ObjectProphecy|ExpressionFactoryInterface
-     */
-    private $expressionFactory;
-
-    /**
      * @var NumberExpressionLoader
      */
     private $loader;
@@ -44,28 +38,15 @@ class NumberExpressionLoaderTest extends TestCase
     public function setUp()
     {
         $this->configParser = $this->prophesize(ConfigParser::class);
-        $this->expressionFactory = $this->prophesize(ExpressionFactoryInterface::class);
 
-        $this->expressionFactory->createNumberExpression(Argument::any())
-            ->will($this->noBind(function (array $args) {
-                /** @var ObjectProphecy|NumberExpression $numberExpression */
-                $numberExpression = $this->prophesize(NumberExpression::class);
-                $numberExpression->toNative()->willReturn($args[0]);
-
-                return $numberExpression;
-            }));
-
-        $this->loader = new NumberExpressionLoader(
-            $this->configParser->reveal(),
-            $this->expressionFactory->reveal()
-        );
+        $this->loader = new NumberExpressionLoader($this->configParser->reveal());
     }
 
     /**
      * @dataProvider numberProvider
      * @param number $number
      */
-    public function testLoadReturnsANumberExpressionWithTheCorrectNativeValue($number)
+    public function testLoadReturnsANumberExpressionNodeWithTheCorrectNativeValue($number)
     {
         $config = [
             'type' => 'number',
@@ -76,7 +57,7 @@ class NumberExpressionLoaderTest extends TestCase
 
         $numberExpression = $this->loader->load($config);
 
-        $this->assert($numberExpression)->isAnInstanceOf(NumberExpression::class);
+        $this->assert($numberExpression)->isAnInstanceOf(NumberExpressionNode::class);
         $this->assert($numberExpression->toNative())->exactlyEquals($number);
     }
 

@@ -31,6 +31,8 @@ use Combyna\Component\Environment\Library\Library;
 use Combyna\Component\Environment\Library\NativeFunction;
 use Combyna\Parameter\ParameterBagModel;
 use Combyna\Component\Type\StaticType;
+use Symfony\Component\Translation\Loader\ArrayLoader;
+use Symfony\Component\Translation\Translator;
 
 /**
  * Class BasicExpressionIntegratedTest
@@ -67,9 +69,11 @@ class BasicExpressionIntegratedTest extends TestCase
     public function setUp()
     {
         $staticExpressionFactory = new StaticExpressionFactory();
+        $translator = new Translator('en');
+        $translator->addLoader('yaml', new ArrayLoader());
         $this->validationFactory = new ValidationFactory();
         $this->bagFactory = new BagFactory($staticExpressionFactory, $this->validationFactory);
-        $this->environment = new Environment();
+        $this->environment = new Environment($translator);
         $this->evaluationContextFactory = new EvaluationContextFactory($this->bagFactory);
 
         $this->environment->installLibrary(
@@ -97,6 +101,16 @@ class BasicExpressionIntegratedTest extends TestCase
                         },
                         new StaticType(NumberExpression::class)
                     )
+                ],
+                [],
+                [
+                    'en' => [
+                        'my' => [
+                            'translation' => [
+                                'key' => ' and done'
+                            ]
+                        ]
+                    ]
                 ]
             )
         );
@@ -166,7 +180,7 @@ class BasicExpressionIntegratedTest extends TestCase
                                 $this->expressionFactory->createTextExpression('heLLO')
                             ),
                             $this->expressionFactory->createTextExpression(' - insensitively equal '),
-                            $this->expressionFactory->createTextExpression('wronf')
+                            $this->expressionFactory->createTextExpression('wrong')
                         ),
                         $this->expressionFactory->createConcatenationExpression(
                             $this->expressionFactory->createMapExpression(
@@ -193,7 +207,8 @@ class BasicExpressionIntegratedTest extends TestCase
                                 )
                             ),
                             $this->expressionFactory->createTextExpression(':')
-                        )
+                        ),
+                        $this->expressionFactory->createTranslationExpression('my.translation.key')
                     ])
                 )
             )
@@ -204,7 +219,7 @@ class BasicExpressionIntegratedTest extends TestCase
 
         $this->assertInstanceOf(TextExpression::class, $resultStatic);
         $this->assert($resultStatic->toNative())->exactlyEquals(
-            '14 is my result - it was zero, oops - insensitively equal 1=20:2=100'
+            '14 is my result - it was zero, oops - insensitively equal 1=20:2=100 and done'
         );
     }
 }

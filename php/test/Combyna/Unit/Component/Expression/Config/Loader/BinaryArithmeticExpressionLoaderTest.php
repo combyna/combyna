@@ -9,15 +9,14 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\BinaryArithmeticExpression;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Harness\TestCase;
-use Combyna\Component\Expression\Config\Loader\BinaryArithmeticExpressionLoader;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
+use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Config\Loader\BinaryArithmeticExpressionLoader;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -29,19 +28,9 @@ use Prophecy\Prophecy\ObjectProphecy;
 class BinaryArithmeticExpressionLoaderTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|BinaryArithmeticExpression
-     */
-    private $binaryExpression;
-
-    /**
      * @var ObjectProphecy|ConfigParser
      */
     private $configParser;
-
-    /**
-     * @var ObjectProphecy|ExpressionFactoryInterface
-     */
-    private $expressionFactory;
 
     /**
      * @var ObjectProphecy|ExpressionLoaderInterface
@@ -55,9 +44,7 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
 
     public function setUp()
     {
-        $this->binaryExpression = $this->prophesize(BinaryArithmeticExpression::class);
         $this->configParser = $this->prophesize(ConfigParser::class);
-        $this->expressionFactory = $this->prophesize(ExpressionFactoryInterface::class);
         $this->expressionLoader = $this->prophesize(ExpressionLoaderInterface::class);
 
         $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any())
@@ -67,12 +54,11 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
 
         $this->loader = new BinaryArithmeticExpressionLoader(
             $this->configParser->reveal(),
-            $this->expressionFactory->reveal(),
             $this->expressionLoader->reveal()
         );
     }
 
-    public function testLoadReturnsACorrectlyBuiltBinaryArithmeticExpression()
+    public function testLoadReturnsACorrectlyBuiltBinaryArithmeticExpressionNode()
     {
         $config = [
             'type' => 'binary-arithmetic',
@@ -86,20 +72,17 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
                 'number' => 101.99
             ]
         ];
-        $leftOperandExpression = $this->prophesize(ExpressionInterface::class);
-        $rightOperandExpression = $this->prophesize(ExpressionInterface::class);
-        $this->expressionLoader->load($config['left'])->willReturn($leftOperandExpression->reveal());
-        $this->expressionLoader->load($config['right'])->willReturn($rightOperandExpression->reveal());
-        $this->expressionFactory->createBinaryArithmeticExpression(
-            Argument::is($leftOperandExpression->reveal()),
-            '+',
-            Argument::is($rightOperandExpression->reveal())
-        )->willReturn($this->binaryExpression->reveal());
+        $leftOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
+        $rightOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
+        $this->expressionLoader->load($config['left'])->willReturn($leftOperandExpressionNode->reveal());
+        $this->expressionLoader->load($config['right'])->willReturn($rightOperandExpressionNode->reveal());
 
-        $resultExpression = $this->loader->load($config);
+        $resultExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultExpression)->exactlyEquals($this->binaryExpression->reveal());
-
+        $this->assert($resultExpressionNode)->isAnInstanceOf(BinaryArithmeticExpressionNode::class);
+        $this->assert($resultExpressionNode->getLeftOperandExpression())->isTheSameAs($leftOperandExpressionNode->reveal());
+        $this->assert($resultExpressionNode->getOperator())->isTheSameAs('+');
+        $this->assert($resultExpressionNode->getRightOperandExpression())->isTheSameAs($rightOperandExpressionNode->reveal());
     }
 
     public function testGetTypeReturnsTheCorrectType()

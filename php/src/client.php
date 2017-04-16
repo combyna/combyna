@@ -9,9 +9,6 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-function array_key_exists($key, $haystack) {
-    return true;
-}
 function is_bool($value) {
     return true;
 }
@@ -25,14 +22,29 @@ function is_string($value) {
     return true;
 }
 
-use Combyna\Client\Client;
 use Combyna\Combyna;
+use Combyna\CombynaBootstrap;
+use Combyna\Component\Renderer\Html\ArrayRenderer;
 
+// Load Composer's autoloader
+require_once __DIR__ . '/../../vendor/autoload.php';
+
+$combynaBootstrap = new CombynaBootstrap();
+$container = $combynaBootstrap->getContainer(false);
 /** @var Combyna $combyna */
-$combyna = require_once __DIR__ . '/combyna.php';
-$engine = $combyna->createApp([
+$combyna = $container->get('combyna');
+/** @var ArrayRenderer $arrayRenderer */
+$arrayRenderer = $container->get('combyna.renderer.array');
 
-]);
-$client = new Client($engine);
+return function (array $environmentConfig, array $appConfig) use ($combyna, $arrayRenderer) {
+    $environment = $combyna->createEnvironment($environmentConfig);
 
-$client->start();
+    $app = $combyna->createApp($appConfig, $environment);
+
+    return function ($viewName, array $viewAttributes = []) use ($app, $arrayRenderer) {
+        $renderedView = $app->renderView($viewName);
+        $renderedViewArray = $arrayRenderer->renderView($renderedView);
+
+        return $renderedViewArray;
+    };
+};

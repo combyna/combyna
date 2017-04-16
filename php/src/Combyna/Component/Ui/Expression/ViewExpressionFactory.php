@@ -257,6 +257,14 @@ class ViewExpressionFactory implements ViewExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createTranslationExpression($translationKey, ExpressionBagInterface $parameterExpressionBag = null)
+    {
+        return $this->parentExpressionFactory->createTranslationExpression($translationKey, $parameterExpressionBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createVariableExpression($variableName)
     {
         return $this->parentExpressionFactory->createVariableExpression($variableName);

@@ -52,6 +52,12 @@ class ExpressionNodePromoter
      */
     public function promote(ExpressionNodeInterface $expressionNode)
     {
+        if (!array_key_exists($expressionNode->getType(), $this->typePromoters)) {
+            throw new InvalidArgumentException(
+                'No expression promoter of type "' . $expressionNode->getType() . '" is registered'
+            );
+        }
+
         return $this->typePromoters[$expressionNode->getType()]->promote($expressionNode);
     }
 }

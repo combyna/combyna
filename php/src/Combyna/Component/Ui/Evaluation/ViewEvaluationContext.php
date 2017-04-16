@@ -112,4 +112,12 @@ class ViewEvaluationContext implements ViewEvaluationContextInterface
 
         return $this->parentContext->getVariable($variableName);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function translate($translationKey, array $parameters = [])
+    {
+        return $this->parentContext->translate($translationKey, $parameters);
+    }
 }

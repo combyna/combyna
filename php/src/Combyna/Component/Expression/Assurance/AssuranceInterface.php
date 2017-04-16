@@ -13,8 +13,6 @@ namespace Combyna\Component\Expression\Assurance;
 
 use Combyna\Component\Bag\MutableStaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface AssuranceInterface
@@ -62,21 +60,4 @@ interface AssuranceInterface
      * @return string[]
      */
     public function getRequiredAssuredStaticNames();
-
-    /**
-     * Fetches the type that a static this assurance defines must evaluate to
-     *
-     * @param ValidationContextInterface $validationContext
-     * @param string $assuredStaticName
-     * @return TypeInterface
-     */
-    public function getStaticType(ValidationContextInterface $validationContext, $assuredStaticName);
-
-    /**
-     * Checks that all operands for this assurance validate recursively and that they will only
-     * resolve to the expected types of static expression
-     *
-     * @param ValidationContextInterface $validationContext
-     */
-    public function validate(ValidationContextInterface $validationContext);
 }

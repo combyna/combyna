@@ -9,33 +9,26 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression;
+namespace Combyna\Unit\Component\Expression;
 
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
+use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticType;
 use InvalidArgumentException;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * Class NumberExpressionTest
+ * Class NumberExpressionNodeTest
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NumberExpressionTest extends TestCase
+class NumberExpressionNodeTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|EvaluationContextInterface
+     * @var NumberExpressionNode
      */
-    private $evaluationContext;
-
-    /**
-     * @var NumberExpression
-     */
-    private $expression;
+    private $node;
 
     /**
      * @var ObjectProphecy|ValidationContextInterface
@@ -44,10 +37,9 @@ class NumberExpressionTest extends TestCase
 
     public function setUp()
     {
-        $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
-        $this->expression = new NumberExpression(21);
+        $this->node = new NumberExpressionNode(21);
     }
 
     /**
@@ -56,7 +48,7 @@ class NumberExpressionTest extends TestCase
      */
     public function testConstructorAllowsValidNumbers($number)
     {
-        new NumberExpression($number);
+        new NumberExpressionNode($number);
     }
 
     /**
@@ -79,10 +71,10 @@ class NumberExpressionTest extends TestCase
     {
         $this->setExpectedException(
             InvalidArgumentException::class,
-            'NumberExpression expects a float or int, ' . $type . ' given'
+            'NumberExpressionNode expects a float or int, ' . $type . ' given'
         );
 
-        new NumberExpression($nonNumber);
+        new NumberExpressionNode($nonNumber);
     }
 
     /**
@@ -99,7 +91,7 @@ class NumberExpressionTest extends TestCase
 
     public function testGetResultTypeReturnsAStaticNumberType()
     {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
+        $resultType = $this->node->getResultType($this->validationContext->reveal());
 
         $this->assert($resultType)->isAnInstanceOf(StaticType::class);
         $this->assert($resultType->getSummary())->exactlyEquals('number');
@@ -107,17 +99,11 @@ class NumberExpressionTest extends TestCase
 
     public function testGetTypeReturnsTheNumberType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('number');
+        $this->assert($this->node->getType())->exactlyEquals('number');
     }
 
     public function testToNativeReturnsTheNativeNumberValue()
     {
-        $this->assert($this->expression->toNative())->exactlyEquals(21);
-    }
-
-    public function testToStaticReturnsItself()
-    {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        $this->assert($this->node->toNative())->exactlyEquals(21);
     }
 }

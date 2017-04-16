@@ -9,33 +9,26 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Expression;
+namespace Combyna\Unit\Component\Expression;
 
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\Config\Act\TextExpressionNode;
+use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticType;
 use InvalidArgumentException;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
- * Class TextExpressionTest
+ * Class TextExpressionNodeTest
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TextExpressionTest extends TestCase
+class TextExpressionNodeTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|EvaluationContextInterface
+     * @var TextExpressionNode
      */
-    private $evaluationContext;
-
-    /**
-     * @var TextExpression
-     */
-    private $expression;
+    private $node;
 
     /**
      * @var ObjectProphecy|ValidationContextInterface
@@ -44,10 +37,9 @@ class TextExpressionTest extends TestCase
 
     public function setUp()
     {
-        $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
-        $this->expression = new TextExpression('this is my string');
+        $this->node = new TextExpressionNode('this is my string');
     }
 
     /**
@@ -56,7 +48,7 @@ class TextExpressionTest extends TestCase
      */
     public function testConstructorAllowsValidStrings($string)
     {
-        new TextExpression($string);
+        new TextExpressionNode($string);
     }
 
     /**
@@ -79,10 +71,10 @@ class TextExpressionTest extends TestCase
     {
         $this->setExpectedException(
             InvalidArgumentException::class,
-            'TextExpression expects a string, ' . $type . ' given'
+            'TextExpressionNode expects a string, ' . $type . ' given'
         );
 
-        new TextExpression($nonString);
+        new TextExpressionNode($nonString);
     }
 
     /**
@@ -100,7 +92,7 @@ class TextExpressionTest extends TestCase
 
     public function testGetResultTypeReturnsAStaticTextType()
     {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
+        $resultType = $this->node->getResultType($this->validationContext->reveal());
 
         $this->assert($resultType)->isAnInstanceOf(StaticType::class);
         $this->assert($resultType->getSummary())->exactlyEquals('text');
@@ -108,17 +100,11 @@ class TextExpressionTest extends TestCase
 
     public function testGetTypeReturnsTheTextType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('text');
+        $this->assert($this->node->getType())->exactlyEquals('text');
     }
 
     public function testToNativeReturnsTheNativeTextString()
     {
-        $this->assert($this->expression->toNative())->exactlyEquals('this is my string');
-    }
-
-    public function testToStaticReturnsItself()
-    {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        $this->assert($this->node->toNative())->exactlyEquals('this is my string');
     }
 }

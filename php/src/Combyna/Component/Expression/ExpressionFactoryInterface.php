@@ -234,6 +234,15 @@ interface ExpressionFactoryInterface
     public function createTextExpression($text);
 
     /**
+     * Creates a TranslationExpression
+     *
+     * @param string $translationKey
+     * @param ExpressionBagInterface|null $parameterExpressionBag
+     * @return TranslationExpression
+     */
+    public function createTranslationExpression($translationKey, ExpressionBagInterface $parameterExpressionBag = null);
+
+    /**
      * Creates a VariableExpression
      *
      * @param string $variableName

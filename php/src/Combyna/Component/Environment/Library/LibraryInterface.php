@@ -41,6 +41,13 @@ interface LibraryInterface
     public function getName();
 
     /**
+     * Fetches an associative array of translation locales to translations
+     *
+     * @return array
+     */
+    public function getTranslations();
+
+    /**
      * Fetches a widget definition defined by this library
      *
      * @param string $widgetDefinitionName

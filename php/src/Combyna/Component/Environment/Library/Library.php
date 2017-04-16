@@ -33,6 +33,11 @@ class Library implements LibraryInterface
     private $name;
 
     /**
+     * @var array
+     */
+    private $translations;
+
+    /**
      * @var WidgetDefinitionInterface[]
      */
     private $widgetDefinitions = [];
@@ -41,8 +46,9 @@ class Library implements LibraryInterface
      * @param string $name
      * @param FunctionInterface[] $functions
      * @param WidgetDefinitionInterface[] $widgetDefinitions
+     * @param array $translations
      */
-    public function __construct($name, array $functions = [], array $widgetDefinitions = [])
+    public function __construct($name, array $functions = [], array $widgetDefinitions = [], array $translations = [])
     {
         $this->name = $name;
 
@@ -50,6 +56,8 @@ class Library implements LibraryInterface
         foreach ($functions as $function) {
             $this->functions[$function->getName()] = $function;
         }
+
+        $this->translations = $translations;
 
         // Index the widget functions by name to simplify lookups
         foreach ($widgetDefinitions as $widgetDefinition) {
@@ -77,6 +85,14 @@ class Library implements LibraryInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTranslations()
+    {
+        return $this->translations;
     }
 
     /**

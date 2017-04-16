@@ -1,4 +1,8 @@
 services:
+    combyna.renderer.array:
+        class: Combyna\Component\Renderer\Html\ArrayRenderer
+        autowire: true
+
     combyna.renderer.html:
         class: Combyna\Component\Renderer\Html\HtmlRenderer
         autowire: true

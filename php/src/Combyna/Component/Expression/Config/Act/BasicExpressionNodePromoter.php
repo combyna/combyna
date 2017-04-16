@@ -27,6 +27,7 @@ use Combyna\Component\Expression\MapExpression;
 use Combyna\Component\Expression\NothingExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\TranslationExpression;
 use Combyna\Component\Expression\VariableExpression;
 use InvalidArgumentException;
 
@@ -67,6 +68,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
         NothingExpressionNode::TYPE => 'promoteNothingExpression',
         NumberExpressionNode::TYPE => 'promoteNumberExpression',
         TextExpressionNode::TYPE => 'promoteTextExpression',
+        TranslationExpressionNode::TYPE => 'promoteTranslationExpression',
         VariableExpressionNode::TYPE => 'promoteVariableExpression'
     ];
 
@@ -110,6 +112,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
      * @uses promoteNothingExpression
      * @uses promoteNumberExpression
      * @uses promoteTextExpression
+     * @uses promoteTranslationExpression
      * @uses promoteVariableExpression
      */
     public function promote(ExpressionNodeInterface $expressionNode)
@@ -341,6 +344,19 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     private function promoteTextExpression(TextExpressionNode $expressionNode)
     {
         return $this->expressionFactory->createTextExpression($expressionNode->toNative());
+    }
+
+    /**
+     * Promotes the specified node to an actual TranslationExpression
+     *
+     * @param TranslationExpressionNode $expressionNode
+     * @return TranslationExpression
+     * @used-by promote
+     */
+    private function promoteTranslationExpression(TranslationExpressionNode $expressionNode)
+    {
+        // FIXME: Include parameters
+        return $this->expressionFactory->createTranslationExpression($expressionNode->getTranslationKey());
     }
 
     /**

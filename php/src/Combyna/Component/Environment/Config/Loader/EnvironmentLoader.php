@@ -49,7 +49,12 @@ class EnvironmentLoader implements EnvironmentLoaderInterface
      */
     public function loadEnvironment(array $environmentConfig)
     {
-        $libraryConfigs = $this->configParser->getElement($environmentConfig, 'libraries', 'environment libraries');
+        $libraryConfigs = $this->configParser->getOptionalElement(
+            $environmentConfig,
+            'libraries',
+            'environment libraries',
+            []
+        );
         $libraryNodes = [];
 
         foreach ($libraryConfigs as $libraryConfig) {

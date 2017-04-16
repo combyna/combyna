@@ -28,7 +28,7 @@ class DelegatingWidgetRenderer
     private $widgetRenderers = [];
 
     /**
-     * Adds a renderer for a new type of widget
+     * Adds a renderer for a new type of core widget
      *
      * @param WidgetRendererInterface $renderer
      */
