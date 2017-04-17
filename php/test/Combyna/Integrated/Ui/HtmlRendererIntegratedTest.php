@@ -20,11 +20,11 @@ use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class HtmlRendererWithNoLogicTest
+ * Class HtmlRendererIntegratedTest
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class HtmlRendererWithNoLogicTest extends TestCase
+class HtmlRendererIntegratedTest extends TestCase
 {
     /**
      * @var App
@@ -81,7 +81,10 @@ class HtmlRendererWithNoLogicTest extends TestCase
                 ]
             ]
         ]);
+    }
 
+    public function testRenderViewReturnsTheCorrectHtmlWhenAppHasNoLogic()
+    {
         $this->app = $this->combyna->createApp([
             'name' => 'My test Combyna app',
             'translations' => [],
@@ -106,10 +109,7 @@ class HtmlRendererWithNoLogicTest extends TestCase
                 ]
             ]
         ], $this->environment);
-    }
 
-    public function testRenderViewReturnsTheCorrectHtml()
-    {
         $renderedView = $this->app->renderView('my_view');
         $renderedHtml = $this->htmlRenderer->renderView($renderedView);
 
