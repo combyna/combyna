@@ -85,6 +85,7 @@ class ValidationIntegratedTest extends TestCase
         $this->environmentNode = new EnvironmentNode([
             new LibraryNode(
                 'text',
+                'A library for processing of text data',
                 [
                     new NativeFunctionNode('text', 'length')
                 ]
@@ -94,11 +95,11 @@ class ValidationIntegratedTest extends TestCase
 
         $this->environmentNode->installNativeFunction(
             'text',
-            'length',
             new NativeFunction(
                 'length',
                 new ParameterBagModel(
                     new FixedStaticBagModel(
+                        $this->bagFactory,
                         $this->validationFactory,
                         [
                             new FixedStaticDefinition(

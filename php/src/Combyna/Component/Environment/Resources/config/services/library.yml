@@ -1,0 +1,4 @@
+services:
+    combyna.environment.library_factory:
+        class: Combyna\Component\Environment\Library\LibraryFactory
+        autowire: true

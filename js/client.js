@@ -37,55 +37,22 @@ clientModule.getStderr().on('data', function (data) {
     console.warn(data);
 });
 
-const renderView = clientModule.execute().getNative()(
-    {
-        'libraries': [
-            {
-                'name': 'gui',
-                'description': 'GUI tools',
-                'widgets': {
-                    'button': {
-                        'type': 'core',
-                        'attributes': {'label': 'text'},
-                        'children': []
-                    }
-                }
-            }
-        ]
-    },
-    {
-        'name': 'My test Combyna app',
-        'translations': {
-            'en': {
-                'form': {
-                    'button_label': 'Click me (translated!)'
-                }
-            }
-        },
-        'views': {
-            'my_view': {
-                'title': {
-                    'type': 'text',
-                    'text': 'My view'
-                },
-                'description': 'A test view, for testing',
-                'widget': {
-                    'type': 'gui.button',
-                    'attributes': {
-                        'label': {'type': 'translation', 'key': 'form.button_label'}
-                    },
-                    'children': null
-                },
-                'store': null
-            }
-        }
-    }
+const scriptElement = document.getElementById('appConfig');
+
+if (!scriptElement) {
+    throw new Error('Cannot find #appConfig element');
+}
+
+const fullConfigJson = scriptElement.text;
+const fullConfig = JSON.parse(fullConfigJson);
+const phpAPI = clientModule.execute().getNative()(
+    fullConfig.environment,
+    fullConfig.app
 );
 
 ReactDOM.render(
     React.createElement(ViewComponent, {
-        name: 'my_view',
-        renderView: renderView
+        phpAPI: phpAPI
     }),
     document.getElementById('app')
 );

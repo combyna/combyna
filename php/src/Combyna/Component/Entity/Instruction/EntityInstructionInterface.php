@@ -13,6 +13,7 @@ namespace Combyna\Component\Entity\Instruction;
 
 use Combyna\Component\Entity\EntityStorageInterface;
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Instruction\InstructionInterface;
 
 /**
  * Interface EntityInstructionInterface
@@ -21,13 +22,6 @@ use Combyna\Component\Bag\StaticBagInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface EntityInstructionInterface
+interface EntityInstructionInterface extends InstructionInterface
 {
-    /**
-     * Performs the operation that this instruction specifies
-     *
-     * @param StaticBagInterface $argumentStaticBag,
-     * @param EntityStorageInterface $storage
-     */
-    public function perform(StaticBagInterface $argumentStaticBag, EntityStorageInterface $storage);
 }

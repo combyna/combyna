@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Common;
 
+use ReflectionClass;
+
 /**
  * Class AbstractComponent
  *
@@ -29,7 +31,17 @@ abstract class AbstractComponent implements ComponentInterface
             return null;
         }
 
-        return new $extensionClass();
+        return new $extensionClass($this);
+    }
+
+    /**
+     * {@inheritdoc]
+     */
+    public function getDirectory()
+    {
+        $reflectionClass = new ReflectionClass(static::class);
+
+        return dirname($reflectionClass->getFileName());
     }
 
     /**

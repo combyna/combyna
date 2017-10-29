@@ -1,0 +1,14 @@
+services:
+    combyna.trigger.instruction.promoter:
+        class: Combyna\Component\Trigger\Config\Act\DelegatingInstructionNodePromoter
+        autowire: true
+
+    combyna.trigger.promoter.signal_instruction_node:
+        class: Combyna\Component\Trigger\Config\Act\SignalInstructionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.trigger_instruction_promoter}
+
+    combyna.trigger.promoter.trigger_node:
+        class: Combyna\Component\Trigger\Config\Act\TriggerNodePromoter
+        autowire: true

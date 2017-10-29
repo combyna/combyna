@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
+use Combyna\Component\Common\DelegatorInterface;
 use InvalidArgumentException;
 
 /**
@@ -18,7 +19,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DelegatingExpressionLoader implements ExpressionLoaderInterface
+class DelegatingExpressionLoader implements ExpressionLoaderInterface, DelegatorInterface
 {
     /**
      * @var ExpressionTypeLoaderInterface[]

@@ -7,10 +7,6 @@ services:
         class: Combyna\Component\Environment\EnvironmentFactory
         autowire: true
 
-    combyna.environment.library.factory:
-        class: Combyna\Component\Environment\Library\LibraryFactory
-        autowire: true
-
     combyna.environment.translator:
         class: Symfony\Component\Translation\Translator
         arguments:

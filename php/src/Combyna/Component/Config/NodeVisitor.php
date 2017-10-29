@@ -11,17 +11,19 @@
 
 namespace Combyna\Component\Config;
 
+use Combyna\Component\Common\DelegatorInterface;
+
 /**
  * Class NodeVisitor
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NodeVisitor
+class NodeVisitor implements NodeVisitorInterface
 {
     /**
      * @var NodeVisitorInterface[]
      */
-    private $visitors;
+    private $visitors = [];
 
     /**
      * Adds a new visitor to be called for every visited node

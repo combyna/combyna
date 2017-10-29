@@ -12,69 +12,45 @@
 namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Ui\WidgetInterface;
+use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
+use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class ViewEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ViewEvaluationContext implements ViewEvaluationContextInterface
+class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEvaluationContextInterface
 {
     /**
      * @var UiEvaluationContextFactory
      */
-    private $evaluationContextFactory;
+    protected $evaluationContextFactory;
 
     /**
-     * @var EvaluationContextInterface
+     * @var UiEvaluationContextInterface
      */
-    private $parentContext;
+    protected $parentContext;
 
     /**
-     * @var StaticBagInterface
+     * @var StaticBagInterface|null
      */
     private $variableStaticBag;
 
     /**
      * @param UiEvaluationContextFactory $evaluationContextFactory
-     * @param EvaluationContextInterface $parentContext
-     * @param StaticBagInterface $variableStaticBag
+     * @param UiEvaluationContextInterface $parentContext
+     * @param StaticBagInterface|null $variableStaticBag
      */
     public function __construct(
         UiEvaluationContextFactory $evaluationContextFactory,
-        EvaluationContextInterface $parentContext,
-        StaticBagInterface $variableStaticBag
+        UiEvaluationContextInterface $parentContext,
+        StaticBagInterface $variableStaticBag = null
     ) {
-        $this->evaluationContextFactory = $evaluationContextFactory;
-        $this->parentContext = $parentContext;
+        parent::__construct($evaluationContextFactory, $parentContext);
+
         $this->variableStaticBag = $variableStaticBag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
-    {
-        return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubExpressionContext(ExpressionInterface $expression)
-    {
-        return $this->evaluationContextFactory->createExpressionContext($this, $expression);
     }
 
     /**
@@ -88,6 +64,14 @@ class ViewEvaluationContext implements ViewEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubStoreContext(UiStoreStateInterface $storeState)
+    {
+        return $this->evaluationContextFactory->createViewStoreEvaluationContext($this, $storeState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
         return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
@@ -96,28 +80,12 @@ class ViewEvaluationContext implements ViewEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getAssuredStatic($assuredStaticName)
-    {
-        return $this->parentContext->getAssuredStatic($assuredStaticName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getVariable($variableName)
     {
-        if ($this->variableStaticBag->hasStatic($variableName)) {
+        if ($this->variableStaticBag && $this->variableStaticBag->hasStatic($variableName)) {
             return $this->variableStaticBag->getStatic($variableName);
         }
 
         return $this->parentContext->getVariable($variableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function translate($translationKey, array $parameters = [])
-    {
-        return $this->parentContext->translate($translationKey, $parameters);
     }
 }

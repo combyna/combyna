@@ -46,4 +46,14 @@ interface StaticBagInterface
      * @return array
      */
     public function toNativeArray();
+
+    /**
+     * Either creates a new static bag with the specified slot static value
+     * or just returns the current one, if it already has the same static value
+     *
+     * @param string $slotName
+     * @param StaticInterface $newSlotStatic
+     * @return StaticBagInterface
+     */
+    public function withSlotStatic($slotName, StaticInterface $newSlotStatic);
 }

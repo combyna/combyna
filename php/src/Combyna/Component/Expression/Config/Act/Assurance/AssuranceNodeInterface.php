@@ -12,7 +12,7 @@
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Expression\Config\Act\ExpressionNodePromoter;
+use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -61,12 +61,12 @@ interface AssuranceNodeInterface extends ActNodeInterface
      * Promotes this node to an actual Assurance
      *
      * @param ExpressionFactoryInterface $expressionFactory
-     * @param ExpressionNodePromoter $expressionNodePromoter
+     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      * @return AssuranceInterface
      */
     public function promote(
         ExpressionFactoryInterface $expressionFactory,
-        ExpressionNodePromoter $expressionNodePromoter
+        DelegatingExpressionNodePromoter $expressionNodePromoter
     );
 
     /**

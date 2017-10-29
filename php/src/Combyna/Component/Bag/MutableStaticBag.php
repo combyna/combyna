@@ -80,4 +80,12 @@ class MutableStaticBag implements MutableStaticBagInterface
 
         return $nativeArray;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    {
+        throw new \Exception('Not implemented');
+    }
 }

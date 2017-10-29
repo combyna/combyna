@@ -57,6 +57,15 @@ class UnknownWidgetDefinitionNode extends AbstractActNode implements WidgetDefin
     /**
      * {@inheritdoc}
      */
+    public function getEventDefinitions()
+    {
+        // We should never reach this point, as validation should have failed
+        throw new LogicException('Unknown widget definition should not be queried for its event definitions');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLibraryName()
     {
         return $this->libraryName;

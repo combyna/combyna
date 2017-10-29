@@ -14,7 +14,8 @@ namespace Combyna\Component\Ui\Config\Loader;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
-use Combyna\Component\Ui\Config\Act\ViewNode;
+use Combyna\Component\Ui\Config\Act\PageViewNode;
+use Combyna\Component\Ui\Store\Config\Loader\ViewStoreLoaderInterface;
 
 /**
  * Class ViewLoader
@@ -34,6 +35,11 @@ class ViewLoader implements ViewLoaderInterface
     private $fixedStaticBagModelLoader;
 
     /**
+     * @var ViewStoreLoaderInterface
+     */
+    private $storeLoader;
+
+    /**
      * @var WidgetLoaderInterface
      */
     private $widgetLoader;
@@ -41,42 +47,49 @@ class ViewLoader implements ViewLoaderInterface
     /**
      * @param ExpressionLoaderInterface $expressionLoader
      * @param FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader
+     * @param ViewStoreLoaderInterface $storeLoader
      * @param WidgetLoaderInterface $widgetLoader
      */
     public function __construct(
         ExpressionLoaderInterface $expressionLoader,
         FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader,
+        ViewStoreLoaderInterface $storeLoader,
         WidgetLoaderInterface $widgetLoader
     ) {
         $this->expressionLoader = $expressionLoader;
         $this->fixedStaticBagModelLoader = $fixedStaticBagModelLoader;
+        $this->storeLoader = $storeLoader;
         $this->widgetLoader = $widgetLoader;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadView($name, array $viewConfig, EnvironmentNode $environmentNode)
+    public function loadPageView($name, array $viewConfig, EnvironmentNode $environmentNode)
     {
         $titleExpressionNode = $this->expressionLoader->load($viewConfig['title']);
         $description = $viewConfig['description'];
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load(
-            array_key_exists('attributes', $viewConfig) ? $viewConfig['attributes'] : []
+            isset($viewConfig['attributes']) ? $viewConfig['attributes'] : []
         );
         $rootWidgetNode = $this->widgetLoader->loadWidget(
             $viewConfig['widget'],
             $environmentNode
         );
-        $visibilityExpressionNode = array_key_exists('visible', $viewConfig) ?
+        $storeNode = isset($viewConfig['store']) ?
+            $this->storeLoader->load($viewConfig['store']) :
+            null;
+        $visibilityExpressionNode = isset($viewConfig['visible']) ?
             $this->expressionLoader->load($viewConfig['visible']) :
             null;
 
-        return new ViewNode(
+        return new PageViewNode(
             $name,
             $titleExpressionNode,
             $description,
             $attributeBagModelNode,
             $rootWidgetNode,
+            $storeNode,
             $visibilityExpressionNode
         );
     }

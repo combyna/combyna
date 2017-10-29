@@ -1,0 +1,8 @@
+services:
+    combyna.event.loader.event_definition:
+        class: Combyna\Component\Event\Config\Loader\EventDefinitionLoader
+        autowire: true
+
+    combyna.event.loader.event_definition_reference:
+        class: Combyna\Component\Event\Config\Loader\EventDefinitionReferenceLoader
+        autowire: true

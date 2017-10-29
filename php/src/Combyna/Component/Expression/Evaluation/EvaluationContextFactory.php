@@ -14,6 +14,8 @@ namespace Combyna\Component\Expression\Evaluation;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\Evaluation\EventEvaluationContext;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 
 /**
@@ -49,6 +51,16 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createEventContext(
+        EvaluationContextInterface $parentContext,
+        EventInterface $event
+    ) {
+        return new EventEvaluationContext($this, $parentContext, $event);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createExpressionContext(
         EvaluationContextInterface $parentContext,
         ExpressionInterface $expression
@@ -72,5 +84,13 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
         StaticBagInterface $variableStaticBag
     ) {
         return new ScopeEvaluationContext($this, $parentContext, $variableStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStateTypeToContextFactoryMap()
+    {
+        return [];
     }
 }

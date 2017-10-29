@@ -49,7 +49,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     private $expressionFactory;
 
     /**
-     * @var ExpressionNodePromoter
+     * @var DelegatingExpressionNodePromoter
      */
     private $expressionNodePromoter;
 
@@ -74,12 +74,12 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
 
     /**
      * @param ExpressionFactoryInterface $expressionFactory
-     * @param ExpressionNodePromoter $expressionNodePromoter
+     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      * @param BagNodePromoter $bagNodePromoter
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
-        ExpressionNodePromoter $expressionNodePromoter,
+        DelegatingExpressionNodePromoter $expressionNodePromoter,
         BagNodePromoter $bagNodePromoter
     ) {
         $this->expressionFactory = $expressionFactory;
@@ -271,8 +271,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
             $expressionNode->getLibraryName(),
             $expressionNode->getFunctionName(),
             $this->bagNodePromoter->promoteExpressionBag(
-                $expressionNode->getArgumentExpressionBag(),
-                $this->expressionNodePromoter
+                $expressionNode->getArgumentExpressionBag()
             )
         );
     }
@@ -288,8 +287,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     {
         return $this->expressionFactory->createListExpression(
             $this->bagNodePromoter->promoteExpressionList(
-                $expressionNode->getExpressionList(),
-                $this->expressionNodePromoter
+                $expressionNode->getExpressionList()
             )
         );
     }
@@ -355,8 +353,10 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
      */
     private function promoteTranslationExpression(TranslationExpressionNode $expressionNode)
     {
-        // FIXME: Include parameters
-        return $this->expressionFactory->createTranslationExpression($expressionNode->getTranslationKey());
+        return $this->expressionFactory->createTranslationExpression(
+            $expressionNode->getTranslationKey(),
+            $this->bagNodePromoter->promoteExpressionBag($expressionNode->getArgumentExpressionBag())
+        );
     }
 
     /**

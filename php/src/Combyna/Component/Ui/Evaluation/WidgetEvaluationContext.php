@@ -12,25 +12,27 @@
 namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Ui\WidgetInterface;
+use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class WidgetEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetEvaluationContext implements WidgetEvaluationContextInterface
+class WidgetEvaluationContext extends AbstractEvaluationContext implements WidgetEvaluationContextInterface
 {
     /**
      * @var UiEvaluationContextFactoryInterface
      */
-    private $evaluationContextFactory;
+    protected $evaluationContextFactory;
 
     /**
      * @var ViewEvaluationContextInterface
      */
-    private $parentContext;
+    protected $parentContext;
 
     /**
      * @var WidgetInterface
@@ -47,8 +49,8 @@ class WidgetEvaluationContext implements WidgetEvaluationContextInterface
         ViewEvaluationContextInterface $parentContext,
         WidgetInterface $widget
     ) {
-        $this->evaluationContextFactory = $evaluationContextFactory;
-        $this->parentContext = $parentContext;
+        parent::__construct($evaluationContextFactory, $parentContext);
+
         $this->widget = $widget;
     }
 
@@ -87,6 +89,14 @@ class WidgetEvaluationContext implements WidgetEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubStoreContext(UiStoreStateInterface $storeState)
+    {
+        return $this->evaluationContextFactory->createWidgetStoreEvaluationContext($this, $storeState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAssuredStatic($assuredStaticName)
     {
         return $this->parentContext->getAssuredStatic($assuredStaticName);
@@ -103,6 +113,14 @@ class WidgetEvaluationContext implements WidgetEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidget()
+    {
+        return $this->widget;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
         return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
@@ -111,8 +129,8 @@ class WidgetEvaluationContext implements WidgetEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function translate($translationKey, array $parameters = [])
+    public function translate($translationKey, array $arguments = [])
     {
-        return $this->parentContext->translate($translationKey, $parameters);
+        return $this->parentContext->translate($translationKey, $arguments);
     }
 }

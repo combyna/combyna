@@ -14,9 +14,15 @@ namespace Combyna\Component\App\Config\Act;
 use Combyna\Component\App\AppFactoryInterface;
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-use Combyna\Component\Environment\Config\Act\EnvironmentPromoter;
+use Combyna\Component\Environment\Config\Act\EnvironmentNodePromoter;
+use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
-use Combyna\Component\Ui\Config\Act\UiNodePromoter;
+use Combyna\Component\Program\ProgramFactoryInterface;
+use Combyna\Component\Router\Config\Act\RouteNodePromoter;
+use Combyna\Component\Router\RouterFactoryInterface;
+use Combyna\Component\Signal\Config\Act\SignalDefinitionNodePromoter;
+use Combyna\Component\Signal\SignalFactoryInterface;
+use Combyna\Component\Ui\Config\Act\ViewNodePromoter;
 
 /**
  * Class AppNodePromoter
@@ -31,9 +37,9 @@ class AppNodePromoter
     private $appFactory;
 
     /**
-     * @var EnvironmentPromoter
+     * @var EnvironmentNodePromoter
      */
-    private $environmentPromoter;
+    private $environmentNodePromoter;
 
     /**
      * @var EvaluationContextFactoryInterface
@@ -41,26 +47,74 @@ class AppNodePromoter
     private $evaluationContextFactory;
 
     /**
-     * @var UiNodePromoter
+     * @var HomeNodePromoter
      */
-    private $uiNodePromoter;
+    private $homeNodePromoter;
+
+    /**
+     * @var ProgramFactoryInterface
+     */
+    private $programFactory;
+
+    /**
+     * @var RouteNodePromoter
+     */
+    private $routeNodePromoter;
+
+    /**
+     * @var RouterFactoryInterface
+     */
+    private $routerFactory;
+
+    /**
+     * @var SignalDefinitionNodePromoter
+     */
+    private $signalDefinitionNodePromoter;
+
+    /**
+     * @var SignalFactoryInterface
+     */
+    private $signalFactory;
+
+    /**
+     * @var ViewNodePromoter
+     */
+    private $viewNodePromoter;
 
     /**
      * @param AppFactoryInterface $appFactory
-     * @param EnvironmentPromoter $environmentPromoter
-     * @param UiNodePromoter $uiNodePromoter
+     * @param ProgramFactoryInterface $programFactory
+     * @param EnvironmentNodePromoter $environmentNodePromoter
+     * @param ViewNodePromoter $viewNodePromoter
+     * @param RouteNodePromoter $routeNodePromoter
+     * @param SignalDefinitionNodePromoter $signalDefinitionNodePromoter
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
+     * @param SignalFactoryInterface $signalFactory
+     * @param RouterFactoryInterface $routerFactory
+     * @param HomeNodePromoter $homeNodePromoter
      */
     public function __construct(
         AppFactoryInterface $appFactory,
-        EnvironmentPromoter $environmentPromoter,
-        UiNodePromoter $uiNodePromoter,
-        EvaluationContextFactoryInterface $evaluationContextFactory
+        ProgramFactoryInterface $programFactory,
+        EnvironmentNodePromoter $environmentNodePromoter,
+        ViewNodePromoter $viewNodePromoter,
+        RouteNodePromoter $routeNodePromoter,
+        SignalDefinitionNodePromoter $signalDefinitionNodePromoter,
+        EvaluationContextFactoryInterface $evaluationContextFactory,
+        SignalFactoryInterface $signalFactory,
+        RouterFactoryInterface $routerFactory,
+        HomeNodePromoter $homeNodePromoter
     ) {
         $this->appFactory = $appFactory;
-        $this->environmentPromoter = $environmentPromoter;
+        $this->environmentNodePromoter = $environmentNodePromoter;
         $this->evaluationContextFactory = $evaluationContextFactory;
-        $this->uiNodePromoter = $uiNodePromoter;
+        $this->homeNodePromoter = $homeNodePromoter;
+        $this->programFactory = $programFactory;
+        $this->routeNodePromoter = $routeNodePromoter;
+        $this->routerFactory = $routerFactory;
+        $this->signalDefinitionNodePromoter = $signalDefinitionNodePromoter;
+        $this->signalFactory = $signalFactory;
+        $this->viewNodePromoter = $viewNodePromoter;
     }
 
     /**
@@ -72,13 +126,63 @@ class AppNodePromoter
      */
     public function promoteApp(AppNode $appNode, EnvironmentNode $environmentNode)
     {
-        $environment = $this->environmentPromoter->promoteEnvironment($environmentNode);
-        
+        $environment = $this->environmentNodePromoter->promoteEnvironment($environmentNode);
+
         $rootEvaluationContext = $this->evaluationContextFactory->createRootContext($environment);
 
+        $appRouteCollection = $this->routeNodePromoter->promoteCollection($appNode->getRoutes());
+        $routeRepository = $this->routerFactory->createRouteRepository($environment, $appRouteCollection);
+
+        $appSignalDefinitionCollection = $this->signalDefinitionNodePromoter->promoteCollection(
+            $appNode->getSignalDefinitions(),
+            LibraryInterface::APP
+        );
+        $signalDefinitionRepository = $this->signalFactory->createSignalDefinitionRepository(
+            $environment,
+            $appSignalDefinitionCollection
+        );
+
+//        $widgetDefinitionCollection = $this->widgetDefinitionNodePromoter->promoteCollection(
+//            $appNode->getWidgetDefinitions()
+//        );
+//        $widgetDefinitionRepository = $this->widgetFactory->createWidgetDefinitionRepository(
+//            $environment,
+//            $widgetDefinitionCollection
+//        );
+
+        $router = $this->routerFactory->createRouter(
+            $routeRepository,
+            $this->homeNodePromoter->promoteHome($appNode->getHome(), $routeRepository),
+            $signalDefinitionRepository
+        );
+
+        $resourceRepository = $this->programFactory->createResourceRepository(
+            $environment,
+            $signalDefinitionRepository
+        );
+        $pageViewCollection = $this->viewNodePromoter->promotePageViewCollection(
+            $appNode->getPageViews(),
+            $resourceRepository
+        );
+        $overlayViewCollection = $this->viewNodePromoter->promoteOverlayViewCollection(
+            $appNode->getOverlayViews(),
+            $resourceRepository
+        );
+        $program = $this->programFactory->createProgram(
+            $environment,
+            $resourceRepository,
+            $pageViewCollection,
+            $overlayViewCollection,
+            $rootEvaluationContext
+        );
+
         return $this->appFactory->create(
-            $rootEvaluationContext,
-            $this->uiNodePromoter->promoteViewCollection($appNode->getViewCollection(), $environment)
+            $router,
+            $signalDefinitionRepository,
+            $pageViewCollection,
+            $overlayViewCollection,
+            $environment,
+            $program
         );
     }
 }

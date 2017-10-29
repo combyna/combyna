@@ -1,0 +1,10 @@
+services:
+    combyna.instruction.collection_loader:
+        class: Combyna\Component\Instruction\Config\Loader\InstructionCollectionLoader
+        autowire: true
+
+    combyna.instruction.loader:
+        class: Combyna\Component\Instruction\Config\Loader\DelegatingInstructionLoader
+        autowire: true
+        autowiring_types:
+            - Combyna\Component\Instruction\Config\Loader\InstructionLoaderInterface

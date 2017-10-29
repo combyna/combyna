@@ -12,6 +12,7 @@
 namespace Combyna\Component\Bag;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\ValidationFactoryInterface;
@@ -26,6 +27,11 @@ use Combyna\Component\Validator\ValidationFactoryInterface;
 class FixedStaticBagModel implements FixedStaticBagModelInterface
 {
     /**
+     * @var BagFactoryInterface
+     */
+    private $bagFactory;
+
+    /**
      * @var FixedStaticDefinition[]
      */
     private $staticDefinitions = [];
@@ -36,16 +42,18 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     private $validationFactory;
 
     /**
+     * @param BagFactoryInterface $bagFactory
      * @param ValidationFactoryInterface $validationFactory
      * @param FixedStaticDefinition[] $staticDefinitions
      */
-    public function __construct(ValidationFactoryInterface $validationFactory, array $staticDefinitions)
+    public function __construct(BagFactoryInterface $bagFactory, ValidationFactoryInterface $validationFactory, array $staticDefinitions)
     {
         // Index definitions by name to simplify lookups
         foreach ($staticDefinitions as $staticDefinition) {
             $this->staticDefinitions[$staticDefinition->getName()] = $staticDefinition;
         }
 
+        $this->bagFactory = $bagFactory;
         $this->validationFactory = $validationFactory;
     }
 
@@ -63,6 +71,20 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     public function assertValidStaticBag(StaticBagInterface $staticBag)
     {
         // ...
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefaultStaticBag(EvaluationContextInterface $evaluationContext)
+    {
+        $statics = [];
+
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            $statics[$staticDefinition->getName()] = $staticDefinition->getDefaultStatic($evaluationContext);
+        }
+
+        return $this->bagFactory->createStaticBag($statics);
     }
 
     /**

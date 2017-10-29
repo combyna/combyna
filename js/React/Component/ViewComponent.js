@@ -19,28 +19,51 @@ import React from 'react';
 export default class ViewComponent extends React.Component
 {
     render() {
-        const renderedViewData = this.props.renderView(this.props.name);
+        const renderedViewsData = this.props.phpAPI('renderVisibleViews');
 
-        function renderWidget(widgetData) {
+        const renderWidget = (widgetData) => {
             if (widgetData.type === 'text') {
                 return widgetData.text;
             }
 
-            let childElements = [];
+            const childElements = [];
 
             for (let childWidget of widgetData.children) {
                 childElements.push(renderWidget(childWidget));
             }
 
-            return React.createElement(widgetData.tag, null, ...childElements);
-        }
+            if (widgetData.type === 'fragment') {
+                return childElements; // No wrapper element needed
+            }
+
+            const uniqueID = widgetData.path.join('-');
+            const attributes = Object.assign({}, widgetData.attributes, {
+                key: uniqueID
+            });
+
+            if (widgetData.tag === 'button') {
+                // TODO: Factor this out into a separate `ButtonComponent` React component
+                attributes.onClick = () => {
+                    this.props.phpAPI('dispatchEvent', [widgetData.path]);
+
+                    // TODO: Find a better way
+                    this.forceUpdate();
+                };
+            } else if (widgetData.tag === 'input' && attributes.type === 'text') {
+                // TODO: Factor this out into a separate `TextboxComponent` React component
+
+                // FIXME: Needs to either set `defaultValue` or `readOnly`.
+            }
+
+            return React.createElement(widgetData.tag, attributes, ...childElements);
+        };
 
         return React.createElement(
             'div',
             {
                 className: 'combyna-view'
             },
-            renderWidget(renderedViewData.widget)
+            ...renderedViewsData.map((renderedViewData) => renderWidget(renderedViewData.widget))
         );
     }
 }

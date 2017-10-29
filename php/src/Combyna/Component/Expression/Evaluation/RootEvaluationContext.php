@@ -13,6 +13,7 @@ namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use LogicException;
 
@@ -50,7 +51,7 @@ class RootEvaluationContext implements EvaluationContextInterface
      */
     public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
     {
-        $function = $this->environment->getGenericFunction($libraryName, $functionName);
+        $function = $this->environment->getGenericFunctionByName($libraryName, $functionName);
 
         return $function->call($argumentStaticBag);
     }
@@ -61,6 +62,14 @@ class RootEvaluationContext implements EvaluationContextInterface
     public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
     {
         return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createSubEventEvaluationContext(EventInterface $event)
+    {
+        return $this->evaluationContextFactory->createEventContext($this, $event);
     }
 
     /**
@@ -90,9 +99,33 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getEnvironment()
+    {
+        return $this->environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStoreSlotStatic($name)
+    {
+        throw new LogicException('Store slot "' . $name . '" cannot be fetched outside a store');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getVariable($variableName)
     {
         throw new LogicException('No variable is defined with name "' . $variableName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
+    {
+        throw new LogicException('No active store - cannot make query with name "' . $queryName . '"');
     }
 
     /**

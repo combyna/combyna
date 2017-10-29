@@ -11,8 +11,9 @@
 
 namespace Combyna\Component\Renderer\Html;
 
+use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
-use Combyna\Component\Ui\RenderedViewInterface;
+use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
  * Class ArrayRenderer
@@ -22,33 +23,51 @@ use Combyna\Component\Ui\RenderedViewInterface;
 class ArrayRenderer
 {
     /**
+     * @var UiStateFactoryInterface
+     */
+    private $uiStateFactory;
+
+    /**
      * @var DelegatingWidgetRenderer
      */
     private $widgetRenderer;
 
     /**
      * @param DelegatingWidgetRenderer $widgetRenderer
+     * @param UiStateFactoryInterface $uiStateFactory
      */
-    public function __construct(DelegatingWidgetRenderer $widgetRenderer)
+    public function __construct(DelegatingWidgetRenderer $widgetRenderer, UiStateFactoryInterface $uiStateFactory)
     {
+        $this->uiStateFactory = $uiStateFactory;
         $this->widgetRenderer = $widgetRenderer;
     }
 
     /**
-     * Renders the specified rendered view to an array structure
+     * Renders the specified app state's visible views to an array structure
      *
-     * @param RenderedViewInterface $renderedView
+     * @param AppStateInterface $appState
      * @return array
      */
-    public function renderView(RenderedViewInterface $renderedView)
+    public function renderViews(AppStateInterface $appState)
     {
-        $viewName = $renderedView->getViewName();
+        $viewsData = [];
 
-        $renderedRootWidget = $this->widgetRenderer->renderWidget($renderedView->getRootWidget());
+        foreach ($appState->getVisibleViewStates() as $viewState) {
+            $viewName = $viewState->getViewName();
 
-        return [
-            'view-name' => $viewName,
-            'widget' => $renderedRootWidget->toArray()
-        ];
+            $rootWidgetStatePath = $this->uiStateFactory->createWidgetStatePath([
+                $viewState,
+                $viewState->getRootWidgetState()
+            ]);
+            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath);
+
+            $viewsData[] = [
+                'type' => $viewState->getType(),
+                'view-name' => $viewName,
+                'widget' => $renderedRootWidget->toArray()
+            ];
+        }
+
+        return $viewsData;
     }
 }

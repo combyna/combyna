@@ -12,19 +12,20 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Act\TranslationExpressionNode;
-use Combyna\Component\Expression\TranslationExpression;
 
 /**
  * Class TranslationExpressionLoader
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TranslationExpressionLoader implements ExpressionTypeLoaderInterface
+class TranslationExpressionLoader implements BuiltinLoaderInterface
 {
+    const BUILTIN_NAME = 'trans';
+
     /**
-     * @var ConfigParser
+     * @var ExpressionConfigParser
      */
     private $configParser;
 
@@ -34,11 +35,11 @@ class TranslationExpressionLoader implements ExpressionTypeLoaderInterface
     private $expressionBagLoader;
 
     /**
-     * @param ConfigParser $configParser
+     * @param ExpressionConfigParser $configParser
      * @param ExpressionBagLoaderInterface $expressionBagLoader
      */
     public function __construct(
-        ConfigParser $configParser,
+        ExpressionConfigParser $configParser,
         ExpressionBagLoaderInterface $expressionBagLoader
     ) {
         $this->configParser = $configParser;
@@ -50,24 +51,25 @@ class TranslationExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $translationKey = $this->configParser->getElement($config, 'key', 'translation expression');
-        $parameterBagConfig = $this->configParser->getOptionalElement($config, 'parameters', 'translation expression');
-
-        $parameterBagNode = $parameterBagConfig !== null ?
-            $this->expressionBagLoader->load($parameterBagConfig) :
-            null;
+        $translationKey = $this->configParser->getPositionalArgumentNative(
+            $config,
+            0,
+            'text',
+            'translation expression'
+        );
+        $argumentBagNode = $this->configParser->getNamedArgumentStaticBag($config);
 
         return new TranslationExpressionNode(
             $translationKey,
-            $parameterBagNode
+            $argumentBagNode
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getType()
+    public function getBuiltinName()
     {
-        return TranslationExpression::TYPE;
+        return self::BUILTIN_NAME;
     }
 }

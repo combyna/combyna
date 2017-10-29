@@ -1,0 +1,16 @@
+services:
+    combyna.signal.loader.signal_definition:
+        class: Combyna\Component\Signal\Config\Loader\SignalDefinitionLoader
+        autowire: true
+
+    combyna.signal.loader.signal_definition_reference:
+        class: Combyna\Component\Signal\Config\Loader\SignalDefinitionReferenceLoader
+        autowire: true
+
+    combyna.signal.loader.signal_handler:
+        class: Combyna\Component\Signal\Config\Loader\SignalHandlerLoader
+        autowire: true
+
+    combyna.signal.loader.signal_handler_collection:
+        class: Combyna\Component\Signal\Config\Loader\SignalHandlerCollectionLoader
+        autowire: true

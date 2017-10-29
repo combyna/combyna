@@ -1,0 +1,26 @@
+name: gui
+description: GUI tools
+events:
+    click:
+        payload:
+            x: number
+            y: number
+widgets:
+    box:
+        type: primitive
+        attributes: ~
+        children:
+            # TODO - needs to allow any primitive or compound widget type, _but_ only if its eventual core widget
+            #        would be valid - eg. an <li> HTML element cannot be nested as a direct child of a <div>
+            contents: ~
+        events: [gui.click]
+    button:
+        type: primitive
+        attributes: {label: text}
+        children: [] # Buttons can have no children, only a label (TODO: allow icons?)
+        events: [gui.click]
+    textbox:
+        type: primitive
+        attributes: {value: text}
+        children: [] # Textboxes can have no children, as there is nowhere to render them
+        events: []

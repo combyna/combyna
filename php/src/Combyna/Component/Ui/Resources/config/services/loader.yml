@@ -3,8 +3,24 @@ services:
         class: Combyna\Component\Ui\Config\Loader\ViewLoader
         autowire: true
 
+    combyna.ui.loader.view_store_query_expression:
+        class: Combyna\Component\Ui\Store\Config\Loader\ViewStoreQueryExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.ui.loader.view_store_slot_expression:
+        class: Combyna\Component\Ui\Store\Config\Loader\ViewStoreSlotExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
     combyna.ui.loader.view_collection:
         class: Combyna\Component\Ui\Config\Loader\ViewCollectionLoader
+        autowire: true
+
+    combyna.ui.loader.view_store:
+        class: Combyna\Component\Ui\Store\Config\Loader\ViewStoreLoader
         autowire: true
 
     combyna.ui.loader.widget:
@@ -18,3 +34,9 @@ services:
     combyna.ui.loader.widget_definition:
         class: Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoader
         autowire: true
+
+    combyna.ui.loader.set_view_store_slot_instruction:
+        class: Combyna\Component\Ui\Store\Config\Loader\SetViewStoreSlotInstructionLoader
+        autowire: true
+        tags:
+            - {name: combyna.instruction_loader}

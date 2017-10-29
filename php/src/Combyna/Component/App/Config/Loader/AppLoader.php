@@ -13,7 +13,10 @@ namespace Combyna\Component\App\Config\Loader;
 
 use Combyna\Component\App\AppFactoryInterface;
 use Combyna\Component\App\Config\Act\AppNode;
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Router\Config\Loader\RouteCollectionLoaderInterface;
+use Combyna\Component\Signal\Config\Loader\SignalDefinitionLoaderInterface;
 use Combyna\Component\Ui\Config\Loader\ViewCollectionLoaderInterface;
 use Symfony\Component\Translation\Translator;
 
@@ -30,6 +33,26 @@ class AppLoader implements AppLoaderInterface
     private $appFactory;
 
     /**
+     * @var ConfigParser
+     */
+    private $configParser;
+
+    /**
+     * @var HomeLoaderInterface
+     */
+    private $homeLoader;
+
+    /**
+     * @var RouteCollectionLoaderInterface
+     */
+    private $routeCollectionLoader;
+
+    /**
+     * @var SignalDefinitionLoaderInterface
+     */
+    private $signalDefinitionLoader;
+
+    /**
      * @var Translator
      */
     private $translator;
@@ -40,16 +63,28 @@ class AppLoader implements AppLoaderInterface
     private $viewCollectionLoader;
 
     /**
+     * @param ConfigParser $configParser
      * @param AppFactoryInterface $appFactory
+     * @param HomeLoaderInterface $homeLoader
      * @param ViewCollectionLoaderInterface $viewCollectionLoader
      * @param Translator $translator
+     * @param RouteCollectionLoaderInterface $routeCollectionLoader
+     * @param SignalDefinitionLoaderInterface $signalDefinitionLoader
      */
     public function __construct(
+        ConfigParser $configParser,
         AppFactoryInterface $appFactory,
+        HomeLoaderInterface $homeLoader,
         ViewCollectionLoaderInterface $viewCollectionLoader,
-        Translator $translator
+        Translator $translator,
+        RouteCollectionLoaderInterface $routeCollectionLoader,
+        SignalDefinitionLoaderInterface $signalDefinitionLoader
     ) {
         $this->appFactory = $appFactory;
+        $this->configParser = $configParser;
+        $this->homeLoader = $homeLoader;
+        $this->routeCollectionLoader = $routeCollectionLoader;
+        $this->signalDefinitionLoader = $signalDefinitionLoader;
         $this->translator = $translator;
         $this->viewCollectionLoader = $viewCollectionLoader;
     }
@@ -63,15 +98,47 @@ class AppLoader implements AppLoaderInterface
         // so that they will be available later
         if (array_key_exists('translations', $appConfig)) {
             foreach ($appConfig['translations'] as $locale => $messages) {
-                $this->translator->addResource('array', $messages, $locale);
+                $namespacedMessages = [];
+
+                foreach ($messages as $key => $message) {
+                    $namespacedMessages['app.' . $key] = $message;
+                }
+
+                $this->translator->addResource('array', $namespacedMessages, $locale);
             }
         }
 
-        $viewCollectionNode = $this->viewCollectionLoader->loadViews(
-            $appConfig['views'],
+        $signalDefinitionConfigs = $this->configParser->getOptionalElement(
+            $appConfig,
+            'signals',
+            'signal definitions',
+            [],
+            'array'
+        );
+
+        $signalDefinitionNodes = [];
+
+        foreach ($signalDefinitionConfigs as $signalName => $signalDefinitionConfig) {
+            $signalDefinitionNodes[] = $this->signalDefinitionLoader->load(
+                AppNode::TYPE,
+                $signalName,
+                $signalDefinitionConfig
+            );
+        }
+
+        $routeNodes = $this->routeCollectionLoader->loadRouteCollection(
+            $appConfig['routes']
+        );
+
+        $homeNode = $this->homeLoader->loadHome($appConfig['home']);
+
+        $pageViewNodes = $this->viewCollectionLoader->loadPageViews(
+            $appConfig['page_views'],
             $environmentNode
         );
 
-        return new AppNode($viewCollectionNode);
+        $overlayViewNodes = []; // TODO
+
+        return new AppNode($signalDefinitionNodes, $routeNodes, $homeNode, $pageViewNodes, $overlayViewNodes);
     }
 }

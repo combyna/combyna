@@ -12,6 +12,9 @@
 namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\Evaluation\EventEvaluationContext;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
 use InvalidArgumentException;
@@ -43,6 +46,15 @@ interface EvaluationContextInterface
     public function createSubAssuredContext(StaticBagInterface $assuredStaticBag);
 
     /**
+     * Creates a new EventEvaluationContext as a child of the current one,
+     * with the specified event as the one to fetch event payload data (eg. the X/Y coords of a click) from
+     *
+     * @param EventInterface $event
+     * @return EventEvaluationContext
+     */
+    public function createSubEventEvaluationContext(EventInterface $event);
+
+    /**
      * Creates a new ExpressionEvaluationContext as a child of the current one,
      * with the specified expression as the one to use as "current"
      *
@@ -69,6 +81,21 @@ interface EvaluationContextInterface
     public function getAssuredStatic($assuredStaticName);
 
     /**
+     * Fetches the environment
+     *
+     * @return EnvironmentInterface
+     */
+    public function getEnvironment();
+
+    /**
+     * Fetches the value of the specified store slot static
+     *
+     * @param string $name
+     * @return StaticInterface
+     */
+    public function getStoreSlotStatic($name);
+
+    /**
      * Fetches the value of the specified variable
      *
      * @param string $variableName
@@ -76,6 +103,15 @@ interface EvaluationContextInterface
      * @throws InvalidArgumentException Throws when the specified variable is not defined in this or a parent
      */
     public function getVariable($variableName);
+
+    /**
+     * Makes the specified query on a view store, returning its static result
+     *
+     * @param string $queryName
+     * @param StaticBagInterface $argumentStaticBag
+     * @return StaticInterface
+     */
+    public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag);
 
     /**
      * Translates a translation key and optional parameters to a message

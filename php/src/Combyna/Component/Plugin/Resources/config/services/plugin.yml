@@ -1,0 +1,4 @@
+services:
+    combyna.plugin.library_collection:
+        class: Combyna\Component\Plugin\LibraryConfigCollection
+        autowire: true

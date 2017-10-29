@@ -58,8 +58,12 @@ class CommandMethod implements CommandMethodInterface
     {
         $this->parameterBagModel->assertValidArgumentBag($argumentStaticBag);
 
+        // FIXME: Should take app state as an arg and return the new one, etc.
+
+        $commandEvaluationContext = $evaluationContext->createSubCommandEvaluationContext($argumentStaticBag);
+
         foreach ($this->instructions as $instruction) {
-            $instruction->perform($argumentStaticBag, $storage);
+            $instruction->perform($commandEvaluationContext, $programState);
         }
     }
 }

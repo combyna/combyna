@@ -31,7 +31,7 @@ class TranslationExpressionNode extends AbstractExpressionNode
     /**
      * @var ExpressionBagNode|null
      */
-    private $parameterExpressionBag;
+    private $argumentExpressionBag;
 
     /**
      * @var string
@@ -40,11 +40,11 @@ class TranslationExpressionNode extends AbstractExpressionNode
 
     /**
      * @param string $translationKey
-     * @param ExpressionBagNode|null $parameterExpressionBag
+     * @param ExpressionBagNode|null $argumentExpressionBag
      */
-    public function __construct($translationKey, ExpressionBagNode $parameterExpressionBag = null)
+    public function __construct($translationKey, ExpressionBagNode $argumentExpressionBag = null)
     {
-        $this->parameterExpressionBag = $parameterExpressionBag;
+        $this->argumentExpressionBag = $argumentExpressionBag;
         $this->translationKey = $translationKey;
     }
 
@@ -53,9 +53,9 @@ class TranslationExpressionNode extends AbstractExpressionNode
      *
      * @return ExpressionBagNode|null
      */
-    public function getParameterExpressionBag()
+    public function getArgumentExpressionBag()
     {
-        return $this->parameterExpressionBag;
+        return $this->argumentExpressionBag;
     }
 
     /**
@@ -87,10 +87,10 @@ class TranslationExpressionNode extends AbstractExpressionNode
             $subValidationContext->addGenericViolation('Translation key cannot be empty');
         }
 
-        if ($this->parameterExpressionBag !== null) {
+        if ($this->argumentExpressionBag !== null) {
             // TODO: Validate that parameters all always evaluate to texts
 
-            $this->parameterExpressionBag->validate($subValidationContext);
+            $this->argumentExpressionBag->validate($subValidationContext);
         }
     }
 }

@@ -11,13 +11,10 @@
 
 namespace Combyna\Component\Config\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderResolver;
+use Combyna\Component\Common\AbstractComponentExtension;
+use Combyna\Component\Framework\DelegatorInitialiser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -29,25 +26,11 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ConfigExtension extends Extension implements CompilerPassInterface
+class ConfigExtension extends AbstractComponentExtension implements CompilerPassInterface
 {
     const DELEGATOR_SERVICE_ID = 'combyna.config.node_visitor';
 
     const DELEGATEE_TAG = 'combyna.config_node_visitor';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $containerBuilder)
-    {
-        $fileLocator = new FileLocator(__DIR__ . '/../Resources/config');
-        $loader = new DirectoryLoader($containerBuilder, $fileLocator);
-        $loader->setResolver(new LoaderResolver([
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            $loader
-        ]));
-        $loader->load('services/');
-    }
 
     /**
      * {@inheritdoc}
@@ -58,14 +41,18 @@ class ConfigExtension extends Extension implements CompilerPassInterface
             return;
         }
 
-        $definition = $containerBuilder->findDefinition(self::DELEGATOR_SERVICE_ID);
+        $initialiserDefinition = $containerBuilder->findDefinition(DelegatorInitialiser::SERVICE_ID);
 
         // Find all service IDs with the node visitor tag
         $taggedServices = $containerBuilder->findTaggedServiceIds(self::DELEGATEE_TAG);
 
         foreach ($taggedServices as $id => $tags) {
-            // Add the node visitor service to the delegating service
-            $definition->addMethodCall('addVisitor', array(new Reference($id)));
+            // Add the node visitor service to the delegator
+            $initialiserDefinition->addMethodCall('addDelegatee', [
+                new Reference(self::DELEGATOR_SERVICE_ID),
+                new Reference($id),
+                'addVisitor'
+            ]);
         }
     }
 }

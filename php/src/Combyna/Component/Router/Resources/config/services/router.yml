@@ -1,0 +1,4 @@
+services:
+    combyna.router.router_factory:
+        class: Combyna\Component\Router\RouterFactory
+        autowire: true

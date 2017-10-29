@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Common\DependencyInjection\Compiler;
 
-use Symfony\Component\DependencyInjection\Compiler\MergeExtensionConfigurationPass as BaseMergeExtensionConfigurationPass;
+use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
@@ -25,7 +25,7 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPass
+class MergeExtensionConfigurationPass implements CompilerPassInterface
 {
     /**
      * @var ExtensionInterface[]
@@ -33,11 +33,20 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
     private $extensions;
 
     /**
+     * @var CompilerPassInterface
+     */
+    private $originalPass;
+
+    /**
+     * @param CompilerPassInterface $originalPass
      * @param ExtensionInterface[] $extensions
      */
-    public function __construct(array $extensions)
-    {
+    public function __construct(
+        CompilerPassInterface $originalPass,
+        array $extensions
+    ) {
         $this->extensions = $extensions;
+        $this->originalPass = $originalPass;
     }
 
     /**
@@ -51,6 +60,6 @@ class MergeExtensionConfigurationPass extends BaseMergeExtensionConfigurationPas
             }
         }
 
-        parent::process($container);
+        $this->originalPass->process($container);
     }
 }

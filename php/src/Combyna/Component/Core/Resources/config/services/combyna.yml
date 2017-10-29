@@ -1,4 +1,0 @@
-services:
-    combyna:
-        class: Combyna\Combyna
-        autowire: true

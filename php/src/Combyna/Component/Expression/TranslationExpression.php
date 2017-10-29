@@ -26,14 +26,14 @@ class TranslationExpression extends AbstractExpression
     const TYPE = 'translation';
 
     /**
+     * @var ExpressionBagInterface
+     */
+    private $argumentExpressionBag;
+
+    /**
      * @var ExpressionFactoryInterface
      */
     private $expressionFactory;
-
-    /**
-     * @var ExpressionBagInterface
-     */
-    private $parameterExpressionBag;
 
     /**
      * @var string
@@ -43,15 +43,15 @@ class TranslationExpression extends AbstractExpression
     /**
      * @param ExpressionFactoryInterface $expressionFactory
      * @param string $translationKey
-     * @param ExpressionBagInterface $parameterExpressionBag
+     * @param ExpressionBagInterface $argumentExpressionBag
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
         $translationKey,
-        ExpressionBagInterface $parameterExpressionBag
+        ExpressionBagInterface $argumentExpressionBag
     ) {
+        $this->argumentExpressionBag = $argumentExpressionBag;
         $this->expressionFactory = $expressionFactory;
-        $this->parameterExpressionBag = $parameterExpressionBag;
         $this->translationKey = $translationKey;
     }
 
@@ -60,13 +60,11 @@ class TranslationExpression extends AbstractExpression
      */
     public function toStatic(EvaluationContextInterface $evaluationContext)
     {
-        $subEvaluationContext = $evaluationContext->createSubExpressionContext($this);
+        $argumentStaticBag = $this->argumentExpressionBag->toStaticBag($evaluationContext);
 
-        $parameterStaticBag = $this->parameterExpressionBag->toStaticBag($subEvaluationContext);
-
-        $translatedMessage = $subEvaluationContext->translate(
+        $translatedMessage = $evaluationContext->translate(
             $this->translationKey,
-            $parameterStaticBag->toNativeArray()
+            $argumentStaticBag->toNativeArray()
         );
 
         return $this->expressionFactory->createTextExpression($translatedMessage);

@@ -11,8 +11,9 @@
 
 namespace Combyna\Component\Renderer\Html;
 
+use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
-use Combyna\Component\Ui\RenderedViewInterface;
+use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
  * Class HtmlRenderer
@@ -22,36 +23,53 @@ use Combyna\Component\Ui\RenderedViewInterface;
 class HtmlRenderer
 {
     /**
+     * @var UiStateFactoryInterface
+     */
+    private $uiStateFactory;
+
+    /**
      * @var DelegatingWidgetRenderer
      */
     private $widgetRenderer;
 
     /**
      * @param DelegatingWidgetRenderer $widgetRenderer
+     * @param UiStateFactoryInterface $uiStateFactory
      */
-    public function __construct(DelegatingWidgetRenderer $widgetRenderer)
+    public function __construct(DelegatingWidgetRenderer $widgetRenderer, UiStateFactoryInterface $uiStateFactory)
     {
+        $this->uiStateFactory = $uiStateFactory;
         $this->widgetRenderer = $widgetRenderer;
     }
 
     /**
-     * Renders the specified rendered view to HTML
+     * Renders the specified rendered app to HTML
      *
-     * @param RenderedViewInterface $renderedView
+     * @param AppStateInterface $appState
      * @return string
      */
-    public function renderView(RenderedViewInterface $renderedView)
+    public function renderApp(AppStateInterface $appState)
     {
-        $viewName = $renderedView->getViewName();
+        $viewsHtml = '';
 
-        $encodedViewName = htmlentities($viewName);
-        $renderedRootWidget = $this->widgetRenderer->renderWidget($renderedView->getRootWidget());
-        $rootWidgetHtml = $renderedRootWidget->toHtml();
+        foreach ($appState->getVisibleViewStates() as $viewState) {
+            $viewName = $viewState->getViewName();
 
-        return <<<HTML
+            $encodedViewName = htmlentities($viewName);
+            $rootWidgetStatePath = $this->uiStateFactory->createWidgetStatePath([
+                $viewState,
+                $viewState->getRootWidgetState()
+            ]);
+            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath);
+            $rootWidgetHtml = $renderedRootWidget->toHtml();
+
+            $viewsHtml .= <<<HTML
 <div class="combyna-view" data-view-name="$encodedViewName">
     $rootWidgetHtml
 </div>
 HTML;
+        }
+
+        return $viewsHtml;
     }
 }

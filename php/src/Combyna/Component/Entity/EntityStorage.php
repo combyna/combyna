@@ -102,4 +102,12 @@ class EntityStorage implements EntityStorageInterface
     {
         return $this->attributeBag->toNativeArray();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    {
+        throw new \Exception('Not implemented');
+    }
 }

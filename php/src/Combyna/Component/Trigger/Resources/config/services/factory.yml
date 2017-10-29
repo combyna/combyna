@@ -1,0 +1,8 @@
+services:
+    combyna.trigger.factory:
+        class: Combyna\Component\Trigger\TriggerFactory
+        autowire: true
+
+    combyna.trigger.instruction.factory:
+        class: Combyna\Component\Trigger\Instruction\InstructionFactory
+        autowire: true

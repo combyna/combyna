@@ -33,7 +33,17 @@ class HtmlElement implements HtmlNodeInterface
     /**
      * @var string[]
      */
-    private static $selfClosingTags = ['img'];
+    private static $fieldTags = ['button', 'input', 'textarea'];
+
+    /**
+     * @var int[]|string[]
+     */
+    private $path;
+
+    /**
+     * @var string[]
+     */
+    private static $selfClosingTags = ['img', 'input'];
 
     /**
      * @var string
@@ -42,13 +52,15 @@ class HtmlElement implements HtmlNodeInterface
 
     /**
      * @param string $tagName
+     * @param string[]|int[] $path
      * @param string[] $attributes
      * @param HtmlNodeInterface[] $childNodes
      */
-    public function __construct($tagName, array $attributes, array $childNodes = [])
+    public function __construct($tagName, array $path, array $attributes, array $childNodes = [])
     {
         $this->attributes = $attributes;
         $this->childNodes = $childNodes;
+        $this->path = $path;
         $this->tagName = $tagName;
     }
 
@@ -66,6 +78,7 @@ class HtmlElement implements HtmlNodeInterface
         return [
             'type' => 'element',
             'tag' => $this->tagName,
+            'path' => $this->path,
             'attributes' => $this->attributes,
             'children' => $childNodeArrays
         ];
@@ -83,6 +96,11 @@ class HtmlElement implements HtmlNodeInterface
         }
 
         $html = '<' . $this->tagName;
+
+        if (in_array($this->tagName, self::$fieldTags, true)) {
+            $uniqueId = implode('-', $this->path);
+            $html .= ' name="combyna-widget-' . htmlentities($uniqueId) . '"';
+        }
 
         foreach ($this->attributes as $name => $value) {
             $html .= ' ' . htmlentities($name) . '="' . htmlentities($value) . '"';

@@ -16,6 +16,8 @@ use Combyna\Component\Bag\FixedStaticBagModel;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Environment;
+use Combyna\Component\Environment\Library\FunctionCollection;
+use Combyna\Component\Event\EventDefinitionCollection;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactory;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
@@ -25,6 +27,7 @@ use Combyna\Component\Expression\ExpressionFactory;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticExpressionFactory;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Signal\SignalDefinitionCollection;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Combyna\Component\Environment\Library\Library;
@@ -79,11 +82,12 @@ class BasicExpressionIntegratedTest extends TestCase
         $this->environment->installLibrary(
             new Library(
                 'text',
-                [
+                new FunctionCollection([
                     new NativeFunction(
                         'length',
                         new ParameterBagModel(
                             new FixedStaticBagModel(
+                                $this->bagFactory,
                                 $this->validationFactory,
                                 [
                                     new FixedStaticDefinition(
@@ -101,7 +105,9 @@ class BasicExpressionIntegratedTest extends TestCase
                         },
                         new StaticType(NumberExpression::class)
                     )
-                ],
+                ], 'text'),
+                new EventDefinitionCollection([], 'text'),
+                new SignalDefinitionCollection([], 'text'),
                 [],
                 [
                     'en' => [

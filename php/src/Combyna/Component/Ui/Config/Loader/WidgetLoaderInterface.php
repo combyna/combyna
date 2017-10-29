@@ -12,7 +12,7 @@
 namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-use Combyna\Component\Ui\Config\Act\WidgetNode;
+use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
 
 /**
  * Interface WidgetLoaderInterface
@@ -26,7 +26,7 @@ interface WidgetLoaderInterface
      *
      * @param array $widgetConfig
      * @param EnvironmentNode $environmentNode
-     * @return WidgetNode
+     * @return WidgetNodeInterface
      */
     public function loadWidget(array $widgetConfig, EnvironmentNode $environmentNode);
 }

@@ -13,6 +13,8 @@ namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\Evaluation\EventEvaluationContext;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 
 /**
@@ -32,6 +34,18 @@ interface EvaluationContextFactoryInterface
     public function createAssuredContext(
         EvaluationContextInterface $parentContext,
         StaticBagInterface $assuredStaticBag
+    );
+
+    /**
+     * Creates a new EventEvaluationContext
+     *
+     * @param EvaluationContextInterface $parentContext
+     * @param EventInterface $event
+     * @return EventEvaluationContext
+     */
+    public function createEventContext(
+        EvaluationContextInterface $parentContext,
+        EventInterface $event
     );
 
     /**
@@ -65,4 +79,11 @@ interface EvaluationContextFactoryInterface
         EvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag
     );
+
+    /**
+     * Fetches a map from state type (eg. "assured") to its factory method
+     *
+     * @return callable[]
+     */
+    public function getStateTypeToContextFactoryMap();
 }

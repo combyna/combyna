@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Config;
 
+use Combyna\Component\Common\DelegatorInterface;
+
 /**
  * Interface NodeVisitorInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface NodeVisitorInterface
+interface NodeVisitorInterface extends DelegatorInterface
 {
     /**
      * Visits a node and returns its new value

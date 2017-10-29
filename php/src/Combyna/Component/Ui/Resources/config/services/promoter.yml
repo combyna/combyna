@@ -1,4 +1,34 @@
 services:
-    combyna.ui.act.promoter:
-        class: Combyna\Component\Ui\Config\Act\UiNodePromoter
+    combyna.ui.promoter.view_node:
+        class: Combyna\Component\Ui\Config\Act\ViewNodePromoter
+        autowire: true
+
+    combyna.ui.promoter.set_slot_instruction_node:
+        class: Combyna\Component\Ui\Store\Config\Act\SetViewStoreSlotInstructionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.view_store_instruction_promoter}
+
+    combyna.ui.promoter.view_store_instruction_node:
+        class: Combyna\Component\Ui\Store\Config\Act\DelegatingViewStoreInstructionNodePromoter
+        autowire: true
+
+    combyna.ui.promoter.view_store_node:
+        class: Combyna\Component\Ui\Store\Config\Act\ViewStoreNodePromoter
+        autowire: true
+
+    combyna.ui.promoter.view_store_query_expression_node:
+        class: Combyna\Component\Ui\Store\Config\Act\ViewStoreQueryExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
+    combyna.ui.promoter.view_store_slot_expression_node:
+        class: Combyna\Component\Ui\Store\Config\Act\ViewStoreSlotExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
+    combyna.ui.promoter.widget_node:
+        class: Combyna\Component\Ui\Config\Act\WidgetNodePromoter
         autowire: true

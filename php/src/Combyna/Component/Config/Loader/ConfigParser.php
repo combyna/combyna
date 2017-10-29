@@ -28,10 +28,12 @@ class ConfigParser
      * @param array $config
      * @param string $key
      * @param string $context
+     * @param string $requiredType The type the value must be
      * @return mixed
-     * @throws InvalidArgumentException Throws when the argument is not passed
+     * @throws InvalidArgumentException Throws when the value is not specified
+     * @throws InvalidArgumentException Throws when the value has the wrong type
      */
-    public function getElement(array $config, $key, $context)
+    public function getElement(array $config, $key, $context, $requiredType = 'string')
     {
         if (!array_key_exists($key, $config)) {
             throw new InvalidArgumentException(
@@ -39,7 +41,23 @@ class ConfigParser
             );
         }
 
-        return $config[$key];
+        $value = $config[$key];
+
+        if ($requiredType === 'array' && $value === null) {
+            return [];
+        }
+
+        if (gettype($value) !== $requiredType) {
+            throw new InvalidArgumentException(sprintf(
+                'Config element "%s" should be of type "%s" but is "%s" for %s',
+                $key,
+                $requiredType,
+                gettype($value),
+                $context
+            ));
+        }
+
+        return $value;
     }
 
     /**
@@ -49,14 +67,33 @@ class ConfigParser
      * @param string $key
      * @param string $context
      * @param mixed $defaultValue Result to return if the element is not defined
+     * @param string $requiredType The type the value must be
      * @return mixed
+     * @throws InvalidArgumentException Throws when the value is not specified
+     * @throws InvalidArgumentException Throws when the value has the wrong type
      */
-    public function getOptionalElement(array $config, $key, $context, $defaultValue = null)
+    public function getOptionalElement(array $config, $key, $context, $defaultValue = null, $requiredType = 'string')
     {
         if (!array_key_exists($key, $config)) {
             return $defaultValue;
         }
 
-        return $config[$key];
+        $value = $config[$key];
+
+        if ($requiredType === 'array' && $value === null) {
+            return [];
+        }
+
+        if (gettype($value) !== $requiredType) {
+            throw new InvalidArgumentException(sprintf(
+                'Config element "%s" should be of type "%s" but is "%s" for %s',
+                $key,
+                $requiredType,
+                gettype($value),
+                $context
+            ));
+        }
+
+        return $value;
     }
 }

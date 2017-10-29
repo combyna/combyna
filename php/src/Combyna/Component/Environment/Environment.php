@@ -50,25 +50,57 @@ class Environment implements EnvironmentInterface
     /**
      * {@inheritdoc}
      */
-    public function getGenericFunction($libraryName, $functionName)
+    public function getEventDefinitionByName($libraryName, $eventName)
     {
         if (!array_key_exists($libraryName, $this->libraries)) {
             throw new LibraryNotInstalledException($libraryName);
         }
 
-        return $this->libraries[$libraryName]->getGenericFunction($functionName);
+        return $this->libraries[$libraryName]->getEventDefinitionByName($eventName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWidgetDefinition($libraryName, $widgetDefinitionName)
+    public function getGenericFunctionByName($libraryName, $functionName)
     {
         if (!array_key_exists($libraryName, $this->libraries)) {
             throw new LibraryNotInstalledException($libraryName);
         }
 
-        return $this->libraries[$libraryName]->getWidgetDefinition($widgetDefinitionName);
+        return $this->libraries[$libraryName]->getGenericFunctionByName($functionName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteByName($libraryName, $routeName)
+    {
+        throw new \Exception('Not yet supported');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignalDefinitionByName($libraryName, $signalName)
+    {
+        if (!array_key_exists($libraryName, $this->libraries)) {
+            throw new LibraryNotInstalledException($libraryName);
+        }
+
+        return $this->libraries[$libraryName]->getSignalDefinitionByName($signalName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWidgetDefinitionByName($libraryName, $widgetDefinitionName)
+    {
+        if (!array_key_exists($libraryName, $this->libraries)) {
+            throw new LibraryNotInstalledException($libraryName);
+        }
+
+        return $this->libraries[$libraryName]->getWidgetDefinitionByName($widgetDefinitionName);
     }
 
     /**
@@ -90,8 +122,14 @@ class Environment implements EnvironmentInterface
     /**
      * {@inheritdoc}
      */
-    public function translate($key, array $parameters = [])
+    public function translate($key, array $arguments = [])
     {
-        return $this->translator->trans($key, $parameters);
+        $placeholderArguments = [];
+
+        foreach ($arguments as $name => $message) {
+            $placeholderArguments['%' . $name . '%'] = $message;
+        }
+
+        return $this->translator->trans($key, $placeholderArguments);
     }
 }

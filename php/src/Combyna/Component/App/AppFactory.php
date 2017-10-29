@@ -12,10 +12,18 @@
 namespace Combyna\Component\App;
 
 use Combyna\Component\Bag\BagFactoryInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\EventDispatcherInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Component\Ui\ViewCollectionInterface;
-use Combyna\Component\Ui\ViewFactoryInterface;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Router\RouteInterface;
+use Combyna\Component\Router\RouterInterface;
+use Combyna\Component\Signal\DispatcherInterface;
+use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
+use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
+use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
 /**
  * Class App
@@ -30,37 +38,77 @@ class AppFactory implements AppFactoryInterface
     private $bagFactory;
 
     /**
+     * @var DispatcherInterface
+     */
+    private $dispatcher;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var ExpressionFactoryInterface
      */
     private $expressionFactory;
 
     /**
-     * @var ViewFactoryInterface
+     * @var UiEvaluationContextTreeFactoryInterface
      */
-    private $viewFactory;
+    private $uiEvaluationContextTreeFactory;
 
     /**
      * @param BagFactoryInterface $bagFactory
-     * @param ViewFactoryInterface $viewFactory
+     * @param DispatcherInterface $dispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      * @param ExpressionFactoryInterface $expressionFactory
+     * @param UiEvaluationContextTreeFactoryInterface $uiEvaluationContextTreeFactory
      */
     public function __construct(
         BagFactoryInterface $bagFactory,
-        ViewFactoryInterface $viewFactory,
-        ExpressionFactoryInterface $expressionFactory
+        DispatcherInterface $dispatcher,
+        EventDispatcherInterface $eventDispatcher,
+        ExpressionFactoryInterface $expressionFactory,
+        UiEvaluationContextTreeFactoryInterface $uiEvaluationContextTreeFactory
     ) {
         $this->bagFactory = $bagFactory;
+        $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
         $this->expressionFactory = $expressionFactory;
-        $this->viewFactory = $viewFactory;
+        $this->uiEvaluationContextTreeFactory = $uiEvaluationContextTreeFactory;
     }
 
     /**
      * {@inheritdoc}
      */
     public function create(
-        EvaluationContextInterface $rootEvaluationContext,
-        ViewCollectionInterface $viewCollection
+        RouterInterface $router,
+        SignalDefinitionRepositoryInterface $signalDefinitionRepository,
+        PageViewCollectionInterface $pageViewCollection,
+        OverlayViewCollectionInterface $overlayViewCollection,
+        EnvironmentInterface $environment,
+        ProgramInterface $program
     ) {
-        return new App($this->bagFactory, $this->expressionFactory, $viewCollection, $rootEvaluationContext);
+        return new App(
+            $this->bagFactory,
+            $this->expressionFactory,
+            $this->dispatcher,
+            $this->eventDispatcher,
+            $router,
+            $signalDefinitionRepository,
+            $pageViewCollection,
+            $overlayViewCollection,
+            $this->uiEvaluationContextTreeFactory,
+            $environment,
+            $program
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createHome(RouteInterface $route, ExpressionBagInterface $attributeExpressionBag)
+    {
+        return new Home($route, $attributeExpressionBag);
     }
 }

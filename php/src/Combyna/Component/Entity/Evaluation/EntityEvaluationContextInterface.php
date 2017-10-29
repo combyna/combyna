@@ -12,13 +12,14 @@
 namespace Combyna\Component\Entity\Evaluation;
 
 use Combyna\Component\Entity\EntityInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 
 /**
  * Interface EntityEvaluationContextInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface EntityEvaluationContextInterface
+interface EntityEvaluationContextInterface extends EvaluationContextInterface
 {
     /**
      * Fetches the entity this context is of

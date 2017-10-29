@@ -28,6 +28,15 @@ interface ComponentInterface
     public function getContainerExtension();
 
     /**
+     * Fetches the path to the directory containing this component
+     *
+     * This is defined as the directory that the main component class is in.
+     *
+     * @return string
+     */
+    public function getDirectory();
+
+    /**
      * Fetches the short/unqualified class name for this component, without `Component` suffix.
      * For example, the component class `Combyna\Component\Awesome\AwesomeComponent` would have
      * the name `Awesome`

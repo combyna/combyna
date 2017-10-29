@@ -11,8 +11,10 @@
 
 namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
+use Combyna\Component\Common\DelegatorInterface;
 use Combyna\Component\Renderer\Html\HtmlNodeInterface;
-use Combyna\Component\Ui\RenderedWidgetInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use LogicException;
 
 /**
@@ -20,7 +22,7 @@ use LogicException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DelegatingWidgetRenderer
+class DelegatingWidgetRenderer implements DelegatorInterface
 {
     /**
      * @var WidgetRendererInterface[][]
@@ -40,15 +42,15 @@ class DelegatingWidgetRenderer
     }
 
     /**
-     * Renders the specified widget to a HTML node
+     * Renders the specified widget state to a HTML node
      *
-     * @param RenderedWidgetInterface $renderedWidget
+     * @param WidgetStatePathInterface $widgetStatePath
      * @return HtmlNodeInterface
      */
-    public function renderWidget(RenderedWidgetInterface $renderedWidget)
+    public function renderWidget(WidgetStatePathInterface $widgetStatePath)
     {
-        $libraryName = $renderedWidget->getWidgetDefinitionLibraryName();
-        $widgetDefinitionName = $renderedWidget->getWidgetDefinitionName();
+        $libraryName = $widgetStatePath->getWidgetDefinitionLibraryName();
+        $widgetDefinitionName = $widgetStatePath->getWidgetDefinitionName();
 
         if (!array_key_exists($libraryName, $this->widgetRenderers)) {
             throw new LogicException(
@@ -63,6 +65,12 @@ class DelegatingWidgetRenderer
             );
         }
 
-        return $this->widgetRenderers[$libraryName][$widgetDefinitionName]->renderWidget($renderedWidget);
+        /** @var WidgetStateInterface $widgetState */
+        $widgetState = $widgetStatePath->getEndState();
+
+        return $this->widgetRenderers[$libraryName][$widgetDefinitionName]->renderWidget(
+            $widgetState,
+            $widgetStatePath
+        );
     }
 }

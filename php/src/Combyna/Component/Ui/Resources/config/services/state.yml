@@ -1,0 +1,4 @@
+services:
+    combyna.ui.state.ui_state_factory:
+        class: Combyna\Component\Ui\State\UiStateFactory
+        autowire: true

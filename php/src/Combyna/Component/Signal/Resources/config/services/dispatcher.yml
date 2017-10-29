@@ -1,0 +1,8 @@
+services:
+    combyna.signal.dispatcher:
+        class: Combyna\Component\Signal\Dispatcher
+        autowire: true
+
+    combyna.signal.event_dispatcher:
+        class: Combyna\Component\Event\EventDispatcher
+        autowire: true

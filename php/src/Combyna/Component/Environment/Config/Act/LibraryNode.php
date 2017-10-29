@@ -14,6 +14,8 @@ namespace Combyna\Component\Environment\Config\Act;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Library\NativeFunction;
+use Combyna\Component\Event\Config\Act\EventDefinitionNode;
+use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -29,6 +31,16 @@ class LibraryNode extends AbstractActNode
     const TYPE = 'library';
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
+     * @var EventDefinitionNode[]
+     */
+    private $eventDefinitionNodes = [];
+
+    /**
      * @var FunctionNodeInterface[]
      */
     private $functionNodes = [];
@@ -39,28 +51,74 @@ class LibraryNode extends AbstractActNode
     private $name;
 
     /**
+     * @var SignalDefinitionNode[]
+     */
+    private $signalDefinitionNodes = [];
+
+    /**
      * @var WidgetDefinitionNodeInterface[]
      */
     private $widgetDefinitionNodes = [];
 
     /**
      * @param string $name
+     * @param string $description
      * @param FunctionNodeInterface[] $functionNodes
+     * @param EventDefinitionNode[] $eventDefinitionNodes
+     * @param SignalDefinitionNode[] $signalDefinitionNodes
      * @param WidgetDefinitionNodeInterface[] $widgetDefinitionNodes
      */
-    public function __construct($name, array $functionNodes = [], array $widgetDefinitionNodes = [])
-    {
+    public function __construct(
+        $name,
+        $description,
+        array $functionNodes = [],
+        array $eventDefinitionNodes = [],
+        array $signalDefinitionNodes = [],
+        array $widgetDefinitionNodes = []
+    ) {
+        $this->description = $description;
+
         // Index functions by name to simplify lookups
         foreach ($functionNodes as $functionNode) {
             $this->functionNodes[$functionNode->getName()] = $functionNode;
+        }
+
+        $this->name = $name;
+
+        // Index event definitions by name to simplify lookups
+        foreach ($eventDefinitionNodes as $eventDefinitionNode) {
+            $this->eventDefinitionNodes[$eventDefinitionNode->getEventName()] = $eventDefinitionNode;
+        }
+
+        // Index signal definitions by name to simplify lookups
+        foreach ($signalDefinitionNodes as $signalDefinitionNode) {
+            $this->signalDefinitionNodes[$signalDefinitionNode->getSignalName()] = $signalDefinitionNode;
         }
 
         // Index widget definitions by name to simplify lookups
         foreach ($widgetDefinitionNodes as $widgetDefinitionNode) {
             $this->widgetDefinitionNodes[$widgetDefinitionNode->getWidgetDefinitionName()] = $widgetDefinitionNode;
         }
+    }
 
-        $this->name = $name;
+    /**
+     * Fetches the human-readable description of this library
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * Fetches all event definitions defined by this library
+     *
+     * @return EventDefinitionNode[]
+     */
+    public function getEventDefinitions()
+    {
+        return $this->eventDefinitionNodes;
     }
 
     /**
@@ -91,6 +149,16 @@ class LibraryNode extends AbstractActNode
         // TODO: Check type of function and return IncorrectTypeFunctionNode if wrong
 
         return $this->functionNodes[$functionName];
+    }
+
+    /**
+     * Fetches all signal definitions defined by this library
+     *
+     * @return SignalDefinitionNode[]
+     */
+    public function getSignalDefinitions()
+    {
+        return $this->signalDefinitionNodes;
     }
 
     /**
@@ -133,13 +201,14 @@ class LibraryNode extends AbstractActNode
     /**
      * Installs a native function, referenced by a NativeFunctionNode
      *
-     * @param string $functionName
      * @param NativeFunction $nativeFunction
      * @throws FunctionNotSupportedException
      * @throws LogicException
      */
-    public function installNativeFunction($functionName, NativeFunction $nativeFunction)
+    public function installNativeFunction(NativeFunction $nativeFunction)
     {
+        $functionName = $nativeFunction->getName();
+
         if (!array_key_exists($functionName, $this->functionNodes)) {
             throw new FunctionNotSupportedException($this->name, $functionName);
         }

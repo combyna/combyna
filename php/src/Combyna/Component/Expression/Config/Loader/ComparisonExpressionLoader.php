@@ -49,9 +49,9 @@ class ComparisonExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $leftOperandConfig = $this->configParser->getElement($config, 'left', 'comparison expression');
+        $leftOperandConfig = $this->configParser->getElement($config, 'left', 'comparison expression', 'array');
         $operator = $this->configParser->getElement($config, 'operator', 'comparison expression');
-        $rightOperandConfig = $this->configParser->getElement($config, 'right', 'comparison expression');
+        $rightOperandConfig = $this->configParser->getElement($config, 'right', 'comparison expression', 'array');
 
         $leftOperandExpressionNode = $this->expressionLoader->load($leftOperandConfig);
         $rightOperandExpressionNode = $this->expressionLoader->load($rightOperandConfig);

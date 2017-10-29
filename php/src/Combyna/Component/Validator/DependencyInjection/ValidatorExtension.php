@@ -11,31 +11,13 @@
 
 namespace Combyna\Component\Validator\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderResolver;
-use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
+use Combyna\Component\Common\AbstractComponentExtension;
 
 /**
  * Class ValidatorExtension
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ValidatorExtension extends Extension
+class ValidatorExtension extends AbstractComponentExtension
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $containerBuilder)
-    {
-        $fileLocator = new FileLocator(__DIR__ . '/../Resources/config');
-        $loader = new DirectoryLoader($containerBuilder, $fileLocator);
-        $loader->setResolver(new LoaderResolver([
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            $loader
-        ]));
-        $loader->load('services/');
-    }
 }

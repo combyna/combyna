@@ -72,4 +72,19 @@ class StaticBag implements StaticBagInterface
 
         return $nativeArray;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    {
+        if ($this->getStatic($slotName)->toNative() === $newSlotStatic->toNative()) {
+            // Slot already has the provided static value, no need to create a new static bag
+            return $this;
+        }
+
+        return new self(array_merge($this->statics, [
+            $slotName => $newSlotStatic
+        ]));
+    }
 }

@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\ConversionExpressionNode;
 use Combyna\Component\Expression\ConversionExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class NumberConversionExpressionLoader
@@ -22,6 +22,8 @@ use Combyna\Component\Config\Loader\ConfigParser;
  */
 class NumberConversionExpressionLoader implements BuiltinLoaderInterface
 {
+    const BUILTIN_NAME = 'number';
+
     /**
      * @var ConfigParser
      */
@@ -68,6 +70,6 @@ class NumberConversionExpressionLoader implements BuiltinLoaderInterface
      */
     public function getBuiltinName()
     {
-        return 'number';
+        return self::BUILTIN_NAME;
     }
 }

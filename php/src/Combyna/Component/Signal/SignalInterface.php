@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Bag\StaticBagInterface;
+
 /**
  * Interface SignalInterface
  *
@@ -21,6 +23,13 @@ namespace Combyna\Component\Signal;
 interface SignalInterface
 {
     /**
+     * Fetches the unique name for the library that defines the signal type within the system
+     *
+     * @return string
+     */
+    public function getLibraryName();
+
+    /**
      * Fetches the unique name for the signal type within the system
      *
      * @return string
@@ -28,9 +37,9 @@ interface SignalInterface
     public function getName();
 
     /**
-     * Dispatches this signal to the provided handler
+     * Fetches the static bag containing the signal payload
      *
-     * @param SignalHandlerInterface $signalHandler
+     * @return StaticBagInterface
      */
-    public function dispatch(SignalHandlerInterface $signalHandler);
+    public function getPayloadStaticBag();
 }

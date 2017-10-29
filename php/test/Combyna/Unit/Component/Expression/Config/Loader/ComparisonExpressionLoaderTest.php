@@ -50,7 +50,7 @@ class ComparisonExpressionLoaderTest extends TestCase
         $this->configParser = $this->prophesize(ConfigParser::class);
         $this->expressionLoader = $this->prophesize(ExpressionLoaderInterface::class);
 
-        $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any())
+        $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any(), Argument::any())
             ->will(function (array $args) {
                 return $args[0][$args[1]];
             });

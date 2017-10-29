@@ -1,0 +1,10 @@
+services:
+    combyna.trigger.loader:
+        class: Combyna\Component\Trigger\Config\Loader\TriggerLoader
+        autowire: true
+
+    combyna.trigger.loader.signal_instruction:
+        class: Combyna\Component\Trigger\Config\Loader\SignalInstructionLoader
+        autowire: true
+        tags:
+            - {name: combyna.instruction_loader}

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Bag;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -38,6 +39,14 @@ interface FixedStaticBagModelInterface
      * @param StaticBagInterface $staticBag
      */
     public function assertValidStaticBag(StaticBagInterface $staticBag);
+
+    /**
+     * Creates a StaticBag with all the default statics of definitions in this model
+     *
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticBagInterface
+     */
+    public function createDefaultStaticBag(EvaluationContextInterface $evaluationContext);
 
     /**
      * Returns true if this model defines a static with the specified name, false otherwise

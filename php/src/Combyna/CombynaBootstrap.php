@@ -13,17 +13,27 @@ namespace Combyna;
 
 use Combyna\Component\App\AppComponent;
 use Combyna\Component\Bag\BagComponent;
-use Combyna\Component\Core\CoreComponent;
-use Combyna\Component\Core\Runtime;
 use Combyna\Component\Config\ConfigComponent;
 use Combyna\Component\Environment\EnvironmentComponent;
+use Combyna\Component\Event\EventComponent;
 use Combyna\Component\Expression\ExpressionComponent;
 use Combyna\Component\ExpressionLanguage\ExpressionLanguageComponent;
+use Combyna\Component\Framework\FrameworkComponent;
+use Combyna\Component\Framework\Runtime;
+use Combyna\Component\Instruction\InstructionComponent;
+use Combyna\Component\Plugin\PluginComponent;
+use Combyna\Component\Program\ProgramComponent;
 use Combyna\Component\Renderer\RendererComponent;
+use Combyna\Component\Router\RouterComponent;
+use Combyna\Component\Signal\SignalComponent;
+use Combyna\Component\Store\StoreComponent;
+use Combyna\Component\Trigger\TriggerComponent;
 use Combyna\Component\Type\TypeComponent;
 use Combyna\Component\Ui\UiComponent;
 use Combyna\Component\Validator\ValidatorComponent;
 use Combyna\Container\CompiledCombynaContainer;
+use Combyna\Plugin\Core\CorePlugin;
+use Combyna\Plugin\Gui\GuiPlugin;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -45,17 +55,30 @@ class CombynaBootstrap
     public function getContainer($isDebug = true)
     {
         $runtime = new Runtime([
+            // Components
             new AppComponent(),
             new BagComponent(),
             new ConfigComponent(),
-            new CoreComponent(),
+            new EventComponent(),
+            new FrameworkComponent(),
             new EnvironmentComponent(),
             new ExpressionComponent(),
             new ExpressionLanguageComponent(),
+            new InstructionComponent(),
+            new PluginComponent(),
+            new ProgramComponent(),
             new RendererComponent(),
+            new RouterComponent(),
+            new SignalComponent(),
+            new StoreComponent(),
+            new TriggerComponent(),
             new TypeComponent(),
             new UiComponent(),
-            new ValidatorComponent()
+            new ValidatorComponent(),
+
+            // Plugins
+            new CorePlugin(),
+            new GuiPlugin()
         ]);
 
         $file = __DIR__ . '/../../dist/Combyna/Container/CompiledCombynaContainer.php';
@@ -77,8 +100,10 @@ class CombynaBootstrap
             );
         }
 
-        $runtime->boot();
+        $container = new CompiledCombynaContainer();
 
-        return new CompiledCombynaContainer();
+        $runtime->boot($container);
+
+        return $container;
     }
 }

@@ -2,3 +2,7 @@ services:
     combyna.app.loader:
         class: Combyna\Component\App\Config\Loader\AppLoader
         autowire: true
+
+    combyna.app.home_loader:
+        class: Combyna\Component\App\Config\Loader\HomeLoader
+        autowire: true

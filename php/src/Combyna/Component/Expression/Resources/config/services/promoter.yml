@@ -1,6 +1,6 @@
 services:
     combyna.expression.act.promoter:
-        class: Combyna\Component\Expression\Config\Act\ExpressionNodePromoter
+        class: Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter
         autowire: true
 
     combyna.expression.act.basic_promoter:

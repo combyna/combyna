@@ -1,0 +1,4 @@
+services:
+    combyna.ui.widget_definition_factory:
+        class: Combyna\Component\Ui\Widget\WidgetDefinitionFactory
+        autowire: true

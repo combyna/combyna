@@ -1,0 +1,8 @@
+name: core
+description: Built-in core tools
+events: ~
+signals:
+    # This signal is dispatched when a new route is navigated to within the app
+    navigated:
+        payload: ~
+widgets: ~

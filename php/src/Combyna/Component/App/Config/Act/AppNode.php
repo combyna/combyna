@@ -12,7 +12,9 @@
 namespace Combyna\Component\App\Config\Act;
 
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Ui\Config\Act\ViewCollectionNode;
+use Combyna\Component\Router\Config\Act\RouteNode;
+use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -25,26 +27,99 @@ class AppNode extends AbstractActNode
     const TYPE = 'app';
 
     /**
-     * @var ViewCollectionNode
+     * @var HomeNode
      */
-    private $viewCollectionNode;
+    private $homeNode;
 
     /**
-     * @param ViewCollectionNode $viewCollectionNode
+     * @var OverlayViewNode[]
      */
-    public function __construct(ViewCollectionNode $viewCollectionNode)
-    {
-        $this->viewCollectionNode = $viewCollectionNode;
+    private $overlayViewNodes;
+
+    /**
+     * @var PageViewNode[]
+     */
+    private $pageViewNodes;
+
+    /**
+     * @var RouteNode[]
+     */
+    private $routeNodes;
+
+    /**
+     * @var array|SignalDefinitionNode[]
+     */
+    private $signalDefinitionNodes;
+
+    /**
+     * @param SignalDefinitionNode[] $signalDefinitionNodes
+     * @param RouteNode[] $routeNodes
+     * @param HomeNode $homeNode
+     * @param PageViewNode[] $pageViewNodes
+     * @param OverlayViewNode[] $overlayViewNodes
+     */
+    public function __construct(
+        array $signalDefinitionNodes,
+        array $routeNodes,
+        HomeNode $homeNode,
+        array $pageViewNodes,
+        array $overlayViewNodes
+    ) {
+        $this->homeNode = $homeNode;
+        $this->overlayViewNodes = $overlayViewNodes;
+        $this->pageViewNodes = $pageViewNodes;
+        $this->routeNodes = $routeNodes;
+        $this->signalDefinitionNodes = $signalDefinitionNodes;
     }
 
     /**
-     * Fetches the collection of views in the app
+     * Fetches the route and attributes to navigate to when the app first loads
      *
-     * @return ViewCollectionNode
+     * @return HomeNode
      */
-    public function getViewCollection()
+    public function getHome()
     {
-        return $this->viewCollectionNode;
+        return $this->homeNode;
+    }
+
+    /**
+     * Fetches the collection of overlay views in the app
+     *
+     * @return OverlayViewNode[]
+     */
+    public function getOverlayViews()
+    {
+        return $this->overlayViewNodes;
+    }
+
+    /**
+     * Fetches the collection of page views in the app
+     *
+     * @return PageViewNode[]
+     */
+    public function getPageViews()
+    {
+        return $this->pageViewNodes;
+    }
+
+    /**
+     * Fetches the collection of routes in the app
+     *
+     * @return RouteNode[]
+     */
+    public function getRoutes()
+    {
+        return $this->routeNodes;
+    }
+
+    /**
+     * Fetches the collection of signal definitions in the app
+     *
+     * @return SignalDefinitionNode[]
+     */
+    public function getSignalDefinitions()
+    {
+        return $this->signalDefinitionNodes;
     }
 
     /**
@@ -54,6 +129,16 @@ class AppNode extends AbstractActNode
     {
         $subValidationContext = $validationContext->createSubActNodeContext($this);
 
-        $this->viewCollectionNode->validate($subValidationContext);
+        foreach ($this->overlayViewNodes as $overlayViewNode) {
+            $overlayViewNode->validate($subValidationContext);
+        }
+
+        foreach ($this->pageViewNodes as $pageViewNode) {
+            $pageViewNode->validate($subValidationContext);
+        }
+
+        foreach ($this->routeNodes as $routeNode) {
+            $routeNode->validate($subValidationContext);
+        }
     }
 }

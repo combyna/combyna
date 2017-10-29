@@ -11,12 +11,12 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
-use Combyna\Component\Expression\Config\Act\ExpressionNodePromoter;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
-use Combyna\Component\Bag\FixedStaticBagModel;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\FixedStaticDefinition;
+use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 
 /**
  * Class BagNodePromoter
@@ -31,29 +31,34 @@ class BagNodePromoter
     private $bagFactory;
 
     /**
+     * @var DelegatingExpressionNodePromoter
+     */
+    private $expressionNodePromoter;
+
+    /**
      * @param BagFactoryInterface $bagFactory
+     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      */
     public function __construct(
-        BagFactoryInterface $bagFactory
+        BagFactoryInterface $bagFactory,
+        DelegatingExpressionNodePromoter $expressionNodePromoter
     ) {
         $this->bagFactory = $bagFactory;
+        $this->expressionNodePromoter = $expressionNodePromoter;
     }
 
     /**
      * Promotes an ExpressionBagNode to an ExpressionBag
      *
      * @param ExpressionBagNode $expressionBagNode
-     * @param ExpressionNodePromoter $expressionNodePromoter
      * @return ExpressionBagInterface
      */
-    public function promoteExpressionBag(
-        ExpressionBagNode $expressionBagNode,
-        ExpressionNodePromoter $expressionNodePromoter
-    ) {
+    public function promoteExpressionBag(ExpressionBagNode $expressionBagNode)
+    {
         $expressions = [];
 
         foreach ($expressionBagNode->getExpressions() as $expressionName => $expressionNode) {
-            $expressions[$expressionName] = $expressionNodePromoter->promote($expressionNode);
+            $expressions[$expressionName] = $this->expressionNodePromoter->promote($expressionNode);
         }
 
         return $this->bagFactory->createExpressionBag($expressions);
@@ -63,17 +68,14 @@ class BagNodePromoter
      * Promotes an ExpressionListNode to an ExpressionList
      *
      * @param ExpressionListNode $expressionListNode
-     * @param ExpressionNodePromoter $expressionNodePromoter
      * @return ExpressionListInterface
      */
-    public function promoteExpressionList(
-        ExpressionListNode $expressionListNode,
-        ExpressionNodePromoter $expressionNodePromoter
-    ) {
+    public function promoteExpressionList(ExpressionListNode $expressionListNode)
+    {
         $expressions = [];
 
         foreach ($expressionListNode->getExpressions() as $expressionNode) {
-            $expressions[] = $expressionNodePromoter->promote($expressionNode);
+            $expressions[] = $this->expressionNodePromoter->promote($expressionNode);
         }
 
         return $this->bagFactory->createExpressionList($expressions);
@@ -83,20 +85,14 @@ class BagNodePromoter
      * Promotes a FixedStaticBagModelNode to a FixedStaticBagModel
      *
      * @param FixedStaticBagModelNode $modelNode
-     * @param ExpressionNodePromoter $expressionNodePromoter
-     * @return FixedStaticBagModel
+     * @return FixedStaticBagModelInterface
      */
-    public function promoteFixedStaticBagModel(
-        FixedStaticBagModelNode $modelNode,
-        ExpressionNodePromoter $expressionNodePromoter
-    ) {
+    public function promoteFixedStaticBagModel(FixedStaticBagModelNode $modelNode)
+    {
         $staticDefinitions = [];
 
         foreach ($modelNode->getStaticDefinitions() as $definitionNode) {
-            $staticDefinitions[] = $this->promoteFixedStaticDefinition(
-                $definitionNode,
-                $expressionNodePromoter
-            );
+            $staticDefinitions[] = $this->promoteFixedStaticDefinition($definitionNode);
         }
 
         return $this->bagFactory->createFixedStaticBagModel($staticDefinitions);
@@ -106,16 +102,13 @@ class BagNodePromoter
      * Promotes a FixedStaticDefinitionNode to a FixedStaticDefinition
      *
      * @param FixedStaticDefinitionNode $definitionNode
-     * @param ExpressionNodePromoter $expressionNodePromoter
      * @return FixedStaticDefinition
      */
-    public function promoteFixedStaticDefinition(
-        FixedStaticDefinitionNode $definitionNode,
-        ExpressionNodePromoter $expressionNodePromoter
-    ) {
+    public function promoteFixedStaticDefinition(FixedStaticDefinitionNode $definitionNode)
+    {
         // Allow the static to specify a default value
         $defaultExpression = $definitionNode->getDefaultExpression() ?
-            $expressionNodePromoter->promote($definitionNode->getDefaultExpression()) :
+            $this->expressionNodePromoter->promote($definitionNode->getDefaultExpression()) :
             null;
 
         return $this->bagFactory->createFixedStaticDefinition(

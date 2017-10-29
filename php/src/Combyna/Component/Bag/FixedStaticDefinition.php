@@ -12,10 +12,12 @@
 namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\ValidationFactoryInterface;
-use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
 /**
@@ -28,9 +30,9 @@ use LogicException;
 class FixedStaticDefinition
 {
     /**
-     * @var StaticInterface|null
+     * @var ExpressionInterface|null
      */
-    private $defaultStatic;
+    private $defaultExpression;
 
     /**
      * @var string
@@ -51,15 +53,15 @@ class FixedStaticDefinition
      * @param ValidationFactoryInterface $validationFactory
      * @param string $name
      * @param TypeInterface $staticType
-     * @param StaticInterface|null $defaultStatic
+     * @param ExpressionInterface|null $defaultExpression
      */
     public function __construct(
         ValidationFactoryInterface $validationFactory,
         $name,
         TypeInterface $staticType,
-        StaticInterface $defaultStatic = null
+        ExpressionInterface $defaultExpression = null
     ) {
-        $this->defaultStatic = $defaultStatic;
+        $this->defaultExpression = $defaultExpression;
         $this->name = $name;
         $this->staticType = $staticType;
         $this->validationFactory = $validationFactory;
@@ -71,15 +73,15 @@ class FixedStaticDefinition
      * @return StaticInterface
      * @throws LogicException when no default static has been configured
      */
-    public function getDefaultStatic()
+    public function getDefaultStatic(EvaluationContextInterface $evaluationContext)
     {
-        if (!$this->defaultStatic) {
+        if (!$this->defaultExpression) {
             throw new LogicException(
-                'No default static has been configured for parameter "' . $this->name . '"'
+                'No default expression has been configured for parameter "' . $this->name . '"'
             );
         }
 
-        return $this->defaultStatic;
+        return $this->defaultExpression->toStatic($evaluationContext);
     }
 
     /**
@@ -99,7 +101,7 @@ class FixedStaticDefinition
      */
     public function isRequired()
     {
-        return $this->defaultStatic === null;
+        return $this->defaultExpression === null;
     }
 
     /**

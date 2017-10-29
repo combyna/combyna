@@ -13,8 +13,9 @@ namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoader;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Event\Config\Loader\EventDefinitionReferenceLoaderInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
-use Combyna\Component\Ui\Config\Act\CoreWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 
 /**
  * Class WidgetDefinitionLoader
@@ -29,6 +30,11 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
     private $configParser;
 
     /**
+     * @var EventDefinitionReferenceLoaderInterface
+     */
+    private $eventDefinitionReferenceLoader;
+
+    /**
      * @var FixedStaticBagModelLoader
      */
     private $fixedStaticBagModelLoader;
@@ -36,10 +42,15 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
     /**
      * @param ConfigParser $configParser
      * @param FixedStaticBagModelLoader $fixedStaticBagModelLoader
+     * @param EventDefinitionReferenceLoaderInterface $eventDefinitionReferenceLoader
      */
-    public function __construct(ConfigParser $configParser, FixedStaticBagModelLoader $fixedStaticBagModelLoader)
-    {
+    public function __construct(
+        ConfigParser $configParser,
+        FixedStaticBagModelLoader $fixedStaticBagModelLoader,
+        EventDefinitionReferenceLoaderInterface $eventDefinitionReferenceLoader
+    ) {
         $this->configParser = $configParser;
+        $this->eventDefinitionReferenceLoader = $eventDefinitionReferenceLoader;
         $this->fixedStaticBagModelLoader = $fixedStaticBagModelLoader;
     }
 
@@ -60,8 +71,8 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
                     $widgetDefinitionName,
                     $widgetDefinitionConfig
                 );
-            case CoreWidgetDefinitionNode::TYPE:
-                return $this->loadCoreWidgetDefinition(
+            case PrimitiveWidgetDefinitionNode::TYPE:
+                return $this->loadPrimitiveWidgetDefinition(
                     $libraryName,
                     $widgetDefinitionName,
                     $widgetDefinitionConfig
@@ -89,21 +100,33 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
             'attributes',
             'compound "' . $widgetDefinitionName . '" widget definition attribute model config'
         );
+        $labelNames = $this->configParser->getOptionalElement(
+            $widgetDefinitionConfig,
+            'labels',
+            'compound "' . $widgetDefinitionName . '" widget definition labels',
+            [],
+            'array'
+        );
 
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load($attributeModelConfig);
 
-        return new CompoundWidgetDefinitionNode($libraryName, $widgetDefinitionName, $attributeBagModelNode);
+        return new CompoundWidgetDefinitionNode(
+            $libraryName,
+            $widgetDefinitionName,
+            $attributeBagModelNode,
+            $this->buildLabelMap($labelNames)
+        );
     }
 
     /**
-     * Loads a CoreWidgetDefinitionNode from its array config
+     * Loads a PrimitiveWidgetDefinitionNode from its array config
      *
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param array $widgetDefinitionConfig
-     * @return CoreWidgetDefinitionNode
+     * @return PrimitiveWidgetDefinitionNode
      */
-    private function loadCoreWidgetDefinition(
+    private function loadPrimitiveWidgetDefinition(
         $libraryName,
         $widgetDefinitionName,
         array $widgetDefinitionConfig
@@ -111,11 +134,51 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         $attributeModelConfig = $this->configParser->getElement(
             $widgetDefinitionConfig,
             'attributes',
-            'core "' . $widgetDefinitionName . '" widget definition attribute model config'
+            'core "' . $widgetDefinitionName . '" widget definition attribute model config',
+            'array'
         );
+        // Types of event that this widget supports / is able to dispatch
+        $eventDefinitionTypes = $this->configParser->getElement(
+            $widgetDefinitionConfig,
+            'events',
+            'core "' . $widgetDefinitionName . '" widget definition supported event types',
+            'array'
+        );
+        $labelNames = $this->configParser->getOptionalElement(
+            $widgetDefinitionConfig,
+            'labels',
+            'compound "' . $widgetDefinitionName . '" widget definition labels',
+            [],
+            'array'
+        );
+
+        $eventDefinitionReferenceNodes = $this->eventDefinitionReferenceLoader->loadCollection($eventDefinitionTypes);
 
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load($attributeModelConfig);
 
-        return new CoreWidgetDefinitionNode($libraryName, $widgetDefinitionName, $attributeBagModelNode);
+        return new PrimitiveWidgetDefinitionNode(
+            $libraryName,
+            $widgetDefinitionName,
+            $attributeBagModelNode,
+            $eventDefinitionReferenceNodes,
+            $this->buildLabelMap($labelNames)
+        );
+    }
+
+    /**
+     * Builds up an associative array to speed up lookups
+     *
+     * @param string[] $labelNames
+     * @return array
+     */
+    private function buildLabelMap(array $labelNames)
+    {
+        $labels = [];
+
+        foreach ($labelNames as $labelName) {
+            $labels[$labelName] = true;
+        }
+
+        return $labels;
     }
 }

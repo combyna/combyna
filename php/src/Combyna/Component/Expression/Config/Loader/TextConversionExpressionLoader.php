@@ -22,6 +22,8 @@ use Combyna\Component\Config\Loader\ConfigParser;
  */
 class TextConversionExpressionLoader implements BuiltinLoaderInterface
 {
+    const BUILTIN_NAME = 'text';
+
     /**
      * @var ConfigParser
      */
@@ -68,6 +70,6 @@ class TextConversionExpressionLoader implements BuiltinLoaderInterface
      */
     public function getBuiltinName()
     {
-        return 'text';
+        return self::BUILTIN_NAME;
     }
 }

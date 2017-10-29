@@ -14,7 +14,7 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Expression\Config\Act\ExpressionNodePromoter;
+use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Type\StaticType;
@@ -81,7 +81,7 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
      */
     public function promote(
         ExpressionFactoryInterface $expressionFactory,
-        ExpressionNodePromoter $expressionNodePromoter
+        DelegatingExpressionNodePromoter $expressionNodePromoter
     ) {
         return $expressionFactory->createGuardAssurance(
             $expressionNodePromoter->promote($this->inputExpressionNode),

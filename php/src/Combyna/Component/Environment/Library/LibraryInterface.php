@@ -14,7 +14,9 @@ namespace Combyna\Component\Environment\Library;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\IncorrectFunctionTypeException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
-use Combyna\Component\Ui\WidgetDefinitionInterface;
+use Combyna\Component\Event\EventDefinitionInterface;
+use Combyna\Component\Signal\SignalDefinitionInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 
 /**
  * Interface LibraryInterface
@@ -24,6 +26,34 @@ use Combyna\Component\Ui\WidgetDefinitionInterface;
 interface LibraryInterface
 {
     /**
+     * The unique name for the special "app" library
+     * that represents resources (routes, signals, views etc.) for the current app
+     */
+    const APP = 'app';
+
+    /**
+     * The unique name for the special "core" library
+     * that represents resources (routes, signals, views etc.) that are built-in.
+     * For example, the "navigated" core signal is dispatched upon navigation
+     */
+    const CORE = 'core';
+
+    /**
+     * The unique name for the special "widget" library
+     * that represents the current widget when defining which events a widget definition may dispatch
+     */
+    const WIDGET = 'widget';
+
+    /**
+     * Fetches an event definition defined by this library
+     *
+     * @param string $eventName
+     * @return EventDefinitionInterface
+     * @throws EventDefinitionNotSupportedException
+     */
+    public function getEventDefinitionByName($eventName);
+
+    /**
      * Fetches a generic function defined by this library
      *
      * @param string $functionName
@@ -31,7 +61,7 @@ interface LibraryInterface
      * @throws FunctionNotSupportedException
      * @throws IncorrectFunctionTypeException
      */
-    public function getGenericFunction($functionName);
+    public function getGenericFunctionByName($functionName);
 
     /**
      * Fetches the unique name of this library
@@ -39,6 +69,15 @@ interface LibraryInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Fetches a signal definition defined by this library
+     *
+     * @param string $signalName
+     * @return SignalDefinitionInterface
+     * @throws SignalDefinitionNotSupportedException
+     */
+    public function getSignalDefinitionByName($signalName);
 
     /**
      * Fetches an associative array of translation locales to translations
@@ -54,5 +93,5 @@ interface LibraryInterface
      * @return WidgetDefinitionInterface
      * @throws WidgetDefinitionNotSupportedException
      */
-    public function getWidgetDefinition($widgetDefinitionName);
+    public function getWidgetDefinitionByName($widgetDefinitionName);
 }

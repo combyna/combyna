@@ -11,7 +11,9 @@
 
 namespace Combyna\Component\Environment\Library;
 
-use Combyna\Component\Ui\WidgetDefinitionInterface;
+use Combyna\Component\Event\EventDefinitionCollectionInterface;
+use Combyna\Component\Signal\SignalDefinitionCollectionInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 
 /**
  * Interface LibraryFactoryInterface
@@ -24,9 +26,17 @@ interface LibraryFactoryInterface
      * Creates a new library
      *
      * @param string $name
-     * @param FunctionInterface[] $functions
+     * @param FunctionCollectionInterface $functionCollection
+     * @param EventDefinitionCollectionInterface $eventDefinitionCollection
+     * @param SignalDefinitionCollectionInterface $signalDefinitionCollection
      * @param WidgetDefinitionInterface[] $widgetDefinitions
-     * @return Library
+     * @return LibraryInterface
      */
-    public function create($name, array $functions, array $widgetDefinitions);
+    public function create(
+        $name,
+        FunctionCollectionInterface $functionCollection,
+        EventDefinitionCollectionInterface $eventDefinitionCollection,
+        SignalDefinitionCollectionInterface $signalDefinitionCollection,
+        array $widgetDefinitions
+    );
 }

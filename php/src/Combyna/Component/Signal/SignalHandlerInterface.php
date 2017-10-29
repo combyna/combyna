@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Signal;
 
-use Combyna\Component\Bag\FixedMutableStaticBagInterface;
-
 /**
  * Interface SignalHandlerInterface
  *
@@ -22,11 +20,4 @@ use Combyna\Component\Bag\FixedMutableStaticBagInterface;
  */
 interface SignalHandlerInterface
 {
-    /**
-     * Handles a dispatched signal
-     *
-     * @param string $name Unique name for the signal type within the system
-     * @param FixedMutableStaticBagInterface $payloadStaticBag Payload attached to the signal
-     */
-    public function handleSignal($name, FixedMutableStaticBagInterface $payloadStaticBag);
 }

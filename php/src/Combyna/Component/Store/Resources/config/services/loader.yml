@@ -1,0 +1,8 @@
+services:
+    combyna.store.loader.query:
+        class: Combyna\Component\Store\Config\Loader\QueryLoader
+        autowire: true
+
+    combyna.store.loader.query_collection:
+        class: Combyna\Component\Store\Config\Loader\QueryCollectionLoader
+        autowire: true

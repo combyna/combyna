@@ -14,6 +14,7 @@ namespace Combyna\Component\Ui\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -29,6 +30,20 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      * @return FixedStaticBagModelNode
      */
     public function getAttributeBagModel();
+
+    /**
+     * Fetches all event definition references defined for this widget definition
+     *
+     * @return EventDefinitionReferenceNode[]
+     */
+    public function getEventDefinitionReferences();
+
+    /**
+     * Fetches the labels for this widget definition
+     *
+     * @return array
+     */
+    public function getLabels();
 
     /**
      * Fetches the name of the library this definition belongs to
@@ -49,7 +64,7 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      *
      * @param ValidationContextInterface $validationContext
      * @param ExpressionBagNode $attributeExpressionBagNode
-     * @param WidgetNode[] $childWidgetNodes
+     * @param WidgetNodeInterface[] $childWidgetNodes
      */
     public function validateWidget(
         ValidationContextInterface $validationContext,

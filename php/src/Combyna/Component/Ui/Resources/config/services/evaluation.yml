@@ -1,0 +1,11 @@
+services:
+    combyna.ui.evaluation_context_factory:
+        class: Combyna\Component\Ui\Evaluation\UiEvaluationContextFactory
+        autowire: true
+        # Ensure autowiring picks the UiEvaluationContextFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface
+
+    combyna.ui.evaluation_context_tree_factory:
+        class: Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactory
+        autowire: true

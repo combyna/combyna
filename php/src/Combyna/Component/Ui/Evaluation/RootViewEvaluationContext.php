@@ -13,17 +13,19 @@ namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Ui\ViewInterface;
-use Combyna\Component\Ui\WidgetInterface;
+use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
+use Combyna\Component\Ui\View\ViewInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class RootViewEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class RootViewEvaluationContext implements ViewEvaluationContextInterface
+class RootViewEvaluationContext extends AbstractEvaluationContext implements ViewEvaluationContextInterface
 {
     /**
      * @var EnvironmentInterface
@@ -31,14 +33,9 @@ class RootViewEvaluationContext implements ViewEvaluationContextInterface
     private $environment;
 
     /**
-     * @var UiEvaluationContextFactory
+     * @var UiEvaluationContextFactoryInterface
      */
-    private $evaluationContextFactory;
-
-    /**
-     * @var EvaluationContextInterface
-     */
-    private $parentContext;
+    protected $evaluationContextFactory;
 
     /**
      * @var ViewInterface
@@ -51,24 +48,34 @@ class RootViewEvaluationContext implements ViewEvaluationContextInterface
     private $viewAttributeStaticBag;
 
     /**
-     * @param UiEvaluationContextFactory $evaluationContextFactory
+     * @var ViewStoreStateInterface
+     */
+    private $viewStoreState;
+
+    /**
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @param ViewInterface $view
+     * @param ViewStoreStateInterface $viewStoreState
      * @param StaticBagInterface $viewAttributeStaticBag
      * @param EvaluationContextInterface $parentContext
      * @param EnvironmentInterface $environment
      */
     public function __construct(
-        UiEvaluationContextFactory $evaluationContextFactory,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewInterface $view,
+        ViewStoreStateInterface $viewStoreState,
         StaticBagInterface $viewAttributeStaticBag,
         EvaluationContextInterface $parentContext,
         EnvironmentInterface $environment
     ) {
+        parent::__construct($evaluationContextFactory, $parentContext);
+
         $this->environment = $environment;
         $this->evaluationContextFactory = $evaluationContextFactory;
         $this->parentContext = $parentContext;
         $this->view = $view;
         $this->viewAttributeStaticBag = $viewAttributeStaticBag;
+        $this->viewStoreState = $viewStoreState;
     }
 
     /**
@@ -77,22 +84,6 @@ class RootViewEvaluationContext implements ViewEvaluationContextInterface
     public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
     {
         return $this->environment->callViewFunction($libraryName, $functionName, $argumentStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
-    {
-        return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubExpressionContext(ExpressionInterface $expression)
-    {
-        return $this->evaluationContextFactory->createExpressionContext($this, $expression);
     }
 
     /**
@@ -109,6 +100,14 @@ class RootViewEvaluationContext implements ViewEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubStoreContext(UiStoreStateInterface $storeState)
+    {
+        return $this->evaluationContextFactory->createViewStoreEvaluationContext($this, $storeState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
         return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
@@ -117,24 +116,8 @@ class RootViewEvaluationContext implements ViewEvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getAssuredStatic($assuredStaticName)
+    public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
     {
-        return $this->parentContext->getAssuredStatic($assuredStaticName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVariable($variableName)
-    {
-        return $this->parentContext->getVariable($variableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function translate($translationKey, array $parameters = [])
-    {
-        return $this->parentContext->translate($translationKey, $parameters);
+        return $this->view->makeStoreQuery($queryName, $argumentStaticBag, $this, $this->viewStoreState);
     }
 }

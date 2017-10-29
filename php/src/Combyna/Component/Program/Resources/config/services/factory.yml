@@ -1,0 +1,4 @@
+services:
+    combyna.program.factory:
+        class: Combyna\Component\Program\ProgramFactory
+        autowire: true

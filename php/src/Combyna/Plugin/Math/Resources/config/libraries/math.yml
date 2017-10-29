@@ -1,0 +1,9 @@
+name: math
+description: Math tools
+events: ~
+widgets: ~
+assurances:
+    # Used by eg. sqrt(...) to ensure that a negative number cannot be provided
+    # (as that would have no defined result)
+    positive_number:
+        condition: !expr value >= 0

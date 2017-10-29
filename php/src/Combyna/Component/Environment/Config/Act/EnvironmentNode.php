@@ -103,17 +103,16 @@ class EnvironmentNode extends AbstractActNode
      * Installs a native function referenced by a NativeFunctionNode
      *
      * @param string $libraryName
-     * @param string $functionName
      * @param NativeFunction $nativeFunction
      * @throws LibraryNotInstalledException
      */
-    public function installNativeFunction($libraryName, $functionName, NativeFunction $nativeFunction)
+    public function installNativeFunction($libraryName, NativeFunction $nativeFunction)
     {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             throw new LibraryNotInstalledException($libraryName);
         }
 
-        return $this->libraryNodes[$libraryName]->installNativeFunction($functionName, $nativeFunction);
+        return $this->libraryNodes[$libraryName]->installNativeFunction($nativeFunction);
     }
 
     /**

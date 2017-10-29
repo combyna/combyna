@@ -1,0 +1,4 @@
+services:
+    combyna.signal.factory:
+        class: Combyna\Component\Signal\SignalFactory
+        autowire: true

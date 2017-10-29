@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
-use Combyna\Component\Expression\Config\Act\ExpressionNodePromoter;
+use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 
@@ -28,17 +28,17 @@ class AssuranceNodePromoter
     private $expressionFactory;
 
     /**
-     * @var ExpressionNodePromoter
+     * @var DelegatingExpressionNodePromoter
      */
     private $expressionNodePromoter;
 
     /**
      * @param ExpressionFactoryInterface $expressionFactory
-     * @param ExpressionNodePromoter $expressionNodePromoter
+     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
-        ExpressionNodePromoter $expressionNodePromoter
+        DelegatingExpressionNodePromoter $expressionNodePromoter
     ) {
         $this->expressionFactory = $expressionFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;

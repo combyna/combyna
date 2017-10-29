@@ -49,9 +49,9 @@ class ConditionalExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $conditionalConfig = $this->configParser->getElement($config, 'conditional', 'comparison expression');
-        $consequentConfig = $this->configParser->getElement($config, 'consequent', 'comparison expression');
-        $alternateConfig = $this->configParser->getElement($config, 'alternate', 'comparison expression');
+        $conditionalConfig = $this->configParser->getElement($config, 'conditional', 'comparison expression', 'array');
+        $consequentConfig = $this->configParser->getElement($config, 'consequent', 'comparison expression', 'array');
+        $alternateConfig = $this->configParser->getElement($config, 'alternate', 'comparison expression', 'array');
 
         $conditionalExpressionNode = $this->expressionLoader->load($conditionalConfig);
         $consequentExpressionNode = $this->expressionLoader->load($consequentConfig);

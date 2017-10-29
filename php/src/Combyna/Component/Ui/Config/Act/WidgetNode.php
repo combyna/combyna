@@ -13,18 +13,18 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class WidgetNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetNode extends AbstractActNode
+class WidgetNode extends AbstractActNode implements WidgetNodeInterface
 {
     const TYPE = 'widget';
 
@@ -34,9 +34,19 @@ class WidgetNode extends AbstractActNode
     private $attributeExpressionBagNode;
 
     /**
-     * @var WidgetNode[]
+     * @var WidgetNodeInterface[]
      */
     private $childWidgetNodes;
+
+    /**
+     * @var array
+     */
+    private $tags;
+
+    /**
+     * @var TriggerNode[]
+     */
+    private $triggerNodes;
 
     /**
      * @var ExpressionNodeInterface|null
@@ -51,17 +61,23 @@ class WidgetNode extends AbstractActNode
     /**
      * @param WidgetDefinitionNodeInterface $widgetDefinitionNode
      * @param ExpressionBagNode $attributeExpressionBagNode
-     * @param WidgetNode[] $childWidgetNodes
+     * @param WidgetNodeInterface[] $childWidgetNodes
+     * @param TriggerNode[] $triggerNodes
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
+     * @param array $tags
      */
     public function __construct(
         WidgetDefinitionNodeInterface $widgetDefinitionNode,
         ExpressionBagNode $attributeExpressionBagNode,
         array $childWidgetNodes,
-        ExpressionNodeInterface $visibilityExpressionNode = null
+        array $triggerNodes,
+        ExpressionNodeInterface $visibilityExpressionNode = null,
+        array $tags
     ) {
         $this->attributeExpressionBagNode = $attributeExpressionBagNode;
         $this->childWidgetNodes = $childWidgetNodes;
+        $this->tags = $tags;
+        $this->triggerNodes = $triggerNodes;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
         $this->widgetDefinitionNode = $widgetDefinitionNode;
     }
@@ -77,9 +93,7 @@ class WidgetNode extends AbstractActNode
     }
 
     /**
-     * Fetches the children of this widget, if any have been added
-     *
-     * @return WidgetNode[]
+     * {@inheritdoc}
      */
     public function getChildWidgets()
     {
@@ -87,9 +101,7 @@ class WidgetNode extends AbstractActNode
     }
 
     /**
-     * Fetches the name of the library this widget's definition should be fetched from
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getLibraryName()
     {
@@ -97,9 +109,25 @@ class WidgetNode extends AbstractActNode
     }
 
     /**
-     * Fetches the expression used to determine whether this widget is visible, if set
+     * {@inheritdoc}
+     */
+    public function getTags()
+    {
+        return $this->tags;
+    }
+
+    /**
+     * Fetches the triggers for this widget, which listen for events and dispatch signals in response
      *
-     * @return ExpressionNodeInterface|null
+     * @return TriggerNode[]
+     */
+    public function getTriggers()
+    {
+        return $this->triggerNodes;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getVisibilityExpression()
     {
@@ -107,9 +135,7 @@ class WidgetNode extends AbstractActNode
     }
 
     /**
-     * Fetches the name of the definition for this widget
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getWidgetDefinitionName()
     {

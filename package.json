@@ -22,6 +22,9 @@
         "!vendor/symfony/dependency-injection/Loader/XmlFileLoader.php",
         "vendor/symfony/event-dispatcher/**/*.php",
         "!vendor/symfony/event-dispatcher/Tests/**",
+        "vendor/symfony/routing/**/*.php",
+        "!vendor/symfony/routing/Tests/**",
+        "!vendor/symfony/routing/RouterInterface.php",
         "vendor/symfony/translation/**/*.php",
         "!vendor/symfony/translation/Tests/**",
         "!vendor/symfony/translation/Util/ArrayConverter.php"
@@ -31,19 +34,19 @@
   },
   "dependencies": {
     "dotphp": "~2",
-    "react": "^15.4.2",
-    "react-dom": "^15.4.2"
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
   },
   "devDependencies": {
-    "babel-core": "^6.24.0",
+    "babel-core": "^6.26.0",
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.3.2",
+    "babel-preset-env": "^1.6.1",
     "browserify": "^13.1.0",
     "phpify": "^3.0.1",
-    "source-map-loader": "^0.2.1",
+    "source-map-loader": "^0.2.3",
     "transform-loader": "^0.2.4",
-    "webpack": "^2.3.3"
+    "webpack": "^2.7.0"
   },
   "scripts": {
     "build:release:client": "mkdir -p dist && cd dist && browserify ../js/client --outfile ./client.js",

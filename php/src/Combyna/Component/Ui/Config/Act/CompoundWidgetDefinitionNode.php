@@ -14,7 +14,8 @@ namespace Combyna\Component\Ui\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Ui\CompoundWidgetDefinition;
+use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
+use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -32,6 +33,16 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     private $attributeBagModelNode;
 
     /**
+     * @var EventDefinitionReferenceNode[]
+     */
+    private $eventDefinitionReferenceNodes;
+
+    /**
+     * @var array
+     */
+    private $labels;
+
+    /**
      * @var string
      */
     private $libraryName;
@@ -45,10 +56,19 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNode $attributeBagModelNode
+     * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
+     * @param array $labels
      */
-    public function __construct($libraryName, $widgetDefinitionName, FixedStaticBagModelNode $attributeBagModelNode)
-    {
+    public function __construct(
+        $libraryName,
+        $widgetDefinitionName,
+        FixedStaticBagModelNode $attributeBagModelNode,
+        array $eventDefinitionReferenceNodes,
+        array $labels
+    ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
+        $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
+        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
     }
@@ -59,6 +79,22 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     public function getAttributeBagModel()
     {
         return $this->attributeBagModelNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventDefinitionReferences()
+    {
+        return $this->eventDefinitionReferenceNodes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLabels()
+    {
+        return $this->labels;
     }
 
     /**
@@ -102,5 +138,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
             $attributeExpressionBagNode,
             'attributes for compound "' . $this->name . '" widget of library "' . $this->libraryName . '"'
         );
+
+        // TODO: Check that all EventDefinitionReferences are valid (ie. reference valid definitions)
     }
 }

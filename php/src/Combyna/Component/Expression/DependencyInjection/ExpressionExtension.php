@@ -11,13 +11,10 @@
 
 namespace Combyna\Component\Expression\DependencyInjection;
 
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderResolver;
+use Combyna\Component\Common\AbstractComponentExtension;
+use Combyna\Component\Framework\DelegatorInitialiser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\Extension;
-use Symfony\Component\DependencyInjection\Loader\DirectoryLoader;
-use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 
 /**
@@ -30,7 +27,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ExpressionExtension extends Extension implements CompilerPassInterface
+class ExpressionExtension extends AbstractComponentExtension implements CompilerPassInterface
 {
     const BUILTIN_LOADER_DELEGATOR_SERVICE_ID = 'combyna.expression.loader.builtin';
     const BUILTIN_LOADER_DELEGATEE_TAG = 'combyna.builtin_expression_loader';
@@ -40,20 +37,6 @@ class ExpressionExtension extends Extension implements CompilerPassInterface
 
     const PROMOTER_DELEGATOR_SERVICE_ID = 'combyna.expression.act.promoter';
     const PROMOTER_DELEGATEE_TAG = 'combyna.expression_promoter';
-
-    /**
-     * {@inheritdoc}
-     */
-    public function load(array $configs, ContainerBuilder $containerBuilder)
-    {
-        $fileLocator = new FileLocator(__DIR__ . '/../Resources/config');
-        $loader = new DirectoryLoader($containerBuilder, $fileLocator);
-        $loader->setResolver(new LoaderResolver([
-            new YamlFileLoader($containerBuilder, $fileLocator),
-            $loader
-        ]));
-        $loader->load('services/');
-    }
 
     /**
      * {@inheritdoc}
@@ -76,14 +59,18 @@ class ExpressionExtension extends Extension implements CompilerPassInterface
             return;
         }
 
-        $definition = $containerBuilder->findDefinition(self::BUILTIN_LOADER_DELEGATOR_SERVICE_ID);
+        $initialiserDefinition = $containerBuilder->findDefinition(DelegatorInitialiser::SERVICE_ID);
 
         // Find all service IDs with the expression loader tag
         $taggedServices = $containerBuilder->findTaggedServiceIds(self::BUILTIN_LOADER_DELEGATEE_TAG);
 
         foreach ($taggedServices as $id => $tags) {
-            // Add the sub-builtin-loader service to the delegating service
-            $definition->addMethodCall('addBuiltinLoader', array(new Reference($id)));
+            // Add the sub-builtin-loader service to the delegator
+            $initialiserDefinition->addMethodCall('addDelegatee', [
+                new Reference(self::BUILTIN_LOADER_DELEGATOR_SERVICE_ID),
+                new Reference($id),
+                'addBuiltinLoader'
+            ]);
         }
     }
 
@@ -98,14 +85,18 @@ class ExpressionExtension extends Extension implements CompilerPassInterface
             return;
         }
 
-        $definition = $containerBuilder->findDefinition(self::LOADER_DELEGATOR_SERVICE_ID);
+        $initialiserDefinition = $containerBuilder->findDefinition(DelegatorInitialiser::SERVICE_ID);
 
         // Find all service IDs with the expression loader tag
         $taggedServices = $containerBuilder->findTaggedServiceIds(self::LOADER_DELEGATEE_TAG);
 
         foreach ($taggedServices as $id => $tags) {
-            // Add the sub-loader service to the delegating service
-            $definition->addMethodCall('addLoader', array(new Reference($id)));
+            // Add the sub-loader service to the delegator
+            $initialiserDefinition->addMethodCall('addDelegatee', [
+                new Reference(self::LOADER_DELEGATOR_SERVICE_ID),
+                new Reference($id),
+                'addLoader'
+            ]);
         }
     }
 
@@ -120,14 +111,18 @@ class ExpressionExtension extends Extension implements CompilerPassInterface
             return;
         }
 
-        $definition = $containerBuilder->findDefinition(self::PROMOTER_DELEGATOR_SERVICE_ID);
+        $initialiserDefinition = $containerBuilder->findDefinition(DelegatorInitialiser::SERVICE_ID);
 
         // Find all service IDs with the expression promoter tag
         $taggedServices = $containerBuilder->findTaggedServiceIds(self::PROMOTER_DELEGATEE_TAG);
 
         foreach ($taggedServices as $id => $tags) {
-            // Add the sub-promoter service to the delegating service
-            $definition->addMethodCall('addPromoter', array(new Reference($id)));
+            // Add the sub-promoter service to the delegator
+            $initialiserDefinition->addMethodCall('addDelegatee', [
+                new Reference(self::PROMOTER_DELEGATOR_SERVICE_ID),
+                new Reference($id),
+                'addPromoter'
+            ]);
         }
     }
 }

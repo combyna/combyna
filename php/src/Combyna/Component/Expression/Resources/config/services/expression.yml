@@ -9,7 +9,3 @@ services:
     combyna.expression.static_factory:
         class: Combyna\Component\Expression\StaticExpressionFactory
         autowire: true
-
-    combyna.expression.validation.factory:
-        class: Combyna\Component\Expression\Validation\ValidationFactory
-        autowire: true

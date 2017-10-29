@@ -33,18 +33,18 @@ class GuardExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     private $expressionFactory;
 
     /**
-     * @var ExpressionNodePromoter
+     * @var DelegatingExpressionNodePromoter
      */
     private $expressionNodePromoter;
 
     /**
      * @param ExpressionFactoryInterface $expressionFactory
-     * @param ExpressionNodePromoter $expressionNodePromoter
+     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      * @param AssuranceNodePromoter $assuranceNodePromoter
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
-        ExpressionNodePromoter $expressionNodePromoter,
+        DelegatingExpressionNodePromoter $expressionNodePromoter,
         AssuranceNodePromoter $assuranceNodePromoter
     ) {
         $this->assuranceNodePromoter = $assuranceNodePromoter;

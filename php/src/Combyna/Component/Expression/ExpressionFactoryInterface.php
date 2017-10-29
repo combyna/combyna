@@ -36,7 +36,7 @@ interface ExpressionFactoryInterface
      * Creates a BinaryArithmeticExpression, which performs an arithmetic calculation with two operands
      * 
      * @param ExpressionInterface $leftOperandExpression
-     * @param $operator
+     * @param string $operator
      * @param ExpressionInterface $rightOperandExpression
      * @return BinaryArithmeticExpression
      */
@@ -60,7 +60,7 @@ interface ExpressionFactoryInterface
      * @param ExpressionInterface $leftOperandExpression
      * @param string $operator
      * @param ExpressionInterface $rightOperandExpression
-     * @return ExpressionInterface
+     * @return ComparisonExpression
      */
     public function createComparisonExpression(
         ExpressionInterface $leftOperandExpression,
@@ -237,10 +237,10 @@ interface ExpressionFactoryInterface
      * Creates a TranslationExpression
      *
      * @param string $translationKey
-     * @param ExpressionBagInterface|null $parameterExpressionBag
+     * @param ExpressionBagInterface|null $argumentExpressionBag
      * @return TranslationExpression
      */
-    public function createTranslationExpression($translationKey, ExpressionBagInterface $parameterExpressionBag = null);
+    public function createTranslationExpression($translationKey, ExpressionBagInterface $argumentExpressionBag = null);
 
     /**
      * Creates a VariableExpression

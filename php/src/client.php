@@ -22,9 +22,10 @@ function is_string($value) {
     return true;
 }
 
-use Combyna\Combyna;
 use Combyna\CombynaBootstrap;
+use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
+use InvalidArgumentException;
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -38,13 +39,29 @@ $arrayRenderer = $container->get('combyna.renderer.array');
 
 return function (array $environmentConfig, array $appConfig) use ($combyna, $arrayRenderer) {
     $environment = $combyna->createEnvironment($environmentConfig);
-
     $app = $combyna->createApp($appConfig, $environment);
 
-    return function ($viewName, array $viewAttributes = []) use ($app, $arrayRenderer) {
-        $renderedView = $app->renderView($viewName);
-        $renderedViewArray = $arrayRenderer->renderView($renderedView);
+    $appState = $app->createInitialState();
 
-        return $renderedViewArray;
+    return function ($command, array $args = []) use ($app, &$appState, $arrayRenderer) {
+        switch ($command) {
+            case 'dispatchEvent':
+                $appState = $app->dispatchEvent(
+                    $appState,
+                    $appState->getWidgetStatePathByPath($args[0]),
+                    'gui',
+                    'click',
+                    [
+                        // FIXME: Pass these in from the event data
+                        'x' => 200,
+                        'y' => 100
+                    ]
+                );
+                break;
+            case 'renderVisibleViews':
+                return $arrayRenderer->renderViews($appState);
+            default:
+                throw new InvalidArgumentException(sprintf('Unsupported command "%s"', $command));
+        }
     };
 };

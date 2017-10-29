@@ -12,6 +12,7 @@
 namespace Combyna\Component\Signal;
 
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
+use Combyna\Component\Bag\StaticBagInterface;
 
 /**
  * Class SignalDefinition
@@ -23,6 +24,11 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
  */
 class SignalDefinition implements SignalDefinitionInterface
 {
+    /**
+     * @var string
+     */
+    private $libraryName;
+
     /**
      * A unique name for the signal type within the system
      *
@@ -38,13 +44,31 @@ class SignalDefinition implements SignalDefinitionInterface
     private $payloadStaticBagModel;
 
     /**
+     * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $payloadStaticBagModel
      */
-    public function __construct($name, FixedStaticBagModelInterface $payloadStaticBagModel)
+    public function __construct($libraryName, $name, FixedStaticBagModelInterface $payloadStaticBagModel)
     {
+        $this->libraryName = $libraryName;
         $this->name = $name;
         $this->payloadStaticBagModel = $payloadStaticBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertValidPayloadStaticBag(StaticBagInterface $payloadStaticBag)
+    {
+        $this->payloadStaticBagModel->assertValidStaticBag($payloadStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLibraryName()
+    {
+        return $this->libraryName;
     }
 
     /**
@@ -53,5 +77,13 @@ class SignalDefinition implements SignalDefinitionInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticBagModel()
+    {
+        return $this->payloadStaticBagModel;
     }
 }

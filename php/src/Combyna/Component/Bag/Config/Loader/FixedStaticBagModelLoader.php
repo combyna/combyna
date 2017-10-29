@@ -57,7 +57,7 @@ class FixedStaticBagModelLoader implements FixedStaticBagModelLoaderInterface
 
             // Allow the static to specify a default value
             $defaultExpressionNode =
-                (is_array($definitionConfig) && array_key_exists('default', $definitionConfig)) ?
+                (is_array($definitionConfig) && isset($definitionConfig['default'])) ?
                 $this->expressionLoader->load($definitionConfig['default']) :
                 null;
 

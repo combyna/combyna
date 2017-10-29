@@ -11,10 +11,10 @@
 
 namespace Combyna\Integrated\Ui;
 
-use Combyna\Combyna;
 use Combyna\CombynaBootstrap;
-use Combyna\Component\App\App;
+use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -27,7 +27,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class HtmlRendererIntegratedTest extends TestCase
 {
     /**
-     * @var App
+     * @var AppInterface
      */
     private $app;
 
@@ -65,21 +65,21 @@ class HtmlRendererIntegratedTest extends TestCase
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');
 
         $this->environment = $this->combyna->createEnvironment([
-            'libraries' => [
-                [
-                    'name' => 'gui',
-                    'description' => 'GUI tools',
-                    'widgets' => [
-                        'button' => [
-                            'type' => 'core',
-                            'attributes' => [
-                                'label' => 'text'
-                            ],
-                            'children' => []
-                        ]
-                    ]
-                ]
-            ]
+//            'libraries' => [
+//                [
+//                    'name' => 'gui',
+//                    'description' => 'GUI tools',
+//                    'widgets' => [
+//                        'button' => [
+//                            'type' => 'core',
+//                            'attributes' => [
+//                                'label' => 'text'
+//                            ],
+//                            'children' => []
+//                        ]
+//                    ]
+//                ]
+//            ]
         ]);
     }
 
@@ -88,7 +88,16 @@ class HtmlRendererIntegratedTest extends TestCase
         $this->app = $this->combyna->createApp([
             'name' => 'My test Combyna app',
             'translations' => [],
-            'views' => [
+            'home' => [
+                'route' => 'app.my_home_route'
+            ],
+            'routes' => [
+                'my_home_route' => [
+                    'pattern' => '',
+                    'page_view' => 'my_view'
+                ]
+            ],
+            'page_views' => [
                 'my_view' => [
                     'title' => [
                         'type' => 'text',
@@ -110,12 +119,12 @@ class HtmlRendererIntegratedTest extends TestCase
             ]
         ], $this->environment);
 
-        $renderedView = $this->app->renderView('my_view');
-        $renderedHtml = $this->htmlRenderer->renderView($renderedView);
+        $appState = $this->app->createInitialState();
+        $renderedHtml = $this->htmlRenderer->renderApp($appState);
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="my_view">
-    <button>Click me</button>
+    <button name="combyna-widget-my_view-root">Click me</button>
 </div>
 HTML;
         $this->assertSame($expectedHtml, $renderedHtml);

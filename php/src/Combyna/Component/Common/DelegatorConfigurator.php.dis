@@ -1,0 +1,60 @@
+<?php
+
+/**
+ * Combyna
+ * Copyright (c) Dan Phillimore (asmblah)
+ * https://github.com/combyna/combyna
+ *
+ * Released under the MIT license
+ * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
+ */
+
+namespace Combyna\Component\Common;
+
+/**
+ * Class DelegatorConfigurator
+ *
+ * @author Dan Phillimore <dan@ovms.co>
+ */
+class DelegatorConfigurator
+{
+    /**
+     * @var string
+     */
+    private $delegateeInstallerMethodName;
+
+    /**
+     * @var object[]
+     */
+    private $delegatees;
+
+    /**
+     * @param string $delegateeInstallerMethodName
+     */
+    public function __construct($delegateeInstallerMethodName)
+    {
+        $this->delegateeInstallerMethodName = $delegateeInstallerMethodName;
+    }
+
+    /**
+     * Adds a new delegatee to be installed in the delegator when it is initialised
+     *
+     * @param object $delegatee
+     */
+    public function addDelegatee($delegatee)
+    {
+        $this->delegatees[] = $delegatee;
+    }
+
+    /**
+     * Initialises a delegator with all delegatees registered with this configurator
+     *
+     * @param DelegatorInterface $delegator
+     */
+    public function configure(DelegatorInterface $delegator)
+    {
+        foreach ($this->delegatees as $delegatee) {
+            $delegator->{$this->delegateeInstallerMethodName}($delegatee);
+        }
+    }
+}

@@ -1,0 +1,8 @@
+services:
+    combyna.ui.store.factory:
+        class: Combyna\Component\Ui\Store\UiStoreFactory
+        autowire: true
+
+    combyna.ui.store.instruction.factory:
+        class: Combyna\Component\Ui\Store\Instruction\InstructionFactory
+        autowire: true

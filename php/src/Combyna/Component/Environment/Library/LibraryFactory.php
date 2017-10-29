@@ -11,6 +11,9 @@
 
 namespace Combyna\Component\Environment\Library;
 
+use Combyna\Component\Event\EventDefinitionCollectionInterface;
+use Combyna\Component\Signal\SignalDefinitionCollectionInterface;
+
 /**
  * Class LibraryFactory
  *
@@ -21,8 +24,19 @@ class LibraryFactory implements LibraryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function create($name, array $functions, array $widgetDefinitions)
-    {
-        return new Library($name, $functions, $widgetDefinitions);
+    public function create(
+        $name,
+        FunctionCollectionInterface $functionCollection,
+        EventDefinitionCollectionInterface $eventDefinitionCollection,
+        SignalDefinitionCollectionInterface $signalDefinitionCollection,
+        array $widgetDefinitions
+    ) {
+        return new Library(
+            $name,
+            $functionCollection,
+            $eventDefinitionCollection,
+            $signalDefinitionCollection,
+            $widgetDefinitions
+        );
     }
 }

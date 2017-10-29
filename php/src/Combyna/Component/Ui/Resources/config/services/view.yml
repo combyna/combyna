@@ -1,0 +1,4 @@
+services:
+    combyna.ui.view_factory:
+        class: Combyna\Component\Ui\View\ViewFactory
+        autowire: true

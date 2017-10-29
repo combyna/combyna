@@ -12,7 +12,6 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Config\Loader\ExpressionConfigParser;
-use Combyna\Component\Expression\AssuredExpression;
 use Combyna\Component\Expression\Config\Act\AssuredExpressionNode;
 use Combyna\Component\Expression\TextExpression;
 
@@ -23,6 +22,8 @@ use Combyna\Component\Expression\TextExpression;
  */
 class AssuredExpressionLoader implements BuiltinLoaderInterface
 {
+    const BUILTIN_NAME = 'assured';
+
     /**
      * @var ExpressionConfigParser
      */
@@ -56,6 +57,6 @@ class AssuredExpressionLoader implements BuiltinLoaderInterface
      */
     public function getBuiltinName()
     {
-        return AssuredExpression::TYPE;
+        return self::BUILTIN_NAME;
     }
 }

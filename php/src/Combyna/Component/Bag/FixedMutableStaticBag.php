@@ -81,4 +81,12 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
     {
         return $this->looseBag->toNativeArray();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    {
+        throw new \Exception('Not implemented');
+    }
 }

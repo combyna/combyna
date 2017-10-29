@@ -1,0 +1,8 @@
+services:
+    combyna.event.promoter.event_definition:
+        class: Combyna\Component\Event\Config\Act\EventDefinitionNodePromoter
+        autowire: true
+
+    combyna.event.promoter.event_definition_reference:
+        class: Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter
+        autowire: true

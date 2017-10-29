@@ -12,29 +12,18 @@
 namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Expression\ExpressionInterface;
 
 /**
  * Class AssuredEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class AssuredEvaluationContext implements EvaluationContextInterface
+class AssuredEvaluationContext extends AbstractEvaluationContext
 {
     /**
      * @var StaticBagInterface
      */
     private $assuredStaticBag;
-
-    /**
-     * @var EvaluationContextFactoryInterface
-     */
-    private $evaluationContextFactory;
-
-    /**
-     * @var EvaluationContextInterface
-     */
-    private $parentContext;
 
     /**
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
@@ -46,41 +35,9 @@ class AssuredEvaluationContext implements EvaluationContextInterface
         EvaluationContextInterface $parentContext,
         StaticBagInterface $assuredStaticBag
     ) {
+        parent::__construct($evaluationContextFactory, $parentContext);
+
         $this->assuredStaticBag = $assuredStaticBag;
-        $this->evaluationContextFactory = $evaluationContextFactory;
-        $this->parentContext = $parentContext;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
-    {
-        return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubExpressionContext(ExpressionInterface $expression)
-    {
-        return $this->evaluationContextFactory->createExpressionContext($this, $expression);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubScopeContext(StaticBagInterface $variableStaticBag)
-    {
-        return $this->evaluationContextFactory->createScopeContext($this, $variableStaticBag);
     }
 
     /**
@@ -93,21 +50,5 @@ class AssuredEvaluationContext implements EvaluationContextInterface
         }
 
         return $this->parentContext->getAssuredStatic($assuredStaticName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVariable($variableName)
-    {
-        return $this->parentContext->getVariable($variableName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function translate($translationKey, array $parameters = [])
-    {
-        return $this->parentContext->translate($translationKey, $parameters);
     }
 }

@@ -1,0 +1,4 @@
+services:
+    combyna.router.loader.environment:
+        class: Combyna\Component\Router\Config\Loader\RouteCollectionLoader
+        autowire: true

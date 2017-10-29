@@ -53,7 +53,8 @@ class EnvironmentLoader implements EnvironmentLoaderInterface
             $environmentConfig,
             'libraries',
             'environment libraries',
-            []
+            [],
+            'array'
         );
         $libraryNodes = [];
 

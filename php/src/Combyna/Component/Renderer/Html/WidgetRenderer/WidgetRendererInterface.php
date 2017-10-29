@@ -12,7 +12,8 @@
 namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Renderer\Html\HtmlNodeInterface;
-use Combyna\Component\Ui\RenderedWidgetInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 
 /**
  * Interface WidgetRendererInterface
@@ -38,8 +39,9 @@ interface WidgetRendererInterface
     /**
      * Renders the specified widget to a HTML node
      *
-     * @param RenderedWidgetInterface $renderedWidget
+     * @param WidgetStateInterface $widgetState
+     * @param WidgetStatePathInterface $widgetStatePath
      * @return HtmlNodeInterface
      */
-    public function renderWidget(RenderedWidgetInterface $renderedWidget);
+    public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath);
 }

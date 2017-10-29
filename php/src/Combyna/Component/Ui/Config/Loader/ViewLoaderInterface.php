@@ -12,7 +12,7 @@
 namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-use Combyna\Component\Ui\ViewInterface;
+use Combyna\Component\Ui\View\ViewInterface;
 
 /**
  * Interface ViewLoaderInterface
@@ -29,5 +29,5 @@ interface ViewLoaderInterface
      * @param EnvironmentNode $environmentNode
      * @return ViewInterface
      */
-    public function loadView($name, array $viewConfig, EnvironmentNode $environmentNode);
+    public function loadPageView($name, array $viewConfig, EnvironmentNode $environmentNode);
 }

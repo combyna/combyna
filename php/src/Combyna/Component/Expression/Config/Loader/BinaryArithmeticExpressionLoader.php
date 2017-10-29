@@ -49,9 +49,9 @@ class BinaryArithmeticExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $leftOperandConfig = $this->configParser->getElement($config, 'left', 'binary arithmetic expression');
+        $leftOperandConfig = $this->configParser->getElement($config, 'left', 'binary arithmetic expression', 'array');
         $operator = $this->configParser->getElement($config, 'operator', 'binary arithmetic expression');
-        $rightOperandConfig = $this->configParser->getElement($config, 'right', 'binary arithmetic expression');
+        $rightOperandConfig = $this->configParser->getElement($config, 'right', 'binary arithmetic expression', 'array');
 
         $leftOperandExpressionNode = $this->expressionLoader->load($leftOperandConfig);
         $rightOperandExpressionNode = $this->expressionLoader->load($rightOperandConfig);

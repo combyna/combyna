@@ -18,7 +18,7 @@ use hafriedlander\Peg\Parser\Basic;
  *
  * A generated PEG parser for parsing the Combyna expression language
  *
- * NB: This class will be modified by php-peg and output to PegExpressionParser.php in this directory,
+ * NB: This class will be modified by php-peg and output to PegExpressionParser.php in the dist directory,
  *     by `composer run build:expression-parser`.
  *
  * @author Dan Phillimore <dan@ovms.co>

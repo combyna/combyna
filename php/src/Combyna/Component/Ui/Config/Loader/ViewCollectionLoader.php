@@ -37,14 +37,14 @@ class ViewCollectionLoader implements ViewCollectionLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadViews(array $viewsConfig, EnvironmentNode $environmentNode)
+    public function loadPageViews(array $viewsConfig, EnvironmentNode $environmentNode)
     {
         $viewNodes = [];
 
         foreach ($viewsConfig as $viewName => $viewConfig) {
-            $viewNodes[$viewName] = $this->viewLoader->loadView($viewName, $viewConfig, $environmentNode);
+            $viewNodes[$viewName] = $this->viewLoader->loadPageView($viewName, $viewConfig, $environmentNode);
         }
 
-        return new ViewCollectionNode($viewNodes);
+        return $viewNodes;
     }
 }
