@@ -45,14 +45,15 @@ if (!scriptElement) {
 
 const fullConfigJson = scriptElement.text;
 const fullConfig = JSON.parse(fullConfigJson);
-const phpAPI = clientModule.execute().getNative()(
+const clientFactory = clientModule.execute().getNative();
+const client = clientFactory.createClient(
     fullConfig.environment,
     fullConfig.app
 );
 
 ReactDOM.render(
     React.createElement(ViewComponent, {
-        phpAPI: phpAPI
+        client: client
     }),
     document.getElementById('app')
 );

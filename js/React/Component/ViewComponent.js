@@ -18,8 +18,16 @@ import React from 'react';
  */
 export default class ViewComponent extends React.Component
 {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            visibleViewsState: props.client.createInitialState()
+        };
+    }
+
     render() {
-        const renderedViewsData = this.props.phpAPI('renderVisibleViews');
+        const renderedViewsData = this.props.client.renderVisibleViews(this.state.visibleViewsState);
 
         const renderWidget = (widgetData) => {
             if (widgetData.type === 'text') {
@@ -44,10 +52,21 @@ export default class ViewComponent extends React.Component
             if (widgetData.tag === 'button') {
                 // TODO: Factor this out into a separate `ButtonComponent` React component
                 attributes.onClick = () => {
-                    this.props.phpAPI('dispatchEvent', [widgetData.path]);
+                    const newVisibleViewsState = this.props.client.dispatchEvent(
+                        this.state.visibleViewsState,
+                        widgetData.path,
+                        'gui',
+                        'click',
+                        {
+                            // FIXME: Pass these in from the event data
+                            x: 200,
+                            y: 100
+                        }
+                    );
 
-                    // TODO: Find a better way
-                    this.forceUpdate();
+                    this.setState({
+                        visibleViewsState: newVisibleViewsState
+                    });
                 };
             } else if (widgetData.tag === 'input' && attributes.type === 'text') {
                 // TODO: Factor this out into a separate `TextboxComponent` React component
