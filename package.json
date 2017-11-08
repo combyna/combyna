@@ -46,7 +46,8 @@
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.6.1",
     "browserify": "^13.1.0",
-    "phpify": "^3.0.1",
+    "happypack": "^4.0.0",
+    "phpify": "~4",
     "source-map-loader": "^0.2.3",
     "transform-loader": "^0.2.4",
     "webpack": "^2.7.0"
