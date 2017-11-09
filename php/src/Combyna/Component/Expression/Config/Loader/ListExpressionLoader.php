@@ -50,7 +50,7 @@ class ListExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $elementConfigs = $this->configParser->getElement($config, 'elements', 'list expression');
+        $elementConfigs = $this->configParser->getElement($config, 'elements', 'list expression', 'array');
         $elementExpressionNodes = [];
 
         foreach ($elementConfigs as $elementConfig) {
