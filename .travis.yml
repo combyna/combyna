@@ -1,0 +1,23 @@
+language: php
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+php:
+  - 5.5
+  - 5.6
+  - 7.1
+  - 7.2
+  - nightly
+
+install:
+    - composer install
+
+before_script:
+    - composer run build:expression-parser
+
+script:
+    - vendor/bin/phpunit
