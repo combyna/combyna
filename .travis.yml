@@ -18,6 +18,7 @@ install:
 
 before_script:
     - composer run build:expression-parser
+    - composer dumpautoload
 
 script:
     - vendor/bin/phpunit
