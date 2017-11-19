@@ -2,7 +2,7 @@
 
 /**
  * Combyna
- * Copyright (c) Dan Phillimore (asmblah)
+ * Copyright (c) the Combyna project and contributors
  * https://github.com/combyna/combyna
  *
  * Released under the MIT license
