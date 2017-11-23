@@ -9,12 +9,6 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-function is_bool($value) {
-    return true;
-}
-function is_float($value) {
-    return true;
-}
 function is_int($value) {
     return true;
 }
