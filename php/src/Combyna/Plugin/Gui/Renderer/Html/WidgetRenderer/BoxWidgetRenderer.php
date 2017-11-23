@@ -12,6 +12,7 @@
 namespace Combyna\Plugin\Gui\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Renderer\Html\HtmlElement;
+use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
@@ -71,6 +72,9 @@ class BoxWidgetRenderer implements WidgetRendererInterface
         $childNode = $this->delegatingWidgetRenderer->renderWidget($widgetStatePath->getChildStatePath('contents'));
         $htmlAttributes = [];
 
-        return new HtmlElement('div', $widgetStatePath->getWidgetStatePath(), $htmlAttributes, [$childNode]);
+        return new RenderedWidget(
+            $widgetState,
+            new HtmlElement('div', $widgetStatePath->getWidgetStatePath(), $htmlAttributes, [$childNode])
+        );
     }
 }

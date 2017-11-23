@@ -12,6 +12,7 @@
 namespace Combyna\Plugin\Gui\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Renderer\Html\HtmlElement;
+use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
@@ -73,6 +74,9 @@ class TextboxWidgetRenderer implements WidgetRendererInterface
             'value' => $widgetState->getAttribute('value')->toNative()
         ];
 
-        return new HtmlElement('input', $widgetStatePath->getWidgetStatePath(), $htmlAttributes);
+        return new RenderedWidget(
+            $widgetState,
+            new HtmlElement('input', $widgetStatePath->getWidgetStatePath(), $htmlAttributes)
+        );
     }
 }

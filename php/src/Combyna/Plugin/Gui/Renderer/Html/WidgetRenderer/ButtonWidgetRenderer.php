@@ -12,6 +12,7 @@
 namespace Combyna\Plugin\Gui\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Renderer\Html\HtmlElement;
+use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\TextNode;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
@@ -74,6 +75,9 @@ class ButtonWidgetRenderer implements WidgetRendererInterface
         ];
         $htmlAttributes = [];
 
-        return new HtmlElement('button', $widgetStatePath->getWidgetStatePath(), $htmlAttributes, $childNodes);
+        return new RenderedWidget(
+            $widgetState,
+            new HtmlElement('button', $widgetStatePath->getWidgetStatePath(), $htmlAttributes, $childNodes)
+        );
     }
 }

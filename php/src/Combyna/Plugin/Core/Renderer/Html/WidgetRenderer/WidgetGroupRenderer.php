@@ -12,6 +12,7 @@
 namespace Combyna\Plugin\Core\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Renderer\Html\DocumentFragment;
+use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
@@ -77,6 +78,9 @@ class WidgetGroupRenderer implements WidgetRendererInterface
             $childNodes[] = $this->delegatingWidgetRenderer->renderWidget($childStatePath);
         }
 
-        return new DocumentFragment($childNodes);
+        return new RenderedWidget(
+            $widgetState,
+            new DocumentFragment($childNodes)
+        );
     }
 }

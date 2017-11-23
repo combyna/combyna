@@ -34,6 +34,12 @@ export default class ViewComponent extends React.Component
                 return widgetData.text;
             }
 
+            if (widgetData.type === 'widget') {
+                // Just render the root element of the widget for now -
+                // TODO: properties `widgetData.library` and `.widget` will give the source widget definition
+                return renderWidget(widgetData.root);
+            }
+
             const childElements = [];
 
             for (let childWidget of widgetData.children) {
