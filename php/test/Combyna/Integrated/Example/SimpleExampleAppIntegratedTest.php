@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Integrated\Ui;
+namespace Combyna\Integrated\Example;
 
 use Combyna\CombynaBootstrap;
 use Combyna\Component\App\AppInterface;
