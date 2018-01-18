@@ -36,9 +36,9 @@
     }
   },
   "dependencies": {
-    "dotphp": "~2",
-    "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "dotphp": "^3.0.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0"
   },
   "devDependencies": {
     "babel-core": "^6.26.0",
@@ -47,7 +47,7 @@
     "babel-preset-env": "^1.6.1",
     "browserify": "^13.1.0",
     "happypack": "^4.0.0",
-    "phpify": "experimental",
+    "phpify": "^4.0.1-experimental.1",
     "source-map-loader": "^0.2.3",
     "transform-loader": "^0.2.4",
     "webpack": "^2.7.0"
