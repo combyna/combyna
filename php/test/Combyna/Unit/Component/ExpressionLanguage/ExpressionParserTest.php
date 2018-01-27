@@ -9,12 +9,11 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\ExpressionLanguage;
+namespace Combyna\Unit\Component\ExpressionLanguage;
 
 use Combyna\Component\ExpressionLanguage\ExpressionParser;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
-use Prophecy\Argument;
 
 /**
  * Class ExpressionParserTest
