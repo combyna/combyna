@@ -47,17 +47,21 @@ class ConfigParser
             return [];
         }
 
-        if (gettype($value) !== $requiredType) {
-            throw new InvalidArgumentException(sprintf(
-                'Config element "%s" should be of type "%s" but is "%s" for %s',
-                $key,
-                $requiredType,
-                gettype($value),
-                $context
-            ));
+        if (gettype($value) === $requiredType) {
+            return $value;
         }
 
-        return $value;
+        if ($requiredType === 'number' && (is_int($value) || is_float($value))) {
+            return $value;
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Config element "%s" should be of type "%s" but is "%s" for %s',
+            $key,
+            $requiredType,
+            gettype($value),
+            $context
+        ));
     }
 
     /**
