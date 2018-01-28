@@ -37,7 +37,7 @@ class TextWidget implements TextWidgetInterface
     private $bagFactory;
 
     /**
-     * @var int
+     * @var string|int
      */
     private $name;
 
@@ -68,7 +68,7 @@ class TextWidget implements TextWidgetInterface
 
     /**
      * @param WidgetInterface $parentWidget
-     * @param int $name
+     * @param string|int $name
      * @param ExpressionInterface $textExpression
      * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory

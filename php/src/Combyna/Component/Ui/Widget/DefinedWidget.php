@@ -45,7 +45,7 @@ class DefinedWidget implements DefinedWidgetInterface
     private $definition;
 
     /**
-     * @var int
+     * @var string|int
      */
     private $name;
 
@@ -76,7 +76,7 @@ class DefinedWidget implements DefinedWidgetInterface
 
     /**
      * @param WidgetInterface|null $parentWidget
-     * @param int $name
+     * @param string|int $name
      * @param WidgetDefinitionInterface $definition
      * @param ExpressionBagInterface $attributeExpressions
      * @param UiStateFactoryInterface $uiStateFactory

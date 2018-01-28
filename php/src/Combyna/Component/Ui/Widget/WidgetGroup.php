@@ -35,7 +35,7 @@ class WidgetGroup implements WidgetGroupInterface
     private $childWidgets = [];
 
     /**
-     * @var string
+     * @var string|int
      */
     private $name;
 
@@ -56,7 +56,7 @@ class WidgetGroup implements WidgetGroupInterface
 
     /**
      * @param UiStateFactoryInterface $uiStateFactory
-     * @param string $name
+     * @param string|int $name
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      */

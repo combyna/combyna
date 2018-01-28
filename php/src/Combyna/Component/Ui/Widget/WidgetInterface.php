@@ -87,14 +87,14 @@ interface WidgetInterface
     /**
      * Fetches the unique name of this widget within its parent
      *
-     * @return string
+     * @return string|int
      */
     public function getName();
 
     /**
      * Fetches the path to this widget, with its view name and all ancestor names
      *
-     * @return string[]
+     * @return string[]|int[]
      */
     public function getPath();
 
