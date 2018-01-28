@@ -107,19 +107,4 @@ class PageViewCollection implements PageViewCollectionInterface
     {
         return array_key_exists($viewName, $this->views);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderView(
-        $viewName,
-        StaticBagInterface $viewAttributeStaticBag,
-        EvaluationContextInterface $rootEvaluationContext
-    ) {
-        if (!array_key_exists($viewName, $this->views)) {
-            throw new InvalidArgumentException('No view with name "' . $viewName . '" exists');
-        }
-
-        return $this->views[$viewName]->render($viewAttributeStaticBag, $rootEvaluationContext);
-    }
 }

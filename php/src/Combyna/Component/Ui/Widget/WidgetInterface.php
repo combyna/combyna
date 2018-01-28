@@ -105,16 +105,4 @@ interface WidgetInterface
      * @return bool
      */
     public function hasTag($tag);
-
-//    /**
-//     * Renders this widget to a CoreWidgetState
-//     *
-//     * @param ViewEvaluationContextInterface $evaluationContext
-//     * @param WidgetStateInterface|null $parentRenderedWidget
-//     * @return WidgetStateInterface|null Returns the rendered widget or null if invisible
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    );
 }

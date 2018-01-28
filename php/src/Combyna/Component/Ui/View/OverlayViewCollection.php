@@ -78,15 +78,4 @@ class OverlayViewCollection implements OverlayViewCollectionInterface
     {
         return array_key_exists($viewName, $this->views);
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderView(
-        $viewName,
-        StaticBagInterface $viewAttributeStaticBag,
-        EvaluationContextInterface $rootEvaluationContext
-    ) {
-        // TODO: Implement renderView() method.
-    }
 }

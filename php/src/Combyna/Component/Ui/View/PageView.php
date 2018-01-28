@@ -239,25 +239,4 @@ class PageView implements PageViewInterface
             $viewStoreState
         );
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        StaticBagInterface $viewAttributeStaticBag,
-//        EvaluationContextInterface $rootEvaluationContext
-//    ) {
-//        $viewEvaluationContext = $this->uiEvaluationContextFactory->createViewEvaluationContext(
-//            $rootEvaluationContext,
-//            $viewAttributeStaticBag
-//        );
-//
-//        $rootWidgetState = $this->rootWidget->render($viewEvaluationContext);
-//
-//        return $this->uiStateFactory->createPageViewState(
-//            $this,
-//            $viewAttributeStaticBag,
-//            $rootWidgetState
-//        );
-//    }
 }

@@ -234,41 +234,4 @@ class DefinedWidget implements DefinedWidgetInterface
     {
         return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    ) {
-//        if ($this->visibilityExpression) {
-//            $visibleStatic = $this->visibilityExpression->toStatic($evaluationContext);
-//
-//            if ($visibleStatic->toNative() === false) {
-//                // Widget is invisible
-//                return null;
-//            }
-//        }
-//
-//        $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
-//
-//        $widgetEvaluationContext = $evaluationContext->createSubWidgetEvaluationContext($this);
-//
-//        $renderedWidget = $this->definition->createRenderedWidget(
-//            $parentRenderedWidget,
-//            $this,
-//            $attributeStaticBag
-//        );
-//
-//        foreach ($this->childWidgets as $childWidgetName => $childWidget) {
-//            $renderedChildWidget = $childWidget->render($widgetEvaluationContext, $renderedWidget);
-//
-//            if ($renderedChildWidget) {
-//                $renderedWidget->addChildState($childWidgetName, $renderedChildWidget);
-//            }
-//        }
-//
-//        return $renderedWidget;
-//    }
 }

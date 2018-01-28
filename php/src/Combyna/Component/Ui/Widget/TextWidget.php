@@ -177,22 +177,4 @@ class TextWidget implements TextWidgetInterface
     {
         return false; // TODO
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    ) {
-//        $textStatic = $this->textExpression->toStatic($evaluationContext);
-//
-//        return $this->uiStateFactory->createRenderedCoreWidget(
-//            $parentRenderedWidget,
-//            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-//        );
-//    }
 }

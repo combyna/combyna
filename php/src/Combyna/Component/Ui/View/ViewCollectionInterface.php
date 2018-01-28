@@ -47,19 +47,4 @@ interface ViewCollectionInterface
      * @return bool
      */
     public function hasView($viewName);
-
-    /**
-     * Renders the specified view, or returns null if invisible
-     *
-     * @param string $viewName
-     * @param StaticBagInterface $viewAttributeStaticBag
-     * @param EvaluationContextInterface $rootEvaluationContext
-     * @return ViewStateInterface|null
-     * @throws InvalidArgumentException Throws when the specified view does not exist
-     */
-    public function renderView(
-        $viewName,
-        StaticBagInterface $viewAttributeStaticBag,
-        EvaluationContextInterface $rootEvaluationContext
-    );
 }
