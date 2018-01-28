@@ -168,6 +168,11 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
             $this->childWidgetNodes
         );
 
+        // Validate all triggers for this widget
+        foreach ($this->triggerNodes as $triggerNode) {
+            $triggerNode->validate($subValidationContext);
+        }
+
         // Recursively validate any child widgets
         foreach ($this->childWidgetNodes as $childWidgetNode) {
             $childWidgetNode->validate($subValidationContext);
