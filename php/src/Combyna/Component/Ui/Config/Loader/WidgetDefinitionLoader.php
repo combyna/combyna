@@ -98,13 +98,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         $attributeModelConfig = $this->configParser->getElement(
             $widgetDefinitionConfig,
             'attributes',
-            'compound "' . $widgetDefinitionName . '" widget definition attribute model config'
-        );
-        $labelNames = $this->configParser->getOptionalElement(
-            $widgetDefinitionConfig,
-            'labels',
-            'compound "' . $widgetDefinitionName . '" widget definition labels',
-            [],
+            'compound "' . $widgetDefinitionName . '" widget definition attribute model config',
             'array'
         );
 
@@ -113,8 +107,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         return new CompoundWidgetDefinitionNode(
             $libraryName,
             $widgetDefinitionName,
-            $attributeBagModelNode,
-            $this->buildLabelMap($labelNames)
+            $attributeBagModelNode
         );
     }
 
@@ -144,13 +137,6 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
             'core "' . $widgetDefinitionName . '" widget definition supported event types',
             'array'
         );
-        $labelNames = $this->configParser->getOptionalElement(
-            $widgetDefinitionConfig,
-            'labels',
-            'compound "' . $widgetDefinitionName . '" widget definition labels',
-            [],
-            'array'
-        );
 
         $eventDefinitionReferenceNodes = $this->eventDefinitionReferenceLoader->loadCollection($eventDefinitionTypes);
 
@@ -160,25 +146,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
             $libraryName,
             $widgetDefinitionName,
             $attributeBagModelNode,
-            $eventDefinitionReferenceNodes,
-            $this->buildLabelMap($labelNames)
+            $eventDefinitionReferenceNodes
         );
-    }
-
-    /**
-     * Builds up an associative array to speed up lookups
-     *
-     * @param string[] $labelNames
-     * @return array
-     */
-    private function buildLabelMap(array $labelNames)
-    {
-        $labels = [];
-
-        foreach ($labelNames as $labelName) {
-            $labels[$labelName] = true;
-        }
-
-        return $labels;
     }
 }

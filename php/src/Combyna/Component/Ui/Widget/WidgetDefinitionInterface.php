@@ -64,23 +64,4 @@ interface WidgetDefinitionInterface
      * @return string
      */
     public function getName();
-
-    /**
-     * Returns true if this widget definition has the specified label, false otherwise
-     *
-     * @param string $label
-     * @return bool
-     */
-    public function hasLabel($label);
-
-//    /**
-//     * Ensures that the provided attribute bag is valid
-//     *
-//     * @param ValidationContextInterface $validationContext
-//     * @param ExpressionBagNode $expressionBagNode
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    );
 }

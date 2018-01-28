@@ -80,8 +80,7 @@ class WidgetDefinitionNodePromoter
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
-                $attributeBagModel,
-                $widgetDefinitionNode->getLabels()
+                $attributeBagModel
             );
         }
 
@@ -90,8 +89,7 @@ class WidgetDefinitionNodePromoter
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
-                $attributeBagModel,
-                $widgetDefinitionNode->getLabels()
+                $attributeBagModel
             );
         }
 

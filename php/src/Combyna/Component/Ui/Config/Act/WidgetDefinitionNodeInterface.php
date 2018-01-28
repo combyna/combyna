@@ -39,13 +39,6 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
     public function getEventDefinitionReferences();
 
     /**
-     * Fetches the labels for this widget definition
-     *
-     * @return array
-     */
-    public function getLabels();
-
-    /**
      * Fetches the name of the library this definition belongs to
      *
      * @return string

@@ -28,15 +28,13 @@ interface WidgetDefinitionFactoryInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
-     * @param array $labels
      * @return CompoundWidgetDefinition
      */
     public function createCompoundWidgetDefinition(
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $attributeBagModel
     );
 
     /**
@@ -46,14 +44,12 @@ interface WidgetDefinitionFactoryInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
-     * @param array $labels
      * @return PrimitiveWidgetDefinition
      */
     public function createPrimitiveWidgetDefinition(
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $attributeBagModel
     );
 }

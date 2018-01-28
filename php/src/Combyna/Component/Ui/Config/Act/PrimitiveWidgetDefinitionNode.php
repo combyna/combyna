@@ -38,11 +38,6 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
     private $eventDefinitionReferenceNodes;
 
     /**
-     * @var array
-     */
-    private $labels;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -57,18 +52,15 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNode $attributeBagModelNode
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
-     * @param array $labels
      */
     public function __construct(
         $libraryName,
         $widgetDefinitionName,
         FixedStaticBagModelNode $attributeBagModelNode,
-        array $eventDefinitionReferenceNodes,
-        array $labels
+        array $eventDefinitionReferenceNodes
     ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
-        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
     }
@@ -87,14 +79,6 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
     public function getEventDefinitionReferences()
     {
         return $this->eventDefinitionReferenceNodes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLabels()
-    {
-        return $this->labels;
     }
 
     /**

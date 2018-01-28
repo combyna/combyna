@@ -42,11 +42,6 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     private $eventFactory;
 
     /**
-     * @var array
-     */
-    private $labels;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -68,7 +63,6 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
-     * @param array $labels
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
@@ -76,13 +70,11 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $attributeBagModel
     ) {
         $this->attributeBagModel = $attributeBagModel;
         $this->eventDefinitionReferenceCollection = $eventDefinitionReferenceCollection;
         $this->eventFactory = $eventFactory;
-        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $name;
         $this->uiStateFactory = $uiStateFactory;
@@ -134,26 +126,4 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     {
         return $this->name;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasLabel($label)
-    {
-        return array_key_exists($label, $this->labels) && $this->labels[$label] === true;
-    }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    ) {
-//        $this->attributeBagModel->validateStaticExpressionBag(
-//            $validationContext,
-//            $expressionBagNode,
-//            'attributes for core "' . $this->name . '" widget'
-//        );
-//    }
 }
