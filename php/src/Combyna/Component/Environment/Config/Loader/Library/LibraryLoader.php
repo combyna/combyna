@@ -69,6 +69,7 @@ class LibraryLoader implements LibraryLoaderInterface
     {
         $libraryName = $this->configParser->getElement($libraryConfig, 'name', 'library name');
         $description = $this->configParser->getElement($libraryConfig, 'description', 'library description');
+        $libraryNamesDependedOn = $this->configParser->getOptionalElement($libraryConfig, 'dependencies', 'library dependencies', [], 'array');
         $eventDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'events', 'event definitions', [], 'array');
         $signalDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'signals', 'signal definitions', [], 'array');
         $widgetDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'widgets', 'widget definitions', [], 'array');
@@ -106,6 +107,7 @@ class LibraryLoader implements LibraryLoaderInterface
         return new LibraryNode(
             $libraryName,
             $description,
+            $libraryNamesDependedOn,
             [], // TODO: FunctionLoader
             $eventDefinitionNodes,
             $signalDefinitionNodes,

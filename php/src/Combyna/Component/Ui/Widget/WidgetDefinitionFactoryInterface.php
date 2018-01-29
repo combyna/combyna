@@ -28,13 +28,15 @@ interface WidgetDefinitionFactoryInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param WidgetInterface $rootWidget
      * @return CompoundWidgetDefinition
      */
     public function createCompoundWidgetDefinition(
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel
+        FixedStaticBagModelInterface $attributeBagModel,
+        WidgetInterface $rootWidget
     );
 
     /**

@@ -86,6 +86,7 @@ class ValidationIntegratedTest extends TestCase
             new LibraryNode(
                 'text',
                 'A library for processing of text data',
+                [],
                 [
                     new NativeFunctionNode('text', 'length')
                 ]

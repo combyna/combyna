@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Environment\EnvironmentInterface;
-use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter;
 use Combyna\Component\Ui\Widget\WidgetDefinitionFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
@@ -42,18 +41,26 @@ class WidgetDefinitionNodePromoter
     private $widgetDefinitionFactory;
 
     /**
+     * @var WidgetNodePromoter
+     */
+    private $widgetNodePromoter;
+
+    /**
      * @param BagNodePromoter $bagNodePromoter
      * @param EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter
      * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
+     * @param WidgetNodePromoter $widgetNodePromoter
      */
     public function __construct(
         BagNodePromoter $bagNodePromoter,
         EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter,
-        WidgetDefinitionFactoryInterface $widgetDefinitionFactory
+        WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
+        WidgetNodePromoter $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->eventDefinitionReferenceNodePromoter = $eventDefinitionReferenceNodePromoter;
         $this->widgetDefinitionFactory = $widgetDefinitionFactory;
+        $this->widgetNodePromoter = $widgetNodePromoter;
     }
 
     /**
@@ -80,7 +87,12 @@ class WidgetDefinitionNodePromoter
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
-                $attributeBagModel
+                $attributeBagModel,
+                $this->widgetNodePromoter->promoteWidget(
+                    'root',
+                    $widgetDefinitionNode->getRootWidget(),
+                    $environment
+                )
             );
         }
 

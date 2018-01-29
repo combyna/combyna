@@ -98,10 +98,10 @@ class Combyna
 
         $appNode = $this->appLoader->loadApp($environmentNode, $appConfig);
 
-//        $validationContext = $this->validator->validate($environmentNode, $environmentNode);
-//        $validationContext->throwIfViolated();
-//        $validationContext = $this->validator->validate($appNode, $environmentNode);
-//        $validationContext->throwIfViolated();
+        $validationContext = $this->validator->validate($environmentNode, $environmentNode);
+        $validationContext->throwIfViolated();
+        $validationContext = $this->validator->validate($appNode, $environmentNode);
+        $validationContext->throwIfViolated();
 
         return $this->appNodePromoter->promoteApp($appNode, $environmentNode);
     }

@@ -20,13 +20,13 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class WidgetNode
+ * Class DefinedWidgetNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetNode extends AbstractActNode implements WidgetNodeInterface
+class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
 {
-    const TYPE = 'widget';
+    const TYPE = 'defined-widget';
 
     /**
      * @var ExpressionBagNode
@@ -54,12 +54,18 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
     private $visibilityExpressionNode;
 
     /**
-     * @var WidgetDefinitionNodeInterface
+     * @var string
      */
-    private $widgetDefinitionNode;
+    private $widgetDefinitionLibraryName;
 
     /**
-     * @param WidgetDefinitionNodeInterface $widgetDefinitionNode
+     * @var string
+     */
+    private $widgetDefinitionName;
+
+    /**
+     * @param string $widgetDefinitionLibraryName
+     * @param string $widgetDefinitionName
      * @param ExpressionBagNode $attributeExpressionBagNode
      * @param WidgetNodeInterface[] $childWidgetNodes
      * @param TriggerNode[] $triggerNodes
@@ -67,7 +73,8 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @param array $tags
      */
     public function __construct(
-        WidgetDefinitionNodeInterface $widgetDefinitionNode,
+        $widgetDefinitionLibraryName,
+        $widgetDefinitionName,
         ExpressionBagNode $attributeExpressionBagNode,
         array $childWidgetNodes,
         array $triggerNodes,
@@ -79,7 +86,8 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
         $this->tags = $tags;
         $this->triggerNodes = $triggerNodes;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
-        $this->widgetDefinitionNode = $widgetDefinitionNode;
+        $this->widgetDefinitionLibraryName = $widgetDefinitionLibraryName;
+        $this->widgetDefinitionName = $widgetDefinitionName;
     }
 
     /**
@@ -105,7 +113,7 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getLibraryName()
     {
-        return $this->widgetDefinitionNode->getLibraryName();
+        return $this->widgetDefinitionLibraryName;
     }
 
     /**
@@ -139,7 +147,7 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return $this->widgetDefinitionNode->getWidgetDefinitionName();
+        return $this->widgetDefinitionName;
     }
 
     /**
@@ -162,11 +170,12 @@ class WidgetNode extends AbstractActNode implements WidgetNodeInterface
             );
         }
 
-        $this->widgetDefinitionNode->validateWidget(
-            $subValidationContext,
-            $this->attributeExpressionBagNode,
-            $this->childWidgetNodes
-        );
+        // FIXME: Reinstate this validation somehow
+//        $this->widgetDefinitionNode->validateWidget(
+//            $subValidationContext,
+//            $this->attributeExpressionBagNode,
+//            $this->childWidgetNodes
+//        );
 
         // Validate all triggers for this widget
         foreach ($this->triggerNodes as $triggerNode) {

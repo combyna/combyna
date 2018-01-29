@@ -24,6 +24,13 @@ use Combyna\Component\Ui\State\UiStateInterface;
 interface WidgetStateInterface extends UiStateInterface
 {
     /**
+     * Fetches the path from this widget to the eventual descendant that is a primitive
+     *
+     * @return WidgetStateInterface[]
+     */
+    public function getEventualRenderableDescendantStatePath();
+
+    /**
      * Fetches the name of the library this widget's definition belongs to
      *
      * @return string

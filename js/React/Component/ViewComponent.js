@@ -40,6 +40,12 @@ export default class ViewComponent extends React.Component
                 return renderWidget(widgetData.root);
             }
 
+            if (widgetData.type === 'generic') {
+                // FIXME: Check widgetData.library and .widget and create a React element
+                //        using the relevant component
+                return 'I should be returning a React element';
+            }
+
             const childElements = [];
 
             for (let childWidget of widgetData.children) {

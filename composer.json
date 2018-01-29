@@ -23,7 +23,7 @@
     "scripts": {
         "build:expression-parser": "mkdir -p ./php/dist/Combyna/Component/ExpressionLanguage && peg ./php/src/Combyna/Component/ExpressionLanguage/PegExpressionParser.php.inc ./php/dist/Combyna/Component/ExpressionLanguage/PegExpressionParser.php",
         "server": "php ./php/src/server.php",
-        "simple-server": "php -S localhost:9000 example/simple/app.php"
+        "simple-server": "php -S localhost:9000 example/app.php"
     },
     "license": "MIT",
     "authors": [

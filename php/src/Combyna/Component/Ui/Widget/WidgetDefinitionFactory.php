@@ -50,7 +50,8 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel
+        FixedStaticBagModelInterface $attributeBagModel,
+        WidgetInterface $rootWidget
     ) {
         return new CompoundWidgetDefinition(
             $this->renderedWidgetFactory,
@@ -58,7 +59,8 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
             $eventDefinitionReferenceCollection,
             $libraryName,
             $name,
-            $attributeBagModel
+            $attributeBagModel,
+            $rootWidget
         );
     }
 

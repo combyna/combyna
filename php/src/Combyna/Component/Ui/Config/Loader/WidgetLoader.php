@@ -13,12 +13,12 @@ namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
-use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Trigger\Config\Loader\TriggerLoaderInterface;
+use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
+use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
-use Combyna\Component\Ui\Config\Act\WidgetNode;
 use InvalidArgumentException;
 
 /**
@@ -29,6 +29,7 @@ use InvalidArgumentException;
 class WidgetLoader implements WidgetLoaderInterface
 {
     const GROUP_NAME = 'group';
+    const TEXT_NAME = 'text';
 
     /**
      * @var ConfigParser
@@ -79,21 +80,10 @@ class WidgetLoader implements WidgetLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadWidget(array $widgetConfig, EnvironmentNode $environmentNode)
+    public function loadWidget(array $widgetConfig)
     {
         $type = $widgetConfig['type'];
-        $attributeExpressionBag = $this->expressionBagLoader->load(
-            isset($widgetConfig['attributes']) ?
-                $widgetConfig['attributes'] :
-                []
-        );
-        $childWidgets = isset($widgetConfig['children']) ?
-            $this->widgetCollectionLoader->loadWidgets(
-                $widgetConfig['children'],
-                $this,
-                $environmentNode
-            ) :
-            [];
+
         $visibilityExpressionNode = isset($widgetConfig['visible']) ?
             $this->expressionLoader->load($widgetConfig['visible']) :
             null;
@@ -104,6 +94,26 @@ class WidgetLoader implements WidgetLoaderInterface
             [],
             'array'
         );
+
+        if ($type === self::TEXT_NAME) {
+            return new TextWidgetNode(
+                $this->expressionLoader->load($widgetConfig['text']),
+                $visibilityExpressionNode,
+                $this->buildTagMap($tagNames)
+            );
+        }
+
+        $attributeExpressionBag = $this->expressionBagLoader->load(
+            isset($widgetConfig['attributes']) ?
+                $widgetConfig['attributes'] :
+                []
+        );
+        $childWidgets = isset($widgetConfig['children']) ?
+            $this->widgetCollectionLoader->loadWidgets(
+                $widgetConfig['children'],
+                $this
+            ) :
+            [];
         $triggerNodes = $this->triggerLoader->loadCollection(
             $this->configParser->getOptionalElement(
                 $widgetConfig,
@@ -141,10 +151,9 @@ class WidgetLoader implements WidgetLoaderInterface
             );
         }
 
-        $widgetDefinitionNode = $environmentNode->getWidgetDefinition($libraryName, $widgetDefinitionName);
-
-        return new WidgetNode(
-            $widgetDefinitionNode,
+        return new DefinedWidgetNode(
+            $libraryName,
+            $widgetDefinitionName,
             $attributeExpressionBag,
             $childWidgets,
             $triggerNodes,

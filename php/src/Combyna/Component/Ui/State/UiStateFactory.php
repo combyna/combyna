@@ -16,12 +16,15 @@ use Combyna\Component\Ui\State\Store\NullViewStoreState;
 use Combyna\Component\Ui\State\Store\ViewStoreState;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewState;
-use Combyna\Component\Ui\State\Widget\DefinedWidgetState;
+use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetState;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetState;
+use Combyna\Component\Ui\State\Widget\TextWidgetState;
 use Combyna\Component\Ui\State\Widget\WidgetGroupState;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePath;
 use Combyna\Component\Ui\View\PageViewInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
@@ -34,11 +37,33 @@ class UiStateFactory implements UiStateFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createDefinedWidgetState(
+    public function createDefinedCompoundWidgetState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        WidgetStateInterface $rootWidgetState
     ) {
-        return new DefinedWidgetState($widget, $attributeStaticBag);
+        return new DefinedCompoundWidgetState(
+            $widget,
+            $attributeStaticBag,
+            $childWidgetStates,
+            $rootWidgetState
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createDefinedPrimitiveWidgetState(
+        DefinedWidgetInterface $widget,
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates
+    ) {
+        return new DefinedPrimitiveWidgetState(
+            $widget,
+            $attributeStaticBag,
+            $childWidgetStates
+        );
     }
 
 //    /**
@@ -70,6 +95,14 @@ class UiStateFactory implements UiStateFactoryInterface
         StaticBagInterface $viewAttributeStaticBag
     ) {
         return new PageViewState($this, $view, $storeState, $renderedRootWidget, $viewAttributeStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createTextWidgetState(TextWidgetInterface $textWidget, $text)
+    {
+        return new TextWidgetState($textWidget, $text);
     }
 
     /**

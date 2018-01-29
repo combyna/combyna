@@ -104,18 +104,11 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
-    ) {
+    public function createInitialState(UiEvaluationContextInterface $evaluationContext)
+    {
         $textStatic = $this->textExpression->toStatic($evaluationContext);
 
-        return $this->uiStateFactory->createTextWidgetState(
-            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-            $textStatic
-        );
+        return $this->uiStateFactory->createTextWidgetState($this, $textStatic->toNative());
     }
 
     /**
@@ -176,5 +169,13 @@ class TextWidget implements TextWidgetInterface
     public function hasTag($tag)
     {
         return false; // TODO
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return true; // TextWidgets cannot be resolved further, so they are always renderable
     }
 }

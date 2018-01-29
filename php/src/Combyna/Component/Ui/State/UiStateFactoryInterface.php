@@ -12,15 +12,18 @@
 namespace Combyna\Component\Ui\State;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\State\StateInterface;
 use Combyna\Component\Ui\State\Store\NullViewStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\ViewStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\TextWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
@@ -31,15 +34,33 @@ use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 interface UiStateFactoryInterface
 {
     /**
-     * Creates a DefinedWidgetState
+     * Creates a DefinedCompoundWidgetState
      *
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
-     * @return WidgetStateInterface
+     * @param WidgetStateInterface[] $childWidgetStates
+     * @param WidgetStateInterface $rootWidgetState
+     * @return DefinedCompoundWidgetStateInterface
      */
-    public function createDefinedWidgetState(
+    public function createDefinedCompoundWidgetState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        WidgetStateInterface $rootWidgetState
+    );
+
+    /**
+     * Creates a DefinedPrimitiveWidgetState
+     *
+     * @param DefinedWidgetInterface $widget
+     * @param StaticBagInterface $attributeStaticBag
+     * @param WidgetStateInterface[] $childWidgetStates
+     * @return DefinedPrimitiveWidgetStateInterface
+     */
+    public function createDefinedPrimitiveWidgetState(
+        DefinedWidgetInterface $widget,
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates
     );
 
     /**
@@ -65,6 +86,15 @@ interface UiStateFactoryInterface
         WidgetStateInterface $renderedRootWidget,
         StaticBagInterface $viewAttributeStaticBag
     );
+
+    /**
+     * Creates a TextWidgetState
+     *
+     * @param TextWidgetInterface $textWidget
+     * @param string $text
+     * @return TextWidgetStateInterface
+     */
+    public function createTextWidgetState(TextWidgetInterface $textWidget, $text);
 
     /**
      * Creates a ViewStoreState

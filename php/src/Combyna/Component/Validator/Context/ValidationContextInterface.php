@@ -161,6 +161,14 @@ interface ValidationContextInterface
     );
 
     /**
+     * Checks that a signal definition exists with the specified name
+     *
+     * @param string $libraryName
+     * @param string $signalName
+     */
+    public function assertValidSignal($libraryName, $signalName);
+
+    /**
      * Checks that a variable exists with the given name in the hierarchy
      *
      * @param string $variableName

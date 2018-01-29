@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\Config\Loader;
 
-use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
 
 /**
@@ -25,8 +24,7 @@ interface WidgetLoaderInterface
      * Creates a widget from a config array
      *
      * @param array $widgetConfig
-     * @param EnvironmentNode $environmentNode
      * @return WidgetNodeInterface
      */
-    public function loadWidget(array $widgetConfig, EnvironmentNode $environmentNode);
+    public function loadWidget(array $widgetConfig);
 }

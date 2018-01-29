@@ -42,9 +42,7 @@ interface WidgetInterface
      * @param UiEvaluationContextInterface $evaluationContext
      * @return WidgetStateInterface
      */
-    public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
-    );
+    public function createInitialState(UiEvaluationContextInterface $evaluationContext);
 
     /**
      * Dispatches an event
@@ -105,4 +103,12 @@ interface WidgetInterface
      * @return bool
      */
     public function hasTag($tag);
+
+    /**
+     * Returns true if the widget can be rendered directly,
+     * or false if only some of its descendants may be rendered
+     *
+     * @return bool
+     */
+    public function isRenderable();
 }

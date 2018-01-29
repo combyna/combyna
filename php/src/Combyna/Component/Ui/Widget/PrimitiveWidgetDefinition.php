@@ -15,6 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -103,11 +104,14 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        UiEvaluationContextInterface $evaluationContext
     ) {
-        return $this->uiStateFactory->createDefinedWidgetState(
+        return $this->uiStateFactory->createDefinedPrimitiveWidgetState(
             $widget,
-            $attributeStaticBag
+            $attributeStaticBag,
+            $childWidgetStates
         );
     }
 
@@ -125,5 +129,13 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return true;
     }
 }

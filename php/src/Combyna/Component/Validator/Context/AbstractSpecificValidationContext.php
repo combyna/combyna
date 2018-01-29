@@ -177,6 +177,14 @@ abstract class AbstractSpecificValidationContext implements ValidationContextInt
     /**
      * {@inheritdoc}
      */
+    public function assertValidSignal($libraryName, $signalName)
+    {
+        $this->genericContext->assertValidSignal($libraryName, $signalName, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function assertVariableExists($variableName)
     {
         $this->genericContext->assertVariableExists($variableName, $this);

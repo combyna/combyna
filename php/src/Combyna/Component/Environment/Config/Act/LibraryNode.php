@@ -46,6 +46,11 @@ class LibraryNode extends AbstractActNode
     private $functionNodes = [];
 
     /**
+     * @var string[]
+     */
+    private $libraryNamesDependedOn;
+
+    /**
      * @var string
      */
     private $name;
@@ -63,6 +68,7 @@ class LibraryNode extends AbstractActNode
     /**
      * @param string $name
      * @param string $description
+     * @param string[] $libraryNamesDependedOn
      * @param FunctionNodeInterface[] $functionNodes
      * @param EventDefinitionNode[] $eventDefinitionNodes
      * @param SignalDefinitionNode[] $signalDefinitionNodes
@@ -71,6 +77,7 @@ class LibraryNode extends AbstractActNode
     public function __construct(
         $name,
         $description,
+        array $libraryNamesDependedOn = [],
         array $functionNodes = [],
         array $eventDefinitionNodes = [],
         array $signalDefinitionNodes = [],
@@ -83,6 +90,7 @@ class LibraryNode extends AbstractActNode
             $this->functionNodes[$functionNode->getName()] = $functionNode;
         }
 
+        $this->libraryNamesDependedOn = $libraryNamesDependedOn;
         $this->name = $name;
 
         // Index event definitions by name to simplify lookups
@@ -220,6 +228,17 @@ class LibraryNode extends AbstractActNode
         }
 
         $functionNode->setNativeFunction($nativeFunction);
+    }
+
+    /**
+     * Determines whether anything in this library references the specified other one
+     *
+     * @param string $otherLibraryName
+     * @return bool
+     */
+    public function referencesLibrary($otherLibraryName)
+    {
+        return in_array($otherLibraryName, $this->libraryNamesDependedOn, true);
     }
 
     /**

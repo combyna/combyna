@@ -20,6 +20,7 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\DefinedWidget;
+use Combyna\Component\Ui\Widget\TextWidget;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetGroup;
 use Combyna\Component\Ui\Widget\WidgetInterface;
@@ -130,6 +131,27 @@ class ViewFactory implements ViewFactoryInterface
     public function createPageViewCollection(array $pageViews)
     {
         return new PageViewCollection($pageViews);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createTextWidget(
+        $name,
+        ExpressionInterface $textExpression,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    ) {
+        return new TextWidget(
+            $parentWidget,
+            $name,
+            $textExpression,
+            $this->bagFactory,
+            $this->uiStateFactory,
+            $visibilityExpression,
+            $tags
+        );
     }
 
     /**

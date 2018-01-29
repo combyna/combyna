@@ -48,21 +48,29 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     private $name;
 
     /**
+     * @var WidgetNodeInterface
+     */
+    private $rootWidgetNode;
+
+    /**
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNode $attributeBagModelNode
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
+     * @param WidgetNodeInterface $rootWidgetNode
      */
     public function __construct(
         $libraryName,
         $widgetDefinitionName,
         FixedStaticBagModelNode $attributeBagModelNode,
-        array $eventDefinitionReferenceNodes
+        array $eventDefinitionReferenceNodes,
+        WidgetNodeInterface $rootWidgetNode
     ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
+        $this->rootWidgetNode = $rootWidgetNode;
     }
 
     /**
@@ -90,6 +98,16 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     }
 
     /**
+     * Fetches the widget that defines the content of all widgets of this definition
+     *
+     * @return WidgetNodeInterface
+     */
+    public function getRootWidget()
+    {
+        return $this->rootWidgetNode;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getWidgetDefinitionName()
@@ -105,6 +123,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         $subValidationContext = $validationContext->createSubActNodeContext($this);
 
         $this->attributeBagModelNode->validate($subValidationContext);
+        $this->rootWidgetNode->validate($subValidationContext);
     }
 
     /**

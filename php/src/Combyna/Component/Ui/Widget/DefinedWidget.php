@@ -137,13 +137,18 @@ class DefinedWidget implements DefinedWidgetInterface
     ) {
         $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
 
-        $state = $this->definition->createInitialState($this, $attributeStaticBag);
+        $childStates = [];
 
         foreach ($this->childWidgets as $childName => $childWidget) {
-            $state->addChildState($childName, $childWidget->createInitialState($evaluationContext));
+            $childStates[$childName] = $childWidget->createInitialState($evaluationContext);
         }
 
-        return $state;
+        return $this->definition->createInitialState(
+            $this,
+            $attributeStaticBag,
+            $childStates,
+            $evaluationContext
+        );
     }
 
     /**
@@ -233,5 +238,13 @@ class DefinedWidget implements DefinedWidgetInterface
     public function hasTag($tag)
     {
         return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return $this->definition->isRenderable();
     }
 }

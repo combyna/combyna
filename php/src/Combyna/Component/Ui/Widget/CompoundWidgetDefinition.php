@@ -15,7 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
-use Combyna\Component\Ui\Event\EventDefinitionRepositoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -53,6 +53,11 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     private $name;
 
     /**
+     * @var WidgetInterface
+     */
+    private $rootWidget;
+
+    /**
      * @var UiStateFactoryInterface
      */
     private $uiStateFactory;
@@ -64,6 +69,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param WidgetInterface $rootWidget
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
@@ -71,13 +77,15 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel
+        FixedStaticBagModelInterface $attributeBagModel,
+        WidgetInterface $rootWidget
     ) {
         $this->attributeBagModel = $attributeBagModel;
         $this->eventDefinitionReferenceCollection = $eventDefinitionReferenceCollection;
         $this->eventFactory = $eventFactory;
         $this->libraryName = $libraryName;
         $this->name = $name;
+        $this->rootWidget = $rootWidget;
         $this->uiStateFactory = $uiStateFactory;
     }
 
@@ -104,9 +112,18 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        UiEvaluationContextInterface $evaluationContext
     ) {
-        throw new \Exception('Implement me');
+        $rootWidgetState = $this->rootWidget->createInitialState($evaluationContext);
+
+        return $this->uiStateFactory->createDefinedCompoundWidgetState(
+            $widget,
+            $attributeStaticBag,
+            $childWidgetStates,
+            $rootWidgetState
+        );
     }
 
     /**
@@ -123,5 +140,13 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return false;
     }
 }

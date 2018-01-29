@@ -11,51 +11,91 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
-use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
- * Class WidgetGroupState
+ * Class DefinedCompoundWidgetState
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetGroupState implements WidgetGroupStateInterface
+class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
 {
+    /**
+     * @var StaticBagInterface
+     */
+    private $attributeStaticBag;
+
     /**
      * @var WidgetStateInterface[]
      */
-    private $childWidgetStates = [];
+    private $childWidgetStates;
+
+    /**
+     * @var WidgetStateInterface
+     */
+    private $rootWidgetState;
 
     /**
      * @var DefinedWidgetInterface
      */
-    private $widgetGroup;
+    private $widget;
 
     /**
-     * @param DefinedWidgetInterface $widgetGroup
+     * @param DefinedWidgetInterface $widget
+     * @param StaticBagInterface $attributeStaticBag
+     * @param WidgetStateInterface[] $childWidgetStates
+     * @param WidgetStateInterface $rootWidgetState
      */
     public function __construct(
-        WidgetGroupInterface $widgetGroup
+        DefinedWidgetInterface $widget,
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        WidgetStateInterface $rootWidgetState
     ) {
-        $this->widgetGroup = $widgetGroup;
+        $widget->assertValidAttributeStaticBag($attributeStaticBag);
+
+        $this->attributeStaticBag = $attributeStaticBag;
+        $this->childWidgetStates = $childWidgetStates;
+        $this->rootWidgetState = $rootWidgetState;
+//        $this->storeStateCollection = $storeStateCollection;
+
+        // FIXME: Should not have access to the widget
+        $this->widget = $widget;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addChild($childName, WidgetStateInterface $childWidgetState)
+    public function getAttribute($name)
     {
-        $this->childWidgetStates[$childName] = $childWidgetState;
+        return $this->attributeStaticBag->getStatic($name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildren()
+    public function getAttributeNames()
     {
-        return $this->childWidgetStates;
+        return array_keys($this->attributeStaticBag->toNativeArray());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributeStaticBag()
+    {
+        return $this->attributeStaticBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildNames()
+    {
+        return array_keys($this->childWidgetStates);
     }
 
     /**
@@ -63,6 +103,8 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getChildState($name)
     {
+        var_dump(array_keys($this->childWidgetStates));
+
         return $this->childWidgetStates[$name];
     }
 
@@ -71,7 +113,10 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getEventualRenderableDescendantStatePath()
     {
-        return []; // WidgetGroups are renderable, nothing to traverse down to
+        return array_merge(
+            [$this->rootWidgetState],
+            $this->rootWidgetState->getEventualRenderableDescendantStatePath()
+        );
     }
 
     /**
@@ -79,7 +124,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getStateName()
     {
-        return $this->widgetGroup->getName();
+        return $this->widget->getName();
     }
 
     /**
@@ -95,7 +140,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getWidgetDefinitionLibraryName()
     {
-        return $this->widgetGroup->getDefinitionLibraryName();
+        return $this->widget->getDefinitionLibraryName();
     }
 
     /**
@@ -103,7 +148,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getWidgetDefinitionName()
     {
-        return $this->widgetGroup->getDefinitionName();
+        return $this->widget->getDefinitionName();
     }
 
     /**
@@ -111,7 +156,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getWidgetPath()
     {
-        return $this->widgetGroup->getPath();
+        return $this->widget->getPath();
     }
 
     /**
@@ -148,7 +193,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getWidgetStatePathsByTag($tag, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
-        $widgetStatePaths = $this->widgetGroup->hasTag($tag) ?
+        $widgetStatePaths = $this->widget->hasTag($tag) ?
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
 

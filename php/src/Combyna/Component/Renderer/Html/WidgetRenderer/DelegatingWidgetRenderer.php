@@ -30,7 +30,7 @@ class DelegatingWidgetRenderer implements DelegatorInterface
     private $widgetRenderers = [];
 
     /**
-     * Adds a renderer for a new type of core widget
+     * Adds a renderer for a new type of primitive widget
      *
      * @param WidgetRendererInterface $renderer
      */
@@ -49,8 +49,12 @@ class DelegatingWidgetRenderer implements DelegatorInterface
      */
     public function renderWidget(WidgetStatePathInterface $widgetStatePath)
     {
-        $libraryName = $widgetStatePath->getWidgetDefinitionLibraryName();
-        $widgetDefinitionName = $widgetStatePath->getWidgetDefinitionName();
+        $eventualEndRenderableStatePath = $widgetStatePath->getEventualEndRenderableStatePath();
+        /** @var WidgetStateInterface $widgetState */
+        $widgetState = $eventualEndRenderableStatePath->getEndState();
+
+        $libraryName = $eventualEndRenderableStatePath->getWidgetDefinitionLibraryName();
+        $widgetDefinitionName = $eventualEndRenderableStatePath->getWidgetDefinitionName();
 
         if (!array_key_exists($libraryName, $this->widgetRenderers)) {
             throw new LogicException(
@@ -65,12 +69,9 @@ class DelegatingWidgetRenderer implements DelegatorInterface
             );
         }
 
-        /** @var WidgetStateInterface $widgetState */
-        $widgetState = $widgetStatePath->getEndState();
-
         return $this->widgetRenderers[$libraryName][$widgetDefinitionName]->renderWidget(
             $widgetState,
-            $widgetStatePath
+            $eventualEndRenderableStatePath
         );
     }
 }

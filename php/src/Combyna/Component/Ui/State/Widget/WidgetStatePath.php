@@ -79,6 +79,18 @@ class WidgetStatePath implements WidgetStatePathInterface
     /**
      * {@inheritdoc}
      */
+    public function getEventualEndRenderableStatePath()
+    {
+        $state = $this->getEndState();
+
+        $states = array_merge($this->states, $state->getEventualRenderableDescendantStatePath());
+
+        return $this->stateFactory->createWidgetStatePath($states);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSubStatePaths()
     {
         $subStatePaths = [];
