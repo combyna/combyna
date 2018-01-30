@@ -20,11 +20,15 @@ use Combyna\Client\ClientFactory;
 use Combyna\CombynaBootstrap;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
+use Combyna\Plugin\Bootstrap\BootstrapPlugin;
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$combynaBootstrap = new CombynaBootstrap();
+$combynaBootstrap = new CombynaBootstrap([
+    new BootstrapPlugin()
+]);
+
 $container = $combynaBootstrap->getContainer(false);
 /** @var Combyna $combyna */
 $combyna = $container->get('combyna');
