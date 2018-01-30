@@ -13,6 +13,7 @@ use Combyna\CombynaBootstrap;
 use Combyna\Component\Config\YamlParser;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
+use Combyna\Plugin\Bootstrap\BootstrapPlugin;
 use Symfony\Component\Routing\Matcher\UrlMatcher;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\Routing\Route;
@@ -66,7 +67,9 @@ $appName = $parameters['_appName'];
 $appTitle = $parameters['_appTitle'];
 $appPath = __DIR__ . '/' . $appName;
 
-$combynaBootstrap = new CombynaBootstrap();
+$combynaBootstrap = new CombynaBootstrap([
+    new BootstrapPlugin()
+]);
 $container = $combynaBootstrap->getContainer(false);
 /** @var Combyna $combyna */
 $combyna = $container->get('combyna');

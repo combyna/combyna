@@ -2,4 +2,7 @@ name: bootstrap
 description: Bootstrap wrapper
 widgets:
     breadcrumb:
-        type: foo
+        type: primitive
+        attributes: ~
+        children: ~
+        events: ~

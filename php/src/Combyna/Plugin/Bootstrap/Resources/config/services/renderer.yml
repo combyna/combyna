@@ -1,1 +1,9 @@
 services:
+    combyna_bootstrap.renderer.html.breadcrumb:
+        class: Combyna\Component\Renderer\Html\WidgetRenderer\GenericWidgetRenderer
+        arguments:
+            - '@combyna.renderer.html.widget'
+            - 'bootstrap'
+            - 'breadcrumb'
+        tags:
+            - {name: combyna.html_widget_renderer}
