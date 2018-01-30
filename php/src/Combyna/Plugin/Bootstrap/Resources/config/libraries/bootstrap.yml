@@ -1,0 +1,5 @@
+name: bootstrap
+description: Bootstrap wrapper
+widgets:
+    breadcrumb:
+        type: foo
