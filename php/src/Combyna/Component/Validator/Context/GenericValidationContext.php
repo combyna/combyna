@@ -11,14 +11,14 @@
 
 namespace Combyna\Component\Validator\Context;
 
-use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
 use Combyna\Component\Expression\Config\Act\AssuredExpressionNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\ValidationFactoryInterface;
 use Combyna\Component\Validator\ViolationInterface;
-use Combyna\Component\Type\TypeInterface;
 
 /**
  * Class GenericValidationContext
@@ -257,6 +257,17 @@ class GenericValidationContext implements GenericValidationContextInterface
             $argumentExpressionBagNode,
             $currentContext
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertValidSignal(
+        $libraryName,
+        $signalName,
+        ValidationContextInterface $currentContext
+    ) {
+        $this->parentContext->assertValidSignal($libraryName, $signalName, $currentContext);
     }
 
     /**

@@ -45,7 +45,7 @@ class DefinedWidget implements DefinedWidgetInterface
     private $definition;
 
     /**
-     * @var int
+     * @var string|int
      */
     private $name;
 
@@ -76,7 +76,7 @@ class DefinedWidget implements DefinedWidgetInterface
 
     /**
      * @param WidgetInterface|null $parentWidget
-     * @param int $name
+     * @param string|int $name
      * @param WidgetDefinitionInterface $definition
      * @param ExpressionBagInterface $attributeExpressions
      * @param UiStateFactoryInterface $uiStateFactory
@@ -137,13 +137,18 @@ class DefinedWidget implements DefinedWidgetInterface
     ) {
         $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
 
-        $state = $this->definition->createInitialState($this, $attributeStaticBag);
+        $childStates = [];
 
         foreach ($this->childWidgets as $childName => $childWidget) {
-            $state->addChildState($childName, $childWidget->createInitialState($evaluationContext));
+            $childStates[$childName] = $childWidget->createInitialState($evaluationContext);
         }
 
-        return $state;
+        return $this->definition->createInitialState(
+            $this,
+            $attributeStaticBag,
+            $childStates,
+            $evaluationContext
+        );
     }
 
     /**
@@ -235,40 +240,11 @@ class DefinedWidget implements DefinedWidgetInterface
         return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    ) {
-//        if ($this->visibilityExpression) {
-//            $visibleStatic = $this->visibilityExpression->toStatic($evaluationContext);
-//
-//            if ($visibleStatic->toNative() === false) {
-//                // Widget is invisible
-//                return null;
-//            }
-//        }
-//
-//        $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
-//
-//        $widgetEvaluationContext = $evaluationContext->createSubWidgetEvaluationContext($this);
-//
-//        $renderedWidget = $this->definition->createRenderedWidget(
-//            $parentRenderedWidget,
-//            $this,
-//            $attributeStaticBag
-//        );
-//
-//        foreach ($this->childWidgets as $childWidgetName => $childWidget) {
-//            $renderedChildWidget = $childWidget->render($widgetEvaluationContext, $renderedWidget);
-//
-//            if ($renderedChildWidget) {
-//                $renderedWidget->addChildState($childWidgetName, $renderedChildWidget);
-//            }
-//        }
-//
-//        return $renderedWidget;
-//    }
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return $this->definition->isRenderable();
+    }
 }

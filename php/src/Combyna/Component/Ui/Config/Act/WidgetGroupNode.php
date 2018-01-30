@@ -58,9 +58,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     }
 
     /**
-     * Fetches the children of this widget, if any have been added
-     *
-     * @return WidgetNodeInterface[]
+     * {@inheritdoc}
      */
     public function getChildWidgets()
     {
@@ -84,9 +82,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     }
 
     /**
-     * Fetches the expression used to determine whether this widget is visible, if set
-     *
-     * @return ExpressionNodeInterface|null
+     * {@inheritdoc}
      */
     public function getVisibilityExpression()
     {

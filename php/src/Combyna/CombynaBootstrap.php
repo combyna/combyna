@@ -22,6 +22,7 @@ use Combyna\Component\Framework\FrameworkComponent;
 use Combyna\Component\Framework\Runtime;
 use Combyna\Component\Instruction\InstructionComponent;
 use Combyna\Component\Plugin\PluginComponent;
+use Combyna\Component\Plugin\PluginInterface;
 use Combyna\Component\Program\ProgramComponent;
 use Combyna\Component\Renderer\RendererComponent;
 use Combyna\Component\Router\RouterComponent;
@@ -47,6 +48,19 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 class CombynaBootstrap
 {
     /**
+     * @var PluginInterface[]
+     */
+    private $plugins;
+
+    /**
+     * @param PluginInterface[] $plugins
+     */
+    public function __construct(array $plugins = [])
+    {
+        $this->plugins = $plugins;
+    }
+
+    /**
      * Fetches or builds the service container
      *
      * @param bool $isDebug
@@ -54,32 +68,37 @@ class CombynaBootstrap
      */
     public function getContainer($isDebug = true)
     {
-        $runtime = new Runtime([
-            // Components
-            new AppComponent(),
-            new BagComponent(),
-            new ConfigComponent(),
-            new EventComponent(),
-            new FrameworkComponent(),
-            new EnvironmentComponent(),
-            new ExpressionComponent(),
-            new ExpressionLanguageComponent(),
-            new InstructionComponent(),
-            new PluginComponent(),
-            new ProgramComponent(),
-            new RendererComponent(),
-            new RouterComponent(),
-            new SignalComponent(),
-            new StoreComponent(),
-            new TriggerComponent(),
-            new TypeComponent(),
-            new UiComponent(),
-            new ValidatorComponent(),
+        $runtime = new Runtime(
+            array_merge(
+                [
+                    // Components
+                    new AppComponent(),
+                    new BagComponent(),
+                    new ConfigComponent(),
+                    new EventComponent(),
+                    new FrameworkComponent(),
+                    new EnvironmentComponent(),
+                    new ExpressionComponent(),
+                    new ExpressionLanguageComponent(),
+                    new InstructionComponent(),
+                    new PluginComponent(),
+                    new ProgramComponent(),
+                    new RendererComponent(),
+                    new RouterComponent(),
+                    new SignalComponent(),
+                    new StoreComponent(),
+                    new TriggerComponent(),
+                    new TypeComponent(),
+                    new UiComponent(),
+                    new ValidatorComponent(),
 
-            // Plugins
-            new CorePlugin(),
-            new GuiPlugin()
-        ]);
+                    // Plugins
+                    new CorePlugin(),
+                    new GuiPlugin()
+                ],
+                $this->plugins
+            )
+        );
 
         $file = __DIR__ . '/../../dist/Combyna/Container/CompiledCombynaContainer.php';
 

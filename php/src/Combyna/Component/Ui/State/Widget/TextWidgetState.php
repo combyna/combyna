@@ -25,11 +25,6 @@ class TextWidgetState implements TextWidgetStateInterface
     /**
      * @var string
      */
-    private $name;
-
-    /**
-     * @var string
-     */
     private $text;
 
     /**
@@ -39,19 +34,24 @@ class TextWidgetState implements TextWidgetStateInterface
 
     /**
      * @param TextWidgetInterface $textWidget
-     * @param string $name
      * @param string $text
      */
     public function __construct(
         TextWidgetInterface $textWidget,
-        $name,
         $text
     ) {
         $this->text = $text;
 
         // FIXME: Remove references from state objects back to the entities like this!
         $this->textWidget = $textWidget;
-        $this->name = $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualRenderableDescendantStatePath()
+    {
+        return []; // TextWidgets are renderable, nothing to traverse down to
     }
 
     /**
@@ -59,7 +59,7 @@ class TextWidgetState implements TextWidgetStateInterface
      */
     public function getStateName()
     {
-        return $this->name;
+        return $this->textWidget->getName();
     }
 
     /**

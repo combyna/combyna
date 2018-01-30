@@ -15,7 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
-use Combyna\Component\Ui\Event\EventDefinitionRepositoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -43,11 +43,6 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     private $eventFactory;
 
     /**
-     * @var array
-     */
-    private $labels;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -56,6 +51,11 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      * @var string
      */
     private $name;
+
+    /**
+     * @var WidgetInterface
+     */
+    private $rootWidget;
 
     /**
      * @var UiStateFactoryInterface
@@ -69,7 +69,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
-     * @param array $labels
+     * @param WidgetInterface $rootWidget
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
@@ -78,14 +78,14 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        WidgetInterface $rootWidget
     ) {
         $this->attributeBagModel = $attributeBagModel;
         $this->eventDefinitionReferenceCollection = $eventDefinitionReferenceCollection;
         $this->eventFactory = $eventFactory;
-        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $name;
+        $this->rootWidget = $rootWidget;
         $this->uiStateFactory = $uiStateFactory;
     }
 
@@ -112,9 +112,18 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        UiEvaluationContextInterface $evaluationContext
     ) {
-        throw new \Exception('Implement me');
+        $rootWidgetState = $this->rootWidget->createInitialState($evaluationContext);
+
+        return $this->uiStateFactory->createDefinedCompoundWidgetState(
+            $widget,
+            $attributeStaticBag,
+            $childWidgetStates,
+            $rootWidgetState
+        );
     }
 
     /**
@@ -136,22 +145,8 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasLabel($label)
+    public function isRenderable()
     {
-        return array_key_exists($label, $this->labels) && $this->labels[$label] === true;
+        return false;
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    ) {
-//        $this->attributeBagModel->validateStaticExpressionBag(
-//            $validationContext,
-//            $expressionBagNode,
-//            'attributes for compound "' . $this->name . '" widget'
-//        );
-//    }
 }

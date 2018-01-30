@@ -269,6 +269,17 @@ class RootGenericValidationContext implements RootGenericValidationContextInterf
     /**
      * {@inheritdoc}
      */
+    public function assertValidSignal(
+        $libraryName,
+        $signalName,
+        ValidationContextInterface $currentContext
+    ) {
+        // ...
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function assertVariableExists(
         $variableName,
         ValidationContextInterface $currentContext

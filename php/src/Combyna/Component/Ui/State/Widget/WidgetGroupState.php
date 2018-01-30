@@ -45,9 +45,9 @@ class WidgetGroupState implements WidgetGroupStateInterface
     /**
      * {@inheritdoc}
      */
-    public function addChild(WidgetStateInterface $childWidget)
+    public function addChild($childName, WidgetStateInterface $childWidgetState)
     {
-        $this->childWidgetStates[] = $childWidget;
+        $this->childWidgetStates[$childName] = $childWidgetState;
     }
 
     /**
@@ -64,6 +64,14 @@ class WidgetGroupState implements WidgetGroupStateInterface
     public function getChildState($name)
     {
         return $this->childWidgetStates[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualRenderableDescendantStatePath()
+    {
+        return []; // WidgetGroups are renderable, nothing to traverse down to
     }
 
     /**

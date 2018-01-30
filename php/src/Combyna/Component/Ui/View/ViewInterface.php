@@ -61,16 +61,4 @@ interface ViewInterface
         UiEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     );
-
-//    /**
-//     * Renders this view to a ViewState
-//     *
-//     * @param StaticBagInterface $viewAttributeStaticBag
-//     * @param EvaluationContextInterface $rootEvaluationContext
-//     * @return ViewStateInterface|null Returns the rendered view or null if invisible
-//     */
-//    public function render(
-//        StaticBagInterface $viewAttributeStaticBag,
-//        EvaluationContextInterface $rootEvaluationContext
-//    );
 }

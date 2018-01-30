@@ -13,7 +13,9 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
 /**
  * Interface WidgetDefinitionInterface
@@ -40,15 +42,19 @@ interface WidgetDefinitionInterface
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag);
 
     /**
-     * Creates a DefinedWidgetState
+     * Creates a DefinedPrimitiveWidgetState
      *
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param WidgetStateInterface[] $childWidgetStates
+     * @param UiEvaluationContextInterface $evaluationContext
      * @return DefinedWidgetStateInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        UiEvaluationContextInterface $evaluationContext
     );
 
     /**
@@ -66,21 +72,12 @@ interface WidgetDefinitionInterface
     public function getName();
 
     /**
-     * Returns true if this widget definition has the specified label, false otherwise
+     * Renderable widgets may be rendered directly, without needing to be "resolved" further.
+     * For example, a compound widget is not renderable as its root widget is the one
+     * that will actually be rendered (if that widget is itself renderable - if not,
+     * then its root widget will be rendered instead, and so on).
      *
-     * @param string $label
      * @return bool
      */
-    public function hasLabel($label);
-
-//    /**
-//     * Ensures that the provided attribute bag is valid
-//     *
-//     * @param ValidationContextInterface $validationContext
-//     * @param ExpressionBagNode $expressionBagNode
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    );
+    public function isRenderable();
 }

@@ -17,6 +17,7 @@ use Combyna\Component\Trigger\TriggerCollectionInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
@@ -83,6 +84,24 @@ interface ViewFactoryInterface
      * @return PageViewCollectionInterface
      */
     public function createPageViewCollection(array $pageViews);
+
+    /**
+     * Creates a new text widget
+     *
+     * @param string $name
+     * @param ExpressionInterface $textExpression
+     * @param WidgetInterface|null $parentWidget
+     * @param ExpressionInterface|null $visibilityExpression
+     * @param array $tags
+     * @return TextWidgetInterface
+     */
+    public function createTextWidget(
+        $name,
+        ExpressionInterface $textExpression,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    );
 
     /**
      * Creates a new widget group

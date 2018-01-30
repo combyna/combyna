@@ -11,12 +11,12 @@
 
 namespace Combyna\Component\Validator\Context;
 
-use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\ViolationInterface;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\ViolationInterface;
 use LogicException;
 
 /**
@@ -189,6 +189,19 @@ interface GenericValidationContextInterface
         $libraryName,
         $functionName,
         ExpressionBagNode $argumentExpressionBagNode,
+        ValidationContextInterface $currentContext
+    );
+
+    /**
+     * Checks that a signal definition exists with the specified name
+     *
+     * @param string $libraryName
+     * @param string $signalName
+     * @param ValidationContextInterface $currentContext
+     */
+    public function assertValidSignal(
+        $libraryName,
+        $signalName,
         ValidationContextInterface $currentContext
     );
 

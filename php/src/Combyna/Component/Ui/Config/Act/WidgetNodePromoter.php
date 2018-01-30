@@ -17,6 +17,7 @@ use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNodePromoter;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 use InvalidArgumentException;
@@ -84,9 +85,12 @@ class WidgetNodePromoter
         if ($widgetNode instanceof WidgetGroupNode) {
             /** @var WidgetGroupNode $widgetNode */
             $widget = $this->promoteWidgetGroupNode($name, $widgetNode, $resourceRepository, $parentWidget);
-        } elseif ($widgetNode instanceof WidgetNode) {
-            /** @var WidgetNode $widgetNode */
-            $widget = $this->promoteWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
+        } elseif ($widgetNode instanceof TextWidgetNode) {
+            /** @var TextWidgetNode $widgetNode */
+            $widget = $this->promoteTextWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
+        } elseif ($widgetNode instanceof DefinedWidgetNode) {
+            /** @var DefinedWidgetNode $widgetNode */
+            $widget = $this->promoteDefinedWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } else {
             throw new InvalidArgumentException('Unsupported widget type given');
         }
@@ -95,17 +99,17 @@ class WidgetNodePromoter
     }
 
     /**
-     * Promotes a WidgetNode to a Widget
+     * Promotes a DefinedWidgetNode to a DefinedWidget
      *
      * @param string $name
-     * @param WidgetNode $widgetNode
+     * @param DefinedWidgetNode $widgetNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
      * @return DefinedWidgetInterface
      */
-    private function promoteWidgetNode(
+    private function promoteDefinedWidgetNode(
         $name,
-        WidgetNode $widgetNode,
+        DefinedWidgetNode $widgetNode,
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
@@ -139,6 +143,34 @@ class WidgetNodePromoter
         }
 
         return $widget;
+    }
+
+    /**
+     * Promotes a TextWidgetNode to a TextWidget
+     *
+     * @param string $name
+     * @param TextWidgetNode $textWidgetNode
+     * @param ResourceRepositoryInterface $resourceRepository
+     * @param WidgetInterface|null $parentWidget
+     * @return TextWidgetInterface
+     */
+    private function promoteTextWidgetNode(
+        $name,
+        TextWidgetNode $textWidgetNode,
+        ResourceRepositoryInterface $resourceRepository,
+        WidgetInterface $parentWidget = null
+    ) {
+        $textExpression = $this->expressionNodePromoter->promote($textWidgetNode->getTextExpression());
+
+        return $this->viewFactory->createTextWidget(
+            $name,
+            $textExpression,
+            $parentWidget,
+            $textWidgetNode->getVisibilityExpression() ?
+                $this->expressionNodePromoter->promote($textWidgetNode->getVisibilityExpression()) :
+                null,
+            $textWidgetNode->getTags()
+        );
     }
 
     /**

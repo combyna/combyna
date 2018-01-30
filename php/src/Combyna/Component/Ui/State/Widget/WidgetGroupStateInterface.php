@@ -25,9 +25,10 @@ interface WidgetGroupStateInterface extends CoreWidgetStateInterface
     /**
      * Adds a widget state to this group
      *
-     * @param WidgetStateInterface $childWidget
+     * @param string $childName
+     * @param WidgetStateInterface $childWidgetState
      */
-    public function addChild(WidgetStateInterface $childWidget);
+    public function addChild($childName, WidgetStateInterface $childWidgetState);
 
     /**
      * Fetches all child widget states of this one

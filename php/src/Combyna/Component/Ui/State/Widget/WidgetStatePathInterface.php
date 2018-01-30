@@ -29,6 +29,15 @@ interface WidgetStatePathInterface extends StatePathInterface
     public function getChildStatePath($childName);
 
     /**
+     * Fetches the path to the final state in the path if it is of a renderable widget,
+     * otherwise if it is a compound widget, fetches the path to the state
+     * of the eventual renderable widget that it resolves to
+     *
+     * @return WidgetStatePathInterface
+     */
+    public function getEventualEndRenderableStatePath();
+
+    /**
      * Fetches a list of state paths starting with just the root node, then the root+node2, etc.
      *
      * @return WidgetStatePathInterface[]

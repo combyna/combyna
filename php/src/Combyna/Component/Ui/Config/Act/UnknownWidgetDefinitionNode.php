@@ -57,10 +57,10 @@ class UnknownWidgetDefinitionNode extends AbstractActNode implements WidgetDefin
     /**
      * {@inheritdoc}
      */
-    public function getEventDefinitions()
+    public function getEventDefinitionReferences()
     {
         // We should never reach this point, as validation should have failed
-        throw new LogicException('Unknown widget definition should not be queried for its event definitions');
+        throw new LogicException('Unknown widget definition should not be queried for its event definition references');
     }
 
     /**

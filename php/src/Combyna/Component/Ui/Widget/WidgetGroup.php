@@ -35,7 +35,7 @@ class WidgetGroup implements WidgetGroupInterface
     private $childWidgets = [];
 
     /**
-     * @var string
+     * @var string|int
      */
     private $name;
 
@@ -43,6 +43,11 @@ class WidgetGroup implements WidgetGroupInterface
      * @var WidgetInterface|null
      */
     private $parentWidget;
+
+    /**
+     * @var array
+     */
+    private $tags;
 
     /**
      * @var UiStateFactoryInterface
@@ -56,18 +61,21 @@ class WidgetGroup implements WidgetGroupInterface
 
     /**
      * @param UiStateFactoryInterface $uiStateFactory
-     * @param string $name
+     * @param string|int $name
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
+     * @param array $tags
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
         $name,
         WidgetInterface $parentWidget = null,
-        ExpressionInterface $visibilityExpression = null
+        ExpressionInterface $visibilityExpression = null,
+        array $tags
     ) {
         $this->name = $name;
         $this->parentWidget = $parentWidget;
+        $this->tags = $tags;
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
     }
@@ -77,7 +85,7 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function addChildWidget(WidgetInterface $childWidget)
     {
-        $this->childWidgets[] = $childWidget;
+        $this->childWidgets[$childWidget->getName()] = $childWidget;
     }
 
     /**
@@ -97,7 +105,7 @@ class WidgetGroup implements WidgetGroupInterface
         $state = $this->uiStateFactory->createWidgetGroupState($this);
 
         foreach ($this->childWidgets as $childWidget) {
-            $state->addChild($childWidget->createInitialState($evaluationContext));
+            $state->addChild($childWidget->getName(), $childWidget->createInitialState($evaluationContext));
         }
 
         return $state;
@@ -171,6 +179,14 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function hasTag($tag)
     {
-        return false; // TODO
+        return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return true; // Widget groups have a renderer
     }
 }

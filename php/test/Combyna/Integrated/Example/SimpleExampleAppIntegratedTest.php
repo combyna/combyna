@@ -79,7 +79,7 @@ class SimpleExampleAppIntegratedTest extends TestCase
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="list">
-    <div><input name="combyna-widget-list-root-contents-0" type="text" value="Click a button"><button name="combyna-widget-list-root-contents-1">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-2">Set text to "Goodbye!"</button></div>
+    <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Click a button"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
         $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
@@ -104,7 +104,7 @@ HTML;
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="list">
-    <div><input name="combyna-widget-list-root-contents-0" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-1">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-2">Set text to "Goodbye!"</button></div>
+    <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
         $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
@@ -118,7 +118,7 @@ HTML;
 
         $appState = $this->app->dispatchEvent(
             $appState,
-            $appState->getWidgetStatePathByPath(['list', 'root', 'contents', 2]),
+            $appState->getWidgetStatePathByPath(['list', 'root', 'contents', 3]),
             'gui',
             'click',
             [
@@ -129,7 +129,7 @@ HTML;
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="list">
-    <div><input name="combyna-widget-list-root-contents-0" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-1">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-2">Set text to "Goodbye!"</button></div>
+    <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
         $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));

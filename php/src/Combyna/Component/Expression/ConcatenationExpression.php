@@ -66,8 +66,8 @@ class ConcatenationExpression extends AbstractExpression
 
         if (!$operandListStatic instanceof StaticListExpression) {
             throw new LogicException(
-                'ConcatenationExpression :: List can only evaluate to a static-list ' .
-                'or error expression, but got a(n) "' . $operandListStatic->getType() . '"'
+                'ConcatenationExpression :: List can only evaluate to a static-list, ' .
+                'but got a(n) "' . $operandListStatic->getType() . '"'
             );
         }
 

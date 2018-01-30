@@ -26,7 +26,7 @@ interface EventFactoryInterface
     /**
      * Creates a new Event
      *
-     * @param EventDefinitionInterface $definition
+     * @param EventDefinitionInterface $eventDefinition
      * @param StaticBagInterface $payloadStaticBag
      * @return EventInterface
      */

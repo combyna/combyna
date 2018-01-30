@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Ui\Config\Loader;
 
-use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-
 /**
  * Interface WidgetCollectionLoaderInterface
  *
@@ -25,13 +23,12 @@ class WidgetCollectionLoader implements WidgetCollectionLoaderInterface
      */
     public function loadWidgets(
         array $widgetCollectionConfig,
-        WidgetLoaderInterface $widgetLoader,
-        EnvironmentNode $environmentNode
+        WidgetLoaderInterface $widgetLoader
     ) {
         $widgets = [];
 
         foreach ($widgetCollectionConfig as $widgetName => $widgetConfig) {
-            $widgets[$widgetName] = $widgetLoader->loadWidget($widgetConfig, $environmentNode);
+            $widgets[$widgetName] = $widgetLoader->loadWidget($widgetConfig);
         }
 
         return $widgets;

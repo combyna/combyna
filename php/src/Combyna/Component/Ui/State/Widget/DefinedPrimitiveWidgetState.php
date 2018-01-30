@@ -17,11 +17,11 @@ use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 
 /**
- * Class DefinedWidgetState
+ * Class DefinedPrimitiveWidgetState
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DefinedWidgetState implements DefinedWidgetStateInterface
+class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterface
 {
     /**
      * @var StaticBagInterface
@@ -31,7 +31,7 @@ class DefinedWidgetState implements DefinedWidgetStateInterface
     /**
      * @var WidgetStateInterface[]
      */
-    private $childWidgetStates = [];
+    private $childWidgetStates;
 
     /**
      * @var DefinedWidgetInterface
@@ -41,26 +41,21 @@ class DefinedWidgetState implements DefinedWidgetStateInterface
     /**
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param WidgetStateInterface[] $childWidgetStates
      */
     public function __construct(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates
     ) {
         $widget->assertValidAttributeStaticBag($attributeStaticBag);
 
         $this->attributeStaticBag = $attributeStaticBag;
+        $this->childWidgetStates = $childWidgetStates;
 //        $this->storeStateCollection = $storeStateCollection;
 
         // FIXME: Should not have access to the widget
         $this->widget = $widget;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChildState($childName, WidgetStateInterface $childWidget)
-    {
-        $this->childWidgetStates[$childName] = $childWidget;
     }
 
     /**
@@ -74,9 +69,41 @@ class DefinedWidgetState implements DefinedWidgetStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getAttributeNames()
+    {
+        return array_keys($this->attributeStaticBag->toNativeArray());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttributeStaticBag()
+    {
+        return $this->attributeStaticBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildNames()
+    {
+        return array_keys($this->childWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getChildState($name)
     {
         return $this->childWidgetStates[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualRenderableDescendantStatePath()
+    {
+        return []; // Primitive widgets can always be rendered: no need to resolve further
     }
 
     /**

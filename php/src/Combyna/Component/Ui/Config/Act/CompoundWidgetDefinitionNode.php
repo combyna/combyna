@@ -38,11 +38,6 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     private $eventDefinitionReferenceNodes;
 
     /**
-     * @var array
-     */
-    private $labels;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -53,24 +48,29 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     private $name;
 
     /**
+     * @var WidgetNodeInterface
+     */
+    private $rootWidgetNode;
+
+    /**
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNode $attributeBagModelNode
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
-     * @param array $labels
+     * @param WidgetNodeInterface $rootWidgetNode
      */
     public function __construct(
         $libraryName,
         $widgetDefinitionName,
         FixedStaticBagModelNode $attributeBagModelNode,
         array $eventDefinitionReferenceNodes,
-        array $labels
+        WidgetNodeInterface $rootWidgetNode
     ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
-        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
+        $this->rootWidgetNode = $rootWidgetNode;
     }
 
     /**
@@ -92,17 +92,19 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * {@inheritdoc}
      */
-    public function getLabels()
-    {
-        return $this->labels;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getLibraryName()
     {
         return $this->libraryName;
+    }
+
+    /**
+     * Fetches the widget that defines the content of all widgets of this definition
+     *
+     * @return WidgetNodeInterface
+     */
+    public function getRootWidget()
+    {
+        return $this->rootWidgetNode;
     }
 
     /**
@@ -121,6 +123,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         $subValidationContext = $validationContext->createSubActNodeContext($this);
 
         $this->attributeBagModelNode->validate($subValidationContext);
+        $this->rootWidgetNode->validate($subValidationContext);
     }
 
     /**

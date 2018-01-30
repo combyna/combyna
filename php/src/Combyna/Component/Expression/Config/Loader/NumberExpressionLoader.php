@@ -40,7 +40,7 @@ class NumberExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $number = $this->configParser->getElement($config, 'number', 'number expression');
+        $number = $this->configParser->getElement($config, 'number', 'number expression', 'number');
 
         return new NumberExpressionNode($number);
     }

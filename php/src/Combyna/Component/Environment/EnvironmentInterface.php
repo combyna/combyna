@@ -19,6 +19,8 @@ use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Environment\Library\FunctionInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
+use Combyna\Component\Event\EventDefinitionInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Router\RouteInterface;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
@@ -28,7 +30,7 @@ use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface EnvironmentInterface
+interface EnvironmentInterface extends ResourceRepositoryInterface
 {
     /**
      * Fetches an event definition from a library installed into this environment.

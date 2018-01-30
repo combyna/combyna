@@ -107,8 +107,7 @@ class ConcatenationExpressionTest extends TestCase
 
         $this->setExpectedException(
             LogicException::class,
-            'ConcatenationExpression :: List can only evaluate to a static-list ' .
-            'or error expression, but got a(n) "number"'
+            'ConcatenationExpression :: List can only evaluate to a static-list, but got a(n) "number"'
         );
 
         $this->expression->toStatic($this->evaluationContext->reveal());

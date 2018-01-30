@@ -22,6 +22,8 @@ use Combyna\Component\State\StatePathInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
@@ -228,8 +230,9 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
      *
      * @param ViewEvaluationContextInterface $parentContext
      * @param WidgetStatePathInterface $widgetStatePath
-     * @param DefinedWidgetStateInterface $widgetState
+     * @param WidgetGroupStateInterface $widgetState
      * @param ProgramInterface $program
+     * @param EnvironmentInterface $environment
      * @return WidgetEvaluationContext
      */
     public function createWidgetEvaluationContextFromWidgetGroupStatePath(
@@ -250,7 +253,8 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
     public function getStateTypeToContextFactoryMap()
     {
         return [
-            DefinedWidgetStateInterface::TYPE => [$this, 'createWidgetEvaluationContextFromDefinedWidgetStatePath'],
+            DefinedCompoundWidgetStateInterface::TYPE => [$this, 'createWidgetEvaluationContextFromDefinedWidgetStatePath'],
+            DefinedPrimitiveWidgetStateInterface::TYPE => [$this, 'createWidgetEvaluationContextFromDefinedWidgetStatePath'],
             PageViewStateInterface::TYPE => [$this, 'createPageViewEvaluationContextFromPageViewStatePath'],
             WidgetGroupStateInterface::TYPE => [$this, 'createWidgetEvaluationContextFromWidgetGroupStatePath']
         ];

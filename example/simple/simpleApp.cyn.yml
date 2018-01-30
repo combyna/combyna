@@ -35,6 +35,9 @@ page_views:
                     type: group
                     children:
                         -
+                            type: text
+                            text: !expr 'Click one of the buttons to change the text: '
+                        -
                             type: gui.textbox
                             attributes:
                                 value: !expr view_query('get_current_text')

@@ -51,7 +51,7 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        WidgetInterface $rootWidget
     ) {
         return new CompoundWidgetDefinition(
             $this->renderedWidgetFactory,
@@ -60,7 +60,7 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
             $libraryName,
             $name,
             $attributeBagModel,
-            $labels
+            $rootWidget
         );
     }
 
@@ -71,8 +71,7 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $attributeBagModel
     ) {
         return new PrimitiveWidgetDefinition(
             $this->renderedWidgetFactory,
@@ -80,8 +79,7 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
             $eventDefinitionReferenceCollection,
             $libraryName,
             $name,
-            $attributeBagModel,
-            $labels
+            $attributeBagModel
         );
     }
 }

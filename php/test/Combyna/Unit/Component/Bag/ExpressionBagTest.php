@@ -9,14 +9,13 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Unit\Bag;
+namespace Combyna\Unit\Component\Bag;
 
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBag;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**

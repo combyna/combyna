@@ -42,9 +42,7 @@ interface WidgetInterface
      * @param UiEvaluationContextInterface $evaluationContext
      * @return WidgetStateInterface
      */
-    public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
-    );
+    public function createInitialState(UiEvaluationContextInterface $evaluationContext);
 
     /**
      * Dispatches an event
@@ -87,14 +85,14 @@ interface WidgetInterface
     /**
      * Fetches the unique name of this widget within its parent
      *
-     * @return string
+     * @return string|int
      */
     public function getName();
 
     /**
      * Fetches the path to this widget, with its view name and all ancestor names
      *
-     * @return string[]
+     * @return string[]|int[]
      */
     public function getPath();
 
@@ -106,15 +104,11 @@ interface WidgetInterface
      */
     public function hasTag($tag);
 
-//    /**
-//     * Renders this widget to a CoreWidgetState
-//     *
-//     * @param ViewEvaluationContextInterface $evaluationContext
-//     * @param WidgetStateInterface|null $parentRenderedWidget
-//     * @return WidgetStateInterface|null Returns the rendered widget or null if invisible
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    );
+    /**
+     * Returns true if the widget can be rendered directly,
+     * or false if only some of its descendants may be rendered
+     *
+     * @return bool
+     */
+    public function isRenderable();
 }

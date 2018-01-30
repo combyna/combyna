@@ -105,14 +105,44 @@ class HtmlRendererIntegratedTest extends TestCase
                     ],
                     'description' => 'A test view, for testing',
                     'widget' => [
-                        'type' => 'gui.button',
-                        'attributes' => [
-                            'label' => [
+                        'type' => 'group',
+                        'children' => [
+                            [
+                                // Demonstrate text widgets
                                 'type' => 'text',
-                                'text' => 'Click me'
+                                'text' => [
+                                    // Just to prove that expressions work
+                                    'type' => 'concatenation',
+                                    'list' => [
+                                        'type' => 'list',
+                                        'elements' => [
+                                            [
+                                                'type' => 'text',
+                                                'text' => 'Some'
+                                            ],
+                                            [
+                                                'type' => 'text',
+                                                'text' => 'here '
+                                            ]
+                                        ]
+                                    ],
+                                    'glue' => [
+                                        'type' => 'text',
+                                        'text' => ' of my text '
+                                    ]
+                                ]
+                            ],
+                            [
+                                'type' => 'gui.button',
+                                'attributes' => [
+                                    'label' => [
+                                        'type' => 'text',
+                                        'text' => 'Click me'
+                                    ]
+                                ],
+                                'children' => null
                             ]
-                        ],
-                        'children' => null
+                        ]
                     ],
                     'store' => null
                 ]
@@ -124,7 +154,7 @@ class HtmlRendererIntegratedTest extends TestCase
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="my_view">
-    <button name="combyna-widget-my_view-root">Click me</button>
+    Some of my text here <button name="combyna-widget-my_view-root-1">Click me</button>
 </div>
 HTML;
         $this->assertSame($expectedHtml, $renderedHtml);

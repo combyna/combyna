@@ -15,6 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -42,11 +43,6 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     private $eventFactory;
 
     /**
-     * @var array
-     */
-    private $labels;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -68,7 +64,6 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
-     * @param array $labels
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
@@ -76,13 +71,11 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $attributeBagModel
     ) {
         $this->attributeBagModel = $attributeBagModel;
         $this->eventDefinitionReferenceCollection = $eventDefinitionReferenceCollection;
         $this->eventFactory = $eventFactory;
-        $this->labels = $labels;
         $this->libraryName = $libraryName;
         $this->name = $name;
         $this->uiStateFactory = $uiStateFactory;
@@ -111,11 +104,14 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        StaticBagInterface $attributeStaticBag,
+        array $childWidgetStates,
+        UiEvaluationContextInterface $evaluationContext
     ) {
-        return $this->uiStateFactory->createDefinedWidgetState(
+        return $this->uiStateFactory->createDefinedPrimitiveWidgetState(
             $widget,
-            $attributeStaticBag
+            $attributeStaticBag,
+            $childWidgetStates
         );
     }
 
@@ -138,22 +134,8 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function hasLabel($label)
+    public function isRenderable()
     {
-        return array_key_exists($label, $this->labels) && $this->labels[$label] === true;
+        return true;
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    ) {
-//        $this->attributeBagModel->validateStaticExpressionBag(
-//            $validationContext,
-//            $expressionBagNode,
-//            'attributes for core "' . $this->name . '" widget'
-//        );
-//    }
 }

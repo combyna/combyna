@@ -37,7 +37,7 @@ class TextWidget implements TextWidgetInterface
     private $bagFactory;
 
     /**
-     * @var int
+     * @var string|int
      */
     private $name;
 
@@ -68,7 +68,7 @@ class TextWidget implements TextWidgetInterface
 
     /**
      * @param WidgetInterface $parentWidget
-     * @param int $name
+     * @param string|int $name
      * @param ExpressionInterface $textExpression
      * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory
@@ -104,18 +104,11 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
-    ) {
+    public function createInitialState(UiEvaluationContextInterface $evaluationContext)
+    {
         $textStatic = $this->textExpression->toStatic($evaluationContext);
 
-        return $this->uiStateFactory->createTextWidgetState(
-            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-            $textStatic
-        );
+        return $this->uiStateFactory->createTextWidgetState($this, $textStatic->toNative());
     }
 
     /**
@@ -178,21 +171,11 @@ class TextWidget implements TextWidgetInterface
         return false; // TODO
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    ) {
-//        $textStatic = $this->textExpression->toStatic($evaluationContext);
-//
-//        return $this->uiStateFactory->createRenderedCoreWidget(
-//            $parentRenderedWidget,
-//            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-//        );
-//    }
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return true; // TextWidgets cannot be resolved further, so they are always renderable
+    }
 }
