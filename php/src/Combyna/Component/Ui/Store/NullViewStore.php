@@ -14,7 +14,6 @@ namespace Combyna\Component\Ui\Store;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Signal\SignalInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
@@ -89,7 +88,7 @@ class NullViewStore implements NullViewStoreInterface
     public function makeQuery(
         $name,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     ) {
         throw new InvalidArgumentException(sprintf(

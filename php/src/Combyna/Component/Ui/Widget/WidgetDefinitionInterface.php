@@ -13,7 +13,7 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
@@ -47,14 +47,14 @@ interface WidgetDefinitionInterface
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @return DefinedWidgetStateInterface
      */
     public function createInitialState(
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates,
-        UiEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext
     );
 
     /**

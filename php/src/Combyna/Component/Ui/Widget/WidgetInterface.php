@@ -15,7 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
@@ -39,10 +39,10 @@ interface WidgetInterface
     /**
      * Creates an initial state for the widget
      *
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @return WidgetStateInterface
      */
-    public function createInitialState(UiEvaluationContextInterface $evaluationContext);
+    public function createInitialState(ViewEvaluationContextInterface $evaluationContext);
 
     /**
      * Dispatches an event

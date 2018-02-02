@@ -79,12 +79,12 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     /**
      * Creates a ViewEvaluationContext
      *
-     * @param UiEvaluationContextInterface $parentContext
+     * @param ViewEvaluationContextInterface $parentContext
      * @param StaticBagInterface|null $variableStaticBag
      * @return ViewEvaluationContextInterface
      */
     public function createViewEvaluationContext(
-        UiEvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag = null
     );
 

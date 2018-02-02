@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
@@ -18,7 +19,7 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface ViewEvaluationContextInterface extends UiEvaluationContextInterface
+interface ViewEvaluationContextInterface extends EvaluationContextInterface
 {
     /**
      * Creates a WidgetEvaluationContext

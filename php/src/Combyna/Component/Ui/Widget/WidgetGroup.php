@@ -16,7 +16,7 @@ use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
@@ -100,7 +100,7 @@ class WidgetGroup implements WidgetGroupInterface
      * {@inheritdoc}
      */
     public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext
     ) {
         $state = $this->uiStateFactory->createWidgetGroupState($this);
 

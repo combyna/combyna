@@ -129,7 +129,7 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
      * {@inheritdoc}
      */
     public function createViewEvaluationContext(
-        UiEvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag = null
     ) {
         return new ViewEvaluationContext($this, $parentContext, $variableStaticBag);

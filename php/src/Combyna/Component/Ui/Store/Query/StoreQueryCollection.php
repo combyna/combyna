@@ -12,7 +12,7 @@
 namespace Combyna\Component\Ui\Store\Query;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use InvalidArgumentException;
 
@@ -45,7 +45,7 @@ class StoreQueryCollection implements StoreQueryCollectionInterface
     public function makeQuery(
         $queryName,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         UiStoreStateInterface $storeState
     ) {
         if (!array_key_exists($queryName, $this->storeQueries)) {

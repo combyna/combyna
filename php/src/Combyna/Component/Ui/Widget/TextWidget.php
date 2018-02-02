@@ -17,7 +17,7 @@ use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use LogicException;
@@ -104,7 +104,7 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(UiEvaluationContextInterface $evaluationContext)
+    public function createInitialState(ViewEvaluationContextInterface $evaluationContext)
     {
         $textStatic = $this->textExpression->toStatic($evaluationContext);
 

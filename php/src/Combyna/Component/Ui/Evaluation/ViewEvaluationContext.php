@@ -29,7 +29,7 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
     protected $evaluationContextFactory;
 
     /**
-     * @var UiEvaluationContextInterface
+     * @var ViewEvaluationContextInterface
      */
     protected $parentContext;
 
@@ -40,12 +40,12 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
 
     /**
      * @param UiEvaluationContextFactory $evaluationContextFactory
-     * @param UiEvaluationContextInterface $parentContext
+     * @param ViewEvaluationContextInterface $parentContext
      * @param StaticBagInterface|null $variableStaticBag
      */
     public function __construct(
         UiEvaluationContextFactory $evaluationContextFactory,
-        UiEvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag = null
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);

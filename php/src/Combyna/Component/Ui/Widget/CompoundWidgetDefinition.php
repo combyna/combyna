@@ -15,7 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -114,7 +114,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates,
-        UiEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext
     ) {
         $rootWidgetState = $this->rootWidget->createInitialState($evaluationContext);
 

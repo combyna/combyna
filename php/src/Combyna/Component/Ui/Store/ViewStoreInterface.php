@@ -16,7 +16,6 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Signal\SignalInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 
@@ -70,14 +69,14 @@ interface ViewStoreInterface
      *
      * @param string $name
      * @param StaticBagInterface $argumentStaticBag
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @param ViewStoreStateInterface $viewStoreState
      * @return StaticInterface
      */
     public function makeQuery(
         $name,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     );
 }

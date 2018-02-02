@@ -20,7 +20,6 @@ use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
@@ -229,7 +228,7 @@ class PageView implements PageViewInterface
     public function makeStoreQuery(
         $queryName,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     ) {
         return $this->store->makeQuery(

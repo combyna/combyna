@@ -14,7 +14,7 @@ namespace Combyna\Component\Ui\Store\Query;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 
 /**
@@ -67,7 +67,7 @@ class StoreQuery implements StoreQueryInterface
      */
     public function make(
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         UiStoreStateInterface $storeState
     ) {
         $this->parameterStaticBagModel->assertValidStaticBag($argumentStaticBag);

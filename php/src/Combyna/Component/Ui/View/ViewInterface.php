@@ -13,7 +13,7 @@ namespace Combyna\Component\Ui\View;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
@@ -51,14 +51,14 @@ interface ViewInterface
      *
      * @param string $queryName
      * @param StaticBagInterface $argumentStaticBag
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @param ViewStoreStateInterface $viewStoreState
      * @return StaticInterface
      */
     public function makeStoreQuery(
         $queryName,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     );
 }
