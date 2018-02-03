@@ -13,8 +13,10 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
@@ -26,6 +28,18 @@ use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
  */
 interface WidgetInterface
 {
+    /**
+     * Creates a WidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return WidgetEvaluationContextInterface
+     */
+    public function createEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
+
     /**
      * Creates an event to dispatch for a rendered instance of this widget
      *
@@ -59,6 +73,15 @@ interface WidgetInterface
         EventInterface $event,
         WidgetEvaluationContextInterface $widgetEvaluationContext
     );
+
+    /**
+     * Evaluates and then returns the specified attribute of this widget
+     *
+     * @param string $attributeName
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext);
 
     /**
      * Fetches the unique name for the definition of this widget

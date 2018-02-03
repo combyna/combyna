@@ -1,4 +1,10 @@
 services:
+    combyna_core.renderer.html.child_reference_widget:
+        class: Combyna\Plugin\Core\Renderer\Html\WidgetRenderer\ChildReferenceWidgetRenderer
+        autowire: true
+        tags:
+            - {name: combyna.html_widget_renderer}
+
     combyna_core.renderer.html.text_widget:
         class: Combyna\Plugin\Core\Renderer\Html\WidgetRenderer\TextWidgetRenderer
         autowire: true

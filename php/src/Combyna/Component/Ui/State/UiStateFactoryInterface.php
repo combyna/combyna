@@ -15,6 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Ui\State\Store\NullViewStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\ViewStateInterface;
+use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\TextWidgetStateInterface;
@@ -22,6 +23,7 @@ use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
@@ -33,6 +35,18 @@ use Combyna\Component\Ui\Widget\WidgetGroupInterface;
  */
 interface UiStateFactoryInterface
 {
+    /**
+     * Creates a ChildReferenceWidgetState
+     *
+     * @param ChildReferenceWidgetInterface $widget
+     * @param WidgetStateInterface $childWidgetState
+     * @return ChildReferenceWidgetStateInterface
+     */
+    public function createChildReferenceWidgetState(
+        ChildReferenceWidgetInterface $widget,
+        WidgetStateInterface $childWidgetState
+    );
+
     /**
      * Creates a DefinedCompoundWidgetState
      *

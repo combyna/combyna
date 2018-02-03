@@ -23,13 +23,6 @@ use Combyna\Component\Trigger\Config\Act\TriggerNode;
 interface WidgetNodeInterface extends ActNodeInterface
 {
     /**
-     * Fetches the children of this widget, if any have been added
-     *
-     * @return WidgetNodeInterface[]
-     */
-    public function getChildWidgets();
-
-    /**
      * Fetches the name of the library this widget's definition should be fetched from
      *
      * @return string

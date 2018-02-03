@@ -287,4 +287,12 @@ class UiExpressionFactory implements UiExpressionFactoryInterface
     {
         return new ViewStoreQueryExpression($this, $queryName, $argumentExpressionBag);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createWidgetAttributeExpression($attributeName)
+    {
+        return new WidgetAttributeExpression($this, $attributeName);
+    }
 }

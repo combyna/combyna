@@ -29,6 +29,12 @@ services:
         tags:
             - {name: combyna.expression_promoter}
 
+    combyna.ui.promoter.widget_attribute_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\WidgetAttributeExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
     combyna.ui.promoter.widget_node:
         class: Combyna\Component\Ui\Config\Act\WidgetNodePromoter
         autowire: true

@@ -19,6 +19,7 @@ use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\View\ViewInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
+use LogicException;
 
 /**
  * Class RootViewEvaluationContext
@@ -110,7 +111,18 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
      */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
+        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidget($childName)
+    {
+        throw new LogicException(sprintf(
+            'Cannot fetch child "%s" from outside a compound widget',
+            $childName
+        ));
     }
 
     /**

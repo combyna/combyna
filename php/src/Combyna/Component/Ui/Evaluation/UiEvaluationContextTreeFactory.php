@@ -128,9 +128,6 @@ class UiEvaluationContextTreeFactory implements UiEvaluationContextTreeFactoryIn
             );
         }
 
-        return $this->evaluationContextFactory->createWidgetEvaluationContext(
-            $parentContext,
-            $widget
-        );
+        return $widget->createEvaluationContext($parentContext, $this->evaluationContextFactory);
     }
 }

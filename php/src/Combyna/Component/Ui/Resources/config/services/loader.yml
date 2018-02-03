@@ -27,6 +27,12 @@ services:
         class: Combyna\Component\Ui\Config\Loader\WidgetLoader
         autowire: true
 
+    combyna.ui.loader.widget_attribute_expression:
+        class: Combyna\Component\Ui\Config\Loader\Expression\WidgetAttributeExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
     combyna.ui.loader.widget_collection:
         class: Combyna\Component\Ui\Config\Loader\WidgetCollectionLoader
         autowire: true

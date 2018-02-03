@@ -33,6 +33,11 @@ $routeCollection->add('app_list', new Route('/', [
 
 // TODO: Fetch these from the directory list under example/,
 //       and fetch their titles etc. from the app configs themselves
+$routeCollection->add('bootstrap_kitchen_sink_app', new Route('/bootstrapKitchenSink', [
+    '_type' => 'app',
+    '_appName' => 'bootstrapKitchenSink',
+    '_appTitle' => 'Combyna Bootstrap plugin kitchen sink demo app'
+]));
 $routeCollection->add('simple_app', new Route('/simple', [
     '_type' => 'app',
     '_appName' => 'simple',
@@ -56,6 +61,7 @@ if ($parameters['_type'] === 'app_list') {
 
         <ul>
             <li><a href="/simple">Simple app</a></li>
+            <li><a href="/bootstrapKitchenSink">Combyna Bootstrap plugin kitchen sink demo app</a></li>
         </ul>
     </body>
 </html>

@@ -1,0 +1,34 @@
+name: Bootstrap plugin kitchen sink demo
+translations:
+    en: ~
+signals: ~
+navigators:
+    -
+        signal: ~
+        route: ~
+        attributes: ~
+home:
+    route: app.demo_home
+routes:
+    demo_home:
+        pattern: '/'
+        page_view: demo_page
+page_views:
+    demo_page:
+        attributes: ~
+        title: !expr 'Bootstrap plugin kitchen sink demo'
+        description: A demonstration of all widget definitions provided by the Bootstrap plugin
+        widget:
+            type: gui.box
+            attributes: ~
+            children:
+                contents:
+                    type: group
+                    children:
+                        -
+                            type: text
+                            text: !expr 'Bootstrap plugin widgets: '
+                        -
+                            type: bootstrap.breadcrumb
+                            attributes: ~
+        store: ~

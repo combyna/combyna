@@ -35,4 +35,12 @@ interface DefinedWidgetInterface extends WidgetInterface
      * @param StaticBagInterface $attributeStaticBag
      */
     public function assertValidAttributeStaticBag(StaticBagInterface $attributeStaticBag);
+
+    /**
+     * Fetches the specified named child widget of this one
+     *
+     * @param string $childName
+     * @return WidgetInterface
+     */
+    public function getChildWidget($childName);
 }

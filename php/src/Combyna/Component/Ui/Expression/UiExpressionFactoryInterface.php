@@ -41,4 +41,12 @@ interface UiExpressionFactoryInterface extends ExpressionFactoryInterface
      * @return ViewStoreQueryExpression
      */
     public function createViewStoreQueryExpression($queryName, ExpressionBagInterface $argumentExpressionBag);
+
+    /**
+     * Creates a WidgetAttributeExpression
+     *
+     * @param string $attributeName
+     * @return WidgetAttributeExpression
+     */
+    public function createWidgetAttributeExpression($attributeName);
 }

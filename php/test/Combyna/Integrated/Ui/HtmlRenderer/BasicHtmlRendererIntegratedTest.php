@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Integrated\Ui;
+namespace Combyna\Integrated\Ui\HtmlRenderer;
 
 use Combyna\CombynaBootstrap;
 use Combyna\Component\App\AppInterface;
@@ -20,11 +20,11 @@ use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Class HtmlRendererIntegratedTest
+ * Class BasicHtmlRendererIntegratedTest
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class HtmlRendererIntegratedTest extends TestCase
+class BasicHtmlRendererIntegratedTest extends TestCase
 {
     /**
      * @var AppInterface
@@ -64,23 +64,7 @@ class HtmlRendererIntegratedTest extends TestCase
         $this->combyna = $this->container->get('combyna');
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');
 
-        $this->environment = $this->combyna->createEnvironment([
-//            'libraries' => [
-//                [
-//                    'name' => 'gui',
-//                    'description' => 'GUI tools',
-//                    'widgets' => [
-//                        'button' => [
-//                            'type' => 'core',
-//                            'attributes' => [
-//                                'label' => 'text'
-//                            ],
-//                            'children' => []
-//                        ]
-//                    ]
-//                ]
-//            ]
-        ]);
+        $this->environment = $this->combyna->createEnvironment();
     }
 
     public function testRenderViewReturnsTheCorrectHtmlWhenAppHasNoLogic()

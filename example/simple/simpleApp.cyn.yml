@@ -35,9 +35,6 @@ page_views:
                     type: group
                     children:
                         -
-                            type: bootstrap.breadcrumb
-                            attributes: ~
-                        -
                             type: text
                             text: !expr 'Click one of the buttons to change the text: '
                         -

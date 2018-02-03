@@ -123,6 +123,16 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidgetAttribute($attributeName)
+    {
+        throw new LogicException(
+            'Attribute "' . $attributeName . '" cannot be fetched outside a compound widget definition'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
     {
         throw new LogicException('No active store - cannot make query with name "' . $queryName . '"');

@@ -19,18 +19,18 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class WidgetGroupNode
+ * Class ChildReferenceWidgetNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
+class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInterface
 {
-    const TYPE = 'widget-group';
+    const TYPE = 'child-reference-widget';
 
     /**
-     * @var WidgetNodeInterface[]
+     * @var string
      */
-    private $childWidgetNodes;
+    private $childName;
 
     /**
      * @var array
@@ -43,28 +43,28 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     private $visibilityExpressionNode;
 
     /**
-     * @param WidgetNodeInterface[] $childWidgetNodes
+     * @param string $childName
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
     public function __construct(
-        array $childWidgetNodes,
+        $childName,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
-        $this->childWidgetNodes = $childWidgetNodes;
+        $this->childName = $childName;
         $this->tags = $tags;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
     }
 
     /**
-     * Fetches the children of this widget, if any have been added
+     * Fetches the name of the compound widget child to reference
      *
-     * @return WidgetNodeInterface[]
+     * @return string
      */
-    public function getChildWidgets()
+    public function getChildName()
     {
-        return $this->childWidgetNodes;
+        return $this->childName;
     }
 
     /**
@@ -96,7 +96,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return 'group';
+        return 'child';
     }
 
     /**
@@ -106,20 +106,19 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     {
         $subValidationContext = $validationContext->createSubActNodeContext($this);
 
-        // Validate ourself
+        // FIXME
+        // Check that the compound widget we are inside actually has a child with this name
+//        $subValidationContext->assertCompoundWidgetHasChild($this->childName);
+
         if ($this->visibilityExpressionNode) {
             $this->visibilityExpressionNode->validate($subValidationContext);
 
+            // Make sure the visibility expression always evaluates to a boolean
             $subValidationContext->assertResultType(
                 $this->visibilityExpressionNode,
                 new StaticType(BooleanExpression::class),
                 'visibility'
             );
-        }
-
-        // Recursively validate any child widgets
-        foreach ($this->childWidgetNodes as $childWidgetNode) {
-            $childWidgetNode->validate($subValidationContext);
         }
     }
 }

@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\State\Widget;
 
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
-use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
@@ -29,12 +28,12 @@ class WidgetGroupState implements WidgetGroupStateInterface
     private $childWidgetStates = [];
 
     /**
-     * @var DefinedWidgetInterface
+     * @var WidgetGroupInterface
      */
     private $widgetGroup;
 
     /**
-     * @param DefinedWidgetInterface $widgetGroup
+     * @param WidgetGroupInterface $widgetGroup
      */
     public function __construct(
         WidgetGroupInterface $widgetGroup

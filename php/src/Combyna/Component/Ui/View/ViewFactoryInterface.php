@@ -14,8 +14,8 @@ namespace Combyna\Component\Ui\View;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Trigger\TriggerCollectionInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
@@ -29,6 +29,24 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface ViewFactoryInterface
 {
+    /**
+     * Creates a new compound widget child reference widget
+     *
+     * @param string $name
+     * @param string $childName
+     * @param WidgetInterface|null $parentWidget
+     * @param ExpressionInterface|null $visibilityExpression
+     * @param array $tags
+     * @return ChildReferenceWidgetInterface
+     */
+    public function createChildReferenceWidget(
+        $name,
+        $childName,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    );
+
     /**
      * Creates a new defined widget
      *

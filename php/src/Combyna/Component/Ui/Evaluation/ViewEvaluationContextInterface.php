@@ -12,6 +12,8 @@
 namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Store\Evaluation\StoreEvaluationContextInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
@@ -22,10 +24,27 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
 interface ViewEvaluationContextInterface extends EvaluationContextInterface
 {
     /**
+     * Creates a new StoreEvaluationContext as a child of the current one,
+     * with the specified store state available for slots etc.
+     *
+     * @param UiStoreStateInterface $storeState
+     * @return StoreEvaluationContextInterface
+     */
+    public function createSubStoreContext(UiStoreStateInterface $storeState);
+
+    /**
      * Creates a WidgetEvaluationContext
      *
      * @param WidgetInterface $widget
      * @return WidgetEvaluationContextInterface
      */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget);
+
+    /**
+     * Fetches the specified child of the current compound widget
+     *
+     * @param string $childName
+     * @return WidgetInterface
+     */
+    public function getChildWidget($childName);
 }

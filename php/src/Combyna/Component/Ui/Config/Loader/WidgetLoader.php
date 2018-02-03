@@ -16,6 +16,7 @@ use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Trigger\Config\Loader\TriggerLoaderInterface;
+use Combyna\Component\Ui\Config\Act\ChildReferenceWidgetNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
@@ -28,6 +29,7 @@ use InvalidArgumentException;
  */
 class WidgetLoader implements WidgetLoaderInterface
 {
+    const CHILD_REFERENCE_NAME = 'child';
     const GROUP_NAME = 'group';
     const TEXT_NAME = 'text';
 
@@ -98,6 +100,14 @@ class WidgetLoader implements WidgetLoaderInterface
         if ($type === self::TEXT_NAME) {
             return new TextWidgetNode(
                 $this->expressionLoader->load($widgetConfig['text']),
+                $visibilityExpressionNode,
+                $this->buildTagMap($tagNames)
+            );
+        }
+
+        if ($type === self::CHILD_REFERENCE_NAME) {
+            return new ChildReferenceWidgetNode(
+                $widgetConfig['name'],
                 $visibilityExpressionNode,
                 $this->buildTagMap($tagNames)
             );

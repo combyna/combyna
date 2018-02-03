@@ -101,7 +101,9 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Fetches the children of this widget, if any have been added
+     *
+     * @return WidgetNodeInterface[]
      */
     public function getChildWidgets()
     {

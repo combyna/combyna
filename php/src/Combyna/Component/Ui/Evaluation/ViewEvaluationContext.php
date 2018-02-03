@@ -74,7 +74,15 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
      */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
+        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidget($childName)
+    {
+        return $this->parentContext->getChildWidget($childName);
     }
 
     /**

@@ -49,7 +49,11 @@ class WidgetStatePath implements WidgetStatePathInterface
     {
         $state = $this->getEndState();
 
-        if (!$state instanceof DefinedWidgetStateInterface && !$state instanceof WidgetGroupStateInterface) {
+        if (
+            !$state instanceof DefinedWidgetStateInterface &&
+            !$state instanceof WidgetGroupStateInterface &&
+            !$state instanceof ChildReferenceWidgetStateInterface
+        ) {
             throw new LogicException('Widget does not support children');
         }
 

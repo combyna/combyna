@@ -54,8 +54,8 @@ class EnvironmentNodePromoter
         $libraries = $environmentNode->getLibraries();
 
         // Sort the libraries so that any that are depended on are loaded before their dependencies
-        if (function_exists('usort')) { // FIXME: Implement usort(...) in Uniter
-            usort($libraries, function (LibraryNode $libraryA, LibraryNode $libraryB) {
+        if (function_exists('uasort')) { // FIXME: Implement uasort(...) in Uniter
+            uasort($libraries, function (LibraryNode $libraryA, LibraryNode $libraryB) {
                 return $libraryB->referencesLibrary($libraryA->getName()) ? 1 : -1;
             });
         }

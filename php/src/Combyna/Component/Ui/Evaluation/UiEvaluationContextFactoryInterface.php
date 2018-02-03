@@ -21,7 +21,8 @@ use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
 use Combyna\Component\Ui\Store\Evaluation\ViewStoreEvaluationContextInterface;
 use Combyna\Component\Ui\View\ViewInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
+use Combyna\Component\Ui\Widget\CoreWidgetInterface;
+use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 
 /**
  * Interface UiEvaluationContextFactoryInterface
@@ -30,6 +31,30 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryInterface
 {
+    /**
+     * Creates a CoreWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param CoreWidgetInterface $widget
+     * @return CoreWidgetEvaluationContextInterface
+     */
+    public function createCoreWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        CoreWidgetInterface $widget
+    );
+
+    /**
+     * Creates a DefinedWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param DefinedWidgetInterface $widget
+     * @return DefinedWidgetEvaluationContextInterface
+     */
+    public function createDefinedWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget
+    );
+
     /**
      * Creates a ViewEvaluationContext from a PageViewState
      *
@@ -86,17 +111,5 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     public function createViewEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag = null
-    );
-
-    /**
-     * Creates a WidgetEvaluationContext
-     *
-     * @param ViewEvaluationContextInterface $parentContext
-     * @param WidgetInterface $widget
-     * @return WidgetEvaluationContextInterface
-     */
-    public function createWidgetEvaluationContext(
-        ViewEvaluationContextInterface $parentContext,
-        WidgetInterface $widget
     );
 }

@@ -15,6 +15,7 @@ use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -55,14 +56,6 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
         $this->tags = $tags;
         $this->textExpressionNode = $textExpressionNode;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChildWidgets()
-    {
-        return []; // Text widgets cannot have any children
     }
 
     /**
@@ -116,10 +109,18 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
 
         $this->textExpressionNode->validate($subValidationContext);
 
+        // Make sure the text expression always evaluates to some text
+        $subValidationContext->assertResultType(
+            $this->textExpressionNode,
+            new StaticType(TextExpression::class),
+            'text'
+        );
+
         // Validate ourself
         if ($this->visibilityExpressionNode) {
             $this->visibilityExpressionNode->validate($subValidationContext);
 
+            // Make sure the visibility expression always evaluates to a boolean
             $subValidationContext->assertResultType(
                 $this->visibilityExpressionNode,
                 new StaticType(BooleanExpression::class),

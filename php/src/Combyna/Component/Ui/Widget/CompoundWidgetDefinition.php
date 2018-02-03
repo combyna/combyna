@@ -116,7 +116,12 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         array $childWidgetStates,
         ViewEvaluationContextInterface $evaluationContext
     ) {
-        $rootWidgetState = $this->rootWidget->createInitialState($evaluationContext);
+        // Create a sub-evaluation context for the compound widget itself,
+        // so that its attributes may be fetched by expressions inside the root widget's structure
+        $compoundDefinitionRootWidgetSubEvaluationContext = $evaluationContext->createSubWidgetEvaluationContext(
+            $widget
+        );
+        $rootWidgetState = $this->rootWidget->createInitialState($compoundDefinitionRootWidgetSubEvaluationContext);
 
         return $this->uiStateFactory->createDefinedCompoundWidgetState(
             $widget,

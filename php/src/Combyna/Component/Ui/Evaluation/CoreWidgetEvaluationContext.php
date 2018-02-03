@@ -15,14 +15,15 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Widget\CoreWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
- * Class WidgetEvaluationContext
+ * Class CoreWidgetEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetEvaluationContext extends AbstractEvaluationContext implements WidgetEvaluationContextInterface
+class CoreWidgetEvaluationContext extends AbstractEvaluationContext implements CoreWidgetEvaluationContextInterface
 {
     /**
      * @var UiEvaluationContextFactoryInterface
@@ -35,19 +36,19 @@ class WidgetEvaluationContext extends AbstractEvaluationContext implements Widge
     protected $parentContext;
 
     /**
-     * @var WidgetInterface
+     * @var CoreWidgetInterface
      */
     private $widget;
 
     /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @param ViewEvaluationContextInterface $parentContext
-     * @param WidgetInterface $widget
+     * @param CoreWidgetInterface $widget
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewEvaluationContextInterface $parentContext,
-        WidgetInterface $widget
+        CoreWidgetInterface $widget
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
@@ -105,6 +106,14 @@ class WidgetEvaluationContext extends AbstractEvaluationContext implements Widge
     /**
      * {@inheritdoc}
      */
+    public function getChildWidget($childName)
+    {
+        return $this->parentContext->getChildWidget($childName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getVariable($variableName)
     {
         return $this->parentContext->getVariable($variableName);
@@ -121,9 +130,17 @@ class WidgetEvaluationContext extends AbstractEvaluationContext implements Widge
     /**
      * {@inheritdoc}
      */
+    public function getWidgetAttribute($attributeName)
+    {
+        return $this->widget->getAttribute($attributeName, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
+        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
     }
 
     /**

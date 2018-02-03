@@ -17,6 +17,7 @@ use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
@@ -96,6 +97,19 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function createEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+            $parentContext,
+            $this
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
     {
         throw new LogicException('TextWidgets cannot handle events');
@@ -121,6 +135,17 @@ class TextWidget implements TextWidgetInterface
         WidgetEvaluationContextInterface $widgetEvaluationContext
     ) {
         throw new LogicException('TextWidgets cannot handle events');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
+    {
+        throw new LogicException(sprintf(
+            'TextWidgets cannot have attributes, so attribute "%s" cannot be fetched',
+            $attributeName
+        ));
     }
 
     /**
@@ -168,7 +193,7 @@ class TextWidget implements TextWidgetInterface
      */
     public function hasTag($tag)
     {
-        return false; // TODO
+        return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
     }
 
     /**

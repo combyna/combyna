@@ -14,9 +14,9 @@ namespace Combyna\Component\Ui\Store\Evaluation;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
-use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
+use LogicException;
 
 /**
  * Class ViewStoreEvaluationContext
@@ -53,6 +53,15 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     /**
      * {@inheritdoc}
      */
+    public function getChildWidget($childName)
+    {
+        // TODO: Restructure interfaces so that this method stub is not needed here
+        throw new LogicException('View stores cannot define child widgets');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStoreSlotStatic($name)
     {
         return $this->viewStoreState->getSlotStatic($name);
@@ -67,13 +76,10 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     }
 
     /**
-     * Creates a WidgetEvaluationContext
-     *
-     * @param WidgetInterface $widget
-     * @return WidgetEvaluationContextInterface
+     * {@inheritdoc}
      */
     public function createSubWidgetEvaluationContext(WidgetInterface $widget)
     {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
+        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
     }
 }

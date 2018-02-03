@@ -16,6 +16,7 @@ use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNodePromoter;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
@@ -91,11 +92,38 @@ class WidgetNodePromoter
         } elseif ($widgetNode instanceof DefinedWidgetNode) {
             /** @var DefinedWidgetNode $widgetNode */
             $widget = $this->promoteDefinedWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
+        } elseif ($widgetNode instanceof ChildReferenceWidgetNode) {
+            /** @var ChildReferenceWidgetNode $widgetNode */
+            $widget = $this->promoteChildReferenceWidgetNode($name, $widgetNode, $parentWidget);
         } else {
             throw new InvalidArgumentException('Unsupported widget type given');
         }
 
         return $widget;
+    }
+
+    /**
+     * Promotes a ChildReferenceWidgetNode to the referenced child widget
+     *
+     * @param string $name
+     * @param ChildReferenceWidgetNode $childReferenceWidgetNode
+     * @param WidgetInterface|null $parentWidget
+     * @return ChildReferenceWidgetInterface
+     */
+    private function promoteChildReferenceWidgetNode(
+        $name,
+        ChildReferenceWidgetNode $childReferenceWidgetNode,
+        WidgetInterface $parentWidget = null
+    ) {
+        return $this->viewFactory->createChildReferenceWidget(
+            $name,
+            $childReferenceWidgetNode->getChildName(),
+            $parentWidget,
+            $childReferenceWidgetNode->getVisibilityExpression() ?
+                $this->expressionNodePromoter->promote($childReferenceWidgetNode->getVisibilityExpression()) :
+                null,
+            $childReferenceWidgetNode->getTags()
+        );
     }
 
     /**

@@ -16,6 +16,7 @@ use Combyna\Component\Ui\State\Store\NullViewStoreState;
 use Combyna\Component\Ui\State\Store\ViewStoreState;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewState;
+use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetState;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetState;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetState;
 use Combyna\Component\Ui\State\Widget\TextWidgetState;
@@ -23,6 +24,7 @@ use Combyna\Component\Ui\State\Widget\WidgetGroupState;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePath;
 use Combyna\Component\Ui\View\PageViewInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
@@ -34,6 +36,16 @@ use Combyna\Component\Ui\Widget\WidgetGroupInterface;
  */
 class UiStateFactory implements UiStateFactoryInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function createChildReferenceWidgetState(
+        ChildReferenceWidgetInterface $widget,
+        WidgetStateInterface $childWidgetState
+    ) {
+        return new ChildReferenceWidgetState($widget, $childWidgetState);
+    }
+
     /**
      * {@inheritdoc}
      */

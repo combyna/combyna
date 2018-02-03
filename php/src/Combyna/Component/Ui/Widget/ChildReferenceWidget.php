@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
@@ -23,18 +24,23 @@ use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use LogicException;
 
 /**
- * Class WidgetGroup
+ * Class ChildReferenceWidget
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetGroup implements WidgetGroupInterface
+class ChildReferenceWidget implements ChildReferenceWidgetInterface
 {
-    const DEFINITION = 'widget-group';
+    const DEFINITION = 'child';
 
     /**
-     * @var WidgetInterface[]
+     * @var BagFactoryInterface
      */
-    private $childWidgets = [];
+    private $bagFactory;
+
+    /**
+     * @var string
+     */
+    private $childName;
 
     /**
      * @var string|int
@@ -42,7 +48,7 @@ class WidgetGroup implements WidgetGroupInterface
     private $name;
 
     /**
-     * @var WidgetInterface|null
+     * @var WidgetInterface
      */
     private $parentWidget;
 
@@ -62,32 +68,30 @@ class WidgetGroup implements WidgetGroupInterface
     private $visibilityExpression;
 
     /**
-     * @param UiStateFactoryInterface $uiStateFactory
+     * @param WidgetInterface $parentWidget
      * @param string|int $name
-     * @param WidgetInterface|null $parentWidget
+     * @param string $childName
+     * @param BagFactoryInterface $bagFactory
+     * @param UiStateFactoryInterface $uiStateFactory
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
     public function __construct(
-        UiStateFactoryInterface $uiStateFactory,
+        WidgetInterface $parentWidget,
         $name,
-        WidgetInterface $parentWidget = null,
+        $childName,
+        BagFactoryInterface $bagFactory,
+        UiStateFactoryInterface $uiStateFactory,
         ExpressionInterface $visibilityExpression = null,
-        array $tags
+        array $tags = []
     ) {
+        $this->bagFactory = $bagFactory;
+        $this->childName = $childName;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChildWidget(WidgetInterface $childWidget)
-    {
-        $this->childWidgets[$childWidget->getName()] = $childWidget;
     }
 
     /**
@@ -108,22 +112,20 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
     {
-        throw new \Exception('Not implemented');
+        throw new LogicException('ChildReferenceWidgets cannot handle events');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(
-        ViewEvaluationContextInterface $evaluationContext
-    ) {
-        $state = $this->uiStateFactory->createWidgetGroupState($this);
+    public function createInitialState(ViewEvaluationContextInterface $evaluationContext)
+    {
+        $childWidget = $evaluationContext->getChildWidget($this->childName);
 
-        foreach ($this->childWidgets as $childWidget) {
-            $state->addChild($childWidget->getName(), $childWidget->createInitialState($evaluationContext));
-        }
-
-        return $state;
+        return $this->uiStateFactory->createChildReferenceWidgetState(
+            $this,
+            $childWidget->createInitialState($evaluationContext)
+        );
     }
 
     /**
@@ -135,7 +137,7 @@ class WidgetGroup implements WidgetGroupInterface
         EventInterface $event,
         WidgetEvaluationContextInterface $widgetEvaluationContext
     ) {
-        throw new \Exception('Not implemented');
+        throw new LogicException('ChildReferenceWidgets cannot handle events');
     }
 
     /**
@@ -144,9 +146,17 @@ class WidgetGroup implements WidgetGroupInterface
     public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
     {
         throw new LogicException(sprintf(
-            'WidgetGroups cannot have attributes, so attribute "%s" cannot be fetched',
+            'ChildReferenceWidgets cannot have attributes, so attribute "%s" cannot be fetched',
             $attributeName
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildName()
+    {
+        return $this->childName;
     }
 
     /**
@@ -170,14 +180,7 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function getDescendantByPath(array $names)
     {
-        $childName = array_shift($names);
-        $child = $this->childWidgets[$childName];
-
-        if (count($names) === 0) {
-            return $child;
-        }
-
-        return $child->getDescendantByPath($names);
+        throw new LogicException('ChildReferenceWidgets cannot have descendants');
     }
 
     /**
@@ -193,11 +196,7 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function getPath()
     {
-        $prefix = ($this->parentWidget !== null) ?
-            $this->parentWidget->getPath() :
-            [];
-
-        return array_merge($prefix, [$this->name]);
+        return array_merge($this->parentWidget->getPath(), [$this->name]);
     }
 
     /**
@@ -213,6 +212,6 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function isRenderable()
     {
-        return true; // Widget groups have a renderer
+        return true; // ChildReferenceWidgets cannot be resolved further, so they are always renderable
     }
 }

@@ -18,6 +18,7 @@ use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Trigger\TriggerCollectionInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
@@ -124,6 +125,19 @@ class DefinedWidget implements DefinedWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function createEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        return $evaluationContextFactory->createDefinedWidgetEvaluationContext(
+            $parentContext,
+            $this
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
     {
         return $this->definition->createEvent($libraryName, $eventName, $payloadStaticBag);
@@ -176,6 +190,22 @@ class DefinedWidget implements DefinedWidgetInterface
         }
 
         return $programState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
+    {
+        return $this->attributeExpressions->getExpression($attributeName)->toStatic($evaluationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidget($childName)
+    {
+        return $this->childWidgets[$childName];
     }
 
     /**

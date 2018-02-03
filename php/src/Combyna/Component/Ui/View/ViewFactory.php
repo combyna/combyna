@@ -19,6 +19,7 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidget;
 use Combyna\Component\Ui\Widget\DefinedWidget;
 use Combyna\Component\Ui\Widget\TextWidget;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
@@ -68,6 +69,27 @@ class ViewFactory implements ViewFactoryInterface
         $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
         $this->uiEvaluationContextTreeFactory = $uiEvaluationContextTreeFactory;
         $this->uiStateFactory = $uiStateFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createChildReferenceWidget(
+        $name,
+        $childName,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    ) {
+        return new ChildReferenceWidget(
+            $parentWidget,
+            $name,
+            $childName,
+            $this->bagFactory,
+            $this->uiStateFactory,
+            $visibilityExpression,
+            $tags
+        );
     }
 
     /**
