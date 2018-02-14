@@ -57,6 +57,7 @@
     "build:release:client": "mkdir -p dist && cd dist && browserify ../js/client --outfile ./client.js",
     "build:debug:client": "mkdir -p dist && cd dist && browserify --debug ../js/client --outfile ./client.js",
     "server:node": "dotphp php/server.php",
-    "server:zend": "php php/server.php"
+    "server:zend": "php php/server.php",
+    "dev:watch": "webpack --watch --devtool source-map"
   }
 }
