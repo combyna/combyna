@@ -1,8 +1,0 @@
-name: bootstrap
-description: Bootstrap wrapper
-widgets:
-    breadcrumb:
-        type: primitive
-        attributes: ~
-        children: ~
-        events: ~

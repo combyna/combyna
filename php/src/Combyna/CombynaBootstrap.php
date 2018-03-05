@@ -93,8 +93,7 @@ class CombynaBootstrap
                     new ValidatorComponent(),
 
                     // Plugins
-                    new CorePlugin(),
-                    new GuiPlugin()
+                    new CorePlugin()
                 ],
                 $this->plugins
             )

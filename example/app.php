@@ -73,9 +73,7 @@ $appName = $parameters['_appName'];
 $appTitle = $parameters['_appTitle'];
 $appPath = __DIR__ . '/' . $appName;
 
-$combynaBootstrap = new CombynaBootstrap([
-    new BootstrapPlugin()
-]);
+$combynaBootstrap = new CombynaBootstrap();
 $container = $combynaBootstrap->getContainer(false);
 /** @var Combyna $combyna */
 $combyna = $container->get('combyna');
