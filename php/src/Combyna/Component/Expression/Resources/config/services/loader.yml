@@ -60,6 +60,12 @@ services:
         tags:
             - {name: combyna.expression_loader}
 
+    combyna.expression.loader.map:
+        class: Combyna\Component\Expression\Config\Loader\MapExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.number_conversion:
         class: Combyna\Component\Expression\Config\Loader\NumberConversionExpressionLoader
         autowire: true
