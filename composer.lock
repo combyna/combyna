@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6d38f058cfe94df87d1d9b5da4dc9654",
+    "content-hash": "5971323e666e4e12cb073457ea4faf19",
     "packages": [
         {
             "name": "combyna/php-peg",
@@ -755,19 +755,19 @@
     "packages-dev": [
         {
             "name": "combyna/gui-plugin",
-            "version": "v2.1.0",
+            "version": "v2.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/combyna/gui-plugin.git",
-                "reference": "7e2b96e4e2c5812d66ff735966145025c89933c4"
+                "reference": "80b66d1917fbf4f240015db9cff1b85a9d8e0f98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/7e2b96e4e2c5812d66ff735966145025c89933c4",
-                "reference": "7e2b96e4e2c5812d66ff735966145025c89933c4",
+                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/80b66d1917fbf4f240015db9cff1b85a9d8e0f98",
+                "reference": "80b66d1917fbf4f240015db9cff1b85a9d8e0f98",
                 "shasum": ""
             },
-            "require": {
+            "require-dev": {
                 "combyna/combyna": "dev-rush"
             },
             "type": "library",
@@ -778,7 +778,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "A plugin for Combyna that provides basic GUI components",
-            "time": "2018-08-29T22:51:50+00:00"
+            "time": "2018-08-29T23:03:05+00:00"
         },
         {
             "name": "doctrine/instantiator",
