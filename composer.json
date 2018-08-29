@@ -26,6 +26,11 @@
         "server": "php ./php/src/server.php",
         "simple-server": "php -S localhost:9000 example/app.php"
     },
+    "config": {
+        "platform": {
+            "php": "5.5.38"
+        }
+    },
     "license": "MIT",
     "authors": [
         {
