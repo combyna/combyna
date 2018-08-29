@@ -7,16 +7,17 @@
         }
     },
     "require": {
-        "symfony/event-dispatcher": "^2.8",
-        "symfony/http-foundation": "^2.8",
-        "symfony/yaml": "^2.8",
+        "symfony/event-dispatcher": "2.8.20",
+        "symfony/http-foundation": "2.8.20",
+        "symfony/yaml": "2.8.20",
         "combyna/php-peg": "^2.0",
-        "symfony/dependency-injection": "^2.8",
-        "symfony/config": "^2.8",
-        "symfony/routing": "^2.8",
-        "symfony/translation": "^2.8"
+        "symfony/dependency-injection": "2.8.20",
+        "symfony/config": "2.8.20",
+        "symfony/routing": "2.8.20",
+        "symfony/translation": "2.8.20"
     },
     "require-dev": {
+        "combyna/gui-plugin": "dev-master",
         "phpunit/phpunit": "^4.6",
         "elliotchance/concise": "^2.1"
     },
