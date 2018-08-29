@@ -84,10 +84,10 @@ class BagNodePromoter
     /**
      * Promotes a FixedStaticBagModelNode to a FixedStaticBagModel
      *
-     * @param FixedStaticBagModelNode $modelNode
+     * @param FixedStaticBagModelNodeInterface $modelNode
      * @return FixedStaticBagModelInterface
      */
-    public function promoteFixedStaticBagModel(FixedStaticBagModelNode $modelNode)
+    public function promoteFixedStaticBagModel(FixedStaticBagModelNodeInterface $modelNode)
     {
         $staticDefinitions = [];
 
@@ -101,10 +101,10 @@ class BagNodePromoter
     /**
      * Promotes a FixedStaticDefinitionNode to a FixedStaticDefinition
      *
-     * @param FixedStaticDefinitionNode $definitionNode
+     * @param FixedStaticDefinitionNodeInterface $definitionNode
      * @return FixedStaticDefinition
      */
-    public function promoteFixedStaticDefinition(FixedStaticDefinitionNode $definitionNode)
+    public function promoteFixedStaticDefinition(FixedStaticDefinitionNodeInterface $definitionNode)
     {
         // Allow the static to specify a default value
         $defaultExpression = $definitionNode->getDefaultExpression() ?

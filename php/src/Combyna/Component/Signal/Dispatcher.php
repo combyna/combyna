@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 
 /**
  * Class Dispatcher

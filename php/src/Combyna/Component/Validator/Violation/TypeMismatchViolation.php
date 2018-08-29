@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Validator\Violation;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\ViolationInterface;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Context\SubValidationContextInterface;
+use Combyna\Component\Validator\ViolationInterface;
 
 /**
  * Class TypeMismatchViolation
@@ -41,26 +41,26 @@ class TypeMismatchViolation implements ViolationInterface
     private $expectedType;
 
     /**
-     * @var ValidationContextInterface
+     * @var SubValidationContextInterface
      */
-    private $validationContext;
+    private $subValidationContext;
 
     /**
      * @param TypeInterface $expectedType
      * @param TypeInterface $actualType
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $subValidationContext
      * @param string $contextDescription
      */
     public function __construct(
         TypeInterface $expectedType,
         TypeInterface $actualType,
-        ValidationContextInterface $validationContext,
+        SubValidationContextInterface $subValidationContext,
         $contextDescription
     ) {
         $this->actualType = $actualType;
         $this->contextDescription = $contextDescription;
         $this->expectedType = $expectedType;
-        $this->validationContext = $validationContext;
+        $this->subValidationContext = $subValidationContext;
     }
 
     /**
@@ -80,6 +80,6 @@ class TypeMismatchViolation implements ViolationInterface
      */
     public function getPath()
     {
-        return $this->validationContext->getPath();
+        return $this->subValidationContext->getPath();
     }
 }

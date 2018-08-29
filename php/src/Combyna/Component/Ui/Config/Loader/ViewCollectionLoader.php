@@ -12,7 +12,6 @@
 namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-use Combyna\Component\Ui\Config\Act\ViewCollectionNode;
 
 /**
  * Class ViewCollectionLoader

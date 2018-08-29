@@ -12,7 +12,6 @@
 namespace Combyna\Component\Expression;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\Evaluation\Request\VariableStaticRequest;
 
 /**
  * Class VariableExpression

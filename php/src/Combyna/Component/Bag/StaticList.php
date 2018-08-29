@@ -15,10 +15,8 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
-use LogicException;
 use OutOfBoundsException;
 
 /**
@@ -55,7 +53,7 @@ class StaticList implements StaticListInterface
         StaticExpressionFactoryInterface $staticExpressionFactory,
         array $statics
     ) {
-        $this->validateStatics($statics);
+        $this->assertValidStatics($statics);
 
         $this->bagFactory = $bagFactory;
         $this->staticExpressionFactory = $staticExpressionFactory;
@@ -113,31 +111,6 @@ class StaticList implements StaticListInterface
         }
 
         return $this->statics[$index];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getElementType(ValidationContextInterface $validationContext)
-    {
-        /** @var TypeInterface|null $combinedType */
-        $combinedType = null;
-
-        if (count($this->statics) === 0) {
-            throw new LogicException('Static list has no elements - unable to determine an element type');
-        }
-
-        foreach ($this->statics as $static) {
-            $type = $static->getResultType($validationContext);
-
-            if ($combinedType === null) {
-                $combinedType = $type;
-            } else {
-                $combinedType = $combinedType->mergeWith($type);
-            }
-        }
-
-        return $combinedType;
     }
 
     /**
@@ -207,7 +180,7 @@ class StaticList implements StaticListInterface
      *
      * @param StaticInterface[] $statics
      */
-    private function validateStatics(array $statics)
+    private function assertValidStatics(array $statics)
     {
         foreach ($statics as $name => $static) {
             if (!$static instanceof StaticInterface) {

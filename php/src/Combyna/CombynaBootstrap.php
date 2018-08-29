@@ -13,6 +13,7 @@ namespace Combyna;
 
 use Combyna\Component\App\AppComponent;
 use Combyna\Component\Bag\BagComponent;
+use Combyna\Component\Behaviour\BehaviourComponent;
 use Combyna\Component\Config\ConfigComponent;
 use Combyna\Component\Environment\EnvironmentComponent;
 use Combyna\Component\Event\EventComponent;
@@ -32,9 +33,7 @@ use Combyna\Component\Trigger\TriggerComponent;
 use Combyna\Component\Type\TypeComponent;
 use Combyna\Component\Ui\UiComponent;
 use Combyna\Component\Validator\ValidatorComponent;
-use Combyna\Container\CompiledCombynaContainer;
 use Combyna\Plugin\Core\CorePlugin;
-use Combyna\Plugin\Gui\GuiPlugin;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -48,16 +47,68 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 class CombynaBootstrap
 {
     /**
+     * @var string
+     */
+    private $compiledContainerClass;
+
+    /**
+     * @var string
+     */
+    private $compiledContainerNamespace;
+
+    /**
+     * @var string
+     */
+    private $compiledContainerPath;
+
+    /**
      * @var PluginInterface[]
      */
     private $plugins;
 
     /**
      * @param PluginInterface[] $plugins
+     * @param string|null $compiledContainerPath
+     * @param string $compiledContainerNamespace
+     * @param string $compiledContainerClass
      */
-    public function __construct(array $plugins = [])
-    {
+    public function __construct(
+        array $plugins = [],
+        $compiledContainerPath = null,
+        $compiledContainerNamespace = 'Combyna\Container',
+        $compiledContainerClass = 'CompiledCombynaContainer'
+    ) {
+        $this->compiledContainerClass = $compiledContainerClass;
+        $this->compiledContainerNamespace = $compiledContainerNamespace;
+        $this->compiledContainerPath = $compiledContainerPath !== null ?
+            $compiledContainerPath :
+            __DIR__ . '/../../dist/Combyna/Container/CompiledCombynaContainer.php';
         $this->plugins = $plugins;
+    }
+
+    /**
+     * Allows the compiled Symfony DI container to be customised
+     *
+     * @param string|null $compiledContainerPath
+     * @param string|null $compiledContainerNamespace
+     * @param string $compiledContainerClass
+     */
+    public function configureContainer(
+        $compiledContainerPath = null,
+        $compiledContainerNamespace = null,
+        $compiledContainerClass = null
+    ) {
+        if ($compiledContainerClass !== null) {
+            $this->compiledContainerClass = $compiledContainerClass;
+        }
+
+        if ($compiledContainerNamespace !== null) {
+            $this->compiledContainerNamespace = $compiledContainerNamespace;
+        }
+
+        if ($compiledContainerPath !== null) {
+            $this->compiledContainerPath = $compiledContainerPath;
+        }
     }
 
     /**
@@ -74,6 +125,7 @@ class CombynaBootstrap
                     // Components
                     new AppComponent(),
                     new BagComponent(),
+                    new BehaviourComponent(),
                     new ConfigComponent(),
                     new EventComponent(),
                     new FrameworkComponent(),
@@ -99,9 +151,7 @@ class CombynaBootstrap
             )
         );
 
-        $file = __DIR__ . '/../../dist/Combyna/Container/CompiledCombynaContainer.php';
-
-        $containerConfigCache = new ConfigCache($file, $isDebug);
+        $containerConfigCache = new ConfigCache($this->compiledContainerPath, $isDebug);
 
         if (!$containerConfigCache->isFresh()) {
             $containerBuilder = new ContainerBuilder();
@@ -111,14 +161,19 @@ class CombynaBootstrap
             $dumper = new PhpDumper($containerBuilder);
             $containerConfigCache->write(
                 $dumper->dump([
-                    'namespace' => 'Combyna\Container',
-                    'class' => 'CompiledCombynaContainer'
+                    'namespace' => $this->compiledContainerNamespace,
+                    'class' => $this->compiledContainerClass
                 ]),
                 $containerBuilder->getResources()
             );
         }
 
-        $container = new CompiledCombynaContainer();
+        // Explicitly fetch the compiled container class module
+        // rather than relying on the autoloader being configured correctly
+        require_once $this->compiledContainerPath;
+
+        $containerFqcn = $this->compiledContainerNamespace . '\\' . $this->compiledContainerClass;
+        $container = new $containerFqcn();
 
         $runtime->boot($container);
 

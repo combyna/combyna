@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
-use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 
 /**

@@ -11,9 +11,10 @@
 
 namespace Combyna\Component\Ui\Store\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Store\Validation\Constraint\ViewStoreHasSlotConstraint;
 
 /**
  * Class SetViewStoreSlotInstructionNode
@@ -45,6 +46,16 @@ class SetViewStoreSlotInstructionNode extends AbstractActNode implements ViewSto
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addConstraint(new ViewStoreHasSlotConstraint($this->slotName));
+
+        $specBuilder->addChildNode($this->valueExpressionNode);
+    }
+
+    /**
      * Fetches the name of the slot in the view store that this instruction will update
      *
      * @return string
@@ -62,17 +73,5 @@ class SetViewStoreSlotInstructionNode extends AbstractActNode implements ViewSto
     public function getValueExpression()
     {
         return $this->valueExpressionNode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $subValidationContext->assertValidStoreSlot($this->slotName);
-
-        $this->valueExpressionNode->validate($subValidationContext);
     }
 }

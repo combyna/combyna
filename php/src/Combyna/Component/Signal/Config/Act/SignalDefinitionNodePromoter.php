@@ -12,11 +12,8 @@
 namespace Combyna\Component\Signal\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
-use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Signal\SignalDefinitionCollectionInterface;
 use Combyna\Component\Signal\SignalFactoryInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class SignalDefinitionNodePromoter

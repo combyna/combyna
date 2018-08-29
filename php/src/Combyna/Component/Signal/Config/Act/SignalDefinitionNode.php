@@ -12,16 +12,19 @@
 namespace Combyna\Component\Signal\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class SignalDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class SignalDefinitionNode extends AbstractActNode
+class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNodeInterface
 {
+    const TYPE = 'signal-definition';
+
     /**
      * @var FixedStaticBagModelNode
      */
@@ -43,13 +46,37 @@ class SignalDefinitionNode extends AbstractActNode
     }
 
     /**
-     * Fetches the model for the static bag of payload data the signal expects
-     *
-     * @return FixedStaticBagModelNode
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->payloadStaticBagModelNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->signalName;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPayloadStaticBagModel()
     {
         return $this->payloadStaticBagModelNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticType($staticName, QueryRequirementInterface $queryRequirement)
+    {
+        $definition = $this->payloadStaticBagModelNode->getStaticDefinitionByName($staticName, $queryRequirement);
+
+        return $definition->getStaticType();
     }
 
     /**
@@ -65,10 +92,8 @@ class SignalDefinitionNode extends AbstractActNode
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function isDefined()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->payloadStaticBagModelNode->validate($subValidationContext);
+        return true;
     }
 }

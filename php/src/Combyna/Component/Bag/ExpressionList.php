@@ -13,8 +13,6 @@ namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
 
 /**
@@ -43,7 +41,7 @@ class ExpressionList implements ExpressionListInterface
      */
     public function __construct(BagFactoryInterface $bagFactory, array $expressions)
     {
-        $this->validateExpressions($expressions);
+        $this->assertValidExpressions($expressions);
 
         if (count($expressions) === 0) {
             throw new InvalidArgumentException('An expression list cannot be empty');
@@ -64,28 +62,6 @@ class ExpressionList implements ExpressionListInterface
     /**
      * {@inheritdoc}
      */
-    public function getElementResultType(ValidationContextInterface $validationContext)
-    {
-        /** @var TypeInterface|null $resultType */
-        $resultType = null;
-
-        foreach ($this->expressions as $expression) {
-            $elementResultType = $expression->getResultType($validationContext);
-
-            if ($resultType === null) {
-                $resultType = $elementResultType;
-            } else {
-                $resultType = $resultType->mergeWith($elementResultType);
-            }
-        }
-
-        // An expression list should never be empty, so this should never return null
-        return $resultType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function toStaticList(EvaluationContextInterface $evaluationContext)
     {
         $statics = [];
@@ -98,21 +74,11 @@ class ExpressionList implements ExpressionListInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        foreach ($this->expressions as $expression) {
-            $expression->validate($validationContext);
-        }
-    }
-
-    /**
      * Validates that all expressions in the provided bag are actually ExpressionInterfaces
      *
      * @param ExpressionInterface[] $expressions
      */
-    private function validateExpressions(array $expressions)
+    private function assertValidExpressions(array $expressions)
     {
         foreach ($expressions as $name => $expression) {
             if (!$expression instanceof ExpressionInterface) {

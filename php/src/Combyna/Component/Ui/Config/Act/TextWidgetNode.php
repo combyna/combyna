@@ -11,13 +11,14 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class TextWidgetNode
@@ -103,28 +104,29 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->textExpressionNode->validate($subValidationContext);
+        $specBuilder->addChildNode($this->textExpressionNode);
 
         // Make sure the text expression always evaluates to some text
-        $subValidationContext->assertResultType(
-            $this->textExpressionNode,
-            new StaticType(TextExpression::class),
-            'text'
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->textExpressionNode,
+                new StaticType(TextExpression::class),
+                'text'
+            )
         );
 
-        // Validate ourself
         if ($this->visibilityExpressionNode) {
-            $this->visibilityExpressionNode->validate($subValidationContext);
+            $specBuilder->addChildNode($this->visibilityExpressionNode);
 
             // Make sure the visibility expression always evaluates to a boolean
-            $subValidationContext->assertResultType(
-                $this->visibilityExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'visibility'
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->visibilityExpressionNode,
+                    new StaticType(BooleanExpression::class),
+                    'visibility'
+                )
             );
         }
     }

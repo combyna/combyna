@@ -17,6 +17,8 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
+use Combyna\Component\Signal\SignalInterface;
 
 /**
  * Class EvaluationContextFactory
@@ -84,6 +86,16 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
         StaticBagInterface $variableStaticBag
     ) {
         return new ScopeEvaluationContext($this, $parentContext, $variableStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createSignalContext(
+        EvaluationContextInterface $parentContext,
+        SignalInterface $signal
+    ) {
+        return new SignalEvaluationContext($this, $parentContext, $signal);
     }
 
     /**

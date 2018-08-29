@@ -11,11 +11,13 @@
 
 namespace Combyna\Component\Ui\Config\Act\Expression;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
-use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Expression\WidgetAttributeExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasAttributeConstraint;
+use Combyna\Component\Ui\Validation\Constraint\InsideCompoundWidgetDefinitionRootWidgetConstraint;
+use Combyna\Component\Ui\Validation\Query\WidgetAttributeTypeQuery;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class WidgetAttributeExpressionNode
@@ -42,6 +44,19 @@ class WidgetAttributeExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addConstraint(
+            new InsideCompoundWidgetDefinitionRootWidgetConstraint()
+        );
+        $specBuilder->addConstraint(
+            new CompoundWidgetDefinitionHasAttributeConstraint($this->attributeName)
+        );
+    }
+
+    /**
      * Fetches the name of the attribute to fetch
      *
      * @return string
@@ -54,23 +69,11 @@ class WidgetAttributeExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-//        return $validationContext->getWidgetAttributeType($this->queryName);
-
-        // FIXME!
-        return new StaticType(TextExpression::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // FIXME!
-//        $subValidationContext->assertInsideCompoundWidgetDefinitionRootWidget();
-//        $subValidationContext->assertCompoundWidgetHasAttribute($this->attributeName);
+        return new QueriedResultTypeDeterminer(
+            new WidgetAttributeTypeQuery($this->attributeName),
+            $this
+        );
     }
 }

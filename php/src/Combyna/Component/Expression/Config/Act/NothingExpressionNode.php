@@ -12,8 +12,8 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Expression\NothingExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class NothingExpressionNode
@@ -32,9 +32,9 @@ class NothingExpressionNode extends AbstractStaticExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(NothingExpression::class);
+        return new PresolvedTypeDeterminer(new StaticType(NothingExpression::class));
     }
 
     /**

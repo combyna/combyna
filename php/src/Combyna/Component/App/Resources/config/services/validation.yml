@@ -1,0 +1,13 @@
+services:
+    combyna.app.validation.app_sub_validation_context_factory:
+        class: Combyna\Component\App\Validation\Context\Factory\AppContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.app.validation.factory:
+        class: Combyna\Component\App\Validation\AppValidationFactory
+        autowire: true
+        # Ensure autowiring picks the AppValidationFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\App\Validation\AppValidationFactoryInterface

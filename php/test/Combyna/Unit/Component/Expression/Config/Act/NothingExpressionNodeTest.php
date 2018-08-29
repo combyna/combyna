@@ -12,7 +12,6 @@
 namespace Combyna\Unit\Component\Expression;
 
 use Combyna\Component\Expression\Config\Act\NothingExpressionNode;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -39,14 +38,6 @@ class NothingExpressionNodeTest extends TestCase
         $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
         $this->node = new NothingExpressionNode();
-    }
-
-    public function testGetResultTypeReturnsAStaticNothingType()
-    {
-        $resultType = $this->node->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('nothing');
     }
 
     public function testGetTypeReturnsTheNothingType()

@@ -71,6 +71,9 @@ class ViewStoreSignalHandler implements ViewStoreSignalHandlerInterface
             return $viewStoreState;
         }
 
-        return $this->instructionList->performAll($storeEvaluationContext, $viewStoreState);
+        // Create a context to allow access to the payload of the signal being handled
+        $signalEvaluationContext = $storeEvaluationContext->createSubSignalEvaluationContext($signal);
+
+        return $this->instructionList->performAll($signalEvaluationContext, $viewStoreState);
     }
 }

@@ -1,0 +1,4 @@
+services:
+    combyna.program.node_validator:
+        class: Combyna\Component\Program\Validation\Validator\NodeValidator
+        autowire: true

@@ -82,7 +82,7 @@ class WidgetLoader implements WidgetLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadWidget(array $widgetConfig)
+    public function loadWidget(array $widgetConfig, $name = null)
     {
         $type = $widgetConfig['type'];
 
@@ -137,6 +137,7 @@ class WidgetLoader implements WidgetLoaderInterface
         if ($type === self::GROUP_NAME) {
             return new WidgetGroupNode(
                 $childWidgets,
+                $name,
                 $visibilityExpressionNode,
                 $this->buildTagMap($tagNames)
             );
@@ -165,6 +166,7 @@ class WidgetLoader implements WidgetLoaderInterface
             $libraryName,
             $widgetDefinitionName,
             $attributeExpressionBag,
+            $name,
             $childWidgets,
             $triggerNodes,
             $visibilityExpressionNode,

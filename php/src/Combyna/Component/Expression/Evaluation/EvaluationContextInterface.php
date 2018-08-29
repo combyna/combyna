@@ -17,6 +17,8 @@ use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
+use Combyna\Component\Signal\SignalInterface;
 use InvalidArgumentException;
 
 /**
@@ -73,6 +75,15 @@ interface EvaluationContextInterface
     public function createSubScopeContext(StaticBagInterface $variableStaticBag);
 
     /**
+     * Creates a new SignalEvaluationContext as a child of the current one,
+     * with the specified signal as the one to fetch signal payload data from
+     *
+     * @param SignalInterface $signal
+     * @return SignalEvaluationContext
+     */
+    public function createSubSignalEvaluationContext(SignalInterface $signal);
+
+    /**
      * Fetches the specified assured static value
      *
      * @param string $assuredStaticName
@@ -86,6 +97,22 @@ interface EvaluationContextInterface
      * @return EnvironmentInterface
      */
     public function getEnvironment();
+
+    /**
+     * Fetches the specified static from the current event's payload
+     *
+     * @param string $staticName
+     * @return StaticInterface
+     */
+    public function getEventPayloadStatic($staticName);
+
+    /**
+     * Fetches the specified static from the current signal's payload
+     *
+     * @param string $staticName
+     * @return StaticInterface
+     */
+    public function getSignalPayloadStatic($staticName);
 
     /**
      * Fetches the value of the specified store slot static

@@ -11,11 +11,11 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Harness\TestCase;
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Loader\BuiltinExpressionLoader;
 use Combyna\Component\Expression\Config\Loader\BuiltinLoaderInterface;
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;

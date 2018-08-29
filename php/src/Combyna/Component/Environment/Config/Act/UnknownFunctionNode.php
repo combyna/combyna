@@ -12,8 +12,13 @@
 namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class UnknownFunctionNode
@@ -22,7 +27,7 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownFunctionNode extends AbstractActNode implements FunctionNodeInterface
+class UnknownFunctionNode extends AbstractActNode implements FunctionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-function';
 
@@ -39,11 +44,29 @@ class UnknownFunctionNode extends AbstractActNode implements FunctionNodeInterfa
     /**
      * @param string $libraryName
      * @param string $functionName
+     * @param QueryRequirementInterface $queryRequirement
      */
-    public function __construct($libraryName, $functionName)
+    public function __construct($libraryName, $functionName, QueryRequirementInterface $queryRequirement)
     {
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
+
+        // Apply the validation for this dynamically created ACT node
+        $queryRequirement->adoptDynamicActNode($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addConstraint(
+            new KnownFailureConstraint(
+                'Library "' . $this->libraryName .
+                '" does not support function "' .
+                $this->functionName . '"'
+            )
+        );
     }
 
     /**
@@ -60,17 +83,15 @@ class UnknownFunctionNode extends AbstractActNode implements FunctionNodeInterfa
     public function getReturnType()
     {
         // We don't know what the function's return type could be as it is not defined
-        return new UnknownType();
+        return new UnresolvedType('undefined function');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function isDefined()
     {
-        $validationContext->addGenericViolation(
-            'Library "' . $this->libraryName . '" does not support function "' . $this->functionName . '"'
-        );
+        return false;
     }
 
     /**

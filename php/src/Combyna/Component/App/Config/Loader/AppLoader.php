@@ -143,6 +143,13 @@ class AppLoader implements AppLoaderInterface
 
         $overlayViewNodes = []; // TODO
 
-        return new AppNode($signalDefinitionNodes, $routeNodes, $homeNode, $pageViewNodes, $overlayViewNodes);
+        return new AppNode(
+            $environmentNode,
+            $signalDefinitionNodes,
+            $routeNodes,
+            $homeNode,
+            $pageViewNodes,
+            $overlayViewNodes
+        );
     }
 }

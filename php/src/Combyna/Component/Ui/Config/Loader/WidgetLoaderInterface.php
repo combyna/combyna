@@ -24,7 +24,8 @@ interface WidgetLoaderInterface
      * Creates a widget from a config array
      *
      * @param array $widgetConfig
+     * @param string|null $name
      * @return WidgetNodeInterface
      */
-    public function loadWidget(array $widgetConfig);
+    public function loadWidget(array $widgetConfig, $name = null);
 }

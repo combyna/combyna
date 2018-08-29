@@ -11,7 +11,10 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class UnknownExpressionNode
@@ -25,12 +28,12 @@ class UnknownExpressionNode extends AbstractExpressionNode
     const TYPE = 'unknown';
 
     /**
-     * @var string
+     * @var string|null
      */
     private $type;
 
     /**
-     * @param string $type
+     * @param string|null $type
      */
     public function __construct($type)
     {
@@ -40,16 +43,20 @@ class UnknownExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        return new UnknownType();
+        $type = $this->type !== null ? $this->type : '[missing]';
+
+        $specBuilder->addConstraint(new KnownFailureConstraint('Expression is of unknown type "' . $type . '"'));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $validationContext->addGenericViolation('Node is of unknown type "' . $this->type . '"');
+        $type = $this->type !== null ? $this->type : '[missing]';
+
+        return new PresolvedTypeDeterminer(new UnresolvedType('Expression type "' . $type . '"'));
     }
 }

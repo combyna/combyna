@@ -12,8 +12,7 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface ExpressionNodeInterface
@@ -23,12 +22,11 @@ use Combyna\Component\Type\TypeInterface;
 interface ExpressionNodeInterface extends ActNodeInterface
 {
     /**
-     * Fetches the type this expression will evaluate to
+     * Fetches a determiner for the type this expression will evaluate to
      *
-     * @param ValidationContextInterface $validationContext
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
-    public function getResultType(ValidationContextInterface $validationContext);
+    public function getResultTypeDeterminer();
 
     /**
      * Fetches the type of expression, eg. `text`

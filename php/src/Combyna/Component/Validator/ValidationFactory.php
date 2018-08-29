@@ -11,21 +11,25 @@
 
 namespace Combyna\Component\Validator;
 
+use Combyna\Component\Behaviour\BehaviourFactoryInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Expression\Validation\Context\AssuredSubValidationContext;
+use Combyna\Component\Expression\Validation\Context\ScopeSubValidationContext;
 use Combyna\Component\Type\TypeInterface;
-use Combyna\Component\Validator\Context\ActNodeValidationContext;
-use Combyna\Component\Validator\Context\AssuredValidationContext;
-use Combyna\Component\Validator\Context\GenericValidationContext;
-use Combyna\Component\Validator\Context\GenericValidationContextInterface;
-use Combyna\Component\Validator\Context\RootGenericValidationContext;
+use Combyna\Component\Validator\Context\ActNodeSubValidationContext;
+use Combyna\Component\Validator\Context\DetachedSubValidationContext;
+use Combyna\Component\Validator\Context\Factory\DelegatingSubValidationContextFactoryInterface;
+use Combyna\Component\Validator\Context\RootSubValidationContext;
+use Combyna\Component\Validator\Context\RootSubValidationContextInterface;
 use Combyna\Component\Validator\Context\RootValidationContext;
-use Combyna\Component\Validator\Context\ScopeValidationContext;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Context\RootValidationContextInterface;
+use Combyna\Component\Validator\Context\SubValidationContextInterface;
+use Combyna\Component\Validator\Context\ValidationContext;
 use Combyna\Component\Validator\Violation\DivisionByZeroViolation;
 use Combyna\Component\Validator\Violation\GenericViolation;
 use Combyna\Component\Validator\Violation\TypeMismatchViolation;
-use Combyna\Component\Validator\Violation\UndefinedAssuredStaticViolation;
 
 /**
  * Class ValidationFactory
@@ -37,77 +41,138 @@ use Combyna\Component\Validator\Violation\UndefinedAssuredStaticViolation;
 class ValidationFactory implements ValidationFactoryInterface
 {
     /**
+     * @var BehaviourFactoryInterface
+     */
+    private $behaviourFactory;
+
+    /**
+     * @var DelegatingSubValidationContextFactoryInterface
+     */
+    private $subValidationContextFactory;
+
+    /**
+     * @param DelegatingSubValidationContextFactoryInterface $subValidationContextFactory
+     * @param BehaviourFactoryInterface $behaviourFactory
+     */
+    public function __construct(
+        DelegatingSubValidationContextFactoryInterface $subValidationContextFactory,
+        BehaviourFactoryInterface $behaviourFactory
+    ) {
+        $this->behaviourFactory = $behaviourFactory;
+        $this->subValidationContextFactory = $subValidationContextFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createActNodeContext(
-        GenericValidationContextInterface $parentGenericContext,
-        ActNodeInterface $actNode
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec
     ) {
-        $genericContext = new GenericValidationContext(
-            $this,
-            $parentGenericContext,
-            [],
-            $actNode
-        );
-
-        return new ActNodeValidationContext($genericContext);
+        return new ActNodeSubValidationContext($parentContext, $actNode, $behaviourSpec);
     }
 
     /**
      * {@inheritdoc}
      */
     public function createAssuredContext(
-        GenericValidationContextInterface $parentGenericContext,
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $guardExpressionNode,
+        BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
         array $assuranceNodes
     ) {
-        $genericContext = new GenericValidationContext(
-            $this,
-            $parentGenericContext,
-            $assuranceNodes,
-            null
+        return new AssuredSubValidationContext(
+            $parentContext,
+            $guardExpressionNode,
+            $guardExpressionNodeBehaviourSpec,
+            $assuranceNodes
         );
-
-        return new AssuredValidationContext($genericContext);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createRootContext(EnvironmentNode $environmentNode)
-    {
-        $genericContext = new RootGenericValidationContext($this, $environmentNode);
+    public function createContext(
+        RootValidationContextInterface $rootValidationContext,
+        SubValidationContextInterface $subValidationContext,
+        BehaviourSpecValidatorInterface $behaviourSpecValidator
+    ) {
+        return new ValidationContext(
+            $this,
+            $this->behaviourFactory,
+            $this->subValidationContextFactory,
+            $behaviourSpecValidator,
+            $rootValidationContext,
+            $subValidationContext
+        );
+    }
 
-        return new RootValidationContext($genericContext);
+    /**
+     * {@inheritdoc}
+     */
+    public function createDetachedContext(
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec
+    ) {
+        return new DetachedSubValidationContext($parentContext, $actNode, $behaviourSpec);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRootContext(
+        RootSubValidationContextInterface $rootSubValidationContext,
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        BehaviourSpecValidatorInterface $behaviourSpecValidator
+    ) {
+        return new RootValidationContext(
+            $this,
+            $this->behaviourFactory,
+            $rootSubValidationContext,
+            $rootNodeBehaviourSpec,
+            $behaviourSpecValidator
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRootSubContext(
+        ActNodeInterface $rootNode,
+        BehaviourSpecInterface $rootNodeBehaviourSpec
+    ) {
+        return new RootSubValidationContext($rootNode, $rootNodeBehaviourSpec);
     }
 
     /**
      * {@inheritdoc}
      */
     public function createScopeContext(
-        GenericValidationContextInterface $parentGenericContext
+        SubValidationContextInterface $parentContext,
+        array $variableTypeDeterminers,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec
     ) {
-        $genericContext = new GenericValidationContext(
-            $this,
-            $parentGenericContext,
-            [],
-            null
-        );
-
-        return new ScopeValidationContext($genericContext);
+        return new ScopeSubValidationContext($parentContext, $variableTypeDeterminers, $actNode, $behaviourSpec);
     }
 
     /**
      * {@inheritdoc}
      */
     public function createDivisionByZeroViolation(
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $validationContext
     ) {
         return new DivisionByZeroViolation($validationContext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function createGenericViolation(
         $description,
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $validationContext
     ) {
         return new GenericViolation($description, $validationContext);
     }
@@ -118,19 +183,9 @@ class ValidationFactory implements ValidationFactoryInterface
     public function createTypeMismatchViolation(
         TypeInterface $expectedType,
         TypeInterface $actualType,
-        ValidationContextInterface $validationContext,
+        SubValidationContextInterface $validationContext,
         $contextDescription
     ) {
         return new TypeMismatchViolation($expectedType, $actualType, $validationContext, $contextDescription);
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function createUndefinedAssuredStaticViolation(
-//        $assuredStaticName,
-//        ValidationContextInterface $validationContext
-//    ) {
-//        return new UndefinedAssuredStaticViolation($assuredStaticName, $validationContext);
-//    }
 }

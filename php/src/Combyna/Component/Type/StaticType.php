@@ -65,6 +65,16 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsAnyType(AnyType $candidateType)
+    {
+        // Static type cannot allow all other types, only other static types
+        // of the correct class (and not static lists, for example)
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsMultipleType(MultipleType $subType, array $subSubTypes)
     {
         foreach ($subSubTypes as $subSubType) {
@@ -102,6 +112,14 @@ class StaticType implements TypeInterface
     {
         // Another static type will match this one if they simply match the same static expression class
         return $candidateType->staticClass === $this->staticClass;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByAnyType()
+    {
+        return true; // "Any" type allows any other type
     }
 
     /**
@@ -149,6 +167,14 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithAnyType(AnyType $otherType)
+    {
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithMultipleType(MultipleType $otherType, array $subSubTypes)
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
@@ -184,6 +210,24 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
+    {
+        // There is nothing common to merge between a static list type and an unresolved type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $unresolvedType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithAnyType(AnyType $otherType)
+    {
+        return $otherType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function whenMergedWithMultipleType(MultipleType $otherType)
     {
         return $otherType->mergeWithStaticType($this);
@@ -203,5 +247,13 @@ class StaticType implements TypeInterface
     public function whenMergedWithStaticType(StaticType $otherType)
     {
         return $otherType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
     }
 }

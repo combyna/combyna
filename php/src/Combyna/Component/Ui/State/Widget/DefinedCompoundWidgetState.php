@@ -103,8 +103,6 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      */
     public function getChildState($name)
     {
-        var_dump(array_keys($this->childWidgetStates));
-
         return $this->childWidgetStates[$name];
     }
 

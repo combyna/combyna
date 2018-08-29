@@ -11,7 +11,9 @@
 
 namespace Combyna\Component\Store\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -21,9 +23,9 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class QueryNode extends AbstractActNode
+class QueryNode extends AbstractActNode implements QueryNodeInterface
 {
-    const TYPE = 'query';
+    const TYPE = 'store-query';
 
     /**
      * @var ExpressionNodeInterface
@@ -56,9 +58,16 @@ class QueryNode extends AbstractActNode
     }
 
     /**
-     * Fetches the expression to evaluate for the result of this query
-     *
-     * @return ExpressionNodeInterface
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->expressionNode);
+        $specBuilder->addChildNode($this->parameterBagModelNode);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getExpression()
     {
@@ -66,9 +75,7 @@ class QueryNode extends AbstractActNode
     }
 
     /**
-     * Fetches the unique name of this query within its store
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -76,9 +83,7 @@ class QueryNode extends AbstractActNode
     }
 
     /**
-     * Fetches the model for parameters to this query
-     *
-     * @return FixedStaticBagModelNode
+     * {@inheritdoc}
      */
     public function getParameterBagModel()
     {
@@ -88,11 +93,14 @@ class QueryNode extends AbstractActNode
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->expressionNode->validate($subValidationContext);
-        $this->parameterBagModelNode->validate($subValidationContext);
+    public function validateArgumentExpressionBag(
+        ValidationContextInterface $validationContext,
+        ExpressionBagNode $expressionBagNode
+    ) {
+        $this->parameterBagModelNode->validateStaticExpressionBag(
+            $validationContext,
+            $expressionBagNode,
+            'parameter'
+        );
     }
 }

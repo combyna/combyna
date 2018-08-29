@@ -15,6 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Signal\SignalInterface;
 use LogicException;
 
 /**
@@ -91,6 +92,14 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubSignalEvaluationContext(SignalInterface $signal)
+    {
+        return $this->evaluationContextFactory->createSignalContext($this, $signal);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAssuredStatic($assuredStaticName)
     {
         throw new LogicException('No assured static is defined with name "' . $assuredStaticName . '"');
@@ -102,6 +111,25 @@ class RootEvaluationContext implements EvaluationContextInterface
     public function getEnvironment()
     {
         return $this->environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventPayloadStatic($staticName)
+    {
+        throw new LogicException('Event payload static "' . $staticName . '" cannot be fetched outside a trigger');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignalPayloadStatic($staticName)
+    {
+        throw new LogicException(
+            'Signal payload static "' . $staticName .
+            '" cannot be fetched outside a signal handler'
+        );
     }
 
     /**

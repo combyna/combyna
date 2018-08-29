@@ -12,7 +12,7 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Common\DelegatorInterface;
-use InvalidArgumentException;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 
 /**
  * Class DelegatingExpressionLoader
@@ -40,15 +40,15 @@ class DelegatingExpressionLoader implements ExpressionLoaderInterface, Delegator
     public function load(array $config)
     {
         if (!array_key_exists('type', $config)) {
-            throw new InvalidArgumentException('Missing "type" element');
+            // Missing "type" element
+            return new UnknownExpressionNode(null);
         }
 
         $type = $config['type'];
 
         if (!array_key_exists($type, $this->loaders)) {
-            throw new InvalidArgumentException(
-                'No loader is registered for expressions of type "' . $type . '"'
-            );
+            // No loader is registered for expressions of this type
+            return new UnknownExpressionNode($type);
         }
 
         return $this->loaders[$type]->load($config);

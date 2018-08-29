@@ -38,6 +38,13 @@ interface FunctionNodeInterface extends ActNodeInterface
     public function getReturnType();
 
     /**
+     * Returns whether or not this function is defined
+     *
+     * @return bool
+     */
+    public function isDefined();
+
+    /**
      * Checks that all expressions in the bag only ever evaluate to valid values for
      * their corresponding parameters and that there are no extra or missing arguments for parameters
      *

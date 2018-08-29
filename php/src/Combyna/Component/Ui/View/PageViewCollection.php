@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\View;
 
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;

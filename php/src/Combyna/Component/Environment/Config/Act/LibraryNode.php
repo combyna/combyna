@@ -11,14 +11,18 @@
 
 namespace Combyna\Component\Environment\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
-use Combyna\Component\Environment\Library\NativeFunction;
 use Combyna\Component\Event\Config\Act\EventDefinitionNode;
+use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
+use Combyna\Component\Event\Config\Act\UnknownEventDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
+use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use LogicException;
 
 /**
@@ -71,7 +75,7 @@ class LibraryNode extends AbstractActNode
      * @param string[] $libraryNamesDependedOn
      * @param FunctionNodeInterface[] $functionNodes
      * @param EventDefinitionNode[] $eventDefinitionNodes
-     * @param SignalDefinitionNode[] $signalDefinitionNodes
+     * @param SignalDefinitionNodeInterface[] $signalDefinitionNodes
      * @param WidgetDefinitionNodeInterface[] $widgetDefinitionNodes
      */
     public function __construct(
@@ -110,6 +114,28 @@ class LibraryNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        foreach ($this->eventDefinitionNodes as $eventDefinitionNode) {
+            $specBuilder->addChildNode($eventDefinitionNode);
+        }
+
+        foreach ($this->functionNodes as $functionNode) {
+            $specBuilder->addChildNode($functionNode);
+        }
+
+        foreach ($this->signalDefinitionNodes as $signalDefinitionNode) {
+            $specBuilder->addChildNode($signalDefinitionNode);
+        }
+
+        foreach ($this->widgetDefinitionNodes as $widgetDefinitionNode) {
+            $specBuilder->addChildNode($widgetDefinitionNode);
+        }
+    }
+
+    /**
      * Fetches the human-readable description of this library
      *
      * @return string
@@ -117,6 +143,22 @@ class LibraryNode extends AbstractActNode
     public function getDescription()
     {
         return $this->description;
+    }
+
+    /**
+     * Fetches an event definition defined by this library
+     *
+     * @param string $eventName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return EventDefinitionNodeInterface
+     */
+    public function getEventDefinition($eventName, QueryRequirementInterface $queryRequirement)
+    {
+        if (!array_key_exists($eventName, $this->eventDefinitionNodes)) {
+            return new UnknownEventDefinitionNode($this->name, $eventName, $queryRequirement);
+        }
+
+        return $this->eventDefinitionNodes[$eventName];
     }
 
     /**
@@ -146,12 +188,13 @@ class LibraryNode extends AbstractActNode
      * then an IncorrectTypeFunctionNode will be returned
      *
      * @param string $functionName
+     * @param QueryRequirementInterface $queryRequirement
      * @return FunctionNodeInterface
      */
-    public function getGenericFunction($functionName)
+    public function getGenericFunction($functionName, QueryRequirementInterface $queryRequirement)
     {
         if (!array_key_exists($functionName, $this->functionNodes)) {
-            return new UnknownFunctionNode($this->name, $functionName);
+            return new UnknownFunctionNode($this->name, $functionName, $queryRequirement);
         }
 
         // TODO: Check type of function and return IncorrectTypeFunctionNode if wrong
@@ -160,40 +203,11 @@ class LibraryNode extends AbstractActNode
     }
 
     /**
-     * Fetches all signal definitions defined by this library
-     *
-     * @return SignalDefinitionNode[]
+     * {@inheritdoc}
      */
-    public function getSignalDefinitions()
+    public function getIdentifier()
     {
-        return $this->signalDefinitionNodes;
-    }
-
-    /**
-     * Fetches a widget definition defined by this library.
-     * If the library does not define the specified definition,
-     * then an UnknownWidgetDefinitionNode will be returned
-     *
-     * @param string $widgetDefinitionName
-     * @return WidgetDefinitionNodeInterface
-     */
-    public function getWidgetDefinition($widgetDefinitionName)
-    {
-        if (!array_key_exists($widgetDefinitionName, $this->widgetDefinitionNodes)) {
-            return new UnknownWidgetDefinitionNode($this->name, $widgetDefinitionName);
-        }
-
-        return $this->widgetDefinitionNodes[$widgetDefinitionName];
-    }
-
-    /**
-     * Fetches all widget definitions defined by this library
-     *
-     * @return WidgetDefinitionNodeInterface[]
-     */
-    public function getWidgetDefinitions()
-    {
-        return $this->widgetDefinitionNodes;
+        return self::TYPE . ':' . $this->name;
     }
 
     /**
@@ -207,16 +221,69 @@ class LibraryNode extends AbstractActNode
     }
 
     /**
+     * Fetches a signal definition defined by this library
+     *
+     * @param string $signalName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return SignalDefinitionNodeInterface
+     */
+    public function getSignalDefinition($signalName, QueryRequirementInterface $queryRequirement)
+    {
+        if (!array_key_exists($signalName, $this->signalDefinitionNodes)) {
+            return new UnknownSignalDefinitionNode($this->name, $signalName, $queryRequirement);
+        }
+
+        return $this->signalDefinitionNodes[$signalName];
+    }
+
+    /**
+     * Fetches all signal definitions defined by this library
+     *
+     * @return SignalDefinitionNodeInterface[]
+     */
+    public function getSignalDefinitions()
+    {
+        return $this->signalDefinitionNodes;
+    }
+
+    /**
+     * Fetches a widget definition defined by this library.
+     * If the library does not define the specified definition,
+     * then an UnknownWidgetDefinitionNode will be returned
+     *
+     * @param string $name
+     * @param QueryRequirementInterface $queryRequirement
+     * @return WidgetDefinitionNodeInterface
+     */
+    public function getWidgetDefinition($name, QueryRequirementInterface $queryRequirement)
+    {
+        if (!array_key_exists($name, $this->widgetDefinitionNodes)) {
+            return new UnknownWidgetDefinitionNode($this->name, $name, $queryRequirement);
+        }
+
+        return $this->widgetDefinitionNodes[$name];
+    }
+
+    /**
+     * Fetches all widget definitions defined by this library
+     *
+     * @return WidgetDefinitionNodeInterface[]
+     */
+    public function getWidgetDefinitions()
+    {
+        return $this->widgetDefinitionNodes;
+    }
+
+    /**
      * Installs a native function, referenced by a NativeFunctionNode
      *
-     * @param NativeFunction $nativeFunction
+     * @param string $functionName
+     * @param callable $callable
      * @throws FunctionNotSupportedException
      * @throws LogicException
      */
-    public function installNativeFunction(NativeFunction $nativeFunction)
+    public function installNativeFunction($functionName, callable $callable)
     {
-        $functionName = $nativeFunction->getName();
-
         if (!array_key_exists($functionName, $this->functionNodes)) {
             throw new FunctionNotSupportedException($this->name, $functionName);
         }
@@ -227,7 +294,7 @@ class LibraryNode extends AbstractActNode
             throw new LogicException('Only native function nodes can reference a native function');
         }
 
-        $functionNode->setNativeFunction($nativeFunction);
+        $functionNode->setNativeFunctionCallable($callable);
     }
 
     /**
@@ -239,21 +306,5 @@ class LibraryNode extends AbstractActNode
     public function referencesLibrary($otherLibraryName)
     {
         return in_array($otherLibraryName, $this->libraryNamesDependedOn, true);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        foreach ($this->functionNodes as $functionNode) {
-            $functionNode->validate($subValidationContext);
-        }
-
-        foreach ($this->widgetDefinitionNodes as $widgetDefinitionNode) {
-            $widgetDefinitionNode->validate($subValidationContext);
-        }
     }
 }

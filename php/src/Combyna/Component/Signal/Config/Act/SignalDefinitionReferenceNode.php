@@ -11,8 +11,9 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Signal\Validation\Constraint\SignalDefinitionExistsConstraint;
 
 /**
  * Class SignalDefinitionReferenceNode
@@ -21,6 +22,8 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  */
 class SignalDefinitionReferenceNode extends AbstractActNode
 {
+    const TYPE = 'signal-definition-reference';
+
     /**
      * @var string
      */
@@ -42,6 +45,19 @@ class SignalDefinitionReferenceNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addConstraint(
+            new SignalDefinitionExistsConstraint(
+                $this->libraryName,
+                $this->signalName
+            )
+        );
+    }
+
+    /**
      * Fetches the unique name of the library that defines this signal definition
      *
      * @return string
@@ -59,15 +75,5 @@ class SignalDefinitionReferenceNode extends AbstractActNode
     public function getSignalName()
     {
         return $this->signalName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // ...
     }
 }

@@ -18,6 +18,7 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\State\StatePathInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
@@ -143,6 +144,19 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
         return $this->parentContextFactory->createScopeContext(
             $parentContext,
             $variableStaticBag
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createSignalContext(
+        EvaluationContextInterface $parentContext,
+        SignalInterface $signal
+    ) {
+        return $this->parentContextFactory->createSignalContext(
+            $parentContext,
+            $signal
         );
     }
 

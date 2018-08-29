@@ -12,7 +12,6 @@
 namespace Combyna\Unit\Component\Expression;
 
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
@@ -88,14 +87,6 @@ class TextExpressionNodeTest extends TestCase
             'null' => [null, 'NULL'],
             'boolean' => [false, 'boolean']
         ];
-    }
-
-    public function testGetResultTypeReturnsAStaticTextType()
-    {
-        $resultType = $this->node->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('text');
     }
 
     public function testGetTypeReturnsTheTextType()

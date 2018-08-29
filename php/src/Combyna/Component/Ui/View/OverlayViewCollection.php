@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Ui\View;
 
-use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use InvalidArgumentException;
 
 /**

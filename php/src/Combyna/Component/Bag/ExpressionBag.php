@@ -14,7 +14,6 @@ namespace Combyna\Component\Bag;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use InvalidArgumentException;
 
 /**
@@ -42,7 +41,7 @@ class ExpressionBag implements ExpressionBagInterface
      */
     public function __construct(BagFactoryInterface $bagFactory, array $expressions)
     {
-        $this->validateExpressions($expressions);
+        $this->assertValidExpressions($expressions);
 
         $this->bagFactory = $bagFactory;
         $this->expressions = $expressions;
@@ -95,21 +94,11 @@ class ExpressionBag implements ExpressionBagInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        foreach ($this->expressions as $expression) {
-            $expression->validate($validationContext);
-        }
-    }
-
-    /**
      * Validates that all expressions in the provided bag are actually ExpressionInterfaces
      *
      * @param ExpressionInterface[] $expressions
      */
-    private function validateExpressions(array $expressions)
+    private function assertValidExpressions(array $expressions)
     {
         foreach ($expressions as $name => $expression) {
             if (!$expression instanceof ExpressionInterface) {

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 
 /**
@@ -20,4 +21,11 @@ use Combyna\Component\Config\Act\AbstractActNode;
  */
 abstract class AbstractExpressionNode extends AbstractActNode implements ExpressionNodeInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return $this->getResultTypeDeterminer()->makesQuery($querySpecifier);
+    }
 }

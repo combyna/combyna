@@ -1,0 +1,12 @@
+services:
+    combyna.trigger.validation.inside_trigger_constraint_validator:
+        class: Combyna\Component\Trigger\Validation\Constraint\InsideTriggerConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.trigger.validation.trigger_sub_validation_context_factory:
+        class: Combyna\Component\Trigger\Validation\Context\Factory\TriggerContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}

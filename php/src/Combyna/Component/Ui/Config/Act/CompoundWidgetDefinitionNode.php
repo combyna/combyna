@@ -12,11 +12,14 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
+use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetContextSpecifier;
 use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class CompoundWidgetDefinitionNode
@@ -28,9 +31,14 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     const TYPE = CompoundWidgetDefinition::TYPE;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $attributeBagModelNode;
+
+    /**
+     * @var ChildWidgetDefinitionNodeInterface[]
+     */
+    private $childDefinitionNodes;
 
     /**
      * @var EventDefinitionReferenceNode[]
@@ -55,22 +63,52 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * @param string $libraryName
      * @param string $widgetDefinitionName
-     * @param FixedStaticBagModelNode $attributeBagModelNode
+     * @param FixedStaticBagModelNodeInterface $attributeBagModelNode
+     * @param ChildWidgetDefinitionNodeInterface[] $childDefinitionNodes
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
      * @param WidgetNodeInterface $rootWidgetNode
      */
     public function __construct(
         $libraryName,
         $widgetDefinitionName,
-        FixedStaticBagModelNode $attributeBagModelNode,
+        FixedStaticBagModelNodeInterface $attributeBagModelNode,
+        array $childDefinitionNodes,
         array $eventDefinitionReferenceNodes,
         WidgetNodeInterface $rootWidgetNode
     ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
+        $this->childDefinitionNodes = $childDefinitionNodes;
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
         $this->rootWidgetNode = $rootWidgetNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->attributeBagModelNode);
+
+        foreach ($this->childDefinitionNodes as $childDefinitionNode) {
+            $specBuilder->addChildNode($childDefinitionNode);
+        }
+
+        foreach ($this->eventDefinitionReferenceNodes as $eventDefinitionReferenceNode) {
+            $specBuilder->addChildNode($eventDefinitionReferenceNode);
+        }
+
+        $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
+            // Only give the root widget node tree the compound widget context,
+            // as compound widget attrs cannot reference other compound widget attrs
+            // for the same widget
+            $subSpecBuilder->defineValidationContext(
+                new CompoundWidgetContextSpecifier()
+            );
+
+            $subSpecBuilder->addChildNode($this->rootWidgetNode);
+        });
     }
 
     /**
@@ -84,9 +122,27 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * {@inheritdoc}
      */
+    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement)
+    {
+        return array_key_exists($childName, $this->childDefinitionNodes) ?
+            $this->childDefinitionNodes[$childName] :
+            new DynamicUnknownChildWidgetDefinitionNode($childName, $queryRequirement);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEventDefinitionReferences()
     {
         return $this->eventDefinitionReferenceNodes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return 'compound-widget-def:' . $this->name;
     }
 
     /**
@@ -118,12 +174,9 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function isDefined()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->attributeBagModelNode->validate($subValidationContext);
-        $this->rootWidgetNode->validate($subValidationContext);
+        return true;
     }
 
     /**
@@ -134,14 +187,44 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         ExpressionBagNode $attributeExpressionBagNode,
         array $childWidgetNodes
     ) {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
         $this->attributeBagModelNode->validateStaticExpressionBag(
-            $subValidationContext,
+            $validationContext,
             $attributeExpressionBagNode,
             'attributes for compound "' . $this->name . '" widget of library "' . $this->libraryName . '"'
         );
 
-        // TODO: Check that all EventDefinitionReferences are valid (ie. reference valid definitions)
+        // Check there are no required children that are missing an expression
+        foreach ($this->childDefinitionNodes as $childName => $definitionNode) {
+            if (!array_key_exists($childName, $childWidgetNodes) && $definitionNode->isRequired()) {
+                $validationContext->addGenericViolation(sprintf(
+                    'Compound widget is missing required child "%s"',
+                    $childName
+                ));
+            }
+        }
+
+        // Check there are no child widgets that aren't needed/are extra
+        foreach ($childWidgetNodes as $childName => $definitionNode) {
+            if (!array_key_exists($childName, $this->childDefinitionNodes)) {
+                $validationContext->addGenericViolation(sprintf(
+                    'Compound widget has an unnecessary extra child widget "%s"',
+                    $childName
+                ));
+            }
+        }
+
+        // Check all child widgets provided can only ever evaluate to valid primitives
+        // for their corresponding children
+        foreach ($this->childDefinitionNodes as $childName => $definitionNode) {
+            if (!array_key_exists($childName, $childWidgetNodes)) {
+                // Skip any undefined children as we won't be able to fetch them.
+                // Validation should already have been marked failed above
+                continue;
+            }
+
+            $childWidgetNode = $childWidgetNodes[$childName];
+
+            $definitionNode->validateWidget($childWidgetNode, $validationContext);
+        }
     }
 }

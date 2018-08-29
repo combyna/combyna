@@ -14,6 +14,7 @@ namespace Combyna\Component\Expression\Evaluation;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Signal\SignalInterface;
 
 /**
  * Class AbstractEvaluationContext
@@ -22,7 +23,7 @@ use Combyna\Component\Expression\ExpressionInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class AbstractEvaluationContext implements EvaluationContextInterface
+abstract class AbstractEvaluationContext implements EvaluationContextInterface
 {
     /**
      * @var EvaluationContextFactoryInterface
@@ -89,6 +90,14 @@ class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubSignalEvaluationContext(SignalInterface $signal)
+    {
+        return $this->evaluationContextFactory->createSignalContext($this, $signal);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAssuredStatic($assuredStaticName)
     {
         return $this->parentContext->getAssuredStatic($assuredStaticName);
@@ -100,6 +109,22 @@ class AbstractEvaluationContext implements EvaluationContextInterface
     public function getEnvironment()
     {
         return $this->parentContext->getEnvironment();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventPayloadStatic($staticName)
+    {
+        return $this->parentContext->getEventPayloadStatic($staticName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignalPayloadStatic($staticName)
+    {
+        return $this->parentContext->getSignalPayloadStatic($staticName);
     }
 
     /**

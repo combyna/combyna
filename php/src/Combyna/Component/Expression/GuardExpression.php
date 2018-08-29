@@ -12,10 +12,9 @@
 namespace Combyna\Component\Expression;
 
 use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
-use Combyna\Component\Validator\ValidationFactoryInterface;
 
 /**
  * Class GuardExpression
@@ -61,15 +60,9 @@ class GuardExpression extends AbstractExpression
     private $expressionFactory;
 
     /**
-     * @var ValidationFactoryInterface
-     */
-    private $validationFactory;
-
-    /**
      * @param ExpressionFactoryInterface $expressionFactory
      * @param BagFactoryInterface $bagFactory
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
-     * @param ValidationFactoryInterface $validationFactory
      * @param AssuranceInterface[] $assurances
      * @param ExpressionInterface $consequentExpression
      * @param ExpressionInterface $alternateExpression
@@ -78,7 +71,6 @@ class GuardExpression extends AbstractExpression
         ExpressionFactoryInterface $expressionFactory,
         BagFactoryInterface $bagFactory,
         EvaluationContextFactoryInterface $evaluationContextFactory,
-        ValidationFactoryInterface $validationFactory,
         array $assurances,
         ExpressionInterface $consequentExpression,
         ExpressionInterface $alternateExpression
@@ -89,7 +81,6 @@ class GuardExpression extends AbstractExpression
         $this->consequentExpression = $consequentExpression;
         $this->evaluationContextFactory = $evaluationContextFactory;
         $this->expressionFactory = $expressionFactory;
-        $this->validationFactory = $validationFactory;
     }
 
     /**

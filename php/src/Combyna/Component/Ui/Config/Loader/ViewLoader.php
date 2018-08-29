@@ -72,7 +72,7 @@ class ViewLoader implements ViewLoaderInterface
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load(
             isset($viewConfig['attributes']) ? $viewConfig['attributes'] : []
         );
-        $rootWidgetNode = $this->widgetLoader->loadWidget($viewConfig['widget']);
+        $rootWidgetNode = $this->widgetLoader->loadWidget($viewConfig['widget'], 'root');
         $storeNode = isset($viewConfig['store']) ?
             $this->storeLoader->load($viewConfig['store']) :
             null;

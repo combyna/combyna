@@ -3,6 +3,14 @@ services:
         class: Combyna\Component\Ui\Config\Loader\ViewLoader
         autowire: true
 
+    combyna.ui.loader.child_widget_definition:
+        class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionLoader
+        autowire: true
+
+    combyna.ui.loader.child_widget_definition_collection:
+        class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionCollectionLoader
+        autowire: true
+
     combyna.ui.loader.view_store_query_expression:
         class: Combyna\Component\Ui\Store\Config\Loader\ViewStoreQueryExpressionLoader
         autowire: true

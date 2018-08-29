@@ -12,8 +12,11 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\FunctionExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraint;
+use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class FunctionExpressionNode
@@ -57,6 +60,24 @@ class FunctionExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        // Ensure all argument expressions are valid within themselves
+        $specBuilder->addChildNode($this->argumentExpressionBagNode);
+
+        // Now ensure all argument expressions resolve to valid static types for their corresponding parameters
+        $specBuilder->addConstraint(
+            new ValidFunctionCallConstraint(
+                $this->libraryName,
+                $this->functionName,
+                $this->argumentExpressionBagNode
+            )
+        );
+    }
+
+    /**
      * Fetches the argument expression bag
      *
      * @return ExpressionBagNode
@@ -89,32 +110,11 @@ class FunctionExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $returnType = $validationContext->getFunctionReturnType($this->libraryName, $this->functionName);
-
-        if ($returnType === null) {
-            return new UnknownType();
-        }
-
-        return $returnType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // Ensure all argument expressions are valid within themselves
-        $this->argumentExpressionBagNode->validate($subValidationContext);
-
-        // Now ensure all argument expressions resolve to valid static types for their corresponding parameters
-        $subValidationContext->assertValidFunctionCall(
-            $this->libraryName,
-            $this->functionName,
-            $this->argumentExpressionBagNode
+        return new QueriedResultTypeDeterminer(
+            new FunctionReturnTypeQuery($this->libraryName, $this->functionName),
+            $this
         );
     }
 }

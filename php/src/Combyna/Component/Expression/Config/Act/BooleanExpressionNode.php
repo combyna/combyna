@@ -12,8 +12,8 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Expression\BooleanExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -49,9 +49,9 @@ class BooleanExpressionNode extends AbstractStaticExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(BooleanExpression::class);
+        return new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class));
     }
 
     /**

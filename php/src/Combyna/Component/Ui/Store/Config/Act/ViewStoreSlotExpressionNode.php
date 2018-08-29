@@ -11,11 +11,13 @@
 
 namespace Combyna\Component\Ui\Store\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
-use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Store\Expression\SlotExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Store\Validation\Constraint\InsideViewStoreConstraint;
+use Combyna\Component\Ui\Store\Validation\Constraint\ViewStoreHasSlotConstraint;
+use Combyna\Component\Ui\Store\Validation\Query\ViewStoreSlotTypeQuery;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class ViewStoreSlotExpressionNode
@@ -44,12 +46,21 @@ class ViewStoreSlotExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-//        return $validationContext->getViewStoreQueryType($this->queryName);
+        // View store slots may only be accessed directly from inside the store itself,
+        // not from anywhere else inside the view. To access from elsewhere in the view
+        // (eg. from a widget attribute expression), use a query on the view store
+        $specBuilder->addConstraint(new InsideViewStoreConstraint());
+        $specBuilder->addConstraint(new ViewStoreHasSlotConstraint($this->slotName));
+    }
 
-        // FIXME!
-        return new StaticType(TextExpression::class);
+    /**
+     * {@inheritdoc}
+     */
+    public function getResultTypeDeterminer()
+    {
+        return new QueriedResultTypeDeterminer(new ViewStoreSlotTypeQuery($this->slotName), $this);
     }
 
     /**
@@ -60,15 +71,5 @@ class ViewStoreSlotExpressionNode extends AbstractExpressionNode
     public function getSlotName()
     {
         return $this->slotName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // ...
     }
 }

@@ -37,6 +37,11 @@ class GenericWidgetRenderer implements WidgetRendererInterface
     private $libraryName;
 
     /**
+     * @var string|null
+     */
+    private $rootChildName;
+
+    /**
      * @var string
      */
     private $widgetDefinitionName;
@@ -45,11 +50,17 @@ class GenericWidgetRenderer implements WidgetRendererInterface
      * @param DelegatingWidgetRenderer $delegatingWidgetRenderer
      * @param string $libraryName
      * @param string $widgetDefinitionName
+     * @param string|null $rootChildName
      */
-    public function __construct(DelegatingWidgetRenderer $delegatingWidgetRenderer, $libraryName, $widgetDefinitionName)
-    {
+    public function __construct(
+        DelegatingWidgetRenderer $delegatingWidgetRenderer,
+        $libraryName,
+        $widgetDefinitionName,
+        $rootChildName = null
+    ) {
         $this->delegatingWidgetRenderer = $delegatingWidgetRenderer;
         $this->libraryName = $libraryName;
+        $this->rootChildName = $rootChildName;
         $this->widgetDefinitionName = $widgetDefinitionName;
     }
 
@@ -88,17 +99,12 @@ class GenericWidgetRenderer implements WidgetRendererInterface
         }
 
         $attributes = $widgetState->getAttributeStaticBag()->toNativeArray();
-        $childNodes = [];
+        $rootChildNode = $this->rootChildName !== null ?
+            $this->delegatingWidgetRenderer->renderWidget(
+                $widgetStatePath->getChildStatePath($this->rootChildName)
+            ) :
+            null;
 
-        // Render all of the widget's children recursively, allowing a mix
-        // where a generically-rendered widget may contain specifically-rendered ones
-        foreach ($widgetState->getChildNames() as $childName) {
-            $childNodes[$childName] = $this->delegatingWidgetRenderer->renderWidget(
-                $widgetStatePath->getChildStatePath($childName)
-            );
-        }
-
-
-        return new GenericNode($widgetState, $attributes, $childNodes);
+        return new GenericNode($widgetState, $widgetStatePath->getWidgetStatePath(), $attributes, $rootChildNode);
     }
 }

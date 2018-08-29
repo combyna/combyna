@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class TextExpressionLoader

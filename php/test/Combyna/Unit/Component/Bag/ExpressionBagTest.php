@@ -86,24 +86,4 @@ class ExpressionBagTest extends TestCase
     {
         $this->assert($this->bag->hasExpression('an-undefined-expr'))->isFalse;
     }
-
-//    public function testSetExpressionAllowsAnExistingExpressionToBeReplaced()
-//    {
-//        /** @var ObjectProphecy|ExpressionInterface $newExpression */
-//        $newExpression = $this->prophesize(ExpressionInterface::class);
-//
-//        $this->bag->setExpression('second-expr', $newExpression->reveal());
-//
-//        $this->assert($this->bag->getExpression('second-expr'))->exactlyEquals($newExpression->reveal());
-//    }
-//
-//    public function testSetExpressionDoesNotAllowAnExpressionToBeAdded()
-//    {
-//        $this->setExpectedException(
-//            InvalidArgumentException::class,
-//            'Expression bag contains no "my-new-expr" expression'
-//        );
-//
-//        $this->bag->setExpression('my-new-expr', $this->prophesize(ExpressionInterface::class)->reveal());
-//    }
 }

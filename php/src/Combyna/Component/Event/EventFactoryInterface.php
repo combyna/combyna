@@ -14,7 +14,6 @@ namespace Combyna\Component\Event;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
-use Combyna\Component\Event\EventDefinitionRepositoryInterface;
 
 /**
  * Interface EventFactoryInterface

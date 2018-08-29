@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\VariableExpressionNode;
 use Combyna\Component\Expression\VariableExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class VariableExpressionLoader

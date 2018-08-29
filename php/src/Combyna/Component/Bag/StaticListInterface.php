@@ -14,7 +14,6 @@ namespace Combyna\Component\Bag;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\TypeInterface;
 use Countable;
 
@@ -50,14 +49,6 @@ interface StaticListInterface extends Countable
      * @return StaticInterface
      */
     public function getElementStatic($index);
-
-    /**
-     * Fetches the type of the elements in this list
-     *
-     * @param ValidationContextInterface $validationContext
-     * @return TypeInterface
-     */
-    public function getElementType(ValidationContextInterface $validationContext);
 
     /**
      * Maps this static list to another, transforming each element with the given expression

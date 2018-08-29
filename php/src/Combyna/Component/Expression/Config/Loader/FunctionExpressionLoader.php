@@ -12,9 +12,9 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\FunctionExpressionNode;
 use Combyna\Component\Expression\FunctionExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class FunctionExpressionLoader

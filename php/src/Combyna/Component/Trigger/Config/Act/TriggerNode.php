@@ -11,9 +11,10 @@
 
 namespace Combyna\Component\Trigger\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Trigger\Validation\Context\Specifier\TriggerContextSpecifier;
 
 /**
  * Class TriggerNode
@@ -43,6 +44,23 @@ class TriggerNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->eventDefinitionReferenceNode);
+
+        $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
+            // Trigger sub-context defines the event's payload for instruction nodes to reference
+            $subSpecBuilder->defineValidationContext(new TriggerContextSpecifier());
+
+            foreach ($this->instructionNodes as $instructionNode) {
+                $subSpecBuilder->addChildNode($instructionNode);
+            }
+        });
+    }
+
+    /**
      * Fetches the event definition this trigger fires on
      *
      * @return EventDefinitionReferenceNode
@@ -60,19 +78,5 @@ class TriggerNode extends AbstractActNode
     public function getInstructions()
     {
         return $this->instructionNodes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->eventDefinitionReferenceNode->validate($subValidationContext);
-
-        foreach ($this->instructionNodes as $instructionNode) {
-            $instructionNode->validate($subValidationContext);
-        }
     }
 }

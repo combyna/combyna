@@ -11,13 +11,15 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\ComparisonExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\Validation\Constraint\PossibleMatchingResultTypesConstraint;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use InvalidArgumentException;
+use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class ComparisonExpressionNode
@@ -62,6 +64,115 @@ class ComparisonExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->leftOperandExpression);
+        $specBuilder->addChildNode($this->rightOperandExpression);
+
+        switch ($this->operator) {
+            case ComparisonExpression::EQUAL:
+                // For text expressions, this will be a case-sensitive comparison
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(BooleanExpression::class),
+                            new StaticType(NumberExpression::class),
+                            new StaticType(TextExpression::class)
+                        ]
+                    )
+                );
+                break;
+            case ComparisonExpression::EQUAL_CASE_INSENSITIVE:
+                // Case-insensitive comparison - only makes sense for text expressions,
+                // so only text expressions may use it
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(TextExpression::class)
+                        ]
+                    )
+                );
+                break;
+            case ComparisonExpression::GREATER_THAN:
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(NumberExpression::class)
+                        ]
+                    )
+                );
+                break;
+            case ComparisonExpression::LESS_THAN:
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(NumberExpression::class)
+                        ]
+                    )
+                );
+                break;
+            case ComparisonExpression::UNEQUAL:
+                // For text expressions, this will be a case-sensitive comparison
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(BooleanExpression::class),
+                            new StaticType(NumberExpression::class),
+                            new StaticType(TextExpression::class)
+                        ]
+                    )
+                );
+                break;
+            case ComparisonExpression::UNEQUAL_CASE_INSENSITIVE:
+                // Case-insensitive comparison - only makes sense for text expressions,
+                // so only text expressions may use it
+                $specBuilder->addConstraint(
+                    new PossibleMatchingResultTypesConstraint(
+                        $this->leftOperandExpression,
+                        'left operand',
+                        $this->rightOperandExpression,
+                        'right operand',
+                        [
+                            new StaticType(TextExpression::class)
+                        ]
+                    )
+                );
+                break;
+            default:
+                $specBuilder->addConstraint(
+                    new KnownFailureConstraint(
+                        sprintf(
+                            'Invalid operator "%s" provided',
+                            $this->operator
+                        )
+                    )
+                );
+        }
+    }
+
+    /**
      * Fetches the left operand's expression node
      *
      * @return ExpressionNodeInterface
@@ -84,9 +195,9 @@ class ComparisonExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(BooleanExpression::class);
+        return new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class));
     }
 
     /**
@@ -97,99 +208,5 @@ class ComparisonExpressionNode extends AbstractExpressionNode
     public function getRightOperandExpression()
     {
         return $this->rightOperandExpression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->leftOperandExpression->validate($subValidationContext);
-        $this->rightOperandExpression->validate($subValidationContext);
-
-        switch ($this->operator) {
-            case ComparisonExpression::EQUAL:
-                // For text expressions, this will be a case-sensitive comparison
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(BooleanExpression::class),
-                        new StaticType(NumberExpression::class),
-                        new StaticType(TextExpression::class)
-                    ]
-                );
-                break;
-            case ComparisonExpression::EQUAL_CASE_INSENSITIVE:
-                // Case-insensitive comparison - only makes sense for text expressions,
-                // so only text expressions may use it
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(TextExpression::class)
-                    ]
-                );
-                break;
-            case ComparisonExpression::GREATER_THAN:
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(NumberExpression::class)
-                    ]
-                );
-                break;
-            case ComparisonExpression::LESS_THAN:
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(NumberExpression::class)
-                    ]
-                );
-                break;
-            case ComparisonExpression::UNEQUAL:
-                // For text expressions, this will be a case-sensitive comparison
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(BooleanExpression::class),
-                        new StaticType(NumberExpression::class),
-                        new StaticType(TextExpression::class)
-                    ]
-                );
-                break;
-            case ComparisonExpression::UNEQUAL_CASE_INSENSITIVE:
-                // Case-insensitive comparison - only makes sense for text expressions,
-                // so only text expressions may use it
-                $subValidationContext->assertPossibleMatchingResultTypes(
-                    $this->leftOperandExpression,
-                    'left operand',
-                    $this->rightOperandExpression,
-                    'right operand',
-                    [
-                        new StaticType(TextExpression::class)
-                    ]
-                );
-                break;
-            default:
-                throw new InvalidArgumentException(
-                    'ComparisonExpressionNode :: Invalid operator "' . $this->operator . '" provided'
-                );
-        }
     }
 }

@@ -18,7 +18,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Loader\EnvironmentLoaderInterface;
 use Combyna\Component\Environment\EnvironmentFactoryInterface;
 use Combyna\Component\Plugin\LibraryConfigCollection;
-use Combyna\Component\Validator\ValidatorInterface;
+use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
 
 /**
  * Class Combyna
@@ -40,6 +40,11 @@ class Combyna
     private $appNodePromoter;
 
     /**
+     * @var NodeValidatorInterface
+     */
+    private $appValidator;
+
+    /**
      * @var EnvironmentFactoryInterface
      */
     private $environmentFactory;
@@ -55,15 +60,10 @@ class Combyna
     private $libraryConfigCollection;
 
     /**
-     * @var ValidatorInterface
-     */
-    private $validator;
-
-    /**
      * @param EnvironmentFactoryInterface $environmentFactory
      * @param EnvironmentLoaderInterface $environmentLoader
      * @param AppLoaderInterface $appLoader
-     * @param ValidatorInterface $validator
+     * @param NodeValidatorInterface $appValidator
      * @param AppNodePromoter $appNodePromoter
      * @param LibraryConfigCollection $libraryConfigCollection
      */
@@ -71,16 +71,16 @@ class Combyna
         EnvironmentFactoryInterface $environmentFactory,
         EnvironmentLoaderInterface $environmentLoader,
         AppLoaderInterface $appLoader,
-        ValidatorInterface $validator,
+        NodeValidatorInterface $appValidator,
         AppNodePromoter $appNodePromoter,
         LibraryConfigCollection $libraryConfigCollection
     ) {
         $this->appLoader = $appLoader;
         $this->appNodePromoter = $appNodePromoter;
+        $this->appValidator = $appValidator;
         $this->environmentFactory = $environmentFactory;
         $this->environmentLoader = $environmentLoader;
         $this->libraryConfigCollection = $libraryConfigCollection;
-        $this->validator = $validator;
     }
 
     /**
@@ -98,9 +98,7 @@ class Combyna
 
         $appNode = $this->appLoader->loadApp($environmentNode, $appConfig);
 
-        $validationContext = $this->validator->validate($environmentNode, $environmentNode);
-        $validationContext->throwIfViolated();
-        $validationContext = $this->validator->validate($appNode, $environmentNode);
+        $validationContext = $this->appValidator->validate($appNode, $appNode);
         $validationContext->throwIfViolated();
 
         return $this->appNodePromoter->promoteApp($appNode, $environmentNode);

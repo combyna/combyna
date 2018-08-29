@@ -11,11 +11,7 @@
 
 namespace Combyna\Component\Ui\View;
 
-use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Ui\State\View\ViewStateInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use InvalidArgumentException;
 
 /**
  * Interface ViewCollectionInterface

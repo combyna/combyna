@@ -6,3 +6,9 @@ services:
     combyna.event.promoter.event_definition_reference:
         class: Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter
         autowire: true
+
+    combyna.event.promoter.event_payload_expression_node:
+        class: Combyna\Component\Event\Config\Act\EventPayloadExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

@@ -11,11 +11,9 @@
 
 namespace Combyna\Component\Environment\Library;
 
-use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Parameter\ParameterBagModelInterface;
 use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
@@ -39,7 +37,7 @@ class NativeFunction implements FunctionInterface
     private $name;
 
     /**
-     * @var ParameterBagModelInterface
+     * @var FixedStaticBagModelInterface
      */
     private $parameterBag;
 
@@ -50,13 +48,13 @@ class NativeFunction implements FunctionInterface
 
     /**
      * @param string $name
-     * @param ParameterBagModelInterface $parameterBag A specification for parameters and their types
+     * @param FixedStaticBagModelInterface $parameterBag A specification for parameters and their types
      * @param callable $callable
      * @param TypeInterface $returnType
      */
     public function __construct(
         $name,
-        ParameterBagModelInterface $parameterBag,
+        FixedStaticBagModelInterface $parameterBag,
         callable $callable,
         TypeInterface $returnType
     ) {
@@ -72,7 +70,7 @@ class NativeFunction implements FunctionInterface
     public function call(StaticBagInterface $argumentStaticBag)
     {
         // Sanity check to ensure all arguments match the parameter list before we continue
-        $this->parameterBag->assertValidArgumentBag($argumentStaticBag);
+        $this->parameterBag->assertValidStaticBag($argumentStaticBag);
 
         $callable = $this->callable;
         $resultStatic = $callable($argumentStaticBag);
@@ -107,18 +105,5 @@ class NativeFunction implements FunctionInterface
     public function getReturnType()
     {
         return $this->returnType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateArgumentExpressionBag(
-        ValidationContextInterface $validationContext,
-        ExpressionBagNode $expressionBagNode
-    ) {
-        $this->parameterBag->validateArgumentExpressionBag(
-            $validationContext,
-            $expressionBagNode
-        );
     }
 }

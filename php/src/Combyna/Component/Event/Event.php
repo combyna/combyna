@@ -23,7 +23,7 @@ class Event implements EventInterface
     /**
      * @var EventDefinitionInterface
      */
-    private $eventDefinition;
+    private $definition;
 
     /**
      * @var StaticBagInterface
@@ -38,23 +38,31 @@ class Event implements EventInterface
     {
         $eventDefinition->assertValidPayloadStaticBag($payloadStaticBag);
 
-        $this->eventDefinition = $eventDefinition;
+        $this->definition = $eventDefinition;
         $this->payloadStaticBag = $payloadStaticBag;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEventLibraryName()
+    public function getLibraryName()
     {
-        return $this->eventDefinition->getLibraryName();
+        return $this->definition->getLibraryName();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEventName()
+    public function getName()
     {
-        return $this->eventDefinition->getName();
+        return $this->definition->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStatic($staticName)
+    {
+        return $this->payloadStaticBag->getStatic($staticName);
     }
 }

@@ -11,13 +11,8 @@
 
 namespace Combyna\Component\Ui\Store\Instruction;
 
-use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Program\ProgramInterface;
-use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Signal\DispatcherInterface;
-use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 
 /**

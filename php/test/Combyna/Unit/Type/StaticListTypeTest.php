@@ -13,11 +13,11 @@ namespace Combyna\Unit\Type;
 
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticListExpression;
-use Combyna\Harness\TestCase;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

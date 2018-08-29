@@ -45,6 +45,14 @@ class TextNode implements HtmlNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function toGenericArray()
+    {
+        return [$this->toArray()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toHtml()
     {
         return $this->text;

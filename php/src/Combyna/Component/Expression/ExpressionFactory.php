@@ -14,10 +14,11 @@ namespace Combyna\Component\Expression;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
+use Combyna\Component\Expression\Assurance\NonNothingValueAssurance;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
-use Combyna\Component\Validator\ValidationFactoryInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use InvalidArgumentException;
 
 /**
@@ -45,26 +46,18 @@ class ExpressionFactory implements ExpressionFactoryInterface
     private $staticExpressionFactory;
 
     /**
-     * @var ValidationFactoryInterface
-     */
-    private $validationFactory;
-
-    /**
      * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param BagFactoryInterface $bagFactory
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
-     * @param ValidationFactoryInterface $validationFactory
      */
     public function __construct(
         StaticExpressionFactoryInterface $staticExpressionFactory,
         BagFactoryInterface $bagFactory,
-        EvaluationContextFactoryInterface $evaluationContextFactory,
-        ValidationFactoryInterface $validationFactory
+        EvaluationContextFactoryInterface $evaluationContextFactory
     ) {
         $this->bagFactory = $bagFactory;
         $this->evaluationContextFactory = $evaluationContextFactory;
         $this->staticExpressionFactory = $staticExpressionFactory;
-        $this->validationFactory = $validationFactory;
     }
 
     /**
@@ -232,7 +225,6 @@ class ExpressionFactory implements ExpressionFactoryInterface
             $this,
             $this->bagFactory,
             $this->evaluationContextFactory,
-            $this->validationFactory,
             $assurances,
             $consequentExpression,
             $alternateExpression

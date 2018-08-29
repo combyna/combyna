@@ -6,3 +6,9 @@ services:
     combyna.event.loader.event_definition_reference:
         class: Combyna\Component\Event\Config\Loader\EventDefinitionReferenceLoader
         autowire: true
+
+    combyna.event.loader.event_payload_expression:
+        class: Combyna\Component\Event\Config\Loader\EventPayloadExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}

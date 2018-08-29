@@ -11,41 +11,49 @@
 
 namespace Combyna\Component\Event\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class EventDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class EventDefinitionNode extends AbstractActNode
+class EventDefinitionNode extends AbstractActNode implements EventDefinitionNodeInterface
 {
+    const TYPE = 'event-definition';
+
     /**
      * @var string
      */
     private $eventName;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $payloadStaticBagModelNode;
 
     /**
      * @param string $eventName
-     * @param FixedStaticBagModelNode $payloadStaticBagModelNode
+     * @param FixedStaticBagModelNodeInterface $payloadStaticBagModelNode
      */
-    public function __construct($eventName, FixedStaticBagModelNode $payloadStaticBagModelNode)
+    public function __construct($eventName, FixedStaticBagModelNodeInterface $payloadStaticBagModelNode)
     {
         $this->eventName = $eventName;
         $this->payloadStaticBagModelNode = $payloadStaticBagModelNode;
     }
 
     /**
-     * Fetches the unique name of the event
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->payloadStaticBagModelNode);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getEventName()
     {
@@ -53,9 +61,15 @@ class EventDefinitionNode extends AbstractActNode
     }
 
     /**
-     * Fetches the model for the static bag of payload data the event expects
-     *
-     * @return FixedStaticBagModelNode
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->eventName;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPayloadStaticBagModel()
     {
@@ -65,10 +79,16 @@ class EventDefinitionNode extends AbstractActNode
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function getPayloadStaticType($payloadStaticName)
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
+        return $this->payloadStaticBagModelNode->getStaticType($payloadStaticName);
+    }
 
-        $this->payloadStaticBagModelNode->validate($subValidationContext);
+    /**
+     * {@inheritdoc}
+     */
+    public function isDefined()
+    {
+        return true;
     }
 }

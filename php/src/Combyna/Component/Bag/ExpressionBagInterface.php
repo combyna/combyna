@@ -13,7 +13,6 @@ namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Interface ExpressionBagInterface
@@ -54,11 +53,4 @@ interface ExpressionBagInterface
      * @return StaticBagInterface
      */
     public function toStaticBag(EvaluationContextInterface $evaluationContext);
-
-    /**
-     * Validates all expressions in the bag
-     *
-     * @param ValidationContextInterface $validationContext
-     */
-    public function validate(ValidationContextInterface $validationContext);
 }

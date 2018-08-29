@@ -1,0 +1,13 @@
+services:
+    combyna.environment.validation.factory:
+        class: Combyna\Component\Environment\Validation\EnvironmentValidationFactory
+        autowire: true
+        # Ensure autowiring picks the EnvironmentValidationFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Environment\Validation\EnvironmentValidationFactoryInterface
+
+    combyna.environment.validation.environment_sub_validation_context_factory:
+        class: Combyna\Component\Environment\Validation\Context\Factory\EnvironmentContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}

@@ -15,7 +15,9 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
+use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
+use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -102,7 +104,16 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      */
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
     {
-        $eventDefinition = $this->eventDefinitionReferenceCollection->getDefinitionByName($libraryName, $eventName);
+        try {
+            $eventDefinition = $this->eventDefinitionReferenceCollection->getDefinitionByName($libraryName, $eventName);
+        } catch (EventDefinitionNotReferencedException $exception) {
+            throw new EventDefinitionNotReferencedByWidgetException(
+                $libraryName,
+                $eventName,
+                $this->libraryName,
+                $this->name
+            );
+        }
 
         return $this->eventFactory->createEvent($eventDefinition, $payloadStaticBag);
     }

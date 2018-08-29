@@ -1,0 +1,73 @@
+services:
+    combyna.ui.store.validation.inside_view_store_constraint_validator:
+        class: Combyna\Component\Ui\Store\Validation\Constraint\InsideViewStoreConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.store.validation.ui_sub_validation_context_factory:
+        class: Combyna\Component\Ui\Validation\Context\Factory\UiContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.ui.store.validation.view_store_has_slot_constraint_validator:
+        class: Combyna\Component\Ui\Store\Validation\Constraint\ViewStoreHasSlotConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.store.validation.view_store_sub_validation_context_factory:
+        class: Combyna\Component\Ui\Store\Validation\Context\Factory\ViewStoreContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.ui.validation.compound_widget_definition_has_attribute_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasAttributeConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.compound_widget_definition_has_child_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.factory:
+        class: Combyna\Component\Ui\Validation\UiValidationFactory
+        autowire: true
+        # Ensure autowiring picks the UiValidationFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Ui\Validation\UiValidationFactoryInterface
+
+    combyna.ui.validation.inside_compound_widget_definition_root_widget_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\InsideCompoundWidgetDefinitionRootWidgetConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.inside_view_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\InsideViewConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.page_view_exists_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\PageViewExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.valid_view_store_query_constraint_validator:
+        class: Combyna\Component\Ui\Store\Validation\Constraint\ValidViewStoreQueryConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.valid_widget_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\ValidWidgetConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

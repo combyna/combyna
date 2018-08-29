@@ -30,9 +30,14 @@ class GenericNode implements HtmlNodeInterface
     private $attributes;
 
     /**
-     * @var HtmlNodeInterface[]
+     * @var string[]|int[]
      */
-    private $childNodes;
+    private $path;
+
+    /**
+     * @var HtmlNodeInterface|null
+     */
+    private $rootChildNode;
 
     /**
      * @var WidgetStateInterface
@@ -41,13 +46,19 @@ class GenericNode implements HtmlNodeInterface
 
     /**
      * @param WidgetStateInterface $widgetState
+     * @param string[]|int[] $path
      * @param array $attributes
-     * @param HtmlNodeInterface[] $childNodes
+     * @param HtmlNodeInterface|null $rootChildNode
      */
-    public function __construct(WidgetStateInterface $widgetState, array $attributes, array $childNodes)
-    {
+    public function __construct(
+        WidgetStateInterface $widgetState,
+        array $path,
+        array $attributes,
+        HtmlNodeInterface $rootChildNode = null
+    ) {
         $this->attributes = $attributes;
-        $this->childNodes = $childNodes;
+        $this->path = $path;
+        $this->rootChildNode = $rootChildNode;
         $this->widgetState = $widgetState;
     }
 
@@ -56,19 +67,22 @@ class GenericNode implements HtmlNodeInterface
      */
     public function toArray()
     {
-        $children = [];
-
-        foreach ($this->childNodes as $childName => $childNode) {
-            $children[$childName] = $childNode->toArray();
-        }
-
         return [
             'type' => 'generic',
             'library' => $this->widgetState->getWidgetDefinitionLibraryName(),
             'widget' => $this->widgetState->getWidgetDefinitionName(),
+            'path' => $this->path,
             'attributes' => $this->attributes,
-            'children' => $children
+            'children' => $this->rootChildNode !== null ? $this->rootChildNode->toGenericArray() : []
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toGenericArray()
+    {
+        return [$this->toArray()];
     }
 
     /**

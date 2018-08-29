@@ -12,12 +12,14 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Validation\Constraint\ValidWidgetConstraint;
 
 /**
  * Class DefinedWidgetNode
@@ -37,6 +39,13 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @var WidgetNodeInterface[]
      */
     private $childWidgetNodes;
+
+    /**
+     * The name of this widget, if set, unique amongst its siblings
+     *
+     * @var string|null
+     */
+    private $name;
 
     /**
      * @var array
@@ -67,6 +76,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @param string $widgetDefinitionLibraryName
      * @param string $widgetDefinitionName
      * @param ExpressionBagNode $attributeExpressionBagNode
+     * @param string|null $name
      * @param WidgetNodeInterface[] $childWidgetNodes
      * @param TriggerNode[] $triggerNodes
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
@@ -76,18 +86,61 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
         $widgetDefinitionLibraryName,
         $widgetDefinitionName,
         ExpressionBagNode $attributeExpressionBagNode,
-        array $childWidgetNodes,
-        array $triggerNodes,
+        $name = null,
+        array $childWidgetNodes = [],
+        array $triggerNodes = [],
         ExpressionNodeInterface $visibilityExpressionNode = null,
-        array $tags
+        array $tags = []
     ) {
         $this->attributeExpressionBagNode = $attributeExpressionBagNode;
         $this->childWidgetNodes = $childWidgetNodes;
+        $this->name = $name;
         $this->tags = $tags;
         $this->triggerNodes = $triggerNodes;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
         $this->widgetDefinitionLibraryName = $widgetDefinitionLibraryName;
         $this->widgetDefinitionName = $widgetDefinitionName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->attributeExpressionBagNode);
+
+        // Validate all triggers for this widget
+        foreach ($this->triggerNodes as $triggerNode) {
+            $specBuilder->addChildNode($triggerNode);
+        }
+
+        // Recursively validate any child widgets
+        foreach ($this->childWidgetNodes as $childWidgetNode) {
+            $specBuilder->addChildNode($childWidgetNode);
+        }
+
+        // Validate the visibility expression, if specified
+        if ($this->visibilityExpressionNode) {
+            $specBuilder->addChildNode($this->visibilityExpressionNode);
+
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->visibilityExpressionNode,
+                    new StaticType(BooleanExpression::class),
+                    'visibility'
+                )
+            );
+        }
+
+        // Validate that this widget is a well-formed instance of its definition
+        $specBuilder->addConstraint(
+            new ValidWidgetConstraint(
+                $this->widgetDefinitionLibraryName,
+                $this->widgetDefinitionName,
+                $this->attributeExpressionBagNode,
+                $this->childWidgetNodes
+            )
+        );
     }
 
     /**
@@ -113,9 +166,27 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function getIdentifier()
+    {
+        return $this->getType() . ':' . $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLibraryName()
     {
         return $this->widgetDefinitionLibraryName;
+    }
+
+    /**
+     * Returns the name of this widget, if set, unique amongst its siblings
+     *
+     * @return string|null
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -150,43 +221,5 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     public function getWidgetDefinitionName()
     {
         return $this->widgetDefinitionName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->attributeExpressionBagNode->validate($subValidationContext);
-
-        // Validate ourself
-        if ($this->visibilityExpressionNode) {
-            $this->visibilityExpressionNode->validate($subValidationContext);
-
-            $subValidationContext->assertResultType(
-                $this->visibilityExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'visibility'
-            );
-        }
-
-        // FIXME: Reinstate this validation somehow
-//        $this->widgetDefinitionNode->validateWidget(
-//            $subValidationContext,
-//            $this->attributeExpressionBagNode,
-//            $this->childWidgetNodes
-//        );
-
-        // Validate all triggers for this widget
-        foreach ($this->triggerNodes as $triggerNode) {
-            $triggerNode->validate($subValidationContext);
-        }
-
-        // Recursively validate any child widgets
-        foreach ($this->childWidgetNodes as $childWidgetNode) {
-            $childWidgetNode->validate($subValidationContext);
-        }
     }
 }

@@ -1,0 +1,12 @@
+services:
+    combyna.event.validation.event_definition_exists_constraint_validator:
+        class: Combyna\Component\Event\Validation\Constraint\EventDefinitionExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.event.validation.event_definition_has_payload_static_constraint_validator:
+        class: Combyna\Component\Event\Validation\Constraint\EventDefinitionHasPayloadStaticConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

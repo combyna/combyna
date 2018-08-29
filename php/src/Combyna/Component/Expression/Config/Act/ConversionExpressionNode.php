@@ -11,11 +11,14 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\ConversionExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -37,7 +40,7 @@ class ConversionExpressionNode extends AbstractExpressionNode
     /**
      * @var ExpressionNodeInterface
      */
-    private $expression;
+    private $expressionNode;
 
     /**
      * @param ExpressionNodeInterface $expression
@@ -48,7 +51,38 @@ class ConversionExpressionNode extends AbstractExpressionNode
         $conversion
     ) {
         $this->conversion = $conversion;
-        $this->expression = $expression;
+        $this->expressionNode = $expression;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->expressionNode);
+
+        switch ($this->conversion) {
+            case ConversionExpression::NUMBER_TO_TEXT:
+                $allowedInputType = NumberExpression::class;
+                break;
+            case ConversionExpression::TEXT_TO_NUMBER:
+                $allowedInputType = TextExpression::class;
+                break;
+            default:
+                throw new InvalidArgumentException(
+                    'ConversionExpressionNode :: Invalid conversion "' . $this->conversion . '" provided'
+                );
+        }
+
+        // Ensure the input expression can only ever evaluate
+        // to the expected type for the specified conversion
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->expressionNode,
+                new StaticType($allowedInputType),
+                'expression'
+            )
+        );
     }
 
     /**
@@ -68,54 +102,28 @@ class ConversionExpressionNode extends AbstractExpressionNode
      */
     public function getExpression()
     {
-        return $this->expression;
+        return $this->expressionNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
         switch ($this->conversion) {
             case ConversionExpression::NUMBER_TO_TEXT:
-                return new StaticType(TextExpression::class);
+                return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
             case ConversionExpression::TEXT_TO_NUMBER:
-                return new StaticType(NumberExpression::class);
+                return new PresolvedTypeDeterminer(new StaticType(NumberExpression::class));
             default:
-                throw new InvalidArgumentException(
-                    'ConversionExpressionNode :: Invalid conversion "' . $this->conversion . '" provided'
+                return new PresolvedTypeDeterminer(
+                    new UnresolvedType(
+                        sprintf(
+                            'Invalid conversion "%s" provided',
+                            $this->conversion
+                        )
+                    )
                 );
         }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->expression->validate($subValidationContext);
-
-        switch ($this->conversion) {
-            case ConversionExpression::NUMBER_TO_TEXT:
-                $allowedInputType = NumberExpression::class;
-                break;
-            case ConversionExpression::TEXT_TO_NUMBER:
-                $allowedInputType = TextExpression::class;
-                break;
-            default:
-                throw new InvalidArgumentException(
-                    'ConversionExpressionNode :: Invalid conversion "' . $this->conversion . '" provided'
-                );
-        }
-
-        // Ensure the input expression can only ever evaluate
-        // to the expected types for the specified conversion
-        $subValidationContext->assertResultType(
-            $this->expression,
-            new StaticType($allowedInputType),
-            'expression'
-        );
     }
 }

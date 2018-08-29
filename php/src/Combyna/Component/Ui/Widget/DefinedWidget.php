@@ -183,8 +183,8 @@ class DefinedWidget implements DefinedWidgetInterface
             return $this->parentWidget->dispatchEvent($programState, $program, $event, $widgetEvaluationContext);
         }
 
-        if ($this->triggerCollection->hasByEventName($event->getEventLibraryName(), $event->getEventName())) {
-            $trigger = $this->triggerCollection->getByEventName($event->getEventLibraryName(), $event->getEventName());
+        if ($this->triggerCollection->hasByEventName($event->getLibraryName(), $event->getName())) {
+            $trigger = $this->triggerCollection->getByEventName($event->getLibraryName(), $event->getName());
 
             $programState = $trigger->invoke($programState, $program, $event, $widgetEvaluationContext);
         }
@@ -229,9 +229,6 @@ class DefinedWidget implements DefinedWidgetInterface
      */
     public function getDescendantByPath(array $names)
     {
-//        var_dump($names);
-//        var_dump(array_keys($this->childWidgets));
-
         $childName = array_shift($names);
         $child = $this->childWidgets[$childName];
 

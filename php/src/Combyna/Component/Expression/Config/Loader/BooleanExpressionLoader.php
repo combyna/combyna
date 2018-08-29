@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\BooleanExpressionNode;
-use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\BooleanExpression;
+use Combyna\Component\Expression\Config\Act\BooleanExpressionNode;
 
 /**
  * Class BooleanExpressionLoader
@@ -40,7 +40,7 @@ class BooleanExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $boolean = $this->configParser->getElement($config, 'boolean', 'boolean expression');
+        $boolean = $this->configParser->getElement($config, 'boolean', 'boolean expression', 'boolean');
 
         return new BooleanExpressionNode($boolean);
     }

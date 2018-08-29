@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
-use Combyna\Component\Expression\ComparisonExpression;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\ComparisonExpression;
+use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
 
 /**
  * Class ComparisonExpressionLoader

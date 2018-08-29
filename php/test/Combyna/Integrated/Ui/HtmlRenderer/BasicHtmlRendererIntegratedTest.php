@@ -11,7 +11,6 @@
 
 namespace Combyna\Integrated\Ui\HtmlRenderer;
 
-use Combyna\CombynaBootstrap;
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
@@ -37,11 +36,6 @@ class BasicHtmlRendererIntegratedTest extends TestCase
     private $combyna;
 
     /**
-     * @var CombynaBootstrap
-     */
-    private $combynaBootstrap;
-
-    /**
      * @var ContainerInterface
      */
     private $container;
@@ -58,8 +52,8 @@ class BasicHtmlRendererIntegratedTest extends TestCase
 
     public function setUp()
     {
-        $this->combynaBootstrap = new CombynaBootstrap();
-        $this->container = $this->combynaBootstrap->getContainer();
+        global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
+        $this->container = $combynaBootstrap->getContainer();
 
         $this->combyna = $this->container->get('combyna');
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');

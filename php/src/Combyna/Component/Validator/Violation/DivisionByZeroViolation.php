@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Validator\Violation;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\ViolationInterface;
 
 /**
@@ -25,17 +25,17 @@ use Combyna\Component\Validator\ViolationInterface;
 class DivisionByZeroViolation implements ViolationInterface
 {
     /**
-     * @var ValidationContextInterface
+     * @var SubValidationContextInterface
      */
-    private $validationContext;
+    private $subValidationContext;
 
     /**
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $subValidationContext
      */
     public function __construct(
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $subValidationContext
     ) {
-        $this->validationContext = $validationContext;
+        $this->subValidationContext = $subValidationContext;
     }
 
     /**
@@ -51,6 +51,6 @@ class DivisionByZeroViolation implements ViolationInterface
      */
     public function getPath()
     {
-        return $this->validationContext->getPath();
+        return $this->subValidationContext->getPath();
     }
 }

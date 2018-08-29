@@ -11,28 +11,30 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Config\Act\AbstractActNode;
 
 /**
  * Class AbstractStaticExpressionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-abstract class AbstractStaticExpressionNode implements StaticNodeInterface
+abstract class AbstractStaticExpressionNode extends AbstractActNode implements StaticNodeInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getType()
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        return static::TYPE;
+        // Nothing to validate, a static expression should have no operands as it is already evaluated
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
     {
-        // Nothing to validate, a static expression should have no operands as it is already evaluated
+        return false; // Static expressions are already resolved, so there is no work such as queries to do
     }
 }

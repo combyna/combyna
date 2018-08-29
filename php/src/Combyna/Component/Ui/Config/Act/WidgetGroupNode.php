@@ -11,12 +11,13 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class WidgetGroupNode
@@ -33,6 +34,11 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     private $childWidgetNodes;
 
     /**
+     * @var string|null
+     */
+    private $name;
+
+    /**
      * @var array
      */
     private $tags;
@@ -44,17 +50,43 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
 
     /**
      * @param WidgetNodeInterface[] $childWidgetNodes
+     * @param string|null $name
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
     public function __construct(
         array $childWidgetNodes,
+        $name = null,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
         $this->childWidgetNodes = $childWidgetNodes;
+        $this->name = $name;
         $this->tags = $tags;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        if ($this->visibilityExpressionNode) {
+            $specBuilder->addChildNode($this->visibilityExpressionNode);
+
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->visibilityExpressionNode,
+                    new StaticType(BooleanExpression::class),
+                    'visibility'
+                )
+            );
+        }
+
+        // Recursively validate any child widgets
+        foreach ($this->childWidgetNodes as $childWidgetNode) {
+            $specBuilder->addChildNode($childWidgetNode);
+        }
     }
 
     /**
@@ -65,6 +97,14 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     public function getChildWidgets()
     {
         return $this->childWidgetNodes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return $this->getType() . ':' . $this->name;
     }
 
     /**
@@ -97,29 +137,5 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     public function getWidgetDefinitionName()
     {
         return 'group';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // Validate ourself
-        if ($this->visibilityExpressionNode) {
-            $this->visibilityExpressionNode->validate($subValidationContext);
-
-            $subValidationContext->assertResultType(
-                $this->visibilityExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'visibility'
-            );
-        }
-
-        // Recursively validate any child widgets
-        foreach ($this->childWidgetNodes as $childWidgetNode) {
-            $childWidgetNode->validate($subValidationContext);
-        }
     }
 }

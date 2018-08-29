@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Event;
 
+use Combyna\Component\Expression\StaticInterface;
+
 /**
  * Interface EventInterface
  *
@@ -23,12 +25,20 @@ interface EventInterface
      *
      * @return string
      */
-    public function getEventLibraryName();
+    public function getLibraryName();
 
     /**
      * Fetches the unique name of the event within its library
      *
      * @return string
      */
-    public function getEventName();
+    public function getName();
+
+    /**
+     * Fetches the specified static from this event's payload
+     *
+     * @param string $staticName
+     * @return StaticInterface
+     */
+    public function getPayloadStatic($staticName);
 }

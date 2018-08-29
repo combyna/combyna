@@ -52,7 +52,7 @@ class BooleanExpressionLoaderTest extends TestCase
             'type' => 'boolean',
             'boolean' => $boolean
         ];
-        $this->configParser->getElement($config, 'boolean', Argument::any())
+        $this->configParser->getElement($config, 'boolean', Argument::any(), 'boolean')
             ->willReturn($boolean);
 
         $booleanExpressionNode = $this->loader->load($config);

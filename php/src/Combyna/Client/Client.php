@@ -81,6 +81,19 @@ class Client
     }
 
     /**
+     * Navigates to a new route
+     *
+     * @param AppStateInterface $appState
+     * @param string $libraryName
+     * @param string $routeName
+     * @return AppStateInterface
+     */
+    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName)
+    {
+        return $this->app->navigateTo($appState, $libraryName, $routeName);
+    }
+
+    /**
      * Renders all views that are visible in the provided app state to a plain array structure
      *
      * @param AppStateInterface $appState

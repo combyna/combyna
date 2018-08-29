@@ -12,8 +12,9 @@
 namespace Combyna\Component\Router\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Validation\Constraint\PageViewExistsConstraint;
 
 /**
  * Class RouteNode
@@ -52,6 +53,16 @@ class RouteNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->attributeBagModelNode);
+
+        $specBuilder->addConstraint(new PageViewExistsConstraint($this->pageViewName));
+    }
+
+    /**
      * Fetches the model for the attribute static bag this route expects to be extracted from its route segments
      *
      * @return FixedStaticBagModelNode
@@ -79,15 +90,5 @@ class RouteNode extends AbstractActNode
     public function getPageViewName()
     {
         return $this->pageViewName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->attributeBagModelNode->validate($subValidationContext);
     }
 }

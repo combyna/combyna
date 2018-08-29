@@ -17,23 +17,21 @@ use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Environment;
 use Combyna\Component\Environment\Library\FunctionCollection;
+use Combyna\Component\Environment\Library\Library;
+use Combyna\Component\Environment\Library\NativeFunction;
 use Combyna\Component\Event\EventDefinitionCollection;
-use Combyna\Component\Expression\Evaluation\EvaluationContextFactory;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\ComparisonExpression;
 use Combyna\Component\Expression\ConversionExpression;
+use Combyna\Component\Expression\Evaluation\EvaluationContextFactory;
 use Combyna\Component\Expression\ExpressionFactory;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticExpressionFactory;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Signal\SignalDefinitionCollection;
-use Combyna\Component\Validator\ValidationFactory;
-use Combyna\Harness\TestCase;
-use Combyna\Component\Environment\Library\Library;
-use Combyna\Component\Environment\Library\NativeFunction;
-use Combyna\Parameter\ParameterBagModel;
 use Combyna\Component\Type\StaticType;
+use Combyna\Harness\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
 
@@ -64,18 +62,12 @@ class BasicExpressionIntegratedTest extends TestCase
      */
     private $expressionFactory;
 
-    /**
-     * @var ValidationFactory
-     */
-    private $validationFactory;
-
     public function setUp()
     {
         $staticExpressionFactory = new StaticExpressionFactory();
         $translator = new Translator('en');
         $translator->addLoader('yaml', new ArrayLoader());
-        $this->validationFactory = new ValidationFactory();
-        $this->bagFactory = new BagFactory($staticExpressionFactory, $this->validationFactory);
+        $this->bagFactory = new BagFactory($staticExpressionFactory);
         $this->environment = new Environment($translator);
         $this->evaluationContextFactory = new EvaluationContextFactory($this->bagFactory);
 
@@ -85,18 +77,14 @@ class BasicExpressionIntegratedTest extends TestCase
                 new FunctionCollection([
                     new NativeFunction(
                         'length',
-                        new ParameterBagModel(
-                            new FixedStaticBagModel(
-                                $this->bagFactory,
-                                $this->validationFactory,
-                                [
-                                    new FixedStaticDefinition(
-                                        $this->validationFactory,
-                                        'textString',
-                                        new StaticType(TextExpression::class)
-                                    )
-                                ]
-                            )
+                        new FixedStaticBagModel(
+                            $this->bagFactory,
+                            [
+                                new FixedStaticDefinition(
+                                    'textString',
+                                    new StaticType(TextExpression::class)
+                                )
+                            ]
                         ),
                         function (StaticBagInterface $argumentBag) {
                             $textString = $argumentBag->getStatic('textString')->toNative();
@@ -124,8 +112,7 @@ class BasicExpressionIntegratedTest extends TestCase
         $this->expressionFactory = new ExpressionFactory(
             $staticExpressionFactory,
             $this->bagFactory,
-            $this->evaluationContextFactory,
-            $this->validationFactory
+            $this->evaluationContextFactory
         );
     }
 

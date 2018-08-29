@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\ConcatenationExpressionNode;
-use Combyna\Component\Expression\ConcatenationExpression;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\ConcatenationExpression;
+use Combyna\Component\Expression\Config\Act\ConcatenationExpressionNode;
 
 /**
  * Class ConcatenationExpressionLoader

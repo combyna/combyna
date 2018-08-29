@@ -29,6 +29,14 @@ interface TypeInterface
     public function allows(TypeInterface $candidateType);
 
     /**
+     * Returns true if this type is lenient enough to allow an AnyType, false otherwise
+     *
+     * @param AnyType $candidateType
+     * @return bool
+     */
+    public function allowsAnyType(AnyType $candidateType);
+
+    /**
      * Returns true if this type allows all sub-types of the specified multiple type, false otherwise
      *
      * @param MultipleType $candidateType
@@ -71,6 +79,14 @@ interface TypeInterface
     public function getSummary();
 
     /**
+     * Returns true if this type is allowed by an AnyType (usually anything except an UnknownType),
+     * false otherwise
+     *
+     * @return bool
+     */
+    public function isAllowedByAnyType();
+
+    /**
      * Returns true if this type is equivalent to the specified multiple type, false otherwise
      *
      * @param MultipleType $otherType
@@ -104,6 +120,14 @@ interface TypeInterface
     public function mergeWith(TypeInterface $otherType);
 
     /**
+     * Returns a new type that will match everything the current type does and also any other type
+     *
+     * @param AnyType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithAnyType(AnyType $otherType);
+
+    /**
      * Returns a new type that will match everything the current type does and also everything
      * the provided multiple type does
      *
@@ -133,6 +157,24 @@ interface TypeInterface
     public function mergeWithStaticType(StaticType $otherType);
 
     /**
+     * Returns a new type that will match everything the current type does and also everything
+     * the provided unresolved type does
+     *
+     * @param UnresolvedType $unresolvedType
+     * @return TypeInterface
+     */
+    public function mergeWithUnresolvedType(UnresolvedType $unresolvedType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after a special "any" type
+     *
+     * @param AnyType $otherType
+     * @return TypeInterface
+     */
+    public function whenMergedWithAnyType(AnyType $otherType);
+
+    /**
      * Returns a new type that matches everything the current type does,
      * after everything the provided multiple type does
      *
@@ -158,4 +200,13 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithStaticType(StaticType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided unresolved type does
+     *
+     * @param UnresolvedType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithUnresolvedType(UnresolvedType $candidateType);
 }

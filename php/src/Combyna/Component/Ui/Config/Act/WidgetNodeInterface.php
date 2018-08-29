@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Trigger\Config\Act\TriggerNode;
 
 /**
  * Interface WidgetNodeInterface

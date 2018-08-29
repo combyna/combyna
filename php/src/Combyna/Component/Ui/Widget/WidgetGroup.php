@@ -135,7 +135,17 @@ class WidgetGroup implements WidgetGroupInterface
         EventInterface $event,
         WidgetEvaluationContextInterface $widgetEvaluationContext
     ) {
-        throw new \Exception('Not implemented');
+        if ($this->parentWidget === null) {
+            // No parent widget - nothing to do, as there is nothing to handle the event
+            return $programState;
+        }
+
+        return $this->parentWidget->dispatchEvent(
+            $programState,
+            $program,
+            $event,
+            $widgetEvaluationContext
+        );
     }
 
     /**

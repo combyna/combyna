@@ -28,7 +28,7 @@ class WidgetCollectionLoader implements WidgetCollectionLoaderInterface
         $widgets = [];
 
         foreach ($widgetCollectionConfig as $widgetName => $widgetConfig) {
-            $widgets[$widgetName] = $widgetLoader->loadWidget($widgetConfig);
+            $widgets[$widgetName] = $widgetLoader->loadWidget($widgetConfig, $widgetName);
         }
 
         return $widgets;

@@ -51,6 +51,14 @@ class DocumentFragment implements HtmlNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function toGenericArray()
+    {
+        return $this->toArray()['children'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toHtml()
     {
         $childHtml = '';

@@ -12,15 +12,12 @@
 namespace Combyna\Unit\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
-use Combyna\Component\Validator\Context\ActNodeValidationContextInterface;
+use Combyna\Component\Validator\Context\ActNodeSubValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -51,11 +48,6 @@ class DefinedWidgetNodeTest extends TestCase
     private $node;
 
     /**
-     * @var ObjectProphecy|ActNodeValidationContextInterface
-     */
-    private $subValidationContext;
-
-    /**
      * @var ObjectProphecy|TriggerNode
      */
     private $triggerNode1;
@@ -64,11 +56,6 @@ class DefinedWidgetNodeTest extends TestCase
      * @var ObjectProphecy|TriggerNode
      */
     private $triggerNode2;
-
-    /**
-     * @var ObjectProphecy|ActNodeValidationContextInterface
-     */
-    private $validationContext;
 
     /**
      * @var ObjectProphecy|ExpressionNodeInterface
@@ -80,24 +67,21 @@ class DefinedWidgetNodeTest extends TestCase
         $this->attributeExpressionBagNode = $this->prophesize(ExpressionBagNode::class);
         $this->childWidgetNode1 = $this->prophesize(WidgetNodeInterface::class);
         $this->childWidgetNode2 = $this->prophesize(WidgetNodeInterface::class);
-        $this->subValidationContext = $this->prophesize(ActNodeValidationContextInterface::class);
+        $this->subValidationContext = $this->prophesize(ActNodeSubValidationContextInterface::class);
         $this->triggerNode1 = $this->prophesize(TriggerNode::class);
         $this->triggerNode2 = $this->prophesize(TriggerNode::class);
-        $this->validationContext = $this->prophesize(ActNodeValidationContextInterface::class);
         $this->visibilityExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
 
         $this->node = new DefinedWidgetNode(
             'my_lib',
             'my_widget',
             $this->attributeExpressionBagNode->reveal(),
+            'my-widget',
             [$this->childWidgetNode1->reveal(), $this->childWidgetNode2->reveal()],
             [$this->triggerNode1->reveal(), $this->triggerNode2->reveal()],
             $this->visibilityExpressionNode->reveal(),
             ['my_app.some_interesting_widget']
         );
-
-        $this->validationContext->createSubActNodeContext(Argument::exact($this->node))
-            ->willReturn($this->subValidationContext->reveal());
     }
 
     public function testGetAttributeExpressionBag()
@@ -115,6 +99,11 @@ class DefinedWidgetNodeTest extends TestCase
     public function testGetLibraryName()
     {
         $this->assert($this->node->getLibraryName())->exactlyEquals('my_lib');
+    }
+
+    public function testGetName()
+    {
+        $this->assert($this->node->getName())->exactlyEquals('my-widget');
     }
 
     public function testGetTags()
@@ -137,78 +126,5 @@ class DefinedWidgetNodeTest extends TestCase
     public function testGetWidgetDefinitionName()
     {
         $this->assert($this->node->getWidgetDefinitionName())->exactlyEquals('my_widget');
-    }
-
-    public function testValidateValidatesAttributeExpressionBagNodeWithASubContext()
-    {
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->attributeExpressionBagNode
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateValidatesVisibilityExpressionNodeWithASubContext()
-    {
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->visibilityExpressionNode
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateValidatesThatVisibilityExpressionWillEvaluateToABoolean()
-    {
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->subValidationContext
-            ->assertResultType(
-                Argument::exact($this->visibilityExpressionNode->reveal()),
-                new StaticType(BooleanExpression::class),
-                Argument::any()
-            )
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateValidatesWidgetAgainstTheDefinitionWithASubContext()
-    {
-        $this->markTestSkipped('FIXME: We need to reinstate this');
-
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->widgetDefinitionNode
-            ->validateWidget(
-                Argument::exact($this->subValidationContext->reveal()),
-                Argument::exact($this->attributeExpressionBagNode->reveal()),
-                Argument::exact([
-                    $this->childWidgetNode1->reveal(),
-                    $this->childWidgetNode2->reveal()
-                ])
-            )
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateValidatesAllTriggerNodesWithASubContext()
-    {
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->triggerNode1
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
-        $this->triggerNode2
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
-    }
-
-    public function testValidateValidatesAllChildWidgetNodesWithASubContext()
-    {
-        $this->node->validate($this->validationContext->reveal());
-
-        $this->childWidgetNode1
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
-        $this->childWidgetNode2
-            ->validate(Argument::exact($this->subValidationContext->reveal()))
-            ->shouldHaveBeenCalled();
     }
 }

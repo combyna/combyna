@@ -12,10 +12,11 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface WidgetDefinitionNodeInterface
@@ -27,9 +28,18 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
     /**
      * Fetches the fixed static bag model for attributes of widgets with this definition
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getAttributeBagModel();
+
+    /**
+     * Fetches a child widget definition by its name, if defined for this widget definition
+     *
+     * @param string $childName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return ChildWidgetDefinitionNode|null
+     */
+    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement);
 
     /**
      * Fetches all event definition references defined for this widget definition
@@ -51,6 +61,13 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getWidgetDefinitionName();
+
+    /**
+     * Returns whether or not this widget definition is defined
+     *
+     * @return bool
+     */
+    public function isDefined();
 
     /**
      * Validates that the provided widget data will produce a valid widget with this definition

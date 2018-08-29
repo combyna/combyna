@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Entity\Instruction;
 
-use Combyna\Component\Entity\EntityStorageInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Instruction\InstructionInterface;
 
 /**

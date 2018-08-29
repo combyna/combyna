@@ -190,8 +190,7 @@ class PageView implements PageViewInterface
             $pageViewState,
             $program,
             $environment
-        )
-            ->createSubScopeContext($signal->getPayloadStaticBag());
+        );
 
         $newStoreState = $this->store->handleSignal(
             $signal,

@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Instruction\Config\Act\InstructionNodeInterface;
+use Combyna\Component\Signal\Validation\Context\Specifier\SignalHandlerContextSpecifier;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class SignalHandlerNode
@@ -25,6 +27,8 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  */
 class SignalHandlerNode extends AbstractActNode
 {
+    const TYPE = 'signal-handler';
+
     /**
      * @var ExpressionNodeInterface|null
      */
@@ -56,6 +60,35 @@ class SignalHandlerNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        // Signal handler sub-context defines the signal's payload for child nodes to reference
+        $specBuilder->defineValidationContext(new SignalHandlerContextSpecifier());
+
+        $specBuilder->addChildNode($this->signalDefinitionReferenceNode);
+
+        if ($this->guardExpressionNode !== null) {
+            $specBuilder->addChildNode($this->guardExpressionNode);
+
+            // Guard expression, if specified, must evaluate to a boolean
+            // to decide whether the signal handler should be run or not
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->guardExpressionNode,
+                    new StaticType(BooleanExpression::class),
+                    'guard'
+                )
+            );
+        }
+
+        foreach ($this->instructionNodes as $instructionNode) {
+            $specBuilder->addChildNode($instructionNode);
+        }
+    }
+
+    /**
      * Fetches the guard expression node that must evaluate to true for this handler to run
      *
      * @return ExpressionNodeInterface|null
@@ -83,29 +116,5 @@ class SignalHandlerNode extends AbstractActNode
     public function getSignalDefinitionReference()
     {
         return $this->signalDefinitionReferenceNode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        if ($this->guardExpressionNode !== null) {
-            $this->guardExpressionNode->validate($subValidationContext);
-
-            $subValidationContext->assertResultType(
-                $this->guardExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'guard'
-            );
-        }
-
-        $this->signalDefinitionReferenceNode->validate($subValidationContext);
-
-        foreach ($this->instructionNodes as $instructionNode) {
-            $instructionNode->validate($subValidationContext);
-        }
     }
 }

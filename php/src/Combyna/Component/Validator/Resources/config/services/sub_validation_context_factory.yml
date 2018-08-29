@@ -1,0 +1,10 @@
+services:
+    combyna.validator.validator_sub_validation_context_factory:
+        class: Combyna\Component\Validator\Context\Factory\ValidatorSubValidationContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.validator.delegating_sub_validation_context_factory:
+        class: Combyna\Component\Validator\Context\Factory\DelegatingSubValidationContextFactory
+        autowire: true

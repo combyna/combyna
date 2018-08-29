@@ -11,10 +11,8 @@
 
 namespace Combyna\Component\Environment\Library;
 
-use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\TypeInterface;
 
 /**
@@ -46,16 +44,4 @@ interface FunctionInterface
      * @return TypeInterface
      */
     public function getReturnType();
-
-    /**
-     * Checks that all expressions in the bag only ever evaluate to valid values for
-     * their corresponding parameters and that there are no extra or missing arguments for parameters
-     *
-     * @param ValidationContextInterface $validationContext
-     * @param ExpressionBagNode $expressionBagNode
-     */
-    public function validateArgumentExpressionBag(
-        ValidationContextInterface $validationContext,
-        ExpressionBagNode $expressionBagNode
-    );
 }

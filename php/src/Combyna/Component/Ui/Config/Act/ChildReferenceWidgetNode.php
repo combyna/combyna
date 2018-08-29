@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraint;
 
 /**
  * Class ChildReferenceWidgetNode
@@ -55,6 +57,28 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
         $this->childName = $childName;
         $this->tags = $tags;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        // Check that the compound widget we are inside actually has a child with this name
+        $specBuilder->addConstraint(new CompoundWidgetDefinitionHasChildConstraint($this->childName));
+
+        if ($this->visibilityExpressionNode !== null) {
+            $specBuilder->addChildNode($this->visibilityExpressionNode);
+
+            // Make sure the visibility expression always evaluates to a boolean
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->visibilityExpressionNode,
+                    new StaticType(BooleanExpression::class),
+                    'visibility'
+                )
+            );
+        }
     }
 
     /**
@@ -97,28 +121,5 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
     public function getWidgetDefinitionName()
     {
         return 'child';
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // FIXME
-        // Check that the compound widget we are inside actually has a child with this name
-//        $subValidationContext->assertCompoundWidgetHasChild($this->childName);
-
-        if ($this->visibilityExpressionNode) {
-            $this->visibilityExpressionNode->validate($subValidationContext);
-
-            // Make sure the visibility expression always evaluates to a boolean
-            $subValidationContext->assertResultType(
-                $this->visibilityExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'visibility'
-            );
-        }
     }
 }

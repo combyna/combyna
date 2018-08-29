@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Entity\Instruction;
 
-use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 
 /**
  * Interface EntityInstructionInterface

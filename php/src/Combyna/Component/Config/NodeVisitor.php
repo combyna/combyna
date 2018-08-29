@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Config;
 
-use Combyna\Component\Common\DelegatorInterface;
-
 /**
  * Class NodeVisitor
  *

@@ -12,7 +12,6 @@
 namespace Combyna\Unit\Component\Expression;
 
 use Combyna\Component\Expression\Config\Act\BooleanExpressionNode;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
@@ -88,14 +87,6 @@ class BooleanExpressionNodeTest extends TestCase
             'int' => [21, 'integer'],
             'float' => [27.7, 'double']
         ];
-    }
-
-    public function testGetResultTypeReturnsAStaticBooleanType()
-    {
-        $resultType = $this->expression->getResultType($this->validationContext->reveal());
-
-        $this->assert($resultType)->isAnInstanceOf(StaticType::class);
-        $this->assert($resultType->getSummary())->exactlyEquals('boolean');
     }
 
     public function testGetTypeReturnsTheBooleanType()

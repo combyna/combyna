@@ -12,9 +12,9 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionListNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\ListExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
 
 /**
  * Class ListExpressionNode
@@ -41,6 +41,14 @@ class ListExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->expressionList);
+    }
+
+    /**
      * Fetches the list of expressions that will form the elements of the list
      *
      * @return ExpressionListNode
@@ -53,20 +61,8 @@ class ListExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        return new StaticListType($this->expressionList->getElementResultType($subValidationContext));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->expressionList->validate($subValidationContext);
+        return new StaticListTypeDeterminer($this->expressionList->getElementResultTypeDeterminer());
     }
 }
