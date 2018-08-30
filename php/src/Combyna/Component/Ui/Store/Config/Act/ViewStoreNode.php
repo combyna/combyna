@@ -15,7 +15,9 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
+use Combyna\Component\Store\Config\Act\DynamicUnknownQueryNode;
 use Combyna\Component\Store\Config\Act\QueryNode;
+use Combyna\Component\Store\Config\Act\QueryNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Store\Validation\Context\Specifier\ViewStoreContextSpecifier;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -93,11 +95,14 @@ class ViewStoreNode extends AbstractActNode
      * Fetches a query this store defines by its name
      *
      * @param string $name
-     * @return QueryNode|null
+     * @param QueryRequirementInterface $queryRequirement
+     * @return QueryNodeInterface
      */
-    public function getQueryByName($name)
+    public function getQueryByName($name, QueryRequirementInterface $queryRequirement)
     {
-        return array_key_exists($name, $this->queryNodes) ? $this->queryNodes[$name] : null;
+        return array_key_exists($name, $this->queryNodes) ?
+            $this->queryNodes[$name] :
+            new DynamicUnknownQueryNode($name, $queryRequirement);
     }
 
     /**
