@@ -66,7 +66,7 @@ class TranslationExpressionNode extends AbstractExpressionNode
                 $specBuilder->addConstraint(
                     new ResultTypeConstraint(
                         $argumentExpressionNode,
-                        new StaticType(TextExpression::class),
+                        new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
                         'parameter "' . $parameterName . '"'
                     )
                 );

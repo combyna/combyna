@@ -72,21 +72,21 @@ class DayExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->yearExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'year'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->monthExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'month'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->dayExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'day'
             )
         );

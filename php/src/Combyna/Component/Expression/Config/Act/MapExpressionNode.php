@@ -104,7 +104,7 @@ class MapExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->listExpression,
-                new StaticListType(new AnyType()),
+                new PresolvedTypeDeterminer(new StaticListType(new AnyType())),
                 'list operand'
             )
         );

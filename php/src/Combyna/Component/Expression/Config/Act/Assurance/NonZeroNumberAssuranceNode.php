@@ -20,6 +20,7 @@ use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class NonZeroNumberAssuranceNode
@@ -63,7 +64,7 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->inputExpressionNode,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'non-zero assurance'
             )
         );

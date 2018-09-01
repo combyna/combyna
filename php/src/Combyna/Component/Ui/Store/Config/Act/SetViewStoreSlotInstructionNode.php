@@ -14,7 +14,10 @@ namespace Combyna\Component\Ui\Store\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Ui\Store\Validation\Constraint\ViewStoreHasSlotConstraint;
+use Combyna\Component\Ui\Store\Validation\Query\ViewStoreSlotTypeQuery;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class SetViewStoreSlotInstructionNode
@@ -53,6 +56,17 @@ class SetViewStoreSlotInstructionNode extends AbstractActNode implements ViewSto
         $specBuilder->addConstraint(new ViewStoreHasSlotConstraint($this->slotName));
 
         $specBuilder->addChildNode($this->valueExpressionNode);
+
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->valueExpressionNode,
+                new QueriedResultTypeDeterminer(
+                    new ViewStoreSlotTypeQuery($this->slotName),
+                    $this
+                ),
+                'value expression result type must match slot type'
+            )
+        );
     }
 
     /**

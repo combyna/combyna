@@ -18,6 +18,7 @@ use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class WidgetGroupNode
@@ -77,7 +78,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->visibilityExpressionNode,
-                    new StaticType(BooleanExpression::class),
+                    new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
                     'visibility'
                 )
             );

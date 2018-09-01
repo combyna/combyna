@@ -76,7 +76,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->leftOperandExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'left operand'
             )
         );
@@ -133,7 +133,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->rightOperandExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'right operand'
             )
         );

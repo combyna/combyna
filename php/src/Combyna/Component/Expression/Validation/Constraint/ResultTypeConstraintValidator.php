@@ -65,10 +65,11 @@ class ResultTypeConstraintValidator implements ConstraintValidatorInterface
         ValidationContextInterface $validationContext
     ) {
         $candidateResultType = $validationContext->getExpressionResultType($constraint->getExpressionNode());
+        $allowedResultType = $constraint->getAllowedTypeDeterminer()->determine($validationContext);
 
-        if (!$constraint->getAllowedType()->allows($candidateResultType)) {
+        if (!$allowedResultType->allows($candidateResultType)) {
             $validationContext->addTypeMismatchViolation(
-                $constraint->getAllowedType(),
+                $allowedResultType,
                 $candidateResultType,
                 $constraint->getContextDescription()
             );

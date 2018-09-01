@@ -79,7 +79,7 @@ class ConversionExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->expressionNode,
-                new StaticType($allowedInputType),
+                new PresolvedTypeDeterminer(new StaticType($allowedInputType)),
                 'expression'
             )
         );

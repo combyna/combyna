@@ -12,7 +12,7 @@
 namespace Combyna\Component\Expression\Validation\Constraint;
 
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class ResultTypeConstraint
@@ -22,9 +22,9 @@ use Combyna\Component\Type\TypeInterface;
 class ResultTypeConstraint implements ExpressionValidationConstraintInterface
 {
     /**
-     * @var TypeInterface
+     * @var TypeDeterminerInterface
      */
-    private $allowedType;
+    private $allowedTypeDeterminer;
 
     /**
      * @var string
@@ -38,15 +38,15 @@ class ResultTypeConstraint implements ExpressionValidationConstraintInterface
 
     /**
      * @param ExpressionNodeInterface $expressionNode
-     * @param TypeInterface $allowedType
+     * @param TypeDeterminerInterface $allowedTypeDeterminer
      * @param string $contextDescription
      */
     public function __construct(
         ExpressionNodeInterface $expressionNode,
-        TypeInterface $allowedType,
+        TypeDeterminerInterface $allowedTypeDeterminer,
         $contextDescription
     ) {
-        $this->allowedType = $allowedType;
+        $this->allowedTypeDeterminer = $allowedTypeDeterminer;
         $this->contextDescription = $contextDescription;
         $this->expressionNode = $expressionNode;
     }
@@ -54,11 +54,11 @@ class ResultTypeConstraint implements ExpressionValidationConstraintInterface
     /**
      * Fetches the Type that the result is allowed to be
      *
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
-    public function getAllowedType()
+    public function getAllowedTypeDeterminer()
     {
-        return $this->allowedType;
+        return $this->allowedTypeDeterminer;
     }
 
     /**

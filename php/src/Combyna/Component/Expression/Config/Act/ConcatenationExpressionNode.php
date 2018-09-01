@@ -66,12 +66,14 @@ class ConcatenationExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->operandListExpression,
-                new StaticListType(
-                    new MultipleType(
-                        [
-                            new StaticType(TextExpression::class),
-                            new StaticType(NumberExpression::class)
-                        ]
+                new PresolvedTypeDeterminer(
+                    new StaticListType(
+                        new MultipleType(
+                            [
+                                new StaticType(TextExpression::class),
+                                new StaticType(NumberExpression::class)
+                            ]
+                        )
                     )
                 ),
                 'operand list'

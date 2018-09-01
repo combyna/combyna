@@ -111,42 +111,42 @@ class DateTimeExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->yearExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'year'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->monthExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'month'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->dayExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'day'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->hourExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'hour'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->minuteExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'minute'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->secondExpression,
-                new StaticType(NumberExpression::class),
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                 'second'
             )
         );
@@ -155,7 +155,7 @@ class DateTimeExpressionNode extends AbstractExpressionNode
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->millisecondExpression,
-                    new StaticType(NumberExpression::class),
+                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
                     'millisecond'
                 )
             );

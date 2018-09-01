@@ -19,6 +19,7 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraint;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class ChildReferenceWidgetNode
@@ -74,7 +75,7 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->visibilityExpressionNode,
-                    new StaticType(BooleanExpression::class),
+                    new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
                     'visibility'
                 )
             );
