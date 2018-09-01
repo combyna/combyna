@@ -28,7 +28,7 @@ class ConfigParser
      * @param array $config
      * @param string $key
      * @param string $context
-     * @param string $requiredType The type the value must be
+     * @param array|string $requiredType The type(s) the value must be
      * @return mixed
      * @throws InvalidArgumentException Throws when the value is not specified
      * @throws InvalidArgumentException Throws when the value has the wrong type
@@ -41,24 +41,26 @@ class ConfigParser
             );
         }
 
+        $requiredTypes = (array) $requiredType;
+
         $value = $config[$key];
 
-        if ($requiredType === 'array' && $value === null) {
+        if (in_array('array', $requiredTypes, true) && $value === null) {
             return [];
         }
 
-        if (gettype($value) === $requiredType) {
+        if (in_array(gettype($value), $requiredTypes, true)) {
             return $value;
         }
 
-        if ($requiredType === 'number' && (is_int($value) || is_float($value))) {
+        if (in_array('number', $requiredTypes, true) && (is_int($value) || is_float($value))) {
             return $value;
         }
 
         throw new InvalidArgumentException(sprintf(
-            'Config element "%s" should be of type "%s" but is "%s" for %s',
+            'Config element "%s" should be of one of the type(s) ["%s"] but is "%s" for %s',
             $key,
-            $requiredType,
+            join('", "', $requiredTypes),
             gettype($value),
             $context
         ));

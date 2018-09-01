@@ -109,6 +109,62 @@ class ConfigParserTest extends TestCase
                 'boolean',
 
                 true
+            ],
+
+            'fetching a boolean element when type could be string or boolean' => [
+                ['my-element' => true],
+                'my-element',
+                'some context of this fetch',
+                ['string', 'boolean'],
+
+                true // Expected boolean
+            ],
+
+            'fetching a string element when type could be string or boolean' => [
+                ['my-element' => 'my value'],
+                'my-element',
+                'some context of this fetch',
+                ['string', 'boolean'],
+
+                'my value' // Expected string
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderForGetElementThrowsMismatchExceptionWhenExpected
+     * @param array $config
+     * @param string $key
+     * @param string $context
+     * @param string $requiredType
+     * @param string $expectedException
+     */
+    public function testGetElementThrowsMismatchExceptionWhenExpected(
+        $config,
+        $key,
+        $context,
+        $requiredType,
+        $expectedException
+    ) {
+        $this->setExpectedException(InvalidArgumentException::class, $expectedException);
+
+        $this->parser->getElement($config, $key, $context, $requiredType);
+    }
+
+    /**
+     * @return array
+     */
+    public function dataProviderForGetElementThrowsMismatchExceptionWhenExpected()
+    {
+        return [
+            'fetching a string element when type could be array or boolean' => [
+                ['my-element' => 'my value'],
+                'my-element',
+                'some context of this fetch',
+                ['array', 'boolean'],
+
+                'Config element "my-element" should be of one of the type(s) ["array", "boolean"] ' .
+                'but is "string" for some context of this fetch'
             ]
         ];
     }
