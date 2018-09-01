@@ -39,7 +39,7 @@ class ExpressionParserTest extends TestCase
      */
     public function testParseReturnsExpectedAstForAnExpression($expression, array $expectedAst)
     {
-        $this->assert($expectedAst)->equals($this->parser->parse($expression));
+        $this->assert($this->parser->parse($expression))->equals($expectedAst);
     }
 
     public function testParseThrowsExceptionWhenUnableToParseExpression()
