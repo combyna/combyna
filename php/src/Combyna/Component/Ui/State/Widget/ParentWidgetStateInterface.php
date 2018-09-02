@@ -12,18 +12,17 @@
 namespace Combyna\Component\Ui\State\Widget;
 
 /**
- * Interface ChildReferenceWidgetStateInterface
+ * Interface ParentWidgetStateInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface ChildReferenceWidgetStateInterface extends CoreWidgetStateInterface, ParentWidgetStateInterface
+interface ParentWidgetStateInterface
 {
-    const TYPE = 'child-reference-widget';
-
     /**
-     * Fetches the name of the child being referenced
+     * Fetches the specified child widget state of this one
      *
-     * @return string
+     * @param string $name
+     * @return WidgetStateInterface
      */
-    public function getChildName();
+    public function getChildState($name);
 }

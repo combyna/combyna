@@ -20,7 +20,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface DefinedWidgetStateInterface extends WidgetStateInterface
+interface DefinedWidgetStateInterface extends ParentWidgetStateInterface, WidgetStateInterface
 {
     /**
      * Fetches the specified attribute, evaluated to a static for this rendered widget
@@ -51,12 +51,4 @@ interface DefinedWidgetStateInterface extends WidgetStateInterface
      * @return string[]
      */
     public function getChildNames();
-
-    /**
-     * Fetches the specified child widget state of this one
-     *
-     * @param string $name
-     * @return WidgetStateInterface
-     */
-    public function getChildState($name);
 }

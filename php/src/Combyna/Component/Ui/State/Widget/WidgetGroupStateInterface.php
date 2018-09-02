@@ -18,7 +18,7 @@ use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface WidgetGroupStateInterface extends CoreWidgetStateInterface
+interface WidgetGroupStateInterface extends CoreWidgetStateInterface, ParentWidgetStateInterface
 {
     const TYPE = WidgetGroupNode::TYPE;
 
@@ -36,12 +36,4 @@ interface WidgetGroupStateInterface extends CoreWidgetStateInterface
      * @return WidgetStateInterface[]
      */
     public function getChildren();
-
-    /**
-     * Fetches the specified child widget state of this one
-     *
-     * @param string $name
-     * @return WidgetStateInterface
-     */
-    public function getChildState($name);
 }
