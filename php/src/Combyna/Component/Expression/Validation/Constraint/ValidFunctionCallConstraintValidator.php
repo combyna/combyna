@@ -53,7 +53,7 @@ class ValidFunctionCallConstraintValidator implements ConstraintValidatorInterfa
         ValidFunctionCallConstraint $constraint,
         ValidationContextInterface $validationContext
     ) {
-        // May return an UnknownFunctionNode or UnknownLibraryForFunctionNode if invalid -
+        // May return a DynamicUnknownFunctionNode or UnknownLibraryForFunctionNode if invalid -
         // it is expected that a FunctionExistsConstraint will be used in tandem
         $functionNode = $validationContext->queryForActNode(
             new FunctionNodeQuery(

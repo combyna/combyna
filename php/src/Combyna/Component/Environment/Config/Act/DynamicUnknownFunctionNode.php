@@ -21,13 +21,13 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
- * Class UnknownFunctionNode
+ * Class DynamicUnknownFunctionNode
  *
  * Indicates that a referenced library exists but does not define the specified function
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownFunctionNode extends AbstractActNode implements FunctionNodeInterface, DynamicActNodeInterface
+class DynamicUnknownFunctionNode extends AbstractActNode implements FunctionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-function';
 

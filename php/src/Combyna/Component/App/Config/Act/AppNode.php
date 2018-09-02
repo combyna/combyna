@@ -16,7 +16,7 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
-use Combyna\Component\Environment\Config\Act\UnknownFunctionNode;
+use Combyna\Component\Environment\Config\Act\DynamicUnknownFunctionNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
 use Combyna\Component\Router\Config\Act\RouteNode;
@@ -140,7 +140,7 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     /**
      * Fetches a function defined by the app.
      * If it does not define the specified function,
-     * then an UnknownFunctionNode will be returned
+     * then a DynamicUnknownFunctionNode will be returned
      *
      * @param string $libraryName
      * @param string $functionName
@@ -151,7 +151,7 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     {
         // TODO: Not yet implemented - only the libraries in the environment can define functions for now
 
-        return new UnknownFunctionNode($libraryName, $functionName, $queryRequirement);
+        return new DynamicUnknownFunctionNode($libraryName, $functionName, $queryRequirement);
     }
 
     /**

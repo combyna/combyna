@@ -183,7 +183,7 @@ class LibraryNode extends AbstractActNode
 
     /**
      * Fetches a function defined by this library. If the library
-     * does not define the specified function, then an UnknownFunctionNode will be returned.
+     * does not define the specified function, then a DynamicUnknownFunctionNode will be returned.
      * If the library does define the function but not of a generic type,
      * then an IncorrectTypeFunctionNode will be returned
      *
@@ -194,7 +194,7 @@ class LibraryNode extends AbstractActNode
     public function getGenericFunction($functionName, QueryRequirementInterface $queryRequirement)
     {
         if (!array_key_exists($functionName, $this->functionNodes)) {
-            return new UnknownFunctionNode($this->name, $functionName, $queryRequirement);
+            return new DynamicUnknownFunctionNode($this->name, $functionName, $queryRequirement);
         }
 
         // TODO: Check type of function and return IncorrectTypeFunctionNode if wrong

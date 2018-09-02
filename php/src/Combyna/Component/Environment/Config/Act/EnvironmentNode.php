@@ -90,7 +90,7 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
      * Fetches a function defined by a library installed into the environment.
      * If the library is not installed then an UnknownLibraryForFunctionNode,
      * or if it is but does not define the specified function,
-     * then an UnknownFunctionNode will be returned
+     * then a DynamicUnknownFunctionNode will be returned
      *
      * @param string $libraryName
      * @param string $functionName
