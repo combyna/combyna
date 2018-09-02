@@ -73,7 +73,7 @@ class ConfigParser
      * @param string $key
      * @param string $context
      * @param mixed $defaultValue Result to return if the element is not defined
-     * @param string $requiredType The type the value must be
+     * @param array|string $requiredType The type(s) the value must be
      * @return mixed
      * @throws InvalidArgumentException Throws when the value is not specified
      * @throws InvalidArgumentException Throws when the value has the wrong type
@@ -84,22 +84,6 @@ class ConfigParser
             return $defaultValue;
         }
 
-        $value = $config[$key];
-
-        if ($requiredType === 'array' && $value === null) {
-            return [];
-        }
-
-        if (gettype($value) !== $requiredType) {
-            throw new InvalidArgumentException(sprintf(
-                'Config element "%s" should be of type "%s" but is "%s" for %s',
-                $key,
-                $requiredType,
-                gettype($value),
-                $context
-            ));
-        }
-
-        return $value;
+        return $this->getElement($config, $key, $context, $requiredType);
     }
 }
