@@ -67,6 +67,22 @@ interface StaticListInterface extends Countable
     );
 
     /**
+     * Maps this static list to a native array, transforming each element with the given callback
+     *
+     * @param string $itemVariableName
+     * @param string|null $indexVariableName
+     * @param callable $mapCallback
+     * @param EvaluationContextInterface $evaluationContext
+     * @return array
+     */
+    public function mapArray(
+        $itemVariableName,
+        $indexVariableName,
+        callable $mapCallback,
+        EvaluationContextInterface $evaluationContext
+    );
+
+    /**
      * Assigns a new value for a static in this list
      *
      * @param int $index

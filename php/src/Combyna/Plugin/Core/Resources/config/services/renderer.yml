@@ -16,3 +16,9 @@ services:
         autowire: true
         tags:
             - {name: combyna.html_widget_renderer}
+
+    combyna_core.renderer.html.repeater_widget:
+        class: Combyna\Plugin\Core\Renderer\Html\WidgetRenderer\RepeaterWidgetRenderer
+        autowire: true
+        tags:
+            - {name: combyna.html_widget_renderer}

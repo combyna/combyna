@@ -118,13 +118,14 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(ViewEvaluationContextInterface $evaluationContext)
+    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext)
     {
         $childWidget = $evaluationContext->getChildWidget($this->childName);
 
         return $this->uiStateFactory->createChildReferenceWidgetState(
+            $name,
             $this,
-            $childWidget->createInitialState($evaluationContext)
+            $childWidget->createInitialState('child', $evaluationContext)
         );
     }
 

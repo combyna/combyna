@@ -11,64 +11,44 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
-use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 
 /**
- * Class DefinedCompoundWidgetState
+ * Class RepeaterWidgetState
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
+class RepeaterWidgetState implements RepeaterWidgetStateInterface
 {
     /**
-     * @var StaticBagInterface
-     */
-    private $attributeStaticBag;
-
-    /**
-     * @var WidgetStateInterface[]
-     */
-    private $childWidgetStates;
-
-    /**
-     * @var string|int
+     * @var int|string
      */
     private $name;
 
     /**
-     * @var WidgetStateInterface
+     * @var WidgetStateInterface[]
      */
-    private $rootWidgetState;
+    private $repeatedWidgetStates;
 
     /**
-     * @var DefinedWidgetInterface
+     * @var RepeaterWidgetInterface
      */
     private $widget;
 
     /**
      * @param string|int $name
-     * @param DefinedWidgetInterface $widget
-     * @param StaticBagInterface $attributeStaticBag
-     * @param WidgetStateInterface[] $childWidgetStates
-     * @param WidgetStateInterface $rootWidgetState
+     * @param RepeaterWidgetInterface $widget
+     * @param WidgetStateInterface[] $repeatedWidgetStates
      */
     public function __construct(
         $name,
-        DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag,
-        array $childWidgetStates,
-        WidgetStateInterface $rootWidgetState
+        RepeaterWidgetInterface $widget,
+        array $repeatedWidgetStates
     ) {
-        $widget->assertValidAttributeStaticBag($attributeStaticBag);
-
-        $this->attributeStaticBag = $attributeStaticBag;
-        $this->childWidgetStates = $childWidgetStates;
         $this->name = $name;
-        $this->rootWidgetState = $rootWidgetState;
-//        $this->storeStateCollection = $storeStateCollection;
+        $this->repeatedWidgetStates = $repeatedWidgetStates;
 
         // FIXME: Should not have access to the widget
         $this->widget = $widget;
@@ -77,41 +57,17 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
     /**
      * {@inheritdoc}
      */
-    public function getAttribute($name)
-    {
-        return $this->attributeStaticBag->getStatic($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributeNames()
-    {
-        return array_keys($this->attributeStaticBag->toNativeArray());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAttributeStaticBag()
-    {
-        return $this->attributeStaticBag;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChildNames()
-    {
-        return array_keys($this->childWidgetStates);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getChildState($name)
     {
-        return $this->childWidgetStates[$name];
+        return $this->repeatedWidgetStates[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRepeatedWidgetStates()
+    {
+        return $this->repeatedWidgetStates;
     }
 
     /**
@@ -119,10 +75,7 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      */
     public function getEventualRenderableDescendantStatePath()
     {
-        return array_merge(
-            [$this->rootWidgetState],
-            $this->rootWidgetState->getEventualRenderableDescendantStatePath()
-        );
+        return []; // RepeaterWidgets are renderable, nothing to traverse down to
     }
 
     /**
@@ -170,6 +123,8 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      */
     public function getWidgetStatePathByPath(array $path, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
+        throw new \Exception('Not implemented');
+
         $widgetName = array_shift($path);
 
         if ($widgetName === $this->getStateName()) {
@@ -199,14 +154,16 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      */
     public function getWidgetStatePathsByTag($tag, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
+//        throw new \Exception('Not implemented');
+
         $widgetStatePaths = $this->widget->hasTag($tag) ?
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
 
-        foreach ($this->childWidgetStates as $childWidgetState) {
+        foreach ($this->repeatedWidgetStates as $repeatedWidgetState) {
             $widgetStatePaths = array_merge(
                 $widgetStatePaths,
-                $childWidgetState->getWidgetStatePathsByTag(
+                $repeatedWidgetState->getWidgetStatePathsByTag(
                     $tag,
                     array_merge($parentStates, [$this]),
                     $stateFactory

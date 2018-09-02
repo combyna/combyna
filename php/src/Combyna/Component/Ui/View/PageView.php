@@ -129,7 +129,7 @@ class PageView implements PageViewInterface
             $rootEvaluationContext->getEnvironment()
         );
 
-        $rootWidgetState = $this->rootWidget->createInitialState($viewEvaluationContext);
+        $rootWidgetState = $this->rootWidget->createInitialState('root', $viewEvaluationContext);
 
         return $this->uiStateFactory->createPageViewState(
             $this,
@@ -212,7 +212,7 @@ class PageView implements PageViewInterface
                 $program,
                 $environment
             );
-            $newRootWidgetState = $this->rootWidget->createInitialState($newEvaluationContext);
+            $newRootWidgetState = $this->rootWidget->createInitialState('root', $newEvaluationContext);
 
             // TODO: Just use a ->withRootWidgetState(...) method - we already have the new store state from above
             return $pageViewState->withState($newStoreState, $newRootWidgetState);

@@ -147,6 +147,7 @@ class DefinedWidget implements DefinedWidgetInterface
      * {@inheritdoc}
      */
     public function createInitialState(
+        $name,
         ViewEvaluationContextInterface $evaluationContext
     ) {
         $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
@@ -154,10 +155,11 @@ class DefinedWidget implements DefinedWidgetInterface
         $childStates = [];
 
         foreach ($this->childWidgets as $childName => $childWidget) {
-            $childStates[$childName] = $childWidget->createInitialState($evaluationContext);
+            $childStates[$childName] = $childWidget->createInitialState($childName, $evaluationContext);
         }
 
         return $this->definition->createInitialState(
+            $name,
             $this,
             $attributeStaticBag,
             $childStates,

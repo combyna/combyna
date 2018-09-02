@@ -23,6 +23,11 @@ use Combyna\Component\Ui\Widget\TextWidgetInterface;
 class TextWidgetState implements TextWidgetStateInterface
 {
     /**
+     * @var int|string
+     */
+    private $name;
+
+    /**
      * @var string
      */
     private $text;
@@ -33,13 +38,16 @@ class TextWidgetState implements TextWidgetStateInterface
     private $textWidget;
 
     /**
+     * @param string|int $name
      * @param TextWidgetInterface $textWidget
      * @param string $text
      */
     public function __construct(
+        $name,
         TextWidgetInterface $textWidget,
         $text
     ) {
+        $this->name = $name;
         $this->text = $text;
 
         // FIXME: Remove references from state objects back to the entities like this!
@@ -59,7 +67,7 @@ class TextWidgetState implements TextWidgetStateInterface
      */
     public function getStateName()
     {
-        return $this->textWidget->getName();
+        return $this->name;
     }
 
     /**

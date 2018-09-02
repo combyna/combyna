@@ -34,16 +34,24 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
     private $childWidgetState;
 
     /**
+     * @var string|int
+     */
+    private $name;
+
+    /**
+     * @param string|int $name
      * @param ChildReferenceWidgetInterface $childReferenceWidget
      * @param WidgetStateInterface $childWidgetState
      */
     public function __construct(
+        $name,
         ChildReferenceWidgetInterface $childReferenceWidget,
         WidgetStateInterface $childWidgetState
     ) {
         // FIXME: Remove references from state objects back to the entities like this!
         $this->childReferenceWidget = $childReferenceWidget;
         $this->childWidgetState = $childWidgetState;
+        $this->name = $name;
     }
 
     /**
@@ -81,7 +89,7 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
      */
     public function getStateName()
     {
-        return $this->childReferenceWidget->getName();
+        return $this->name;
     }
 
     /**

@@ -44,6 +44,7 @@ interface WidgetDefinitionInterface
     /**
      * Creates a DefinedPrimitiveWidgetState
      *
+     * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
@@ -51,6 +52,7 @@ interface WidgetDefinitionInterface
      * @return DefinedWidgetStateInterface
      */
     public function createInitialState(
+        $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates,

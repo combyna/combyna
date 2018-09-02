@@ -21,6 +21,7 @@ use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidget;
 use Combyna\Component\Ui\Widget\DefinedWidget;
+use Combyna\Component\Ui\Widget\RepeaterWidget;
 use Combyna\Component\Ui\Widget\TextWidget;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetGroup;
@@ -158,6 +159,30 @@ class ViewFactory implements ViewFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createRepeaterWidget(
+        $name,
+        ExpressionInterface $itemListExpression,
+        $indexVariableName,
+        $itemVariableName,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    ) {
+        return new RepeaterWidget(
+            $parentWidget,
+            $name,
+            $itemListExpression,
+            $indexVariableName,
+            $itemVariableName,
+            $this->uiStateFactory,
+            $visibilityExpression,
+            $tags
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createTextWidget(
         $name,
         ExpressionInterface $textExpression,
@@ -169,7 +194,6 @@ class ViewFactory implements ViewFactoryInterface
             $parentWidget,
             $name,
             $textExpression,
-            $this->bagFactory,
             $this->uiStateFactory,
             $visibilityExpression,
             $tags

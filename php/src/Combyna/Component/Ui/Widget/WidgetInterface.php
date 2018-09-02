@@ -53,10 +53,11 @@ interface WidgetInterface
     /**
      * Creates an initial state for the widget
      *
+     * @param string|int $name
      * @param ViewEvaluationContextInterface $evaluationContext
      * @return WidgetStateInterface
      */
-    public function createInitialState(ViewEvaluationContextInterface $evaluationContext);
+    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext);
 
     /**
      * Dispatches an event

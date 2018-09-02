@@ -114,12 +114,14 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * {@inheritdoc}
      */
     public function createInitialState(
+        $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates,
         ViewEvaluationContextInterface $evaluationContext
     ) {
         return $this->uiStateFactory->createDefinedPrimitiveWidgetState(
+            $name,
             $widget,
             $attributeStaticBag,
             $childWidgetStates

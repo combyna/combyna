@@ -17,6 +17,7 @@ use Combyna\Component\Trigger\TriggerCollectionInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
@@ -102,6 +103,28 @@ interface ViewFactoryInterface
      * @return PageViewCollectionInterface
      */
     public function createPageViewCollection(array $pageViews);
+
+    /**
+     * Creates a new RepeaterWidget
+     *
+     * @param string|null $name
+     * @param ExpressionInterface $itemListExpression
+     * @param string|null $indexVariableName
+     * @param string $itemVariableName
+     * @param WidgetInterface|null $parentWidget
+     * @param ExpressionInterface|null $visibilityExpression
+     * @param array $tags
+     * @return RepeaterWidgetInterface
+     */
+    public function createRepeaterWidget(
+        $name,
+        ExpressionInterface $itemListExpression,
+        $indexVariableName,
+        $itemVariableName,
+        WidgetInterface $parentWidget = null,
+        ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    );
 
     /**
      * Creates a new text widget

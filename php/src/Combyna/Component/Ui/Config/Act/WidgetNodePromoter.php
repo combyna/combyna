@@ -18,6 +18,8 @@ use Combyna\Component\Trigger\Config\Act\TriggerNodePromoter;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\RepeaterWidget;
+use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
@@ -84,17 +86,15 @@ class WidgetNodePromoter
         WidgetInterface $parentWidget = null
     ) {
         if ($widgetNode instanceof WidgetGroupNode) {
-            /** @var WidgetGroupNode $widgetNode */
             $widget = $this->promoteWidgetGroupNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } elseif ($widgetNode instanceof TextWidgetNode) {
-            /** @var TextWidgetNode $widgetNode */
             $widget = $this->promoteTextWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } elseif ($widgetNode instanceof DefinedWidgetNode) {
-            /** @var DefinedWidgetNode $widgetNode */
             $widget = $this->promoteDefinedWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } elseif ($widgetNode instanceof ChildReferenceWidgetNode) {
-            /** @var ChildReferenceWidgetNode $widgetNode */
             $widget = $this->promoteChildReferenceWidgetNode($name, $widgetNode, $parentWidget);
+        } elseif ($widgetNode instanceof RepeaterWidgetNode) {
+            $widget = $this->promoteRepeaterWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } else {
             throw new InvalidArgumentException('Unsupported widget type given');
         }
@@ -171,6 +171,45 @@ class WidgetNodePromoter
         }
 
         return $widget;
+    }
+
+    /**
+     * Promotes a RepeaterWidgetNode to a RepeaterWidget
+     *
+     * @param string $name
+     * @param RepeaterWidgetNode $repeaterWidgetNode
+     * @param ResourceRepositoryInterface $resourceRepository
+     * @param WidgetInterface|null $parentWidget
+     * @return RepeaterWidgetInterface
+     */
+    private function promoteRepeaterWidgetNode(
+        $name,
+        RepeaterWidgetNode $repeaterWidgetNode,
+        ResourceRepositoryInterface $resourceRepository,
+        WidgetInterface $parentWidget = null
+    ) {
+        $repeaterWidget = $this->viewFactory->createRepeaterWidget(
+            $name,
+            $this->expressionNodePromoter->promote($repeaterWidgetNode->getItemListExpression()),
+            $repeaterWidgetNode->getIndexVariableName(),
+            $repeaterWidgetNode->getItemVariableName(),
+            $parentWidget,
+            $repeaterWidgetNode->getVisibilityExpression() ?
+                $this->expressionNodePromoter->promote($repeaterWidgetNode->getVisibilityExpression()) :
+                null,
+            $repeaterWidgetNode->getTags()
+        );
+
+        $repeaterWidget->setRepeatedWidget(
+            $this->promoteWidget(
+                RepeaterWidget::REPEATED_WIDGET_NAME,
+                $repeaterWidgetNode->getRepeatedWidget(),
+                $resourceRepository,
+                $repeaterWidget
+            )
+        );
+
+        return $repeaterWidget;
     }
 
     /**

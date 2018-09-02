@@ -18,6 +18,7 @@ use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Trigger\Config\Loader\TriggerLoaderInterface;
 use Combyna\Component\Ui\Config\Act\ChildReferenceWidgetNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
+use Combyna\Component\Ui\Config\Act\RepeaterWidgetNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use InvalidArgumentException;
@@ -31,6 +32,7 @@ class WidgetLoader implements WidgetLoaderInterface
 {
     const CHILD_REFERENCE_NAME = 'child';
     const GROUP_NAME = 'group';
+    const REPEATER_NAME = 'repeater';
     const TEXT_NAME = 'text';
 
     /**
@@ -108,6 +110,23 @@ class WidgetLoader implements WidgetLoaderInterface
         if ($type === self::CHILD_REFERENCE_NAME) {
             return new ChildReferenceWidgetNode(
                 $widgetConfig['name'],
+                $visibilityExpressionNode,
+                $this->buildTagMap($tagNames)
+            );
+        }
+
+        if ($type === self::REPEATER_NAME) {
+            $itemListConfig = $this->configParser->getElement($widgetConfig, 'items', 'items list', 'array');
+            $indexVariableName = $this->configParser->getOptionalElement($widgetConfig, 'index_variable', 'index variable');
+            $itemVariableName = $this->configParser->getElement($widgetConfig, 'item_variable', 'index variable');
+            $repeatedWidgetConfig = $this->configParser->getElement($widgetConfig, 'repeated', 'repeated widget', 'array');
+
+            return new RepeaterWidgetNode(
+                $this->expressionLoader->load($itemListConfig),
+                $indexVariableName,
+                $itemVariableName,
+                $this->loadWidget($repeatedWidgetConfig),
+                $name,
                 $visibilityExpressionNode,
                 $this->buildTagMap($tagNames)
             );

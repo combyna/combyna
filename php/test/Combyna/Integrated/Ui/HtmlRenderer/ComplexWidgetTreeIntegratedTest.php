@@ -198,6 +198,39 @@ class ComplexWidgetTreeIntegratedTest extends TestCase
                                         ]
                                     ]
                                 ]
+                            ],
+                            [
+                                // Demonstrate a repeater widget
+                                'type' => 'repeater',
+                                'items' => [
+                                    'type' => 'list',
+                                    'elements' => [
+                                        ['type' => 'text', 'text' => 'First'],
+                                        ['type' => 'text', 'text' => 'Second']
+                                    ]
+                                ],
+                                'index_variable' => 'this_item_index',
+                                'item_variable' => 'this_item',
+                                'repeated' => [
+                                    'type' => 'text', // A text widget
+                                    'text' => [
+                                        'type' => 'concatenation',
+                                        'list' => [
+                                            'type' => 'list',
+                                            'elements' => [
+                                                ['type' => 'text', 'text' => '<Repeated #'],
+                                                ['type' => 'variable', 'variable' => 'this_item_index'],
+                                                ['type' => 'text', 'text' => ' - "'],
+                                                ['type' => 'variable', 'variable' => 'this_item'],
+                                                ['type' => 'text', 'text' => '">']
+                                            ]
+                                        ],
+                                        'glue' => [
+                                            'type' => 'text',
+                                            'text' => ''
+                                        ]
+                                    ]
+                                ]
                             ]
                         ]
                     ],
@@ -211,7 +244,7 @@ class ComplexWidgetTreeIntegratedTest extends TestCase
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="my_view">
-    Some of my text here - [¯\_(ツ)_/¯] Click this button: <div><button name="combyna-widget-my_view-root-1-root-2-contents">Click me</button></div>
+    Some of my text here - [¯\_(ツ)_/¯] Click this button: <div><button name="combyna-widget-my_view-root-1-root-2-contents">Click me</button></div><Repeated #1 - "First"><Repeated #2 - "Second">
 </div>
 HTML;
         $this->assertSame($expectedHtml, $renderedHtml);

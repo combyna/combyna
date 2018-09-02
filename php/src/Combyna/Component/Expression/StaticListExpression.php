@@ -94,6 +94,24 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
+     * Maps this static list to a native array, transforming each element with the given callback
+     *
+     * @param string $itemVariableName
+     * @param string|null $indexVariableName
+     * @param callable $mapCallback
+     * @param EvaluationContextInterface $evaluationContext
+     * @return array
+     */
+    public function mapArray(
+        $itemVariableName,
+        $indexVariableName,
+        callable $mapCallback,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        return $this->staticList->mapArray($itemVariableName, $indexVariableName, $mapCallback, $evaluationContext);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function toNative()

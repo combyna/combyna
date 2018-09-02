@@ -152,6 +152,39 @@ class StaticList implements StaticListInterface
     /**
      * {@inheritdoc}
      */
+    public function mapArray(
+        $itemVariableName,
+        $indexVariableName,
+        callable $mapCallback,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        $resultArray = [];
+
+        foreach ($this->statics as $index => $static) {
+            $variableStatics = [
+                // Expose one variable with the static's value
+                $itemVariableName => $static
+            ];
+
+            if ($indexVariableName !== null) {
+                // Expose another variable with the current 1-based list element index as a number static
+                $variableStatics[$indexVariableName] =
+                    $this->staticExpressionFactory->createNumberExpression($index + 1);
+            }
+
+            $itemEvaluationContext = $evaluationContext->createSubScopeContext(
+                $this->bagFactory->createStaticBag($variableStatics)
+            );
+
+            $resultArray[] = $mapCallback($itemEvaluationContext, $static, $index);
+        }
+
+        return $resultArray;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setElementStatic($index, StaticInterface $value)
     {
         if (!is_int($index)) {

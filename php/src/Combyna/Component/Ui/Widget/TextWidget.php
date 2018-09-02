@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\Widget;
 
-use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
@@ -31,11 +30,6 @@ use LogicException;
 class TextWidget implements TextWidgetInterface
 {
     const DEFINITION = 'text';
-
-    /**
-     * @var BagFactoryInterface
-     */
-    private $bagFactory;
 
     /**
      * @var string|int
@@ -71,7 +65,6 @@ class TextWidget implements TextWidgetInterface
      * @param WidgetInterface $parentWidget
      * @param string|int $name
      * @param ExpressionInterface $textExpression
-     * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -80,12 +73,10 @@ class TextWidget implements TextWidgetInterface
         WidgetInterface $parentWidget,
         $name,
         ExpressionInterface $textExpression,
-        BagFactoryInterface $bagFactory,
         UiStateFactoryInterface $uiStateFactory,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
-        $this->bagFactory = $bagFactory;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
@@ -118,11 +109,11 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(ViewEvaluationContextInterface $evaluationContext)
+    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext)
     {
         $textStatic = $this->textExpression->toStatic($evaluationContext);
 
-        return $this->uiStateFactory->createTextWidgetState($this, $textStatic->toNative());
+        return $this->uiStateFactory->createTextWidgetState($name, $this, $textStatic->toNative());
     }
 
     /**

@@ -34,16 +34,23 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
     private $childWidgetStates;
 
     /**
+     * @var string|int
+     */
+    private $name;
+
+    /**
      * @var DefinedWidgetInterface
      */
     private $widget;
 
     /**
+     * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
      */
     public function __construct(
+        $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates
@@ -52,6 +59,7 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
 
         $this->attributeStaticBag = $attributeStaticBag;
         $this->childWidgetStates = $childWidgetStates;
+        $this->name = $name;
 //        $this->storeStateCollection = $storeStateCollection;
 
         // FIXME: Should not have access to the widget
@@ -111,7 +119,7 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
      */
     public function getStateName()
     {
-        return $this->widget->getName();
+        return $this->name;
     }
 
     /**

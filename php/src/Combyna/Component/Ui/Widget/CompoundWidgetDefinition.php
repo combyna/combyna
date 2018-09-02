@@ -122,6 +122,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
      * {@inheritdoc}
      */
     public function createInitialState(
+        $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
         array $childWidgetStates,
@@ -132,9 +133,13 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         $compoundDefinitionRootWidgetSubEvaluationContext = $evaluationContext->createSubWidgetEvaluationContext(
             $widget
         );
-        $rootWidgetState = $this->rootWidget->createInitialState($compoundDefinitionRootWidgetSubEvaluationContext);
+        $rootWidgetState = $this->rootWidget->createInitialState(
+            'root',
+            $compoundDefinitionRootWidgetSubEvaluationContext
+        );
 
         return $this->uiStateFactory->createDefinedCompoundWidgetState(
+            $name,
             $widget,
             $attributeStaticBag,
             $childWidgetStates,

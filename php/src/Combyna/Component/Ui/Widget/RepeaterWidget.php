@@ -14,6 +14,8 @@ namespace Combyna\Component\Ui\Widget;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
@@ -23,18 +25,29 @@ use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use LogicException;
 
 /**
- * Class WidgetGroup
+ * Class RepeaterWidget
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetGroup implements WidgetGroupInterface
+class RepeaterWidget implements RepeaterWidgetInterface
 {
-    const DEFINITION = 'widget-group';
+    const DEFINITION = 'repeater';
+    const REPEATED_WIDGET_NAME = 'repeated';
 
     /**
-     * @var WidgetInterface[]
+     * @var string|null
      */
-    private $childWidgets = [];
+    private $indexVariableName;
+
+    /**
+     * @var ExpressionInterface
+     */
+    private $itemListExpression;
+
+    /**
+     * @var string
+     */
+    private $itemVariableName;
 
     /**
      * @var string|int
@@ -42,9 +55,14 @@ class WidgetGroup implements WidgetGroupInterface
     private $name;
 
     /**
-     * @var WidgetInterface|null
+     * @var WidgetInterface
      */
     private $parentWidget;
+
+    /**
+     * @var WidgetInterface|null
+     */
+    private $repeatedWidget;
 
     /**
      * @var array
@@ -62,32 +80,33 @@ class WidgetGroup implements WidgetGroupInterface
     private $visibilityExpression;
 
     /**
-     * @param UiStateFactoryInterface $uiStateFactory
+     * @param WidgetInterface $parentWidget
      * @param string|int $name
-     * @param WidgetInterface|null $parentWidget
+     * @param ExpressionInterface $itemListExpression
+     * @param string|null $indexVariableName
+     * @param string $itemVariableName
+     * @param UiStateFactoryInterface $uiStateFactory
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
     public function __construct(
-        UiStateFactoryInterface $uiStateFactory,
+        WidgetInterface $parentWidget,
         $name,
-        WidgetInterface $parentWidget = null,
+        ExpressionInterface $itemListExpression,
+        $indexVariableName,
+        $itemVariableName,
+        UiStateFactoryInterface $uiStateFactory,
         ExpressionInterface $visibilityExpression = null,
-        array $tags
+        array $tags = []
     ) {
+        $this->indexVariableName = $indexVariableName;
+        $this->itemListExpression = $itemListExpression;
+        $this->itemVariableName = $itemVariableName;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChildWidget(WidgetInterface $childWidget)
-    {
-        $this->childWidgets[$childWidget->getName()] = $childWidget;
     }
 
     /**
@@ -118,14 +137,44 @@ class WidgetGroup implements WidgetGroupInterface
         $name,
         ViewEvaluationContextInterface $evaluationContext
     ) {
-        $state = $this->uiStateFactory->createWidgetGroupState($name, $this);
+        if ($this->repeatedWidget === null) {
+            // This should never happen, but just in case
+            throw new LogicException('Repeated widget has not been set for repeater');
+        }
 
-        foreach ($this->childWidgets as $childIndex => $childWidget) {
-            $state->addChild(
-                $childWidget->getName(),
-                $childWidget->createInitialState($childIndex, $evaluationContext)
+        $itemStaticList = $this->itemListExpression->toStatic($evaluationContext);
+
+        if (!$itemStaticList instanceof StaticListExpression) {
+            // This should never happen as it should be caught by validation, but just in case
+            throw new LogicException(
+                sprintf(
+                    'Repeated widget item list should have evaluated to a "%s", but it was a "%s"',
+                    StaticListExpression::TYPE,
+                    $itemStaticList->getType()
+                )
             );
         }
+
+        // Create one instance of the repeated widget's state for each item in the list
+        $repeatedWidgetStates = $itemStaticList->mapArray(
+            $this->itemVariableName,
+            $this->indexVariableName,
+            function (
+                ViewEvaluationContextInterface $itemEvaluationContext,
+                StaticInterface $static,
+                $index
+            ) use ($evaluationContext) {
+                // Use the index of each repeated instance as its name
+                return $this->repeatedWidget->createInitialState($index, $itemEvaluationContext);
+            },
+            $evaluationContext
+        );
+
+        $state = $this->uiStateFactory->createRepeaterWidgetState(
+            $name,
+            $this,
+            $repeatedWidgetStates
+        );
 
         return $state;
     }
@@ -158,7 +207,7 @@ class WidgetGroup implements WidgetGroupInterface
     public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
     {
         throw new LogicException(sprintf(
-            'WidgetGroups cannot have attributes, so attribute "%s" cannot be fetched',
+            'RepeaterWidgets cannot have attributes, so attribute "%s" cannot be fetched',
             $attributeName
         ));
     }
@@ -185,13 +234,27 @@ class WidgetGroup implements WidgetGroupInterface
     public function getDescendantByPath(array $names)
     {
         $childName = array_shift($names);
-        $child = $this->childWidgets[$childName];
 
-        if (count($names) === 0) {
-            return $child;
+        if ($this->repeatedWidget === null) {
+            // This should never happen, but just in case
+            throw new LogicException('Repeated widget has not been set for repeater');
         }
 
-        return $child->getDescendantByPath($names);
+        if ($childName !== self::REPEATED_WIDGET_NAME) {
+            throw new LogicException(
+                sprintf(
+                    'Repeater widget only supports a single child called "%s" but "%s" was requested',
+                    self::REPEATED_WIDGET_NAME,
+                    $childName
+                )
+            );
+        }
+
+        if (count($names) === 0) {
+            return $this->repeatedWidget;
+        }
+
+        return $this->repeatedWidget->getDescendantByPath($names);
     }
 
     /**
@@ -228,5 +291,13 @@ class WidgetGroup implements WidgetGroupInterface
     public function isRenderable()
     {
         return true; // Widget groups have a renderer
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setRepeatedWidget(WidgetInterface $repeatedWidget)
+    {
+        $this->repeatedWidget = $repeatedWidget;
     }
 }

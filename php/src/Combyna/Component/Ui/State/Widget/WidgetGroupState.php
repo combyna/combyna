@@ -28,16 +28,24 @@ class WidgetGroupState implements WidgetGroupStateInterface
     private $childWidgetStates = [];
 
     /**
+     * @var int|string
+     */
+    private $name;
+
+    /**
      * @var WidgetGroupInterface
      */
     private $widgetGroup;
 
     /**
+     * @param string|int $name
      * @param WidgetGroupInterface $widgetGroup
      */
     public function __construct(
+        $name,
         WidgetGroupInterface $widgetGroup
     ) {
+        $this->name = $name;
         $this->widgetGroup = $widgetGroup;
     }
 
@@ -78,7 +86,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
      */
     public function getStateName()
     {
-        return $this->widgetGroup->getName();
+        return $this->name;
     }
 
     /**
