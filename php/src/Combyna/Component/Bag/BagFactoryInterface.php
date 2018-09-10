@@ -13,7 +13,6 @@ namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface BagFactoryInterface
@@ -52,13 +51,11 @@ interface BagFactoryInterface
      * Creates a FixedStaticDefinition
      *
      * @param string $name
-     * @param TypeInterface $type
      * @param ExpressionInterface|null $defaultExpression
      * @return FixedStaticDefinition
      */
     public function createFixedStaticDefinition(
         $name,
-        TypeInterface $type,
         ExpressionInterface $defaultExpression = null
     );
 

@@ -13,6 +13,7 @@ namespace Combyna\Client;
 
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
+use Combyna\Component\Validator\Exception\ValidationFailureException;
 
 /**
  * Class ClientFactory
@@ -47,12 +48,21 @@ class ClientFactory
      * @param array $environmentConfig
      * @param array $appConfig
      * @return Client
+     * @throws ValidationFailureException
      */
     public function createClient(array $environmentConfig, array $appConfig)
     {
-        $environment = $this->combyna->createEnvironment($environmentConfig);
-        $app = $this->combyna->createApp($appConfig, $environment);
+        $environmentNode = $this->combyna->createEnvironment($environmentConfig);
+        $app = $this->combyna->createApp($appConfig, $environmentNode);
 
         return new Client($this->arrayRenderer, $app);
+    }
+
+    /**
+     * Switches to production mode (non-reversible, and can only be done before any app is loaded)
+     */
+    public function useProductionMode()
+    {
+        $this->combyna->useProductionMode();
     }
 }

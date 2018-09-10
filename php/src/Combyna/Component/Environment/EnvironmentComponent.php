@@ -12,6 +12,8 @@
 namespace Combyna\Component\Environment;
 
 use Combyna\Component\Common\AbstractComponent;
+use Combyna\Component\Environment\DependencyInjection\RegisterNativeFunctionProvidersPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class EnvironmentComponent
@@ -20,4 +22,12 @@ use Combyna\Component\Common\AbstractComponent;
  */
 class EnvironmentComponent extends AbstractComponent
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+        // Register the native PHP implementation for native functions
+        $containerBuilder->addCompilerPass(new RegisterNativeFunctionProvidersPass());
+    }
 }

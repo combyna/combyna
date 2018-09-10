@@ -56,7 +56,7 @@ class EventDefinitionExistsConstraintValidator implements ConstraintValidatorInt
                 $constraint->getLibraryName(),
                 $constraint->getEventName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$eventDefinitionExists) {

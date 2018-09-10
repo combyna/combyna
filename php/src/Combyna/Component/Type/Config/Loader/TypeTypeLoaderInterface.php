@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Type\Config\Loader;
 
-use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface TypeTypeLoaderInterface
@@ -31,7 +31,7 @@ interface TypeTypeLoaderInterface
      * Parses the given type config and creates a type structure
      *
      * @param array $config
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
     public function load(array $config);
 }

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Validation;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\ViewNodeInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
@@ -33,12 +34,14 @@ interface UiValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param CompoundWidgetDefinitionNode $definitionNode
      * @param BehaviourSpecInterface $definitionNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return CompoundWidgetDefinitionSubValidationContextInterface
      */
     public function createCompoundWidgetDefinitionContext(
         SubValidationContextInterface $parentContext,
         CompoundWidgetDefinitionNode $definitionNode,
-        BehaviourSpecInterface $definitionNodeBehaviourSpec
+        BehaviourSpecInterface $definitionNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
@@ -47,12 +50,14 @@ interface UiValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ViewNodeInterface $viewNode
      * @param BehaviourSpecInterface $viewNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ViewSubValidationContextInterface
      */
     public function createViewContext(
         SubValidationContextInterface $parentContext,
         ViewNodeInterface $viewNode,
-        BehaviourSpecInterface $viewNodeBehaviourSpec
+        BehaviourSpecInterface $viewNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
@@ -61,11 +66,13 @@ interface UiValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ViewStoreNode $viewStoreNode
      * @param BehaviourSpecInterface $viewStoreNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ViewStoreSubValidationContextInterface
      */
     public function createViewStoreContext(
         SubValidationContextInterface $parentContext,
         ViewStoreNode $viewStoreNode,
-        BehaviourSpecInterface $viewStoreNodeBehaviourSpec
+        BehaviourSpecInterface $viewStoreNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     );
 }

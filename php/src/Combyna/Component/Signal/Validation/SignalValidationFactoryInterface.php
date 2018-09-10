@@ -12,6 +12,7 @@
 namespace Combyna\Component\Signal\Validation;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
 use Combyna\Component\Signal\Validation\Context\SignalHandlerSubValidationContextInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
@@ -29,11 +30,13 @@ interface SignalValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param SignalHandlerNode $signalHandlerNode
      * @param BehaviourSpecInterface $signalHandlerNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return SignalHandlerSubValidationContextInterface
      */
     public function createSignalHandlerContext(
         SubValidationContextInterface $parentContext,
         SignalHandlerNode $signalHandlerNode,
-        BehaviourSpecInterface $signalHandlerNodeBehaviourSpec
+        BehaviourSpecInterface $signalHandlerNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     );
 }

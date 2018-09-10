@@ -14,6 +14,7 @@ namespace Combyna\Component\App\Validation;
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\App\Validation\Context\AppSubValidationContextInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 
 /**
@@ -29,11 +30,13 @@ interface AppValidationFactoryInterface
      * @param SubValidationContextInterface $environmentParentContext
      * @param AppNode $appNode
      * @param BehaviourSpecInterface $appNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return AppSubValidationContextInterface
      */
     public function createAppContext(
         SubValidationContextInterface $environmentParentContext,
         AppNode $appNode,
-        BehaviourSpecInterface $appNodeBehaviourSpec
+        BehaviourSpecInterface $appNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     );
 }

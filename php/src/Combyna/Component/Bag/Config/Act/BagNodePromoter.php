@@ -113,7 +113,6 @@ class BagNodePromoter
 
         return $this->bagFactory->createFixedStaticDefinition(
             $definitionNode->getName(),
-            $definitionNode->getStaticType(),
             $defaultExpression
         );
     }

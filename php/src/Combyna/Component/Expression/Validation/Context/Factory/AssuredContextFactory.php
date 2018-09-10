@@ -12,6 +12,7 @@
 namespace Combyna\Component\Expression\Validation\Context\Factory;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\GuardExpressionNode;
 use Combyna\Component\Expression\Validation\Context\AssuredSubValidationContextInterface;
 use Combyna\Component\Expression\Validation\Context\Specifier\AssuredContextSpecifier;
@@ -46,19 +47,22 @@ class AssuredContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param GuardExpressionNode $guardExpressionNode
      * @param BehaviourSpecInterface $guardExpressionNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return AssuredSubValidationContextInterface
      */
     public function createAssuredContext(
         AssuredContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         GuardExpressionNode $guardExpressionNode,
-        BehaviourSpecInterface $guardExpressionNodeBehaviourSpec
+        BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         return $this->validationFactory->createAssuredContext(
             $parentContext,
             $guardExpressionNode,
             $guardExpressionNodeBehaviourSpec,
-            $guardExpressionNode->getAssuranceNodes()
+            $guardExpressionNode->getAssuranceNodes(),
+            $subjectNode
         );
     }
 

@@ -37,12 +37,14 @@ interface DelegatingSubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param StructuredNodeInterface $structuredNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param StructuredNodeInterface $subjectNode
      * @return SubValidationContextInterface
      */
     public function createContext(
         SubValidationContextSpecifierInterface $contextSpecifier,
         SubValidationContextInterface $parentContext,
         StructuredNodeInterface $structuredNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        StructuredNodeInterface $subjectNode
     );
 }

@@ -173,7 +173,8 @@ class BehaviourSpec implements BehaviourSpecInterface
             $this->subValidationContextSpecifier,
             $parentContext,
             $this->node,
-            $this
+            $this,
+            $structuredNode
         );
 
         if ($this->node === $structuredNode) {

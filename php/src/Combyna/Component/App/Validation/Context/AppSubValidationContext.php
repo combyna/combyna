@@ -49,24 +49,32 @@ class AppSubValidationContext implements AppSubValidationContextInterface
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param AppNode $appNode
      * @param BehaviourSpecInterface $appNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         AppNode $appNode,
-        BehaviourSpecInterface $appNodeBehaviourSpec
+        BehaviourSpecInterface $appNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->appNode = $appNode;
         $this->appNodeBehaviourSpec = $appNodeBehaviourSpec;
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->appNode;
     }
@@ -112,6 +120,14 @@ class AppSubValidationContext implements AppSubValidationContextInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
+    }
+
+    /**
      * Fetches the return type of the specified function
      *
      * @param FunctionReturnTypeQuery $query
@@ -134,7 +150,7 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             $validationContext->createTypeQueryRequirement($query)
         );
 
-        return $functionNode->getReturnType();
+        return $functionNode->getReturnTypeDeterminer()->determine($validationContext);
     }
 
     /**

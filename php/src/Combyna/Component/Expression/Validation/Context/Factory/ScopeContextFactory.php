@@ -46,13 +46,15 @@ class ScopeContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ScopeSubValidationContextInterface
      */
     public function createScopeContext(
         ScopeContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $variableTypeDeterminers = $specifier->getVariableTypeDeterminers();
 
@@ -60,7 +62,8 @@ class ScopeContextFactory implements SubValidationContextFactoryInterface
             $parentContext,
             $variableTypeDeterminers,
             $actNode,
-            $behaviourSpec
+            $behaviourSpec,
+            $subjectNode
         );
     }
 

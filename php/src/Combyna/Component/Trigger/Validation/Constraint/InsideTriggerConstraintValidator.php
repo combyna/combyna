@@ -54,7 +54,7 @@ class InsideTriggerConstraintValidator implements ConstraintValidatorInterface
         if (
             !$validationContext->queryForBoolean(
                 new InsideTriggerQuery(),
-                $validationContext->getActNode()
+                $validationContext->getCurrentActNode()
             )
         ) {
             $validationContext->addGenericViolation('Not inside a trigger');

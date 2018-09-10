@@ -291,7 +291,7 @@ class RootValidationContext implements RootValidationContextInterface
         QueryInterface $query,
         SubValidationContextInterface $subValidationContext
     ) {
-        $nodeQueriedFrom = $subValidationContext->getActNode();
+        $nodeQueriedFrom = $subValidationContext->getCurrentActNode();
         $queryClass = get_class($query);
 
         do {

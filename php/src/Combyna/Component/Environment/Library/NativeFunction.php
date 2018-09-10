@@ -42,32 +42,24 @@ class NativeFunction implements FunctionInterface
     private $parameterBag;
 
     /**
-     * @var TypeInterface
-     */
-    private $returnType;
-
-    /**
      * @param string $name
      * @param FixedStaticBagModelInterface $parameterBag A specification for parameters and their types
      * @param callable $callable
-     * @param TypeInterface $returnType
      */
     public function __construct(
         $name,
         FixedStaticBagModelInterface $parameterBag,
-        callable $callable,
-        TypeInterface $returnType
+        callable $callable
     ) {
         $this->callable = $callable;
         $this->name = $name;
         $this->parameterBag = $parameterBag;
-        $this->returnType = $returnType;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function call(StaticBagInterface $argumentStaticBag)
+    public function call(StaticBagInterface $argumentStaticBag, TypeInterface $returnType)
     {
         // Sanity check to ensure all arguments match the parameter list before we continue
         $this->parameterBag->assertValidStaticBag($argumentStaticBag);
@@ -81,10 +73,14 @@ class NativeFunction implements FunctionInterface
         }
 
         // Check that the function returned a static of the type it declares that it returns
-        if (!$this->returnType->allowsStatic($resultStatic)) {
+        if (!$returnType->allowsStatic($resultStatic)) {
             throw new LogicException(
-                'Function must return a [' . $this->returnType->getSummary() . '], ' .
-                get_class($resultStatic) . ' returned'
+                sprintf(
+                    'Function "%s" must return a [%s], %s returned',
+                    $this->name,
+                    $returnType->getSummary(),
+                    get_class($resultStatic)
+                )
             );
         }
 
@@ -97,13 +93,5 @@ class NativeFunction implements FunctionInterface
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getReturnType()
-    {
-        return $this->returnType;
     }
 }

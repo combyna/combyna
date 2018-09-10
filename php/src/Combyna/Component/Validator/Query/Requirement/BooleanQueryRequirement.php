@@ -14,6 +14,7 @@ namespace Combyna\Component\Validator\Query\Requirement;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\BooleanQueryInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class BooleanQueryRequirement
@@ -53,5 +54,13 @@ class BooleanQueryRequirement implements QueryRequirementInterface
          * Don't adopt the ACT node, as we're trying to query for a boolean
          * so we don't want to apply any validation for the node itself
          */
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function determineType(TypeDeterminerInterface $typeDeterminer)
+    {
+        return $typeDeterminer->determine($this->validationContext);
     }
 }

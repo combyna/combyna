@@ -12,6 +12,7 @@
 namespace Combyna\Component\Signal\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
 use Combyna\Component\Signal\Validation\Query\CurrentSignalHasPayloadStaticQuery;
 use Combyna\Component\Signal\Validation\Query\CurrentSignalPayloadStaticTypeQuery;
@@ -45,24 +46,32 @@ class SignalHandlerSubValidationContext implements SignalHandlerSubValidationCon
     private $signalHandlerNodeBehaviourSpec;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param SignalHandlerNode $signalHandlerNode
      * @param BehaviourSpecInterface $signalHandlerNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         SignalHandlerNode $signalHandlerNode,
-        BehaviourSpecInterface $signalHandlerNodeBehaviourSpec
+        BehaviourSpecInterface $signalHandlerNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->parentContext = $parentContext;
         $this->signalHandlerNode = $signalHandlerNode;
         $this->signalHandlerNodeBehaviourSpec = $signalHandlerNodeBehaviourSpec;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->signalHandlerNode;
     }
@@ -113,6 +122,14 @@ class SignalHandlerSubValidationContext implements SignalHandlerSubValidationCon
             CurrentSignalHasPayloadStaticQuery::class => [$this, 'queryForSignalPayloadStaticExistence'],
             CurrentSignalPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**

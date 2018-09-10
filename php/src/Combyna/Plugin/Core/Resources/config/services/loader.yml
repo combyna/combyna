@@ -1,0 +1,6 @@
+services:
+    combyna_core.loader.type.list_concat_function_return_type:
+        class: Combyna\Plugin\Core\Config\Loader\Type\Function_\ListConcatReturnTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}

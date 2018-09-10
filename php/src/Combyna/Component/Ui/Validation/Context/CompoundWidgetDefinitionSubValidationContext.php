@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
 use Combyna\Component\Ui\Validation\Query\CurrentCompoundWidgetDefinitionHasAttributeStaticQuery;
@@ -44,24 +45,32 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param CompoundWidgetDefinitionNode $definitionNode
      * @param BehaviourSpecInterface $definitionNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         CompoundWidgetDefinitionNode $definitionNode,
-        BehaviourSpecInterface $definitionNodeBehaviourSpec
+        BehaviourSpecInterface $definitionNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->definitionNode = $definitionNode;
-        $this->parentContext = $parentContext;
         $this->definitionNodeBehaviourSpec = $definitionNodeBehaviourSpec;
+        $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->definitionNode;
     }
@@ -110,6 +119,14 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
             ],
             WidgetAttributeTypeQuery::class => [$this, 'queryForWidgetAttributeType']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**
@@ -168,6 +185,6 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
                 $validationContext->createTypeQueryRequirement($query)
             );
 
-        return $attributeStaticDefinitionNode->getStaticType();
+        return $attributeStaticDefinitionNode->getStaticTypeDeterminer()->determine($validationContext);
     }
 }

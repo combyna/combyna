@@ -132,14 +132,16 @@ class ViewStoreNode extends AbstractActNode
      * @param QueryRequirementInterface $queryRequirement
      * @return TypeInterface|null
      */
-    public function getSlotStaticType($slotName, QueryRequirementInterface $queryRequirement)
-    {
+    public function getSlotStaticType(
+        $slotName,
+        QueryRequirementInterface $queryRequirement
+    ) {
         $slotStaticDefinition = $this->slotBagModelNode->getStaticDefinitionByName($slotName, $queryRequirement);
 
         if ($slotStaticDefinition === null) {
             return null;
         }
 
-        return $slotStaticDefinition->getStaticType();
+        return $queryRequirement->determineType($slotStaticDefinition->getStaticTypeDeterminer());
     }
 }

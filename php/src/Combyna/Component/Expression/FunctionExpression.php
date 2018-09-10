@@ -13,6 +13,7 @@ namespace Combyna\Component\Expression;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Class FunctionExpression
@@ -46,21 +47,29 @@ class FunctionExpression extends AbstractExpression
     private $libraryName;
 
     /**
+     * @var TypeInterface
+     */
+    private $returnType;
+
+    /**
      * @param ExpressionFactoryInterface $expressionFactory
      * @param string $libraryName
      * @param string $functionName
      * @param ExpressionBagInterface $argumentExpressionBag
+     * @param TypeInterface $returnType
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
         $libraryName,
         $functionName,
-        ExpressionBagInterface $argumentExpressionBag
+        ExpressionBagInterface $argumentExpressionBag,
+        TypeInterface $returnType
     ) {
         $this->argumentExpressionBag = $argumentExpressionBag;
         $this->expressionFactory = $expressionFactory;
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
+        $this->returnType = $returnType;
     }
 
     /**
@@ -73,6 +82,11 @@ class FunctionExpression extends AbstractExpression
         // Evaluate the arguments to statics suitable for passing to the function
         $argumentStaticBag = $this->argumentExpressionBag->toStaticBag($subEvaluationContext);
 
-        return $evaluationContext->callFunction($this->libraryName, $this->functionName, $argumentStaticBag);
+        return $evaluationContext->callFunction(
+            $this->libraryName,
+            $this->functionName,
+            $argumentStaticBag,
+            $this->returnType
+        );
     }
 }

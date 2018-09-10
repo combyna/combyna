@@ -76,7 +76,7 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     {
         $definition = $this->payloadStaticBagModelNode->getStaticDefinitionByName($staticName, $queryRequirement);
 
-        return $definition->getStaticType();
+        return $queryRequirement->determineType($definition->getStaticTypeDeterminer());
     }
 
     /**

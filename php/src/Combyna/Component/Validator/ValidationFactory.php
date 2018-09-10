@@ -12,6 +12,7 @@
 namespace Combyna\Component\Validator;
 
 use Combyna\Component\Behaviour\BehaviourFactoryInterface;
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
@@ -68,9 +69,10 @@ class ValidationFactory implements ValidationFactoryInterface
     public function createActNodeContext(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return new ActNodeSubValidationContext($parentContext, $actNode, $behaviourSpec);
+        return new ActNodeSubValidationContext($parentContext, $actNode, $behaviourSpec, $subjectNode);
     }
 
     /**
@@ -80,13 +82,15 @@ class ValidationFactory implements ValidationFactoryInterface
         SubValidationContextInterface $parentContext,
         ActNodeInterface $guardExpressionNode,
         BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
-        array $assuranceNodes
+        array $assuranceNodes,
+        ActNodeInterface $subjectNode
     ) {
         return new AssuredSubValidationContext(
             $parentContext,
             $guardExpressionNode,
             $guardExpressionNodeBehaviourSpec,
-            $assuranceNodes
+            $assuranceNodes,
+            $subjectNode
         );
     }
 
@@ -114,9 +118,10 @@ class ValidationFactory implements ValidationFactoryInterface
     public function createDetachedContext(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return new DetachedSubValidationContext($parentContext, $actNode, $behaviourSpec);
+        return new DetachedSubValidationContext($parentContext, $actNode, $behaviourSpec, $subjectNode);
     }
 
     /**
@@ -141,9 +146,10 @@ class ValidationFactory implements ValidationFactoryInterface
      */
     public function createRootSubContext(
         ActNodeInterface $rootNode,
-        BehaviourSpecInterface $rootNodeBehaviourSpec
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        StructuredNodeInterface $subjectNode
     ) {
-        return new RootSubValidationContext($rootNode, $rootNodeBehaviourSpec);
+        return new RootSubValidationContext($rootNode, $rootNodeBehaviourSpec, $subjectNode);
     }
 
     /**
@@ -153,9 +159,16 @@ class ValidationFactory implements ValidationFactoryInterface
         SubValidationContextInterface $parentContext,
         array $variableTypeDeterminers,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return new ScopeSubValidationContext($parentContext, $variableTypeDeterminers, $actNode, $behaviourSpec);
+        return new ScopeSubValidationContext(
+            $parentContext,
+            $variableTypeDeterminers,
+            $actNode,
+            $behaviourSpec,
+            $subjectNode
+        );
     }
 
     /**

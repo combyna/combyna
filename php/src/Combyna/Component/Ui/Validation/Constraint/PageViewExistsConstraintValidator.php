@@ -53,7 +53,7 @@ class PageViewExistsConstraintValidator implements ConstraintValidatorInterface
     ) {
         $pageViewExists = $validationContext->queryForBoolean(
             new PageViewExistsQuery($constraint->getPageViewName()),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$pageViewExists) {

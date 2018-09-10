@@ -1,0 +1,6 @@
+services:
+    combyna_core.list.functions:
+        class: Combyna\Plugin\Core\Library\List_\Functions
+        autowire: true
+        tags:
+            - {name: combyna.native_library_function_provider}

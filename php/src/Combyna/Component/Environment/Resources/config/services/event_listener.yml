@@ -1,0 +1,6 @@
+services:
+    combyna.environment.event_listener.native_function_installer:
+        class: Combyna\Component\Environment\EventListener\NativeFunctionInstallerListener
+        autowire: true
+        tags:
+            - {name: combyna.event_listener, event: combyna.environment_loaded, method: onEnvironmentLoaded}

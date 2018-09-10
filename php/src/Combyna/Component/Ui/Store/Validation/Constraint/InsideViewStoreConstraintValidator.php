@@ -54,7 +54,7 @@ class InsideViewStoreConstraintValidator implements ConstraintValidatorInterface
         if (
             !$validationContext->queryForBoolean(
                 new InsideViewStoreQuery(),
-                $validationContext->getActNode()
+                $validationContext->getCurrentActNode()
             )
         ) {
             $validationContext->addGenericViolation('Not inside a view store');

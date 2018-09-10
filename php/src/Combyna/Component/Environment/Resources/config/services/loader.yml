@@ -3,6 +3,10 @@ services:
         class: Combyna\Component\Environment\Config\Loader\EnvironmentLoader
         autowire: true
 
+    combyna.environment.loader.function:
+        class: Combyna\Component\Environment\Config\Loader\Functions\FunctionLoader
+        autowire: true
+
     combyna.environment.loader.library:
         class: Combyna\Component\Environment\Config\Loader\Library\LibraryLoader
         autowire: true

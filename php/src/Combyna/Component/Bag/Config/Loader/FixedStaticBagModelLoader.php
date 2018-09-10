@@ -53,7 +53,7 @@ class FixedStaticBagModelLoader implements FixedStaticBagModelLoaderInterface
         $staticDefinitionNodes = [];
 
         foreach ($modelConfig as $name => $definitionConfig) {
-            $staticType = $this->typeLoader->load($definitionConfig);
+            $staticTypeDeterminer = $this->typeLoader->load($definitionConfig);
 
             // Allow the static to specify a default value
             $defaultExpressionNode =
@@ -63,7 +63,7 @@ class FixedStaticBagModelLoader implements FixedStaticBagModelLoaderInterface
 
             $staticDefinitionNodes[] = new FixedStaticDefinitionNode(
                 $name,
-                $staticType,
+                $staticTypeDeterminer,
                 $defaultExpressionNode
             );
         }

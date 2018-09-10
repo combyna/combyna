@@ -116,6 +116,14 @@ class StaticList implements StaticListInterface
     /**
      * {@inheritdoc}
      */
+    public function getElementStatics()
+    {
+        return $this->statics;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function map(
         $itemVariableName,
         $indexVariableName,

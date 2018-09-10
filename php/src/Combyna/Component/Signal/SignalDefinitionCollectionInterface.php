@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
+
 /**
  * Interface SignalDefinitionCollectionInterface
  *

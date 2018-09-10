@@ -104,7 +104,8 @@ class NodeValidator implements NodeValidatorInterface
 
         $rootSubValidationContext = $this->validationFactory->createRootSubContext(
             $environmentNode,
-            $environmentNodeBehaviourSpec
+            $environmentNodeBehaviourSpec,
+            $node
         );
 
         $rootValidationContext = $this->validationFactory->createRootContext(

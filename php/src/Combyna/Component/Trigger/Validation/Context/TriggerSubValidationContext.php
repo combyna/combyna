@@ -12,6 +12,7 @@
 namespace Combyna\Component\Trigger\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Event\Validation\Query\CurrentEventPayloadStaticTypeQuery;
 use Combyna\Component\Event\Validation\Query\EventDefinitionPayloadStaticTypeQuery;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
@@ -33,6 +34,11 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @var TriggerNode
      */
     private $triggerNode;
@@ -46,13 +52,16 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
      * @param SubValidationContextInterface $parentContext
      * @param TriggerNode $triggerNode
      * @param BehaviourSpecInterface $triggerNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         TriggerNode $triggerNode,
-        BehaviourSpecInterface $triggerNodeBehaviourSpec
+        BehaviourSpecInterface $triggerNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
         $this->triggerNode = $triggerNode;
         $this->triggerNodeBehaviourSpec = $triggerNodeBehaviourSpec;
     }
@@ -60,7 +69,7 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->triggerNode;
     }
@@ -110,6 +119,14 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
             CurrentEventPayloadStaticTypeQuery::class => [$this, 'queryForCurrentEventPayloadStaticType'],
             InsideTriggerQuery::class => [$this, 'queryForInsideTrigger']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**

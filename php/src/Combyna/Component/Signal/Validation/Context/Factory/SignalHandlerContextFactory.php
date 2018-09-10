@@ -12,6 +12,7 @@
 namespace Combyna\Component\Signal\Validation\Context\Factory;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
 use Combyna\Component\Signal\Validation\Context\SignalHandlerSubValidationContextInterface;
 use Combyna\Component\Signal\Validation\Context\Specifier\SignalHandlerContextSpecifier;
@@ -46,18 +47,21 @@ class SignalHandlerContextFactory implements SubValidationContextFactoryInterfac
      * @param SubValidationContextInterface $parentContext
      * @param SignalHandlerNode $signalHandlerNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return SignalHandlerSubValidationContextInterface
      */
     public function createSignalHandlerContext(
         SignalHandlerContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         SignalHandlerNode $signalHandlerNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         return $this->validationFactory->createSignalHandlerContext(
             $parentContext,
             $signalHandlerNode,
-            $behaviourSpec
+            $behaviourSpec,
+            $subjectNode
         );
     }
 

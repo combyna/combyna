@@ -54,7 +54,7 @@ class InsideCompoundWidgetDefinitionRootWidgetConstraintValidator implements Con
         if (
             !$validationContext->queryForBoolean(
                 new InsideCompoundWidgetDefinitionRootWidgetQuery(),
-                $validationContext->getActNode()
+                $validationContext->getCurrentActNode()
             )
         ) {
             $validationContext->addGenericViolation('Not inside a compound widget definition\'s root widget');

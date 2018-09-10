@@ -20,6 +20,7 @@ use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class UnknownFixedStaticDefinitionNode
@@ -87,9 +88,11 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
     /**
      * {@inheritdoc}
      */
-    public function getStaticType()
+    public function getStaticTypeDeterminer()
     {
-        return new UnresolvedType('Unknown fixed static "' . $this->name . '"');
+        return new PresolvedTypeDeterminer(
+            new UnresolvedType('Unknown fixed static "' . $this->name . '"')
+        );
     }
 
     /**

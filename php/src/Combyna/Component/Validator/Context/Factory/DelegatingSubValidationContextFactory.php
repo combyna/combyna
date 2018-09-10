@@ -50,7 +50,8 @@ class DelegatingSubValidationContextFactory implements DelegatingSubValidationCo
         SubValidationContextSpecifierInterface $contextSpecifier,
         SubValidationContextInterface $parentContext,
         StructuredNodeInterface $structuredNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        StructuredNodeInterface $subjectNode
     ) {
         $contextSpecifierClass = get_class($contextSpecifier);
 
@@ -67,7 +68,8 @@ class DelegatingSubValidationContextFactory implements DelegatingSubValidationCo
             $contextSpecifier,
             $parentContext,
             $structuredNode,
-            $behaviourSpec
+            $behaviourSpec,
+            $subjectNode
         );
     }
 }

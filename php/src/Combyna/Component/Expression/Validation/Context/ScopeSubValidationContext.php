@@ -46,6 +46,11 @@ class ScopeSubValidationContext implements ScopeSubValidationContextInterface
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @var TypeDeterminerInterface[]
      */
     private $variableTypeDeterminers;
@@ -55,23 +60,26 @@ class ScopeSubValidationContext implements ScopeSubValidationContextInterface
      * @param TypeDeterminerInterface[] $variableTypeDeterminers
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         array $variableTypeDeterminers,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->actNode = $actNode;
         $this->behaviourSpec = $behaviourSpec;
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
         $this->variableTypeDeterminers = $variableTypeDeterminers;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->actNode;
     }
@@ -120,8 +128,17 @@ class ScopeSubValidationContext implements ScopeSubValidationContextInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
+    }
+
+    /**
      * Determines whether the specified variable exists
      *
+     * @param VariableExistsQuery $query
      * @return bool|null
      */
     public function queryForVariableExistence(VariableExistsQuery $query)

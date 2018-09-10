@@ -34,6 +34,7 @@ use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -90,10 +91,10 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-param',
-                                new UnresolvedType('invalid func param type')
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid func param type'))
                             )
                         ]),
-                        new UnresolvedType('invalid func return type')
+                        new PresolvedTypeDeterminer(new UnresolvedType('invalid func return type'))
                     )
                 ],
                 [
@@ -102,7 +103,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-payload-static',
-                                new UnresolvedType('invalid event payload static type')
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid event payload static type'))
                             )
                         ])
                     )
@@ -113,7 +114,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-payload-static',
-                                new UnresolvedType('invalid signal payload static type')
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid signal payload static type'))
                             )
                         ])
                     )
@@ -125,7 +126,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-widget-attr',
-                                new UnresolvedType('invalid widget attr type')
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
                             )
                         ]),
                         [
@@ -144,7 +145,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-widget-attr',
-                                new UnresolvedType('invalid widget attr type')
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
                             )
                         ]),
                         [

@@ -55,7 +55,7 @@ class CompoundWidgetDefinitionHasChildConstraintValidator implements ConstraintV
             new CurrentCompoundWidgetDefinitionHasChildStaticQuery(
                 $constraint->getChildName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$childExists) {

@@ -55,7 +55,7 @@ class SignalDefinitionHasPayloadStaticConstraintValidator implements ConstraintV
             new CurrentSignalHasPayloadStaticQuery(
                 $constraint->getPayloadStaticName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$payloadStaticExists) {

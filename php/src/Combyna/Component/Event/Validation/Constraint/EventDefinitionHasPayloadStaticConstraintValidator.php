@@ -55,7 +55,7 @@ class EventDefinitionHasPayloadStaticConstraintValidator implements ConstraintVa
             new CurrentEventHasPayloadStaticQuery(
                 $constraint->getPayloadStaticName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$payloadStaticExists) {

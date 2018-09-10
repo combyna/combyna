@@ -12,6 +12,7 @@
 namespace Combyna\Component\Trigger\Validation\Context\Factory;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Trigger\Validation\Context\Specifier\TriggerContextSpecifier;
 use Combyna\Component\Trigger\Validation\Context\TriggerSubValidationContext;
@@ -33,18 +34,21 @@ class TriggerContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param TriggerNode $triggerNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return TriggerSubValidationContextInterface
      */
     public function createTriggerContext(
         TriggerContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         TriggerNode $triggerNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         return new TriggerSubValidationContext(
             $parentContext,
             $triggerNode,
-            $behaviourSpec
+            $behaviourSpec,
+            $subjectNode
         );
     }
 

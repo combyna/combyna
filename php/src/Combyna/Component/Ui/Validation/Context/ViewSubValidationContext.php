@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Store\Config\Act\QueryNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
@@ -35,6 +36,11 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @var ViewNodeInterface
      */
     private $viewNode;
@@ -48,13 +54,16 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
      * @param SubValidationContextInterface $parentContext
      * @param ViewNodeInterface $viewNode
      * @param BehaviourSpecInterface $viewNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         ViewNodeInterface $viewNode,
-        BehaviourSpecInterface $viewNodeBehaviourSpec
+        BehaviourSpecInterface $viewNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
         $this->viewNode = $viewNode;
         $this->viewNodeBehaviourSpec = $viewNodeBehaviourSpec;
     }
@@ -62,7 +71,7 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->viewNode;
     }
@@ -112,6 +121,14 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
+    }
+
+    /**
      * Determines whether we are inside a view
      *
      * @return bool
@@ -134,7 +151,7 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     ) {
         return $this->viewNode->getStore()->getQueryByName(
             $query->getQueryName(),
-            $validationContext->createActNodeQueryRequirement($query, $validationContext->getActNode())
+            $validationContext->createActNodeQueryRequirement($query, $validationContext->getCurrentActNode())
         );
     }
 

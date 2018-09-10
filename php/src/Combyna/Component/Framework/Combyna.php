@@ -17,8 +17,13 @@ use Combyna\Component\App\Config\Loader\AppLoaderInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Loader\EnvironmentLoaderInterface;
 use Combyna\Component\Environment\EnvironmentFactoryInterface;
+use Combyna\Component\Framework\Context\ModeContext;
+use Combyna\Component\Framework\EventDispatcher\Event\EnvironmentLoadedEvent;
 use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
+use Combyna\Component\Validator\Exception\ValidationFailureException;
+use LogicException;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class Combyna
@@ -29,6 +34,11 @@ use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
  */
 class Combyna
 {
+    /**
+     * @var bool
+     */
+    private $appCreated = false;
+
     /**
      * @var AppLoaderInterface
      */
@@ -55,32 +65,48 @@ class Combyna
     private $environmentLoader;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var LibraryConfigCollection
      */
     private $libraryConfigCollection;
 
     /**
+     * @var ModeContext
+     */
+    private $modeContext;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param EnvironmentFactoryInterface $environmentFactory
      * @param EnvironmentLoaderInterface $environmentLoader
      * @param AppLoaderInterface $appLoader
      * @param NodeValidatorInterface $appValidator
      * @param AppNodePromoter $appNodePromoter
      * @param LibraryConfigCollection $libraryConfigCollection
+     * @param ModeContext $modeContext
      */
     public function __construct(
+        EventDispatcherInterface $eventDispatcher,
         EnvironmentFactoryInterface $environmentFactory,
         EnvironmentLoaderInterface $environmentLoader,
         AppLoaderInterface $appLoader,
         NodeValidatorInterface $appValidator,
         AppNodePromoter $appNodePromoter,
-        LibraryConfigCollection $libraryConfigCollection
+        LibraryConfigCollection $libraryConfigCollection,
+        ModeContext $modeContext
     ) {
         $this->appLoader = $appLoader;
         $this->appNodePromoter = $appNodePromoter;
         $this->appValidator = $appValidator;
         $this->environmentFactory = $environmentFactory;
         $this->environmentLoader = $environmentLoader;
+        $this->eventDispatcher = $eventDispatcher;
         $this->libraryConfigCollection = $libraryConfigCollection;
+        $this->modeContext = $modeContext;
     }
 
     /**
@@ -89,17 +115,23 @@ class Combyna
      * @param array $appConfig
      * @param EnvironmentNode|null $environmentNode
      * @return AppInterface
+     * @throws ValidationFailureException
      */
     public function createApp(array $appConfig, EnvironmentNode $environmentNode = null)
     {
+        $this->appCreated = true;
+
         if ($environmentNode === null) {
             $environmentNode = $this->createEnvironment();
         }
 
         $appNode = $this->appLoader->loadApp($environmentNode, $appConfig);
 
-        $validationContext = $this->appValidator->validate($appNode, $appNode);
-        $validationContext->throwIfViolated();
+        // For development environments, statically validate the app for correctness before continuing
+        if ($this->modeContext->getMode()->isDevelopment()) {
+            $validationContext = $this->appValidator->validate($appNode, $appNode);
+            $validationContext->throwIfViolated();
+        }
 
         return $this->appNodePromoter->promoteApp($appNode, $environmentNode);
     }
@@ -117,12 +149,32 @@ class Combyna
         }
 
         $environmentConfig['libraries'] = array_merge(
-            $environmentConfig['libraries'],
-            $this->libraryConfigCollection->getLibraryConfigs()
+            $this->libraryConfigCollection->getLibraryConfigs(),
+            $environmentConfig['libraries']
         );
 
         $environmentNode = $this->environmentLoader->loadEnvironment($environmentConfig);
 
+        // Dispatch an event to provide an extension point for automatically installing native functions, etc.
+        $this->eventDispatcher->dispatch(
+            FrameworkEvents::ENVIRONMENT_LOADED,
+            new EnvironmentLoadedEvent(
+                $environmentNode
+            )
+        );
+
         return $environmentNode;
+    }
+
+    /**
+     * Switches to production mode (non-reversible, and can only be done before any app is loaded)
+     */
+    public function useProductionMode()
+    {
+        if ($this->appCreated) {
+            throw new LogicException('Unable to switch to production mode, as an app has already been created');
+        }
+
+        $this->modeContext->useProductionMode();
     }
 }

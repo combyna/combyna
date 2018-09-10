@@ -14,11 +14,13 @@ namespace Combyna\Component\Environment\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class DynamicUnknownFunctionNode
@@ -80,10 +82,10 @@ class DynamicUnknownFunctionNode extends AbstractActNode implements FunctionNode
     /**
      * {@inheritdoc}
      */
-    public function getReturnType()
+    public function getReturnTypeDeterminer(ActNodeInterface $nodeQueriedFrom)
     {
         // We don't know what the function's return type could be as it is not defined
-        return new UnresolvedType('undefined function');
+        return new PresolvedTypeDeterminer(new UnresolvedType('undefined function'));
     }
 
     /**

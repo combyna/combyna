@@ -52,27 +52,35 @@ class AssuredSubValidationContext implements AssuredSubValidationContextInterfac
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $guardExpressionNode
      * @param BehaviourSpecInterface $guardExpressionNodeBehaviourSpec
      * @param AssuranceNodeInterface[] $assuranceNodes
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $guardExpressionNode,
         BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
-        array $assuranceNodes
+        array $assuranceNodes,
+        ActNodeInterface $subjectNode
     ) {
         $this->assuranceNodes = $assuranceNodes;
         $this->guardExpressionNode = $guardExpressionNode;
         $this->guardExpressionNodeBehaviourSpec = $guardExpressionNodeBehaviourSpec;
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->guardExpressionNode;
     }
@@ -111,6 +119,14 @@ class AssuredSubValidationContext implements AssuredSubValidationContextInterfac
             AssuredStaticExistsQuery::class => [$this, 'queryForAssuredStaticExistence'],
             AssuredStaticTypeQuery::class => [$this, 'queryForAssuredStaticType']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**

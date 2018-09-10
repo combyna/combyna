@@ -56,7 +56,7 @@ class SignalDefinitionExistsConstraintValidator implements ConstraintValidatorIn
                 $constraint->getLibraryName(),
                 $constraint->getSignalName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$signalDefinitionExists) {

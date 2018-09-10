@@ -14,6 +14,7 @@ namespace Combyna\Component\Ui\Evaluation;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\Widget\CoreWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
@@ -58,9 +59,13 @@ class CoreWidgetEvaluationContext extends AbstractEvaluationContext implements C
     /**
      * {@inheritdoc}
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag);
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    ) {
+        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag, $returnType);
     }
 
     /**

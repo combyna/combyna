@@ -24,12 +24,15 @@ interface FunctionInterface
 {
     /**
      * Calls the function, passing it its arguments evaluated to static values,
-     * and returns the static value it evaluates to
+     * and returns the static value it evaluates to. The return type must be passed in
+     * as it can be different depending on the types of the arguments provided
+     * (eg. if a custom TypeDeterminer is used for a parameter's type)
      *
      * @param StaticBagInterface $argumentStaticBag
+     * @param TypeInterface $returnType
      * @return StaticInterface
      */
-    public function call(StaticBagInterface $argumentStaticBag);
+    public function call(StaticBagInterface $argumentStaticBag, TypeInterface $returnType);
 
     /**
      * Fetches the name of this function, which must be unique within its library
@@ -37,11 +40,4 @@ interface FunctionInterface
      * @return string
      */
     public function getName();
-
-    /**
-     * Fetches the type of static that this function will return
-     *
-     * @return TypeInterface
-     */
-    public function getReturnType();
 }

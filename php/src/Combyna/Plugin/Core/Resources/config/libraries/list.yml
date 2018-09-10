@@ -1,0 +1,23 @@
+name: list
+description: Built-in tools for list handling
+functions:
+    # Concatenates a series of lists together into one merged list
+    concat:
+        type: native
+        parameters:
+            lists:
+                type: list
+                element:
+                    type: list
+                    element: any
+        #
+        # A special return type determiner is used here, as the result type of the concatenation
+        # depends on the types of the elements in each of the lists provided as an argument.
+        # eg. if:
+        # - the `lists` arg is a list with two sub-lists,
+        # - the first list's elements are all texts (list<text>)
+        # - the second list's elements are all numbers (list<number>)
+        # then the return type of the function is a list where the elements are text and numbers (list<text|number>)
+        #
+        # @see Combyna\Plugin\Core\Type\Function_\ListConcatReturnTypeDeterminer
+        return: list.concat

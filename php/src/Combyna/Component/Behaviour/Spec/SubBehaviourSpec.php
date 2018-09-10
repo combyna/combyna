@@ -154,7 +154,8 @@ class SubBehaviourSpec implements SubBehaviourSpecInterface
             $this->subValidationContextSpecifier,
             $parentContext,
             $this->owningNode,
-            $this
+            $this,
+            $parentContext->getSubjectActNode()
         );
     }
 
@@ -169,7 +170,8 @@ class SubBehaviourSpec implements SubBehaviourSpecInterface
             $this->subValidationContextSpecifier,
             $parentContext,
             $this->owningNode,
-            $this
+            $this,
+            $structuredNode
         );
 
         // Go through all the child specs of this one recursively for our branch of the tree

@@ -53,7 +53,7 @@ class VariableExistsConstraintValidator implements ConstraintValidatorInterface
     ) {
         $variableExists = $validationContext->queryForBoolean(
             new VariableExistsQuery($constraint->getVariableName()),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$variableExists) {

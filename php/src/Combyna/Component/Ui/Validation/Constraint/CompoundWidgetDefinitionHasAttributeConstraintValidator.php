@@ -55,7 +55,7 @@ class CompoundWidgetDefinitionHasAttributeConstraintValidator implements Constra
             new CurrentCompoundWidgetDefinitionHasAttributeStaticQuery(
                 $constraint->getAttributeName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$attributeExists) {

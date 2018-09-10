@@ -53,7 +53,7 @@ class AssuredStaticExistsConstraintValidator implements ConstraintValidatorInter
     ) {
         $assuredStaticExists = $validationContext->queryForBoolean(
             new AssuredStaticExistsQuery($constraint->getStaticName()),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$assuredStaticExists) {

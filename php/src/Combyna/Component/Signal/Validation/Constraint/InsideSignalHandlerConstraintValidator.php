@@ -54,7 +54,7 @@ class InsideSignalHandlerConstraintValidator implements ConstraintValidatorInter
         if (
             !$validationContext->queryForBoolean(
                 new InsideSignalHandlerQuery(),
-                $validationContext->getActNode()
+                $validationContext->getCurrentActNode()
             )
         ) {
             $validationContext->addGenericViolation('Not inside a signal handler');

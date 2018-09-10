@@ -13,6 +13,7 @@ namespace Combyna\Component\Expression;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Class AbstractExpressionFactory
@@ -164,12 +165,14 @@ abstract class AbstractExpressionFactory implements ExpressionFactoryInterface
     public function createFunctionExpression(
         $libraryName,
         $functionName,
-        ExpressionBagInterface $argumentExpressionBag
+        ExpressionBagInterface $argumentExpressionBag,
+        TypeInterface $returnType
     ) {
         return $this->parentExpressionFactory->createFunctionExpression(
             $libraryName,
             $functionName,
-            $argumentExpressionBag
+            $argumentExpressionBag,
+            $returnType
         );
     }
 

@@ -51,6 +51,13 @@ interface StaticListInterface extends Countable
     public function getElementStatic($index);
 
     /**
+     * Fetches all statics in this list
+     *
+     * @return StaticInterface[]
+     */
+    public function getElementStatics();
+
+    /**
      * Maps this static list to another, transforming each element with the given expression
      *
      * @param string $itemVariableName

@@ -113,11 +113,13 @@ interface ValidationContextInterface
     public function createTypeQueryRequirement(ResultTypeQueryInterface $query);
 
     /**
-     * Fetches the ACT node currently being validated
+     * Fetches the ACT node that the current context represents.
+     * This is not necessarily the same as the original node being validated -
+     * to fetch that, see ::getSubjectActNode()
      *
      * @return ActNodeInterface
      */
-    public function getActNode();
+    public function getCurrentActNode();
 
     /**
      * Fetches all descendant nodes of the current ACT node (which is not necessarily an expression node)
@@ -142,6 +144,13 @@ interface ValidationContextInterface
      * @return string
      */
     public function getPath();
+
+    /**
+     * Fetches the original ACT node currently being validated
+     *
+     * @return ActNodeInterface
+     */
+    public function getSubjectActNode();
 
     /**
      * Fetches the sub-validation context

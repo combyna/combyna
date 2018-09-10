@@ -19,6 +19,7 @@ use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
 use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
 
 /**
@@ -29,14 +30,22 @@ use InvalidArgumentException;
 interface EvaluationContextInterface
 {
     /**
-     * Calls a function and returns its static result
+     * Calls a function and returns its static result. The return type must be passed in
+     * as it can be different depending on the types of the arguments provided
+     * (eg. if a custom TypeDeterminer is used for a parameter's type)
      *
      * @param string $libraryName
      * @param string $functionName
      * @param StaticBagInterface $argumentStaticBag
+     * @param TypeInterface $returnType
      * @return StaticInterface
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag);
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    );
 
     /**
      * Creates a new AssuredEvaluationContext as a child of the current one,

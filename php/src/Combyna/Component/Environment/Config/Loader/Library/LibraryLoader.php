@@ -13,6 +13,7 @@ namespace Combyna\Component\Environment\Config\Loader\Library;
 
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Config\Act\LibraryNode;
+use Combyna\Component\Environment\Config\Loader\Functions\FunctionLoaderInterface;
 use Combyna\Component\Event\Config\Loader\EventDefinitionLoaderInterface;
 use Combyna\Component\Signal\Config\Loader\SignalDefinitionLoaderInterface;
 use Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoaderInterface;
@@ -35,6 +36,11 @@ class LibraryLoader implements LibraryLoaderInterface
     private $eventDefinitionLoader;
 
     /**
+     * @var FunctionLoaderInterface
+     */
+    private $functionLoader;
+
+    /**
      * @var SignalDefinitionLoaderInterface
      */
     private $signalDefinitionLoader;
@@ -47,17 +53,20 @@ class LibraryLoader implements LibraryLoaderInterface
     /**
      * @param ConfigParser $configParser
      * @param EventDefinitionLoaderInterface $eventDefinitionLoader
+     * @param FunctionLoaderInterface $functionLoader
      * @param SignalDefinitionLoaderInterface $signalDefinitionLoader
      * @param WidgetDefinitionLoaderInterface $widgetDefinitionLoader
      */
     public function __construct(
         ConfigParser $configParser,
         EventDefinitionLoaderInterface $eventDefinitionLoader,
+        FunctionLoaderInterface $functionLoader,
         SignalDefinitionLoaderInterface $signalDefinitionLoader,
         WidgetDefinitionLoaderInterface $widgetDefinitionLoader
     ) {
         $this->configParser = $configParser;
         $this->eventDefinitionLoader = $eventDefinitionLoader;
+        $this->functionLoader = $functionLoader;
         $this->signalDefinitionLoader = $signalDefinitionLoader;
         $this->widgetDefinitionLoader = $widgetDefinitionLoader;
     }
@@ -71,6 +80,7 @@ class LibraryLoader implements LibraryLoaderInterface
         $description = $this->configParser->getElement($libraryConfig, 'description', 'library description');
         $libraryNamesDependedOn = $this->configParser->getOptionalElement($libraryConfig, 'dependencies', 'library dependencies', [], 'array');
         $eventDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'events', 'event definitions', [], 'array');
+        $functionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'functions', 'functions', [], 'array');
         $signalDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'signals', 'signal definitions', [], 'array');
         $widgetDefinitionConfigs = $this->configParser->getOptionalElement($libraryConfig, 'widgets', 'widget definitions', [], 'array');
 
@@ -81,6 +91,16 @@ class LibraryLoader implements LibraryLoaderInterface
                 $libraryName,
                 $eventName,
                 $eventDefinitionConfig
+            );
+        }
+
+        $functionNodes = [];
+
+        foreach ($functionConfigs as $functionName => $functionConfig) {
+            $functionNodes[] = $this->functionLoader->load(
+                $libraryName,
+                $functionName,
+                $functionConfig
             );
         }
 
@@ -108,7 +128,7 @@ class LibraryLoader implements LibraryLoaderInterface
             $libraryName,
             $description,
             $libraryNamesDependedOn,
-            [], // TODO: FunctionLoader
+            $functionNodes,
             $eventDefinitionNodes,
             $signalDefinitionNodes,
             $widgetDefinitionNodes

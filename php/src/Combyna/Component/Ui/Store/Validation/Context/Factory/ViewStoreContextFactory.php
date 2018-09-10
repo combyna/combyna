@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Store\Validation\Context\Factory;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
 use Combyna\Component\Ui\Store\Validation\Context\Specifier\ViewStoreContextSpecifier;
 use Combyna\Component\Ui\Store\Validation\Context\ViewStoreSubValidationContextInterface;
@@ -46,15 +47,22 @@ class ViewStoreContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ViewStoreNode $viewStoreNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ViewStoreSubValidationContextInterface
      */
     public function createViewStoreContext(
         ViewStoreContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         ViewStoreNode $viewStoreNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return $this->validationFactory->createViewStoreContext($parentContext, $viewStoreNode, $behaviourSpec);
+        return $this->validationFactory->createViewStoreContext(
+            $parentContext,
+            $viewStoreNode,
+            $behaviourSpec,
+            $subjectNode
+        );
     }
 
     /**

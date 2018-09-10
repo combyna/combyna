@@ -47,6 +47,7 @@ use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
@@ -110,11 +111,11 @@ class ExpressionValidationIntegratedTest extends TestCase
                             [
                                 new FixedStaticDefinitionNode(
                                     'textString',
-                                    new StaticType(TextExpression::class)
+                                    new PresolvedTypeDeterminer(new StaticType(TextExpression::class))
                                 )
                             ]
                         ),
-                        new StaticType(NumberExpression::class)
+                        new PresolvedTypeDeterminer(new StaticType(NumberExpression::class))
                     )
                 ]
             )

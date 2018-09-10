@@ -16,6 +16,7 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
 /**
@@ -50,11 +51,15 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    ) {
         $function = $this->environment->getGenericFunctionByName($libraryName, $functionName);
 
-        return $function->call($argumentStaticBag);
+        return $function->call($argumentStaticBag, $returnType);
     }
 
     /**

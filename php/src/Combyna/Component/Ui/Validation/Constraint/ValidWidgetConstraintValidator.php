@@ -61,7 +61,7 @@ class ValidWidgetConstraintValidator implements ConstraintValidatorInterface
                 $constraint->getWidgetDefinitionLibraryName(),
                 $constraint->getWidgetDefinitionName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$widgetDefinitionNode instanceof WidgetDefinitionNodeInterface) {

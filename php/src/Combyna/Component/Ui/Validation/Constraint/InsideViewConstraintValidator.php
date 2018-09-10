@@ -54,7 +54,7 @@ class InsideViewConstraintValidator implements ConstraintValidatorInterface
         if (
             !$validationContext->queryForBoolean(
                 new InsideViewQuery(),
-                $validationContext->getActNode()
+                $validationContext->getCurrentActNode()
             )
         ) {
             $validationContext->addGenericViolation('Not inside a view');

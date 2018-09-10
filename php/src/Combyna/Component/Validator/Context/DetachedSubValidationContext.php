@@ -37,24 +37,32 @@ class DetachedSubValidationContext implements DetachedSubValidationContextInterf
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->actNode = $actNode;
         $this->behaviourSpec = $behaviourSpec;
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->actNode;
     }
@@ -89,5 +97,13 @@ class DetachedSubValidationContext implements DetachedSubValidationContextInterf
     public function getQueryClassToQueryCallableMap()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 }

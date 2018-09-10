@@ -12,6 +12,8 @@
 namespace Combyna\Component\Validator\Query\Requirement;
 
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface QueryRequirementInterface
@@ -26,4 +28,12 @@ interface QueryRequirementInterface
      * @param DynamicActNodeInterface $actNode
      */
     public function adoptDynamicActNode(DynamicActNodeInterface $actNode);
+
+    /**
+     * Determines a type for the current validation context
+     *
+     * @param TypeDeterminerInterface $typeDeterminer
+     * @return TypeInterface
+     */
+    public function determineType(TypeDeterminerInterface $typeDeterminer);
 }

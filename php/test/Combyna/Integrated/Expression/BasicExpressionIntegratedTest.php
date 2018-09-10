@@ -80,18 +80,14 @@ class BasicExpressionIntegratedTest extends TestCase
                         new FixedStaticBagModel(
                             $this->bagFactory,
                             [
-                                new FixedStaticDefinition(
-                                    'textString',
-                                    new StaticType(TextExpression::class)
-                                )
+                                new FixedStaticDefinition('textString')
                             ]
                         ),
                         function (StaticBagInterface $argumentBag) {
                             $textString = $argumentBag->getStatic('textString')->toNative();
 
                             return $this->expressionFactory->createNumberExpression(strlen($textString));
-                        },
-                        new StaticType(NumberExpression::class)
+                        }
                     )
                 ], 'text'),
                 new EventDefinitionCollection([], 'text'),
@@ -126,7 +122,8 @@ class BasicExpressionIntegratedTest extends TestCase
                         'length',
                         $this->bagFactory->createExpressionBag([
                             'textString' => $this->expressionFactory->createTextExpression('Fred')
-                        ])
+                        ]),
+                        new StaticType(NumberExpression::class)
                     ),
                     ComparisonExpression::EQUAL,
                     $this->expressionFactory->createNumberExpression(21)

@@ -25,18 +25,20 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 interface SubValidationContextInterface
 {
     /**
-     * Fetches the ACT node this context represents
-     *
-     * @return ActNodeInterface
-     */
-    public function getActNode();
-
-    /**
      * Fetches the behaviour spec for the ACT node this context represents
      *
      * @return BehaviourSpecInterface
      */
     public function getBehaviourSpec();
+
+    /**
+     * Fetches the ACT node that the current context represents.
+     * This is not necessarily the same as the original node being validated -
+     * to fetch that, see ::getSubjectActNode()
+     *
+     * @return ActNodeInterface
+     */
+    public function getCurrentActNode();
 
     /**
      * Fetches the parent sub-validation context
@@ -58,4 +60,11 @@ interface SubValidationContextInterface
      * @return callable[]
      */
     public function getQueryClassToQueryCallableMap();
+
+    /**
+     * Fetches the original ACT node currently being validated
+     *
+     * @return ActNodeInterface
+     */
+    public function getSubjectActNode();
 }

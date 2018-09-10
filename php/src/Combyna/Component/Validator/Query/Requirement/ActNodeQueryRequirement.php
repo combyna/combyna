@@ -14,7 +14,9 @@ namespace Combyna\Component\Validator\Query\Requirement;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Validator\Context\RootValidationContextInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class ActNodeQueryRequirement
@@ -39,18 +41,26 @@ class ActNodeQueryRequirement implements QueryRequirementInterface
     private $subValidationContext;
 
     /**
+     * @var ValidationContextInterface
+     */
+    private $validationContext;
+
+    /**
      * @param ActNodeQueryInterface $query
      * @param RootValidationContextInterface $rootValidationContext
      * @param SubValidationContextInterface $subValidationContext
+     * @param ValidationContextInterface $validationContext
      */
     public function __construct(
         ActNodeQueryInterface $query,
         RootValidationContextInterface $rootValidationContext,
-        SubValidationContextInterface $subValidationContext
+        SubValidationContextInterface $subValidationContext,
+        ValidationContextInterface $validationContext
     ) {
         $this->query = $query; // Not used yet
         $this->rootValidationContext = $rootValidationContext;
         $this->subValidationContext = $subValidationContext;
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -62,5 +72,13 @@ class ActNodeQueryRequirement implements QueryRequirementInterface
             $actNode,
             $this->subValidationContext
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function determineType(TypeDeterminerInterface $typeDeterminer)
+    {
+        return $typeDeterminer->determine($this->validationContext);
     }
 }

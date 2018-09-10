@@ -13,6 +13,8 @@ namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Environment\EnvironmentFactoryInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Environment\Exception\LibraryAlreadyInstalledException;
+use Combyna\Component\Environment\Library\LibraryInterface;
 
 /**
  * Class EnvironmentNodePromoter
@@ -46,21 +48,27 @@ class EnvironmentNodePromoter
      *
      * @param EnvironmentNode $environmentNode
      * @return EnvironmentInterface
+     * @throws LibraryAlreadyInstalledException
      */
     public function promoteEnvironment(EnvironmentNode $environmentNode)
     {
         $environment = $this->environmentFactory->create();
 
-        $libraries = $environmentNode->getLibraries();
+        $libraryNodes = $environmentNode->getLibraries();
 
-        // Sort the libraries so that any that are depended on are loaded before their dependencies
+        // Sort the libraries so that any that are depended on are promoted before their dependencies
         if (function_exists('uasort')) { // FIXME: Implement uasort(...) in Uniter
-            uasort($libraries, function (LibraryNode $libraryA, LibraryNode $libraryB) {
-                return $libraryB->referencesLibrary($libraryA->getName()) ? 1 : -1;
+            uasort($libraryNodes, function (LibraryNode $libraryNodeA, LibraryNode $libraryNodeB) {
+                if ($libraryNodeA->getName() === LibraryInterface::CORE) {
+                    // Always load the special Core library first
+                    return -1;
+                }
+
+                return $libraryNodeB->referencesLibrary($libraryNodeA->getName()) ? -1 : 1;
             });
         }
 
-        foreach ($libraries as $libraryNode) {
+        foreach ($libraryNodes as $libraryNode) {
             $environment->installLibrary($this->libraryPromoter->promoteLibrary($libraryNode, $environment));
         }
 

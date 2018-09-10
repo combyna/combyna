@@ -16,11 +16,11 @@ use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class ResolvedTypeConstraintValidator
+ * Class ResolvableTypeConstraintValidator
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ResolvedTypeConstraintValidator implements ConstraintValidatorInterface
+class ResolvableTypeConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -28,7 +28,7 @@ class ResolvedTypeConstraintValidator implements ConstraintValidatorInterface
     public function getConstraintClassToValidatorCallableMap()
     {
         return [
-            ResolvedTypeConstraint::class => [$this, 'validate']
+            ResolvableTypeConstraint::class => [$this, 'validate']
         ];
     }
 
@@ -44,17 +44,19 @@ class ResolvedTypeConstraintValidator implements ConstraintValidatorInterface
      * Validates this constraint in the given validation context. If the constraint is not met,
      * one or more violations will be added to the context to make the validation fail
      *
-     * @param ResolvedTypeConstraint $constraint
+     * @param ResolvableTypeConstraint $constraint
      * @param ValidationContextInterface $validationContext
      */
     public function validate(
-        ResolvedTypeConstraint $constraint,
+        ResolvableTypeConstraint $constraint,
         ValidationContextInterface $validationContext
     ) {
-        if ($constraint->getType() instanceof UnresolvedType) {
+        $type = $constraint->getTypeDeterminer()->determine($validationContext);
+
+        if ($type instanceof UnresolvedType) {
             $validationContext->addGenericViolation(
                 'Expected type not to be unresolved, but it was: ' .
-                $constraint->getType()->getSummary()
+                $type->getSummary()
             );
         }
     }

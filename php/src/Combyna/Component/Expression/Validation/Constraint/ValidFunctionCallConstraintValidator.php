@@ -60,7 +60,7 @@ class ValidFunctionCallConstraintValidator implements ConstraintValidatorInterfa
                 $constraint->getLibraryName(),
                 $constraint->getFunctionName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$functionNode instanceof FunctionNodeInterface) {

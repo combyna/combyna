@@ -59,7 +59,7 @@ class ValidViewStoreQueryConstraintValidator implements ConstraintValidatorInter
             new QueryNodeQuery(
                 $constraint->getQueryName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$queryNode instanceof QueryNodeInterface) {

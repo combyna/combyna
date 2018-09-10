@@ -69,6 +69,16 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
+     * Fetches all statics in this list
+     *
+     * @return StaticInterface[]
+     */
+    public function getElementStatics()
+    {
+        return $this->staticList->getElementStatics();
+    }
+
+    /**
      * Maps this static list to another, transforming each element with the given expression
      *
      * @param string $itemVariableName

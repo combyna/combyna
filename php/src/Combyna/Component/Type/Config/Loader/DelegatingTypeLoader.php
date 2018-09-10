@@ -14,6 +14,7 @@ namespace Combyna\Component\Type\Config\Loader;
 use Combyna\Component\Common\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class DelegatingTypeLoader
@@ -67,10 +68,12 @@ class DelegatingTypeLoader implements TypeLoaderInterface, DelegatorInterface
         }
 
         if (!array_key_exists($type, $this->loaders)) {
-            return new UnresolvedType(sprintf(
-                'No loader is registered for types of type "%s"',
-                $type
-            ));
+            return new PresolvedTypeDeterminer(
+                new UnresolvedType(sprintf(
+                    'No loader is registered for types of type "%s"',
+                    $type
+                ))
+            );
         }
 
         return $this->loaders[$type]->load($config);

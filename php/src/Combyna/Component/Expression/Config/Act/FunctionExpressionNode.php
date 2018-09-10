@@ -16,7 +16,11 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\FunctionExpression;
 use Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraint;
 use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
+use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
+use LogicException;
 
 /**
  * Class FunctionExpressionNode
@@ -43,6 +47,11 @@ class FunctionExpressionNode extends AbstractExpressionNode
      * @var string
      */
     private $libraryName;
+
+    /**
+     * @var TypeInterface|null
+     */
+    private $resolvedResultType = null;
 
     /**
      * @param string $libraryName
@@ -75,6 +84,20 @@ class FunctionExpressionNode extends AbstractExpressionNode
                 $this->argumentExpressionBagNode
             )
         );
+
+        // Resolve the function's return type when given this call's arguments,
+        // as it can be different depending on the types of the arguments provided
+        // (eg. if a custom TypeDeterminer is used for a parameter's type)
+        $specBuilder->addConstraint(
+            new CallbackConstraint(
+                function (ValidationContextInterface $validationContext) {
+                    $this->resolvedResultType = $validationContext->queryForResultType(
+                        new FunctionReturnTypeQuery($this->libraryName, $this->functionName),
+                        $this
+                    );
+                }
+            )
+        );
     }
 
     /**
@@ -105,6 +128,26 @@ class FunctionExpressionNode extends AbstractExpressionNode
     public function getLibraryName()
     {
         return $this->libraryName;
+    }
+
+    /**
+     * Fetches the resolved result type for the function call (the function call's return type)
+     *
+     * @return TypeInterface
+     */
+    public function getResolvedResultType()
+    {
+        if ($this->resolvedResultType === null) {
+            throw new LogicException(
+                sprintf(
+                    'Function "%s.%s" call expression result type was expected to be resolved but was not',
+                    $this->libraryName,
+                    $this->functionName
+                )
+            );
+        }
+
+        return $this->resolvedResultType;
     }
 
     /**

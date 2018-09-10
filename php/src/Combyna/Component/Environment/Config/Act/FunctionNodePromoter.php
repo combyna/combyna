@@ -79,8 +79,7 @@ class FunctionNodePromoter
             return new NativeFunction(
                 $functionNode->getName(),
                 $this->bagNodePromoter->promoteFixedStaticBagModel($functionNode->getParameterBagModel()),
-                $functionNode->getCallable(),
-                $functionNode->getReturnType()
+                $functionNode->getCallable()
             );
         }
 

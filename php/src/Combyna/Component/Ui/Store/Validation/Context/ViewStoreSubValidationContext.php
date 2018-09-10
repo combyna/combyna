@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Store\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
@@ -34,6 +35,11 @@ class ViewStoreSubValidationContext implements ViewStoreSubValidationContextInte
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @var ViewStoreNode
      */
     private $viewStoreNode;
@@ -47,13 +53,16 @@ class ViewStoreSubValidationContext implements ViewStoreSubValidationContextInte
      * @param SubValidationContextInterface $parentContext
      * @param ViewStoreNode $viewStoreNode
      * @param BehaviourSpecInterface $viewStoreNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         ViewStoreNode $viewStoreNode,
-        BehaviourSpecInterface $viewStoreNodeBehaviourSpec
+        BehaviourSpecInterface $viewStoreNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
         $this->viewStoreNode = $viewStoreNode;
         $this->viewStoreNodeBehaviourSpec = $viewStoreNodeBehaviourSpec;
     }
@@ -61,7 +70,7 @@ class ViewStoreSubValidationContext implements ViewStoreSubValidationContextInte
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->viewStoreNode;
     }
@@ -108,6 +117,14 @@ class ViewStoreSubValidationContext implements ViewStoreSubValidationContextInte
             ViewStoreHasSlotQuery::class => [$this, 'queryForViewStoreSlotExistence'],
             ViewStoreSlotTypeQuery::class => [$this, 'queryForViewStoreSlotType']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**

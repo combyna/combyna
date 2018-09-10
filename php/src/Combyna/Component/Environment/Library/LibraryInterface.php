@@ -15,8 +15,11 @@ use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\IncorrectFunctionTypeException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Event\EventDefinitionInterface;
+use Combyna\Component\Event\Exception\EventDefinitionNotFoundException;
+use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
+use Combyna\Plugin\Core\CorePlugin;
 
 /**
  * Interface LibraryInterface
@@ -36,7 +39,7 @@ interface LibraryInterface
      * that represents resources (routes, signals, views etc.) that are built-in.
      * For example, the "navigated" core signal is dispatched upon navigation
      */
-    const CORE = 'core';
+    const CORE = CorePlugin::CORE_LIBRARY;
 
     /**
      * The unique name for the special "widget" library
@@ -49,7 +52,7 @@ interface LibraryInterface
      *
      * @param string $eventName
      * @return EventDefinitionInterface
-     * @throws EventDefinitionNotSupportedException
+     * @throws EventDefinitionNotFoundException
      */
     public function getEventDefinitionByName($eventName);
 
@@ -75,7 +78,7 @@ interface LibraryInterface
      *
      * @param string $signalName
      * @return SignalDefinitionInterface
-     * @throws SignalDefinitionNotSupportedException
+     * @throws SignalDefinitionNotFoundException
      */
     public function getSignalDefinitionByName($signalName);
 

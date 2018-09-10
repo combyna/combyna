@@ -12,6 +12,7 @@
 namespace Combyna\Component\Environment\Validation\Context\Factory;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Validation\Context\EnvironmentSubValidationContextInterface;
 use Combyna\Component\Environment\Validation\Context\Specifier\EnvironmentContextSpecifier;
@@ -46,15 +47,22 @@ class EnvironmentContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param EnvironmentNode $environmentNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return EnvironmentSubValidationContextInterface
      */
     public function createEnvironmentContext(
         EnvironmentContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         EnvironmentNode $environmentNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return $this->validationFactory->createEnvironmentContext($parentContext, $environmentNode, $behaviourSpec);
+        return $this->validationFactory->createEnvironmentContext(
+            $parentContext,
+            $environmentNode,
+            $behaviourSpec,
+            $subjectNode
+        );
     }
 
     /**

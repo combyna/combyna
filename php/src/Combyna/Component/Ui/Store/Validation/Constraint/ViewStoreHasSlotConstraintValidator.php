@@ -55,7 +55,7 @@ class ViewStoreHasSlotConstraintValidator implements ConstraintValidatorInterfac
             new ViewStoreHasSlotQuery(
                 $constraint->getSlotName()
             ),
-            $validationContext->getActNode()
+            $validationContext->getCurrentActNode()
         );
 
         if (!$slotExists) {

@@ -15,8 +15,8 @@ use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\App\Validation\AppValidationFactoryInterface;
 use Combyna\Component\App\Validation\Context\AppSubValidationContextInterface;
 use Combyna\Component\App\Validation\Context\Specifier\AppContextSpecifier;
-use Combyna\Component\Behaviour\BehaviourFactoryInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Validator\Context\Factory\SubValidationContextFactoryInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 
@@ -28,24 +28,15 @@ use Combyna\Component\Validator\Context\SubValidationContextInterface;
 class AppContextFactory implements SubValidationContextFactoryInterface
 {
     /**
-     * @var BehaviourFactoryInterface
-     */
-    private $behaviourFactory;
-
-    /**
      * @var AppValidationFactoryInterface
      */
     private $validationFactory;
 
     /**
      * @param AppValidationFactoryInterface $validationFactory
-     * @param BehaviourFactoryInterface $behaviourFactory
      */
-    public function __construct(
-        AppValidationFactoryInterface $validationFactory,
-        BehaviourFactoryInterface $behaviourFactory
-    ) {
-        $this->behaviourFactory = $behaviourFactory;
+    public function __construct(AppValidationFactoryInterface $validationFactory)
+    {
         $this->validationFactory = $validationFactory;
     }
 
@@ -56,28 +47,17 @@ class AppContextFactory implements SubValidationContextFactoryInterface
      * @param SubValidationContextInterface $rootSubContext
      * @param AppNode $appNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return AppSubValidationContextInterface
      */
     public function createAppContext(
         AppContextSpecifier $specifier,
         SubValidationContextInterface $rootSubContext,
         AppNode $appNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-//        // Build the environment's behaviour spec so we can create its sub-context,
-//        // with the root sub-context as its parent
-//        $environmentBehaviourSpecBuilder = $this->behaviourFactory->createBehaviourSpecBuilder(
-//            $specifier->getEnvironmentNode()
-//        );
-//        $specifier->getEnvironmentNode()->buildBehaviourSpec($environmentBehaviourSpecBuilder);
-//        $environmentBehaviourSpec = $environmentBehaviourSpecBuilder->build();
-//        $environmentParentContext = $environmentBehaviourSpec->getSubValidationContext(
-//            $rootSubContext
-//        );
-//
-//        return $this->validationFactory->createAppContext($environmentParentContext, $appNode, $behaviourSpec);
-
-        return $this->validationFactory->createAppContext($rootSubContext, $appNode, $behaviourSpec);
+        return $this->validationFactory->createAppContext($rootSubContext, $appNode, $behaviourSpec, $subjectNode);
     }
 
     /**

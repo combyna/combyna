@@ -79,6 +79,9 @@ class Runtime
             if ($component instanceof PluginInterface) {
                 $containerBuilder->addCompilerPass($component, PassConfig::TYPE_OPTIMIZE);
             }
+
+            // Allow the component to register any container extensions or compiler passes
+            $component->build($containerBuilder);
         }
 
         // Ensure the extensions for components are always loaded

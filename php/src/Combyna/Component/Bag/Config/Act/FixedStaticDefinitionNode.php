@@ -14,9 +14,9 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Type\TypeInterface;
-use Combyna\Component\Type\Validation\Constraint\ResolvedTypeConstraint;
+use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class FixedStaticDefinitionNode
@@ -38,23 +38,23 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
     private $name;
 
     /**
-     * @var TypeInterface
+     * @var TypeDeterminerInterface
      */
-    private $staticType;
+    private $staticTypeDeterminer;
 
     /**
      * @param string $name
-     * @param TypeInterface $staticType
+     * @param TypeDeterminerInterface $staticTypeDeterminer
      * @param ExpressionNodeInterface|null $defaultExpressionNode
      */
     public function __construct(
         $name,
-        TypeInterface $staticType,
+        TypeDeterminerInterface $staticTypeDeterminer,
         ExpressionNodeInterface $defaultExpressionNode = null
     ) {
         $this->defaultExpressionNode = $defaultExpressionNode;
         $this->name = $name;
-        $this->staticType = $staticType;
+        $this->staticTypeDeterminer = $staticTypeDeterminer;
     }
 
     /**
@@ -67,7 +67,7 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
         }
 
         // Make sure the static's type is a resolved, valid type
-        $specBuilder->addConstraint(new ResolvedTypeConstraint($this->staticType));
+        $specBuilder->addConstraint(new ResolvableTypeConstraint($this->staticTypeDeterminer));
     }
 
     /**
@@ -97,9 +97,9 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
     /**
      * {@inheritdoc}
      */
-    public function getStaticType()
+    public function getStaticTypeDeterminer()
     {
-        return $this->staticType;
+        return $this->staticTypeDeterminer;
     }
 
     /**
@@ -119,10 +119,11 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
         $contextDescription
     ) {
         $expressionResultType = $validationContext->getExpressionResultType($expressionNode);
+        $staticType = $this->staticTypeDeterminer->determine($validationContext);
 
-        if (!$this->staticType->allows($expressionResultType)) {
+        if (!$staticType->allows($expressionResultType)) {
             $validationContext->addTypeMismatchViolation(
-                $this->staticType,
+                $staticType,
                 $expressionResultType,
                 $contextDescription . ' ' . $this->name
             );

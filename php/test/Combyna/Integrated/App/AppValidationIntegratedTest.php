@@ -30,6 +30,7 @@ use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -98,7 +99,7 @@ class AppValidationIntegratedTest extends TestCase
                     new FixedStaticBagModelNode([
                         new FixedStaticDefinitionNode(
                             'invalid-attr',
-                            new StaticType(TextExpression::class),
+                            new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
                             new UnknownExpressionNode('invalid-type-for-page-attr')
                         )
                     ]),

@@ -51,24 +51,32 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
     private $parentContext;
 
     /**
+     * @var ActNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param SubValidationContextInterface $parentContext
      * @param EnvironmentNode $environmentNode
      * @param BehaviourSpecInterface $environmentNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
      */
     public function __construct(
         SubValidationContextInterface $parentContext,
         EnvironmentNode $environmentNode,
-        BehaviourSpecInterface $environmentNodeBehaviourSpec
+        BehaviourSpecInterface $environmentNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
         $this->environmentNode = $environmentNode;
         $this->environmentNodeBehaviourSpec = $environmentNodeBehaviourSpec;
         $this->parentContext = $parentContext;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->environmentNode;
     }
@@ -111,6 +119,14 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
             WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode']
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 
     /**
@@ -197,7 +213,8 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
                 $query->getFunctionName(),
                 $validationContext->createTypeQueryRequirement($query)
             )
-            ->getReturnType();
+            ->getReturnTypeDeterminer()
+            ->determine($validationContext);
     }
 
     /**

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Validator\Context;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 
@@ -32,21 +33,29 @@ class RootSubValidationContext implements RootSubValidationContextInterface
     private $rootNodeBehaviourSpec;
 
     /**
+     * @var StructuredNodeInterface
+     */
+    private $subjectNode;
+
+    /**
      * @param ActNodeInterface $rootNode
      * @param BehaviourSpecInterface $rootNodeBehaviourSpec
+     * @param StructuredNodeInterface $subjectNode
      */
     public function __construct(
         ActNodeInterface $rootNode,
-        BehaviourSpecInterface $rootNodeBehaviourSpec
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        StructuredNodeInterface $subjectNode
     ) {
         $this->rootNode = $rootNode;
         $this->rootNodeBehaviourSpec = $rootNodeBehaviourSpec;
+        $this->subjectNode = $subjectNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
         return $this->rootNode;
     }
@@ -81,5 +90,13 @@ class RootSubValidationContext implements RootSubValidationContextInterface
     public function getQueryClassToQueryCallableMap()
     {
         return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subjectNode;
     }
 }

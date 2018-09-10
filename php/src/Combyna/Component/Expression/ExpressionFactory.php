@@ -19,6 +19,7 @@ use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
 use Combyna\Component\Expression\Assurance\NonNothingValueAssurance;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
+use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
 
 /**
@@ -190,9 +191,10 @@ class ExpressionFactory implements ExpressionFactoryInterface
     public function createFunctionExpression(
         $libraryName,
         $functionName,
-        ExpressionBagInterface $argumentExpressionBag
+        ExpressionBagInterface $argumentExpressionBag,
+        TypeInterface $returnType
     ) {
-        return new FunctionExpression($this, $libraryName, $functionName, $argumentExpressionBag);
+        return new FunctionExpression($this, $libraryName, $functionName, $argumentExpressionBag, $returnType);
     }
 
     /**

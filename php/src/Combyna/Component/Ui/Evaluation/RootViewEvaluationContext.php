@@ -15,6 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\View\ViewInterface;
@@ -82,9 +83,13 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     /**
      * {@inheritdoc}
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->environment->callViewFunction($libraryName, $functionName, $argumentStaticBag);
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    ) {
+        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag, $returnType);
     }
 
     /**

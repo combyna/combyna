@@ -15,6 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Class AbstractEvaluationContext
@@ -50,9 +51,13 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag);
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    ) {
+        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag, $returnType);
     }
 
     /**

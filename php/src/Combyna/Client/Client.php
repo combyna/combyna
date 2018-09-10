@@ -13,6 +13,7 @@ namespace Combyna\Client;
 
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\App\State\AppStateInterface;
+use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
 
 /**
@@ -61,6 +62,7 @@ class Client
      * @param string $eventName
      * @param array $eventPayload
      * @return AppStateInterface
+     * @throws NotFoundException
      */
     public function dispatchEvent(
         AppStateInterface $oldAppState,

@@ -16,10 +16,10 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\NativeFunctionNotInstalledException;
-use Combyna\Component\Type\TypeInterface;
-use Combyna\Component\Type\Validation\Constraint\ResolvedTypeConstraint;
+use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class NativeFunctionNode
@@ -51,26 +51,26 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     private $parameterBagModelNode;
 
     /**
-     * @var TypeInterface
+     * @var TypeDeterminerInterface
      */
-    private $returnType;
+    private $returnTypeDeterminer;
 
     /**
      * @param string $libraryName
      * @param string $functionName
      * @param FixedStaticBagModelNode $parameterBagModelNode
-     * @param TypeInterface $returnType
+     * @param TypeDeterminerInterface $returnTypeDeterminer
      */
     public function __construct(
         $libraryName,
         $functionName,
         FixedStaticBagModelNode $parameterBagModelNode,
-        TypeInterface $returnType
+        TypeDeterminerInterface $returnTypeDeterminer
     ) {
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
         $this->parameterBagModelNode = $parameterBagModelNode;
-        $this->returnType = $returnType;
+        $this->returnTypeDeterminer = $returnTypeDeterminer;
     }
 
     /**
@@ -94,7 +94,7 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
         );
 
         // Make sure the return type is a resolved, valid type
-        $specBuilder->addConstraint(new ResolvedTypeConstraint($this->returnType));
+        $specBuilder->addConstraint(new ResolvableTypeConstraint($this->returnTypeDeterminer));
     }
 
     /**
@@ -151,9 +151,9 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     /**
      * {@inheritdoc}
      */
-    public function getReturnType()
+    public function getReturnTypeDeterminer()
     {
-        return $this->returnType;
+        return $this->returnTypeDeterminer;
     }
 
     /**

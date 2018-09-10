@@ -1,0 +1,3 @@
+services:
+    combyna.framework.context.mode_context:
+        class: Combyna\Component\Framework\Context\ModeContext

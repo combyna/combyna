@@ -20,4 +20,13 @@ use Combyna\Component\Plugin\AbstractPlugin;
  */
 class CorePlugin extends AbstractPlugin
 {
+    /**
+     * The Core library defines the special widget types "group", "repeater", "text" etc.
+     */
+    const CORE_LIBRARY = 'core';
+
+    /**
+     * The List library defines functions for manipulating Lists in expressions
+     */
+    const LIST_LIBRARY = 'list';
 }

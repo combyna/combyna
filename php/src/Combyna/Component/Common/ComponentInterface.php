@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Common;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
@@ -20,6 +21,13 @@ use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
  */
 interface ComponentInterface
 {
+    /**
+     * Allows compilation passes and further container extensions to be installed
+     *
+     * @param ContainerBuilder $containerBuilder
+     */
+    public function build(ContainerBuilder $containerBuilder);
+
     /**
      * Fetches the Symfony container extension defined for this component, if any
      *

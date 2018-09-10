@@ -47,15 +47,17 @@ class ValidatorSubValidationContextFactory implements SubValidationContextFactor
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ActNodeSubValidationContextInterface
      */
     public function createActNodeContext(
         ActNodeContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return $this->validationFactory->createActNodeContext($parentContext, $actNode, $behaviourSpec);
+        return $this->validationFactory->createActNodeContext($parentContext, $actNode, $behaviourSpec, $subjectNode);
     }
 
     /**
@@ -65,15 +67,17 @@ class ValidatorSubValidationContextFactory implements SubValidationContextFactor
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return DetachedSubValidationContextInterface
      */
     public function createDetachedContext(
         DetachedContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     ) {
-        return $this->validationFactory->createDetachedContext($parentContext, $actNode, $behaviourSpec);
+        return $this->validationFactory->createDetachedContext($parentContext, $actNode, $behaviourSpec, $subjectNode);
     }
 
     /**

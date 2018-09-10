@@ -19,6 +19,7 @@ use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class UnknownLibraryForFunctionNode
@@ -79,11 +80,11 @@ class UnknownLibraryForFunctionNode extends AbstractActNode implements FunctionN
     /**
      * {@inheritdoc}
      */
-    public function getReturnType()
+    public function getReturnTypeDeterminer()
     {
         // Library and function are both unknown, so we don't know
         // what the function's return type could be
-        return new UnresolvedType('unresolved library and function');
+        return new PresolvedTypeDeterminer(new UnresolvedType('unresolved library and function'));
     }
 
     /**

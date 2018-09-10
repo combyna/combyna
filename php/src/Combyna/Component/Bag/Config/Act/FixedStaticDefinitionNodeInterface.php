@@ -13,8 +13,8 @@ namespace Combyna\Component\Bag\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface FixedStaticDefinitionNodeInterface
@@ -26,7 +26,7 @@ interface FixedStaticDefinitionNodeInterface extends ActNodeInterface
     /**
      * Fetches the expression evaluated as the default value for this static, if set
      *
-     * @return ExpressionNodeInterface
+     * @return ExpressionNodeInterface|null
      */
     public function getDefaultExpression();
 
@@ -40,9 +40,9 @@ interface FixedStaticDefinitionNodeInterface extends ActNodeInterface
     /**
      * Fetches the type that a value of this static must match
      *
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
-    public function getStaticType();
+    public function getStaticTypeDeterminer();
 
     /**
      * Determines whether this static must be defined in the bag or not

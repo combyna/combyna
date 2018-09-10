@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Validator;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
@@ -44,12 +45,14 @@ interface ValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ActNodeSubValidationContextInterface
      */
     public function createActNodeContext(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
@@ -59,13 +62,15 @@ interface ValidationFactoryInterface
      * @param ActNodeInterface $guardExpressionNode
      * @param BehaviourSpecInterface $guardExpressionNodeBehaviourSpec
      * @param AssuranceNodeInterface[] $assuranceNodes
+     * @param ActNodeInterface $subjectNode
      * @return AssuredSubValidationContextInterface
      */
     public function createAssuredContext(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $guardExpressionNode,
         BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
-        array $assuranceNodes
+        array $assuranceNodes,
+        ActNodeInterface $subjectNode
     );
 
     /**
@@ -88,12 +93,14 @@ interface ValidationFactoryInterface
      * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return DetachedSubValidationContextInterface
      */
     public function createDetachedContext(
         SubValidationContextInterface $parentContext,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
@@ -115,11 +122,13 @@ interface ValidationFactoryInterface
      *
      * @param ActNodeInterface $rootNode
      * @param BehaviourSpecInterface $rootNodeBehaviourSpec
+     * @param StructuredNodeInterface $subjectNode
      * @return RootSubValidationContextInterface
      */
     public function createRootSubContext(
         ActNodeInterface $rootNode,
-        BehaviourSpecInterface $rootNodeBehaviourSpec
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        StructuredNodeInterface $subjectNode
     );
 
     /**
@@ -129,13 +138,15 @@ interface ValidationFactoryInterface
      * @param TypeDeterminerInterface[] $variableTypeDeterminers
      * @param ActNodeInterface $actNode
      * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
      * @return ScopeSubValidationContextInterface
      */
     public function createScopeContext(
         SubValidationContextInterface $parentContext,
         array $variableTypeDeterminers,
         ActNodeInterface $actNode,
-        BehaviourSpecInterface $behaviourSpec
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**

@@ -20,6 +20,7 @@ use Combyna\Component\Expression\StaticDayExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class StaticTypeLoader
@@ -67,7 +68,7 @@ class StaticTypeLoader implements TypeTypeLoaderInterface
             );
         }
 
-        return new StaticType(self::$typesToClasses[$type]);
+        return new PresolvedTypeDeterminer(new StaticType(self::$typesToClasses[$type]));
     }
 
     /**

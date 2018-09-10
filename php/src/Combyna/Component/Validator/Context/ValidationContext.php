@@ -147,7 +147,7 @@ class ValidationContext implements ValidationContextInterface
                 $this->rootValidationContext->getRootSubValidationContext()
             );
 
-        return new ActNodeQueryRequirement($query, $this->rootValidationContext, $subValidationContext);
+        return new ActNodeQueryRequirement($query, $this->rootValidationContext, $subValidationContext, $this);
     }
 
     /**
@@ -170,7 +170,8 @@ class ValidationContext implements ValidationContextInterface
             $subContextSpecifier,
             $this->subValidationContext,
             $structuredNode,
-            $behaviourSpec
+            $behaviourSpec,
+            $this->subValidationContext->getSubjectActNode() // Carry the subject ACT node forward
         );
     }
 
@@ -185,9 +186,9 @@ class ValidationContext implements ValidationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function getActNode()
+    public function getCurrentActNode()
     {
-        return $this->subValidationContext->getActNode();
+        return $this->subValidationContext->getCurrentActNode();
     }
 
     /**
@@ -215,6 +216,14 @@ class ValidationContext implements ValidationContextInterface
     public function getPath()
     {
         return $this->subValidationContext->getPath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSubjectActNode()
+    {
+        return $this->subValidationContext->getSubjectActNode();
     }
 
     /**
