@@ -11,16 +11,16 @@
 
 namespace Combyna\Component\Ui\Validation\Constraint;
 
-use Combyna\Component\Ui\Validation\Query\InsideCompoundWidgetDefinitionRootWidgetQuery;
+use Combyna\Component\Ui\Validation\Query\WidgetHasValueQuery;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class InsideCompoundWidgetDefinitionRootWidgetConstraintValidator
+ * Class WidgetHasValueConstraintValidator
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class InsideCompoundWidgetDefinitionRootWidgetConstraintValidator implements ConstraintValidatorInterface
+class WidgetHasValueConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -28,7 +28,7 @@ class InsideCompoundWidgetDefinitionRootWidgetConstraintValidator implements Con
     public function getConstraintClassToValidatorCallableMap()
     {
         return [
-            InsideCompoundWidgetDefinitionRootWidgetConstraint::class => [$this, 'validate']
+            WidgetHasValueConstraint::class => [$this, 'validate']
         ];
     }
 
@@ -44,20 +44,26 @@ class InsideCompoundWidgetDefinitionRootWidgetConstraintValidator implements Con
      * Validates this constraint in the given validation context. If the constraint is not met,
      * one or more violations will be added to the context to make the validation fail
      *
-     * @param InsideCompoundWidgetDefinitionRootWidgetConstraint $constraint
+     * @param WidgetHasValueConstraint $constraint
      * @param ValidationContextInterface $validationContext
      */
     public function validate(
-        InsideCompoundWidgetDefinitionRootWidgetConstraint $constraint,
+        WidgetHasValueConstraint $constraint,
         ValidationContextInterface $validationContext
     ) {
-        if (
-            !$validationContext->queryForBoolean(
-                new InsideCompoundWidgetDefinitionRootWidgetQuery(),
-                $validationContext->getCurrentActNode()
-            )
-        ) {
-            $validationContext->addGenericViolation('Not inside a compound widget definition\'s root widget');
+        $valueExists = $validationContext->queryForBoolean(
+            new WidgetHasValueQuery(
+                $constraint->getValueName()
+            ),
+            $validationContext->getCurrentActNode()
+        );
+
+        if (!$valueExists) {
+            $validationContext->addGenericViolation(
+                'Widget does not define a value with name "' .
+                $constraint->getValueName() .
+                '"'
+            );
         }
     }
 }

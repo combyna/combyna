@@ -14,9 +14,15 @@ namespace Combyna\Component\Ui\Validation\Context\Factory;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
+use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\ViewNodeInterface;
 use Combyna\Component\Ui\Validation\Context\CompoundWidgetDefinitionSubValidationContextInterface;
-use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\DefinedWidgetSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\PrimitiveWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetDefinitionContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\DefinedWidgetContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\PrimitiveWidgetDefinitionContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\ViewContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\ViewSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\UiValidationFactoryInterface;
@@ -46,15 +52,15 @@ class UiContextFactory implements SubValidationContextFactoryInterface
     /**
      * Creates a CompoundWidgetDefinitionSubValidationContext
      *
-     * @param CompoundWidgetContextSpecifier $specifier
+     * @param CompoundWidgetDefinitionContextSpecifier $specifier
      * @param SubValidationContextInterface $parentContext
      * @param CompoundWidgetDefinitionNode $compoundWidgetDefinitionNode
      * @param BehaviourSpecInterface $behaviourSpec
      * @param ActNodeInterface $subjectNode
      * @return CompoundWidgetDefinitionSubValidationContextInterface
      */
-    public function createCompoundWidgetContext(
-        CompoundWidgetContextSpecifier $specifier,
+    public function createCompoundWidgetDefinitionContext(
+        CompoundWidgetDefinitionContextSpecifier $specifier,
         SubValidationContextInterface $parentContext,
         CompoundWidgetDefinitionNode $compoundWidgetDefinitionNode,
         BehaviourSpecInterface $behaviourSpec,
@@ -63,6 +69,56 @@ class UiContextFactory implements SubValidationContextFactoryInterface
         return $this->validationFactory->createCompoundWidgetDefinitionContext(
             $parentContext,
             $compoundWidgetDefinitionNode,
+            $behaviourSpec,
+            $subjectNode
+        );
+    }
+
+    /**
+     * Creates a DefinedWidgetSubValidationContext
+     *
+     * @param DefinedWidgetContextSpecifier $specifier
+     * @param SubValidationContextInterface $parentContext
+     * @param DefinedWidgetNode $widgetNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return DefinedWidgetSubValidationContextInterface
+     */
+    public function createDefinedWidgetContext(
+        DefinedWidgetContextSpecifier $specifier,
+        SubValidationContextInterface $parentContext,
+        DefinedWidgetNode $widgetNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    ) {
+        return $this->validationFactory->createDefinedWidgetContext(
+            $parentContext,
+            $widgetNode,
+            $behaviourSpec,
+            $subjectNode
+        );
+    }
+
+    /**
+     * Creates a PrimitiveWidgetDefinitionSubValidationContext
+     *
+     * @param PrimitiveWidgetDefinitionContextSpecifier $specifier
+     * @param SubValidationContextInterface $parentContext
+     * @param PrimitiveWidgetDefinitionNode $primitiveWidgetDefinitionNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return PrimitiveWidgetDefinitionSubValidationContextInterface
+     */
+    public function createPrimitiveWidgetDefinitionContext(
+        PrimitiveWidgetDefinitionContextSpecifier $specifier,
+        SubValidationContextInterface $parentContext,
+        PrimitiveWidgetDefinitionNode $primitiveWidgetDefinitionNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    ) {
+        return $this->validationFactory->createPrimitiveWidgetDefinitionContext(
+            $parentContext,
+            $primitiveWidgetDefinitionNode,
             $behaviourSpec,
             $subjectNode
         );
@@ -94,7 +150,9 @@ class UiContextFactory implements SubValidationContextFactoryInterface
     public function getSpecifierClassToContextFactoryCallableMap()
     {
         return [
-            CompoundWidgetContextSpecifier::class => [$this, 'createCompoundWidgetContext'],
+            CompoundWidgetDefinitionContextSpecifier::class => [$this, 'createCompoundWidgetDefinitionContext'],
+            DefinedWidgetContextSpecifier::class => [$this, 'createDefinedWidgetContext'],
+            PrimitiveWidgetDefinitionContextSpecifier::class => [$this, 'createPrimitiveWidgetDefinitionContext'],
             ViewContextSpecifier::class => [$this, 'createViewContext']
         ];
     }

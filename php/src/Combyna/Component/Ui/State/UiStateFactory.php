@@ -56,6 +56,7 @@ class UiStateFactory implements UiStateFactoryInterface
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates,
         WidgetStateInterface $rootWidgetState
     ) {
@@ -63,6 +64,7 @@ class UiStateFactory implements UiStateFactoryInterface
             $name,
             $widget,
             $attributeStaticBag,
+            $valueStaticBag,
             $childWidgetStates,
             $rootWidgetState
         );
@@ -75,12 +77,14 @@ class UiStateFactory implements UiStateFactoryInterface
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates
     ) {
         return new DefinedPrimitiveWidgetState(
             $name,
             $widget,
             $attributeStaticBag,
+            $valueStaticBag,
             $childWidgetStates
         );
     }

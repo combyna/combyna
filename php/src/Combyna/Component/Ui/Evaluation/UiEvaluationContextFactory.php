@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventInterface;
@@ -23,6 +24,7 @@ use Combyna\Component\State\StatePathInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
+use Combyna\Component\Ui\State\Widget\CoreWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
@@ -32,6 +34,8 @@ use Combyna\Component\Ui\Store\Evaluation\ViewStoreEvaluationContext;
 use Combyna\Component\Ui\View\ViewInterface;
 use Combyna\Component\Ui\Widget\CoreWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
+use LogicException;
 
 /**
  * Class UiEvaluationContextFactory
@@ -69,21 +73,30 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createCoreWidgetEvaluationContext(
+    public function createCompoundWidgetEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        CoreWidgetInterface $widget
+        DefinedWidgetInterface $widget,
+        StaticBagInterface $attributeStaticBag,
+        ExpressionBagInterface $valueExpressionBag
     ) {
-        return new CoreWidgetEvaluationContext($this, $parentContext, $widget);
+        return new CompoundWidgetEvaluationContext(
+            $this,
+            $parentContext,
+            $widget,
+            $attributeStaticBag,
+            $valueExpressionBag
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createDefinedWidgetEvaluationContext(
+    public function createCoreWidgetEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        DefinedWidgetInterface $widget
+        CoreWidgetInterface $widget,
+        CoreWidgetStateInterface $widgetState
     ) {
-        return new DefinedWidgetEvaluationContext($this, $parentContext, $widget);
+        return new CoreWidgetEvaluationContext($this, $parentContext, $widget);
     }
 
     /**
@@ -104,6 +117,23 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
         ExpressionInterface $expression
     ) {
         return $this->parentContextFactory->createExpressionContext($parentContext, $expression);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createPrimitiveWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        PrimitiveWidgetDefinition $widgetDefinition,
+        DefinedWidgetInterface $widget,
+        StaticBagInterface $attributeStaticBag
+    ) {
+        return new PrimitiveWidgetEvaluationContext(
+            $this,
+            $parentContext,
+            $widgetDefinition,
+            $widget
+        );
     }
 
     /**
@@ -174,7 +204,7 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
      * {@inheritdoc}
      */
     public function createViewStoreEvaluationContext(
-        EvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         UiStoreStateInterface $viewStoreState
     ) {
         return new ViewStoreEvaluationContext($this, $parentContext, $viewStoreState);
@@ -235,20 +265,30 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
      * @param WidgetStatePathInterface $widgetStatePath
      * @param DefinedWidgetStateInterface $widgetState
      * @param ProgramInterface $program
-     * @param EnvironmentInterface $environment
-     * @return DefinedWidgetEvaluationContext
+     * @return DefinedWidgetEvaluationContextInterface
      */
     public function createWidgetEvaluationContextFromDefinedWidgetStatePath(
         ViewEvaluationContextInterface $parentContext,
         WidgetStatePathInterface $widgetStatePath,
         DefinedWidgetStateInterface $widgetState,
-        ProgramInterface $program,
-        EnvironmentInterface $environment
+        ProgramInterface $program
     ) {
         /** @var DefinedWidgetInterface $widget */
         $widget = $program->getWidgetByPath($widgetStatePath->getWidgetPath());
 
-        return new DefinedWidgetEvaluationContext($this, $parentContext, $widget);
+        $evaluationContext = $widget->createEvaluationContext($parentContext, $this, $widgetState);
+
+        if (!$evaluationContext instanceof DefinedWidgetEvaluationContextInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    DefinedWidgetEvaluationContextInterface::class,
+                    get_class($evaluationContext)
+                )
+            );
+        }
+
+        return $evaluationContext;
     }
 
     /**
@@ -258,15 +298,13 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
      * @param WidgetStatePathInterface $widgetStatePath
      * @param WidgetGroupStateInterface $widgetState
      * @param ProgramInterface $program
-     * @param EnvironmentInterface $environment
      * @return CoreWidgetEvaluationContext
      */
     public function createWidgetEvaluationContextFromWidgetGroupStatePath(
         ViewEvaluationContextInterface $parentContext,
         WidgetStatePathInterface $widgetStatePath,
         WidgetGroupStateInterface $widgetState,
-        ProgramInterface $program,
-        EnvironmentInterface $environment
+        ProgramInterface $program
     ) {
         /** @var CoreWidgetInterface $widget */
         $widget = $program->getWidgetByPath($widgetStatePath->getWidgetPath());

@@ -159,6 +159,14 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidgetValue($valueName)
+    {
+        return $this->parentContext->getWidgetValue($valueName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
     {
         return $this->parentContext->makeViewStoreQuery($queryName, $argumentStaticBag);

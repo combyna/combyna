@@ -149,6 +149,14 @@ interface EvaluationContextInterface
     public function getWidgetAttribute($attributeName);
 
     /**
+     * Evaluates and then returns the value of the specified widget value
+     *
+     * @param string $valueName
+     * @return StaticInterface
+     */
+    public function getWidgetValue($valueName);
+
+    /**
      * Makes the specified query on a view store, returning its static result
      *
      * @param string $queryName

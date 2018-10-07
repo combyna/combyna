@@ -16,6 +16,8 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
+use Combyna\Component\Ui\Validation\Constraint\ValidWidgetValueProvidersConstraint;
+use Combyna\Component\Ui\Validation\Context\Specifier\PrimitiveWidgetDefinitionContextSpecifier;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -55,9 +57,20 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
     private $name;
 
     /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $valueBagModelNode;
+
+    /**
+     * @var callable[]
+     */
+    private $valueNameToProviderCallableMap = [];
+
+    /**
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNodeInterface $attributeBagModelNode
+     * @param FixedStaticBagModelNodeInterface $valueBagModelNode
      * @param ChildWidgetDefinitionNodeInterface[] $childDefinitionNodes
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
      */
@@ -65,6 +78,7 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
         $libraryName,
         $widgetDefinitionName,
         FixedStaticBagModelNodeInterface $attributeBagModelNode,
+        FixedStaticBagModelNodeInterface $valueBagModelNode,
         array $childDefinitionNodes,
         array $eventDefinitionReferenceNodes
     ) {
@@ -73,6 +87,7 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
+        $this->valueBagModelNode = $valueBagModelNode;
     }
 
     /**
@@ -89,6 +104,37 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
         foreach ($this->eventDefinitionReferenceNodes as $eventDefinitionReferenceNode) {
             $specBuilder->addChildNode($eventDefinitionReferenceNode);
         }
+
+        $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
+            // Only give the widget value defaults the primitive widget definition context,
+            // as primitive widget attrs cannot reference other primitive widget attrs
+            // for the same widget
+            $subSpecBuilder->defineValidationContext(
+                new PrimitiveWidgetDefinitionContextSpecifier()
+            );
+
+            $subSpecBuilder->addChildNode($this->valueBagModelNode);
+            $subSpecBuilder->addConstraint(
+                new ValidWidgetValueProvidersConstraint(
+                    $this->libraryName,
+                    $this->name,
+                    $this->valueBagModelNode->getStaticDefinitionNames(),
+                    function () {
+                        // Defer the fetching of the providers with a callback,
+                        // to allow providers to be installed before validation
+                        return $this->valueNameToProviderCallableMap;
+                    }
+                )
+            );
+        });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function definesValue($valueName)
+    {
+        return $this->valueBagModelNode->definesStatic($valueName);
     }
 
     /**
@@ -126,6 +172,38 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
     }
 
     /**
+     * Fetches the fixed static bag model for values of widgets with this definition
+     *
+     * @return FixedStaticBagModelNodeInterface
+     */
+    public function getValueBagModel()
+    {
+        return $this->valueBagModelNode;
+    }
+
+    /**
+     * Fetches the map of widget value names to provider callables
+     *
+     * @return callable[]
+     */
+    public function getValueNameToProviderCallableMap()
+    {
+        return $this->valueNameToProviderCallableMap;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValueType($valueName, QueryRequirementInterface $queryRequirement)
+    {
+        return $queryRequirement->determineType(
+            $this->valueBagModelNode
+                ->getStaticDefinitionByName($valueName, $queryRequirement)
+                ->getStaticTypeDeterminer()
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getWidgetDefinitionName()
@@ -139,6 +217,18 @@ class PrimitiveWidgetDefinitionNode extends AbstractActNode implements WidgetDef
     public function isDefined()
     {
         return true;
+    }
+
+    /**
+     * Sets the provider to use for a widget value. If any of the widget values
+     * do not get a provider installed, this definition will fail validation
+     *
+     * @param string $valueName
+     * @param callable $callable
+     */
+    public function setValueProviderCallable($valueName, callable $callable)
+    {
+        $this->valueNameToProviderCallableMap[$valueName] = $callable;
     }
 
     /**

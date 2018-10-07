@@ -13,6 +13,7 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
@@ -20,6 +21,7 @@ use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidWidgetConstraint;
+use Combyna\Component\Ui\Validation\Context\Specifier\DefinedWidgetContextSpecifier;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -110,29 +112,6 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     {
         $specBuilder->addChildNode($this->attributeExpressionBagNode);
 
-        // Validate all triggers for this widget
-        foreach ($this->triggerNodes as $triggerNode) {
-            $specBuilder->addChildNode($triggerNode);
-        }
-
-        // Recursively validate any child widgets
-        foreach ($this->childWidgetNodes as $childWidgetNode) {
-            $specBuilder->addChildNode($childWidgetNode);
-        }
-
-        // Validate the visibility expression, if specified
-        if ($this->visibilityExpressionNode) {
-            $specBuilder->addChildNode($this->visibilityExpressionNode);
-
-            $specBuilder->addConstraint(
-                new ResultTypeConstraint(
-                    $this->visibilityExpressionNode,
-                    new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
-                    'visibility'
-                )
-            );
-        }
-
         // Validate that this widget is a well-formed instance of its definition
         $specBuilder->addConstraint(
             new ValidWidgetConstraint(
@@ -142,6 +121,33 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
                 $this->childWidgetNodes
             )
         );
+
+        $specBuilder->addSubSpec(function (SubBehaviourSpecBuilderInterface $subSpecBuilder) {
+            $subSpecBuilder->defineValidationContext(new DefinedWidgetContextSpecifier());
+
+            // Validate all triggers for this widget
+            foreach ($this->triggerNodes as $triggerNode) {
+                $subSpecBuilder->addChildNode($triggerNode);
+            }
+
+            // Recursively validate any child widgets
+            foreach ($this->childWidgetNodes as $childWidgetNode) {
+                $subSpecBuilder->addChildNode($childWidgetNode);
+            }
+
+            // Validate the visibility expression, if specified
+            if ($this->visibilityExpressionNode) {
+                $subSpecBuilder->addChildNode($this->visibilityExpressionNode);
+
+                $subSpecBuilder->addConstraint(
+                    new ResultTypeConstraint(
+                        $this->visibilityExpressionNode,
+                        new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                        'visibility'
+                    )
+                );
+            }
+        });
     }
 
     /**

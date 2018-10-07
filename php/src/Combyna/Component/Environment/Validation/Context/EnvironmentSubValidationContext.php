@@ -24,7 +24,9 @@ use Combyna\Component\Signal\Validation\Query\SignalDefinitionHasPayloadStaticQu
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQuery;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionHasValueQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionNodeQuery;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionValueTypeQuery;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -117,7 +119,9 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             FunctionReturnTypeQuery::class => [$this, 'queryForFunctionReturnType'],
             SignalDefinitionExistsQuery::class => [$this, 'queryForSignalDefinitionExistence'],
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
-            WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode']
+            WidgetDefinitionHasValueQuery::class => [$this, 'queryForWidgetValueExistence'],
+            WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode'],
+            WidgetDefinitionValueTypeQuery::class => [$this, 'queryForWidgetValueType']
         ];
     }
 
@@ -309,5 +313,47 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
         );
 
         return $widgetDefinitionNode;
+    }
+
+    /**
+     * Determines whether the specified widget definition defines the specified value
+     *
+     * @param WidgetDefinitionHasValueQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool
+     */
+    public function queryForWidgetValueExistence(
+        WidgetDefinitionHasValueQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        $widgetDefinitionNode = $this->environmentNode->getWidgetDefinition(
+            $query->getLibraryName(),
+            $query->getWidgetDefinitionName(),
+            $validationContext->createBooleanQueryRequirement($query)
+        );
+
+        return $widgetDefinitionNode->definesValue($query->getValueName());
+    }
+
+    /**
+     * Fetches the return type of the specified value of a widget defined by a library
+     *
+     * @param WidgetDefinitionValueTypeQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return TypeInterface
+     */
+    public function queryForWidgetValueType(
+        WidgetDefinitionValueTypeQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        $queryRequirement = $validationContext->createTypeQueryRequirement($query);
+
+        $widgetDefinitionNode = $this->environmentNode->getWidgetDefinition(
+            $query->getLibraryName(),
+            $query->getWidgetDefinitionName(),
+            $queryRequirement
+        );
+
+        return $widgetDefinitionNode->getValueType($query->getValueName(), $queryRequirement);
     }
 }

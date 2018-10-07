@@ -14,9 +14,12 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
+use LogicException;
 
 /**
  * Class FixedStaticDefinitionNode
@@ -36,6 +39,11 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
      * @var string
      */
     private $name;
+
+    /**
+     * @var TypeInterface|null
+     */
+    private $resolvedStaticType = null;
 
     /**
      * @var TypeDeterminerInterface
@@ -68,6 +76,17 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
 
         // Make sure the static's type is a resolved, valid type
         $specBuilder->addConstraint(new ResolvableTypeConstraint($this->staticTypeDeterminer));
+
+        // Resolve the static's type once all static values are known,
+        // as it can be different depending on the types of the other statics in the bag
+        // (eg. if a custom TypeDeterminer is used for a static's type)
+        $specBuilder->addConstraint(
+            new CallbackConstraint(
+                function (ValidationContextInterface $validationContext) {
+                    $this->resolvedStaticType = $this->staticTypeDeterminer->determine($validationContext);
+                }
+            )
+        );
     }
 
     /**
@@ -92,6 +111,23 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResolvedStaticType()
+    {
+        if ($this->resolvedStaticType === null) {
+            throw new LogicException(
+                sprintf(
+                    'Bag static "%s" type was expected to be resolved but was not',
+                    $this->name
+                )
+            );
+        }
+
+        return $this->resolvedStaticType;
     }
 
     /**

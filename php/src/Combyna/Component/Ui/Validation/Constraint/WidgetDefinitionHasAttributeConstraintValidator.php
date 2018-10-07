@@ -11,16 +11,16 @@
 
 namespace Combyna\Component\Ui\Validation\Constraint;
 
-use Combyna\Component\Ui\Validation\Query\CurrentCompoundWidgetDefinitionHasAttributeStaticQuery;
+use Combyna\Component\Ui\Validation\Query\CurrentWidgetDefinitionHasAttributeQuery;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class CompoundWidgetDefinitionHasAttributeConstraintValidator
+ * Class WidgetDefinitionHasAttributeConstraintValidator
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CompoundWidgetDefinitionHasAttributeConstraintValidator implements ConstraintValidatorInterface
+class WidgetDefinitionHasAttributeConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -28,7 +28,7 @@ class CompoundWidgetDefinitionHasAttributeConstraintValidator implements Constra
     public function getConstraintClassToValidatorCallableMap()
     {
         return [
-            CompoundWidgetDefinitionHasAttributeConstraint::class => [$this, 'validate']
+            WidgetDefinitionHasAttributeConstraint::class => [$this, 'validate']
         ];
     }
 
@@ -44,15 +44,15 @@ class CompoundWidgetDefinitionHasAttributeConstraintValidator implements Constra
      * Validates this constraint in the given validation context. If the constraint is not met,
      * one or more violations will be added to the context to make the validation fail
      *
-     * @param CompoundWidgetDefinitionHasAttributeConstraint $constraint
+     * @param WidgetDefinitionHasAttributeConstraint $constraint
      * @param ValidationContextInterface $validationContext
      */
     public function validate(
-        CompoundWidgetDefinitionHasAttributeConstraint $constraint,
+        WidgetDefinitionHasAttributeConstraint $constraint,
         ValidationContextInterface $validationContext
     ) {
         $attributeExists = $validationContext->queryForBoolean(
-            new CurrentCompoundWidgetDefinitionHasAttributeStaticQuery(
+            new CurrentWidgetDefinitionHasAttributeQuery(
                 $constraint->getAttributeName()
             ),
             $validationContext->getCurrentActNode()

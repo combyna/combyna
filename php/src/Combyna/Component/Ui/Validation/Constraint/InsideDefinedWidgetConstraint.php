@@ -14,10 +14,10 @@ namespace Combyna\Component\Ui\Validation\Constraint;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
- * Class InsideCompoundWidgetDefinitionRootWidgetConstraint
+ * Class InsideDefinedWidgetConstraint
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class InsideCompoundWidgetDefinitionRootWidgetConstraint implements ConstraintInterface
+class InsideDefinedWidgetConstraint implements ConstraintInterface
 {
 }

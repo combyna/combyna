@@ -16,7 +16,7 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
-use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetDefinitionContextSpecifier;
 use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -61,9 +61,15 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     private $rootWidgetNode;
 
     /**
+     * @var ExpressionBagNode
+     */
+    private $valueExpressionBagNode;
+
+    /**
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param FixedStaticBagModelNodeInterface $attributeBagModelNode
+     * @param ExpressionBagNode $valueExpressionBagNode
      * @param ChildWidgetDefinitionNodeInterface[] $childDefinitionNodes
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
      * @param WidgetNodeInterface $rootWidgetNode
@@ -72,6 +78,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         $libraryName,
         $widgetDefinitionName,
         FixedStaticBagModelNodeInterface $attributeBagModelNode,
+        ExpressionBagNode $valueExpressionBagNode,
         array $childDefinitionNodes,
         array $eventDefinitionReferenceNodes,
         WidgetNodeInterface $rootWidgetNode
@@ -82,6 +89,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
         $this->rootWidgetNode = $rootWidgetNode;
+        $this->valueExpressionBagNode = $valueExpressionBagNode;
     }
 
     /**
@@ -100,15 +108,25 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
         }
 
         $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
-            // Only give the root widget node tree the compound widget context,
+            // Only give the root widget node tree and widget value defaults
+            // the compound widget definition context,
             // as compound widget attrs cannot reference other compound widget attrs
             // for the same widget
             $subSpecBuilder->defineValidationContext(
-                new CompoundWidgetContextSpecifier()
+                new CompoundWidgetDefinitionContextSpecifier()
             );
 
             $subSpecBuilder->addChildNode($this->rootWidgetNode);
+            $subSpecBuilder->addChildNode($this->valueExpressionBagNode);
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function definesValue($valueName)
+    {
+        return $this->valueExpressionBagNode->hasExpression($valueName);
     }
 
     /**
@@ -161,6 +179,28 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     public function getRootWidget()
     {
         return $this->rootWidgetNode;
+    }
+
+    /**
+     * Fetches the fixed static bag model for values of widgets with this definition
+     *
+     * @return ExpressionBagNode
+     */
+    public function getValueExpressionBag()
+    {
+        return $this->valueExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValueType($valueName, QueryRequirementInterface $queryRequirement)
+    {
+        return $queryRequirement->determineType(
+            $this->valueExpressionBagNode
+                ->getExpression($valueName)
+                ->getResultTypeDeterminer()
+        );
     }
 
     /**

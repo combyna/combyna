@@ -166,6 +166,16 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidgetValue($valueName)
+    {
+        throw new LogicException(
+            'Value "' . $valueName . '" cannot be fetched outside a defined widget'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
     {
         throw new LogicException('No active store - cannot make query with name "' . $queryName . '"');

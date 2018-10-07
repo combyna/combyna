@@ -121,7 +121,7 @@ class PageView implements PageViewInterface
     {
         $storeState = $this->store->createInitialState($rootEvaluationContext);
         $viewAttributeStaticBag = new StaticBag([]); // FIXME
-        $viewEvaluationContext = $this->uiEvaluationContextFactory->createRootViewEvaluationContext(
+        $rootViewEvaluationContext = $this->uiEvaluationContextFactory->createRootViewEvaluationContext(
             $this,
             $storeState,
             $viewAttributeStaticBag,
@@ -129,7 +129,7 @@ class PageView implements PageViewInterface
             $rootEvaluationContext->getEnvironment()
         );
 
-        $rootWidgetState = $this->rootWidget->createInitialState('root', $viewEvaluationContext);
+        $rootWidgetState = $this->rootWidget->createInitialState('root', $rootViewEvaluationContext);
 
         return $this->uiStateFactory->createPageViewState(
             $this,

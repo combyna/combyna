@@ -15,6 +15,7 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
@@ -25,6 +26,14 @@ use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
  */
 interface WidgetDefinitionNodeInterface extends ActNodeInterface
 {
+    /**
+     * Determines whether this definition defines the specified value
+     *
+     * @param string $valueName
+     * @return bool
+     */
+    public function definesValue($valueName);
+
     /**
      * Fetches the fixed static bag model for attributes of widgets with this definition
      *
@@ -54,6 +63,15 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getLibraryName();
+
+    /**
+     * Fetches the type of a value defined by this definition
+     *
+     * @param string $valueName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return TypeInterface
+     */
+    public function getValueType($valueName, QueryRequirementInterface $queryRequirement);
 
     /**
      * Fetches the name of this widget definition

@@ -14,9 +14,9 @@ namespace Combyna\Component\App\Config\Act;
 use Combyna\Component\App\Validation\Context\Specifier\AppContextSpecifier;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Environment\Config\Act\DynamicUnknownFunctionNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
-use Combyna\Component\Environment\Config\Act\DynamicUnknownFunctionNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
 use Combyna\Component\Router\Config\Act\RouteNode;
@@ -124,6 +124,10 @@ class AppNode extends AbstractActNode implements RootNodeInterface
 
         foreach ($this->routeNodes as $routeNode) {
             $specBuilder->addChildNode($routeNode);
+        }
+
+        foreach ($this->signalDefinitionNodes as $signalDefinitionNode) {
+            $specBuilder->addChildNode($signalDefinitionNode);
         }
     }
 

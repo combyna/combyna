@@ -44,6 +44,11 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
     private $rootWidgetState;
 
     /**
+     * @var StaticBagInterface
+     */
+    private $valueStaticBag;
+
+    /**
      * @var DefinedWidgetInterface
      */
     private $widget;
@@ -52,6 +57,7 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param StaticBagInterface $valueStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
      * @param WidgetStateInterface $rootWidgetState
      */
@@ -59,6 +65,7 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates,
         WidgetStateInterface $rootWidgetState
     ) {
@@ -68,7 +75,7 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
         $this->childWidgetStates = $childWidgetStates;
         $this->name = $name;
         $this->rootWidgetState = $rootWidgetState;
-//        $this->storeStateCollection = $storeStateCollection;
+        $this->valueStaticBag = $valueStaticBag;
 
         // FIXME: Should not have access to the widget
         $this->widget = $widget;
@@ -139,6 +146,14 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
     public function getType()
     {
         return self::TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValue($name)
+    {
+        return $this->valueStaticBag->getStatic($name);
     }
 
     /**

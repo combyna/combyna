@@ -131,7 +131,7 @@ class Library implements LibraryInterface
     public function getWidgetDefinitionByName($widgetDefinitionName)
     {
         if (!array_key_exists($widgetDefinitionName, $this->widgetDefinitions)) {
-            throw new WidgetDefinitionNotSupportedException($this, $widgetDefinitionName);
+            throw new WidgetDefinitionNotSupportedException($this->name, $widgetDefinitionName);
         }
 
         return $this->widgetDefinitions[$widgetDefinitionName];

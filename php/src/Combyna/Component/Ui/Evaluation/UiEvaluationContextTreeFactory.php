@@ -16,6 +16,7 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\State\StatePathInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use InvalidArgumentException;
 
@@ -128,6 +129,9 @@ class UiEvaluationContextTreeFactory implements UiEvaluationContextTreeFactoryIn
             );
         }
 
-        return $widget->createEvaluationContext($parentContext, $this->evaluationContextFactory);
+        /** @var WidgetStateInterface $widgetState */
+        $widgetState = $widgetStatePath->getEndState();
+
+        return $widget->createEvaluationContext($parentContext, $this->evaluationContextFactory, $widgetState);
     }
 }

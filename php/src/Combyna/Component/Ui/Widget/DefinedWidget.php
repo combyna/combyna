@@ -22,6 +22,9 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
+use LogicException;
 
 /**
  * Class DefinedWidget
@@ -127,12 +130,20 @@ class DefinedWidget implements DefinedWidgetInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     ) {
-        return $evaluationContextFactory->createDefinedWidgetEvaluationContext(
-            $parentContext,
-            $this
-        );
+        if (!$widgetState instanceof DefinedWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    DefinedWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $this->definition->createEvaluationContextForWidget($parentContext, $this, $widgetState);
     }
 
     /**
@@ -155,10 +166,13 @@ class DefinedWidget implements DefinedWidgetInterface
         $childStates = [];
 
         foreach ($this->childWidgets as $childName => $childWidget) {
-            $childStates[$childName] = $childWidget->createInitialState($childName, $evaluationContext);
+            $childStates[$childName] = $childWidget->createInitialState(
+                $childName,
+                $evaluationContext
+            );
         }
 
-        return $this->definition->createInitialState(
+        return $this->definition->createInitialStateForWidget(
             $name,
             $this,
             $attributeStaticBag,

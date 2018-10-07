@@ -14,10 +14,8 @@ namespace Combyna\Component\Ui\Evaluation;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\Widget\CoreWidgetInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class CoreWidgetEvaluationContext
@@ -59,18 +57,6 @@ class CoreWidgetEvaluationContext extends AbstractEvaluationContext implements C
     /**
      * {@inheritdoc}
      */
-    public function callFunction(
-        $libraryName,
-        $functionName,
-        StaticBagInterface $argumentStaticBag,
-        TypeInterface $returnType
-    ) {
-        return $this->parentContext->callFunction($libraryName, $functionName, $argumentStaticBag, $returnType);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
     {
         return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
@@ -103,17 +89,17 @@ class CoreWidgetEvaluationContext extends AbstractEvaluationContext implements C
     /**
      * {@inheritdoc}
      */
-    public function getAssuredStatic($assuredStaticName)
+    public function getChildWidget($childName)
     {
-        return $this->parentContext->getAssuredStatic($assuredStaticName);
+        return $this->parentContext->getChildWidget($childName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getPath()
     {
-        return $this->parentContext->getChildWidget($childName);
+        return array_merge($this->parentContext->getPath(), [$this->widget->getName()]);
     }
 
     /**
@@ -138,21 +124,5 @@ class CoreWidgetEvaluationContext extends AbstractEvaluationContext implements C
     public function getWidgetAttribute($attributeName)
     {
         return $this->widget->getAttribute($attributeName, $this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubWidgetEvaluationContext(WidgetInterface $widget)
-    {
-        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function translate($translationKey, array $arguments = [])
-    {
-        return $this->parentContext->translate($translationKey, $arguments);
     }
 }

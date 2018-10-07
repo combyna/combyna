@@ -14,32 +14,32 @@ namespace Combyna\Component\Ui\Validation\Constraint;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
- * Class CompoundWidgetDefinitionHasAttributeConstraint
+ * Class WidgetHasValueConstraint
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CompoundWidgetDefinitionHasAttributeConstraint implements ConstraintInterface
+class WidgetHasValueConstraint implements ConstraintInterface
 {
     /**
      * @var string
      */
-    private $attributeName;
+    private $valueName;
 
     /**
-     * @param string $attributeName
+     * @param string $valueName
      */
-    public function __construct($attributeName)
+    public function __construct($valueName)
     {
-        $this->attributeName = $attributeName;
+        $this->valueName = $valueName;
     }
 
     /**
-     * Fetches the name of the attribute to check for existence of
+     * Fetches the name of the value to check for existence of
      *
      * @return string
      */
-    public function getAttributeName()
+    public function getValueName()
     {
-        return $this->attributeName;
+        return $this->valueName;
     }
 }

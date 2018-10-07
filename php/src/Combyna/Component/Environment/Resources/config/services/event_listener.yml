@@ -4,3 +4,9 @@ services:
         autowire: true
         tags:
             - {name: combyna.event_listener, event: combyna.environment_loaded, method: onEnvironmentLoaded}
+
+    combyna.environment.event_listener.widget_value_provider_installer:
+        class: Combyna\Component\Environment\EventListener\WidgetValueProviderInstallerListener
+        autowire: true
+        tags:
+            - {name: combyna.event_listener, event: combyna.environment_loaded, method: onEnvironmentLoaded}

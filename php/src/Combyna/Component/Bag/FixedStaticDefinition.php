@@ -14,6 +14,7 @@ namespace Combyna\Component\Bag;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
 /**
@@ -36,15 +37,23 @@ class FixedStaticDefinition
     private $name;
 
     /**
+     * @var TypeInterface
+     */
+    private $staticType;
+
+    /**
      * @param string $name
+     * @param TypeInterface $staticType
      * @param ExpressionInterface|null $defaultExpression
      */
     public function __construct(
         $name,
+        TypeInterface $staticType,
         ExpressionInterface $defaultExpression = null
     ) {
         $this->defaultExpression = $defaultExpression;
         $this->name = $name;
+        $this->staticType = $staticType;
     }
 
     /**
@@ -73,6 +82,16 @@ class FixedStaticDefinition
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Fetches the type of the static
+     *
+     * @return TypeInterface
+     */
+    public function getStaticType()
+    {
+        return $this->staticType;
     }
 
     /**

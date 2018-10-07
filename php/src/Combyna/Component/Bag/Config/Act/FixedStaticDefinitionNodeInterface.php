@@ -13,6 +13,7 @@ namespace Combyna\Component\Bag\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
@@ -36,6 +37,13 @@ interface FixedStaticDefinitionNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Fetches the resolved type for the static
+     *
+     * @return TypeInterface
+     */
+    public function getResolvedStaticType();
 
     /**
      * Fetches the type that a value of this static must match

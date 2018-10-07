@@ -15,6 +15,7 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
+use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Environment\Validation\Context\Specifier\EnvironmentContextSpecifier;
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownLibraryForEventDefinitionNode;
@@ -192,6 +193,33 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
 
         return $this->libraryNodes[$libraryName]->installNativeFunction(
             $functionName,
+            $callable
+        );
+    }
+
+    /**
+     * Installs a widget value provider
+     *
+     * @param string $libraryName
+     * @param string $widgetDefinitionName
+     * @param string $valueName
+     * @param callable $callable
+     * @throws LibraryNotInstalledException
+     * @throws WidgetDefinitionNotSupportedException
+     */
+    public function installWidgetValueProvider(
+        $libraryName,
+        $widgetDefinitionName,
+        $valueName,
+        callable $callable
+    ) {
+        if (!array_key_exists($libraryName, $this->libraryNodes)) {
+            throw new LibraryNotInstalledException($libraryName);
+        }
+
+        return $this->libraryNodes[$libraryName]->installWidgetValueProvider(
+            $widgetDefinitionName,
+            $valueName,
             $callable
         );
     }

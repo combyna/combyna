@@ -13,6 +13,7 @@ namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use LogicException;
 
 /**
  * Class FixedStaticBagModel
@@ -83,5 +84,22 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     public function definesStatic($name)
     {
         return array_key_exists($name, $this->staticDefinitions);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticType($name)
+    {
+        if (!$this->definesStatic($name)) {
+            throw new LogicException(
+                sprintf(
+                    'Bag model does not define static %s',
+                    $name
+                )
+            );
+        }
+
+        return $this->staticDefinitions[$name]->getStaticType();
     }
 }

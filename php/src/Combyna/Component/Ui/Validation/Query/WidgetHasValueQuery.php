@@ -15,23 +15,23 @@ use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Query\BooleanQueryInterface;
 
 /**
- * Class CurrentCompoundWidgetDefinitionHasAttributeStaticQuery
+ * Class WidgetHasValueQuery
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CurrentCompoundWidgetDefinitionHasAttributeStaticQuery implements BooleanQueryInterface
+class WidgetHasValueQuery implements BooleanQueryInterface
 {
     /**
      * @var string
      */
-    private $attributeName;
+    private $valueName;
 
     /**
-     * @param string $attributeName
+     * @param string $valueName
      */
-    public function __construct($attributeName)
+    public function __construct($valueName)
     {
-        $this->attributeName = $attributeName;
+        $this->valueName = $valueName;
     }
 
     /**
@@ -47,17 +47,17 @@ class CurrentCompoundWidgetDefinitionHasAttributeStaticQuery implements BooleanQ
      */
     public function getDescription()
     {
-        return 'Whether the compound widget definition has an attribute called "' . $this->attributeName . '"';
+        return 'Whether the widget has a value called "' . $this->valueName . '"';
     }
 
     /**
-     * Fetches the name of the attribute to query the existence of
+     * Fetches the name of the value to query the existence of
      *
      * @return string
      */
-    public function getAttributeName()
+    public function getValueName()
     {
-        return $this->attributeName;
+        return $this->valueName;
     }
 
     /**

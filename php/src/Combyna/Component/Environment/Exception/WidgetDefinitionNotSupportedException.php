@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Environment\Exception;
 
-use Combyna\Component\Environment\Library\LibraryInterface;
 use Exception;
 
 /**
@@ -25,9 +24,9 @@ use Exception;
 class WidgetDefinitionNotSupportedException extends Exception
 {
     /**
-     * @var LibraryInterface
+     * @var string
      */
-    private $library;
+    private $libraryName;
 
     /**
      * @var string
@@ -35,27 +34,31 @@ class WidgetDefinitionNotSupportedException extends Exception
     private $widgetDefinitionName;
 
     /**
-     * @param LibraryInterface $library
+     * @param string $libraryName
      * @param string $widgetDefinitionName
      */
-    public function __construct(LibraryInterface $library, $widgetDefinitionName)
+    public function __construct($libraryName, $widgetDefinitionName)
     {
         parent::__construct(
-            'Library "' . $library->getName() . '" does not define widget definition "' . $widgetDefinitionName . '"'
+            sprintf(
+                'Library "%s" does not define widget definition "%s"',
+                $libraryName,
+                $widgetDefinitionName
+            )
         );
 
-        $this->library = $library;
+        $this->libraryName = $libraryName;
         $this->widgetDefinitionName = $widgetDefinitionName;
     }
 
     /**
-     * Fetches the library that does not support the requested widget definition
+     * Fetches the name of the library that does not support the requested widget definition
      *
-     * @return LibraryInterface
+     * @return string
      */
-    public function getLibrary()
+    public function getLibraryName()
     {
-        return $this->library;
+        return $this->libraryName;
     }
 
     /**

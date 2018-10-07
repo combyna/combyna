@@ -20,6 +20,8 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\TextWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use LogicException;
 
 /**
@@ -90,12 +92,20 @@ class TextWidget implements TextWidgetInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     ) {
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
-            $parentContext,
-            $this
-        );
+        if (!$widgetState instanceof TextWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    TextWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**
@@ -109,8 +119,10 @@ class TextWidget implements TextWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext)
-    {
+    public function createInitialState(
+        $name,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         $textStatic = $this->textExpression->toStatic($evaluationContext);
 
         return $this->uiStateFactory->createTextWidgetState($name, $this, $textStatic->toNative());

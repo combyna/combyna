@@ -23,32 +23,41 @@ use InvalidArgumentException;
 interface DefinedWidgetStateInterface extends ParentWidgetStateInterface, WidgetStateInterface
 {
     /**
-     * Fetches the specified attribute, evaluated to a static for this rendered widget
+     * Fetches the specified attribute for this widget, evaluated to a static
      *
      * @param string $name
      * @return StaticInterface
-     * @throws InvalidArgumentException Throws when the bag does not contain the specified static
+     * @throws InvalidArgumentException Throws when the widget does not define the specified attribute
      */
     public function getAttribute($name);
 
     /**
-     * Fetches the names of all attributes for this widget
+     * Fetches the names of all attributes for the widget this state is for
      *
      * @return string[]
      */
     public function getAttributeNames();
 
     /**
-     * Fetches the attribute bag for this widget
+     * Fetches the attribute bag for the widget this state is for
      *
      * @return StaticBagInterface
      */
     public function getAttributeStaticBag();
 
     /**
-     * Fetches the names of the children of this widget
+     * Fetches the names of the children of the widget this state is for
      *
      * @return string[]
      */
     public function getChildNames();
+
+    /**
+     * Fetches the specified value for this widget, wrapped as a static
+     *
+     * @param string $name
+     * @return StaticInterface
+     * @throws InvalidArgumentException Throws when the widget does not define the specified value
+     */
+    public function getValue($name);
 }

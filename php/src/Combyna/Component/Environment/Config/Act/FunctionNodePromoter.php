@@ -54,6 +54,7 @@ class FunctionNodePromoter
      * @param FunctionNodeInterface[] $functionNodes
      * @param string $libraryName
      * @return FunctionCollectionInterface
+     * @throws NativeFunctionNotInstalledException
      */
     public function promoteCollection(array $functionNodes, $libraryName)
     {

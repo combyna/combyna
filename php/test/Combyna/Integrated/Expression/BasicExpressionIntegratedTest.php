@@ -80,7 +80,7 @@ class BasicExpressionIntegratedTest extends TestCase
                         new FixedStaticBagModel(
                             $this->bagFactory,
                             [
-                                new FixedStaticDefinition('textString')
+                                new FixedStaticDefinition('textString', new StaticType(TextExpression::class))
                             ]
                         ),
                         function (StaticBagInterface $argumentBag) {

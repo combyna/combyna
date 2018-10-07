@@ -39,6 +39,11 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
     private $name;
 
     /**
+     * @var StaticBagInterface
+     */
+    private $valueStaticBag;
+
+    /**
      * @var DefinedWidgetInterface
      */
     private $widget;
@@ -47,12 +52,14 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
      * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param StaticBagInterface $valueStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
      */
     public function __construct(
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates
     ) {
         $widget->assertValidAttributeStaticBag($attributeStaticBag);
@@ -61,6 +68,7 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
         $this->childWidgetStates = $childWidgetStates;
         $this->name = $name;
 //        $this->storeStateCollection = $storeStateCollection;
+        $this->valueStaticBag = $valueStaticBag;
 
         // FIXME: Should not have access to the widget
         $this->widget = $widget;
@@ -128,6 +136,14 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
     public function getType()
     {
         return self::TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValue($name)
+    {
+        return $this->valueStaticBag->getStatic($name);
     }
 
     /**

@@ -15,9 +15,9 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
-use Combyna\Component\Ui\Validation\Query\CurrentCompoundWidgetDefinitionHasAttributeStaticQuery;
 use Combyna\Component\Ui\Validation\Query\CurrentCompoundWidgetDefinitionHasChildStaticQuery;
-use Combyna\Component\Ui\Validation\Query\InsideCompoundWidgetDefinitionRootWidgetQuery;
+use Combyna\Component\Ui\Validation\Query\CurrentWidgetDefinitionHasAttributeQuery;
+use Combyna\Component\Ui\Validation\Query\InsideWidgetDefinitionQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetAttributeTypeQuery;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -105,17 +105,17 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
     public function getQueryClassToQueryCallableMap()
     {
         return [
-            CurrentCompoundWidgetDefinitionHasAttributeStaticQuery::class => [
+            CurrentWidgetDefinitionHasAttributeQuery::class => [
                 $this,
-                'queryForCompoundWidgetDefinitionAttributeExistence'
+                'queryForWidgetDefinitionAttributeExistence'
             ],
             CurrentCompoundWidgetDefinitionHasChildStaticQuery::class => [
                 $this,
                 'queryForCompoundWidgetDefinitionChildExistence'
             ],
-            InsideCompoundWidgetDefinitionRootWidgetQuery::class => [
+            InsideWidgetDefinitionQuery::class => [
                 $this,
-                'queryForInsideCompoundWidgetDefinitionRootWidget'
+                'queryForInsideWidgetDefinition'
             ],
             WidgetAttributeTypeQuery::class => [$this, 'queryForWidgetAttributeType']
         ];
@@ -132,11 +132,11 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
     /**
      * Determines whether the current compound widget definition defines the specified attribute
      *
-     * @param CurrentCompoundWidgetDefinitionHasAttributeStaticQuery $query
+     * @param CurrentWidgetDefinitionHasAttributeQuery $query
      * @return bool
      */
-    public function queryForCompoundWidgetDefinitionAttributeExistence(
-        CurrentCompoundWidgetDefinitionHasAttributeStaticQuery $query
+    public function queryForWidgetDefinitionAttributeExistence(
+        CurrentWidgetDefinitionHasAttributeQuery $query
     ) {
         return $this->definitionNode->getAttributeBagModel()->definesStatic($query->getAttributeName());
     }
@@ -159,11 +159,11 @@ class CompoundWidgetDefinitionSubValidationContext implements CompoundWidgetDefi
     }
 
     /**
-     * Determines whether we are inside a compound widget definition's root widget
+     * Determines whether we are inside a compound widget definition
      *
      * @return bool
      */
-    public function queryForInsideCompoundWidgetDefinitionRootWidget()
+    public function queryForInsideWidgetDefinition()
     {
         return true;
     }

@@ -21,6 +21,8 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use LogicException;
 
 /**
@@ -99,12 +101,20 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     ) {
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
-            $parentContext,
-            $this
-        );
+        if (!$widgetState instanceof ChildReferenceWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    ChildReferenceWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**
@@ -118,14 +128,19 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext)
-    {
+    public function createInitialState(
+        $name,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         $childWidget = $evaluationContext->getChildWidget($this->childName);
 
         return $this->uiStateFactory->createChildReferenceWidgetState(
             $name,
             $this,
-            $childWidget->createInitialState('child', $evaluationContext)
+            $childWidget->createInitialState(
+                'child',
+                $evaluationContext
+            )
         );
     }
 

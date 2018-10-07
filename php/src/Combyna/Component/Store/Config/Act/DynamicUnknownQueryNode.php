@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Store\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
@@ -87,7 +87,7 @@ class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeI
      */
     public function getParameterBagModel()
     {
-        return new UnknownFixedStaticBagModelNode(
+        return new DynamicUnknownFixedStaticBagModelNode(
             sprintf('Unknown query node "%s" parameter bag model', $this->name),
             $this->queryRequirement
         );

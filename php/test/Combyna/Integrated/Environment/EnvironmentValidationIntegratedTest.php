@@ -129,6 +129,12 @@ class EnvironmentValidationIntegratedTest extends TestCase
                                 new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
                             )
                         ]),
+                        new FixedStaticBagModelNode([
+                            new FixedStaticDefinitionNode(
+                                'my-invalid-widget-value',
+                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget value type'))
+                            )
+                        ]),
                         [
                             new ChildWidgetDefinitionNode('a_child')
                         ],
@@ -147,6 +153,9 @@ class EnvironmentValidationIntegratedTest extends TestCase
                                 'my-invalid-widget-attr',
                                 new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
                             )
+                        ]),
+                        new ExpressionBagNode([
+                            'my-invalid-widget-value' => new UnknownExpressionNode('unknown widget value expression type')
                         ]),
                         [
                             new ChildWidgetDefinitionNode('a_child')
@@ -230,7 +239,10 @@ class EnvironmentValidationIntegratedTest extends TestCase
             ' - text would get [unknown<Expression type "unknown_type">], expects [text]. :: ' .
 
             'ACT node [environment].[library:my_lib].[compound-widget-def:my_widget].[defined-widget:root].[text-widget].[unknown]' .
-            ' - Expression is of unknown type "unknown_type"'
+            ' - Expression is of unknown type "unknown_type". :: ' .
+
+            'ACT node [environment].[library:my_lib].[compound-widget-def:my_widget].[expression-bag].[unknown]' .
+            ' - Expression is of unknown type "unknown widget value expression type"'
         );
 
         $this->nodeValidator->validate($environmentNode, $appNode)->throwIfViolated();

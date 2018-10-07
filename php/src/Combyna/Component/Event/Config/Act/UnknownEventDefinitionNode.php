@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Event\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
@@ -88,7 +88,7 @@ class UnknownEventDefinitionNode extends AbstractActNode implements EventDefinit
      */
     public function getPayloadStaticBagModel()
     {
-        return new UnknownFixedStaticBagModelNode(
+        return new DynamicUnknownFixedStaticBagModelNode(
             sprintf(
                 'Payload static bag for undefined event "%s" of defined library "%s"',
                 $this->eventName,

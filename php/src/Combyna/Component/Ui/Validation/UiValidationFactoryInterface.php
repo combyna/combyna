@@ -14,10 +14,14 @@ namespace Combyna\Component\Ui\Validation;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
+use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\ViewNodeInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
 use Combyna\Component\Ui\Store\Validation\Context\ViewStoreSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\CompoundWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\DefinedWidgetSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\PrimitiveWidgetDefinitionSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\ViewSubValidationContextInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 
@@ -40,6 +44,38 @@ interface UiValidationFactoryInterface
     public function createCompoundWidgetDefinitionContext(
         SubValidationContextInterface $parentContext,
         CompoundWidgetDefinitionNode $definitionNode,
+        BehaviourSpecInterface $definitionNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a DefinedWidgetSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param DefinedWidgetNode $widgetNode
+     * @param BehaviourSpecInterface $widgetNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return DefinedWidgetSubValidationContextInterface
+     */
+    public function createDefinedWidgetContext(
+        SubValidationContextInterface $parentContext,
+        DefinedWidgetNode $widgetNode,
+        BehaviourSpecInterface $widgetNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a PrimitiveWidgetDefinitionSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param PrimitiveWidgetDefinitionNode $definitionNode
+     * @param BehaviourSpecInterface $definitionNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return PrimitiveWidgetDefinitionSubValidationContextInterface
+     */
+    public function createPrimitiveWidgetDefinitionContext(
+        SubValidationContextInterface $parentContext,
+        PrimitiveWidgetDefinitionNode $definitionNode,
         BehaviourSpecInterface $definitionNodeBehaviourSpec,
         ActNodeInterface $subjectNode
     );

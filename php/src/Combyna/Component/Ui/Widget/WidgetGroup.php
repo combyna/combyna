@@ -20,6 +20,8 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use LogicException;
 
 /**
@@ -73,7 +75,7 @@ class WidgetGroup implements WidgetGroupInterface
         $name,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
-        array $tags
+        array $tags = []
     ) {
         $this->name = $name;
         $this->parentWidget = $parentWidget;
@@ -95,12 +97,20 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     ) {
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
-            $parentContext,
-            $this
-        );
+        if (!$widgetState instanceof WidgetGroupStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    WidgetGroupStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**
@@ -123,7 +133,10 @@ class WidgetGroup implements WidgetGroupInterface
         foreach ($this->childWidgets as $childIndex => $childWidget) {
             $state->addChild(
                 $childWidget->getName(),
-                $childWidget->createInitialState($childIndex, $evaluationContext)
+                $childWidget->createInitialState(
+                    $childIndex,
+                    $evaluationContext
+                )
             );
         }
 

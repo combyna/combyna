@@ -22,6 +22,8 @@ use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\RepeaterWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use LogicException;
 
 /**
@@ -114,12 +116,20 @@ class RepeaterWidget implements RepeaterWidgetInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     ) {
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
-            $parentContext,
-            $this
-        );
+        if (!$widgetState instanceof RepeaterWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    RepeaterWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**
@@ -165,7 +175,10 @@ class RepeaterWidget implements RepeaterWidgetInterface
                 $index
             ) use ($evaluationContext) {
                 // Use the index of each repeated instance as its name
-                return $this->repeatedWidget->createInitialState($index, $itemEvaluationContext);
+                return $this->repeatedWidget->createInitialState(
+                    $index,
+                    $itemEvaluationContext
+                );
             },
             $evaluationContext
         );

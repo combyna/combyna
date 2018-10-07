@@ -12,21 +12,26 @@
 namespace Combyna\Component\Ui\Validation\Query;
 
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
-use Combyna\Component\Validator\Query\BooleanQueryInterface;
+use Combyna\Component\Validator\Query\ResultTypeQueryInterface;
 
 /**
- * Class InsideCompoundWidgetDefinitionRootWidgetQuery
+ * Class WidgetValueTypeQuery
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class InsideCompoundWidgetDefinitionRootWidgetQuery implements BooleanQueryInterface
+class WidgetValueTypeQuery implements ResultTypeQueryInterface
 {
     /**
-     * {@inheritdoc}
+     * @var string
      */
-    public function getDefaultResult()
+    private $valueName;
+
+    /**
+     * @param string $valueName
+     */
+    public function __construct($valueName)
     {
-        return false;
+        $this->valueName = $valueName;
     }
 
     /**
@@ -34,7 +39,20 @@ class InsideCompoundWidgetDefinitionRootWidgetQuery implements BooleanQueryInter
      */
     public function getDescription()
     {
-        return 'Whether we are inside a compound widget definition\'s root widget';
+        return sprintf(
+            'The type of the widget value "%s"',
+            $this->valueName
+        );
+    }
+
+    /**
+     * Fetches the name of the value to fetch the type of
+     *
+     * @return string
+     */
+    public function getValueName()
+    {
+        return $this->valueName;
     }
 
     /**

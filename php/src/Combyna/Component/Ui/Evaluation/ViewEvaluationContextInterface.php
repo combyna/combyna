@@ -33,18 +33,17 @@ interface ViewEvaluationContextInterface extends EvaluationContextInterface
     public function createSubStoreContext(UiStoreStateInterface $storeState);
 
     /**
-     * Creates a WidgetEvaluationContext
-     *
-     * @param WidgetInterface $widget
-     * @return WidgetEvaluationContextInterface
-     */
-    public function createSubWidgetEvaluationContext(WidgetInterface $widget);
-
-    /**
      * Fetches the specified child of the current compound widget
      *
      * @param string $childName
      * @return WidgetInterface
      */
     public function getChildWidget($childName);
+
+    /**
+     * Fetches the path to the current UI component
+     *
+     * @return string[]|int[]
+     */
+    public function getPath();
 }

@@ -15,6 +15,8 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
+use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 

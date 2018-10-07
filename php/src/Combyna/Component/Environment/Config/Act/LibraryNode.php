@@ -14,12 +14,14 @@ namespace Combyna\Component\Environment\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
+use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Event\Config\Act\EventDefinitionNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownEventDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
 use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
+use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -295,6 +297,32 @@ class LibraryNode extends AbstractActNode
         }
 
         $functionNode->setNativeFunctionCallable($callable);
+    }
+
+    /**
+     * Installs a widget value provider
+     *
+     * @param string $widgetDefinitionName
+     * @param string $valueName
+     * @param callable $callable
+     * @throws LogicException
+     * @throws WidgetDefinitionNotSupportedException
+     */
+    public function installWidgetValueProvider($widgetDefinitionName, $valueName, callable $callable)
+    {
+        if (!array_key_exists($widgetDefinitionName, $this->widgetDefinitionNodes)) {
+            throw new WidgetDefinitionNotSupportedException($this->name, $widgetDefinitionName);
+        }
+
+        $widgetDefinitionNode = $this->widgetDefinitionNodes[$widgetDefinitionName];
+
+        if (!$widgetDefinitionNode instanceof PrimitiveWidgetDefinitionNode) {
+            throw new LogicException(
+                'Only primitive widget definition nodes can define values with providers'
+            );
+        }
+
+        $widgetDefinitionNode->setValueProviderCallable($valueName, $callable);
     }
 
     /**

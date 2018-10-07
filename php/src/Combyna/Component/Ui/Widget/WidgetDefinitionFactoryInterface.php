@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 
@@ -28,6 +29,7 @@ interface WidgetDefinitionFactoryInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param ExpressionBagInterface $valueExpressionBag
      * @param WidgetInterface $rootWidget
      * @return CompoundWidgetDefinition
      */
@@ -36,6 +38,7 @@ interface WidgetDefinitionFactoryInterface
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
+        ExpressionBagInterface $valueExpressionBag,
         WidgetInterface $rootWidget
     );
 
@@ -46,12 +49,16 @@ interface WidgetDefinitionFactoryInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param FixedStaticBagModelInterface $valueBagModel
+     * @param array $valueNameToProviderCallableMap
      * @return PrimitiveWidgetDefinition
      */
     public function createPrimitiveWidgetDefinition(
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
-        FixedStaticBagModelInterface $attributeBagModel
+        FixedStaticBagModelInterface $attributeBagModel,
+        FixedStaticBagModelInterface $valueBagModel,
+        array $valueNameToProviderCallableMap
     );
 }

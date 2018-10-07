@@ -49,4 +49,12 @@ interface UiExpressionFactoryInterface extends ExpressionFactoryInterface
      * @return WidgetAttributeExpression
      */
     public function createWidgetAttributeExpression($attributeName);
+
+    /**
+     * Creates a WidgetValueExpression
+     *
+     * @param string $valueName
+     * @return WidgetValueExpression
+     */
+    public function createWidgetValueExpression($valueName);
 }

@@ -13,6 +13,7 @@ namespace Combyna\Component\Bag;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface FixedStaticBagModelInterface
@@ -53,4 +54,11 @@ interface FixedStaticBagModelInterface
      * @return bool
      */
     public function definesStatic($name);
+
+    /**
+     * Fetches the type of the specified static in the model
+     *
+     * @return TypeInterface
+     */
+    public function getStaticType($name);
 }

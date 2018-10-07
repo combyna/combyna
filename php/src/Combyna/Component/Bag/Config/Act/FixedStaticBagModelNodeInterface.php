@@ -40,6 +40,13 @@ interface FixedStaticBagModelNodeInterface extends ActNodeInterface
     public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement);
 
     /**
+     * Fetches the names of the statics in bags of this model
+     *
+     * @return string[]
+     */
+    public function getStaticDefinitionNames();
+
+    /**
      * Fetches the definitions for statics in bags of this model
      *
      * @return FixedStaticDefinitionNodeInterface[]

@@ -11,11 +11,13 @@
 
 namespace Combyna\Component\Ui\Config\Loader;
 
+use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoader;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Event\Config\Loader\EventDefinitionReferenceLoaderInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionTypeNode;
 
 /**
  * Class WidgetDefinitionLoader
@@ -40,6 +42,11 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
     private $eventDefinitionReferenceLoader;
 
     /**
+     * @var ExpressionBagLoaderInterface
+     */
+    private $expressionBagLoader;
+
+    /**
      * @var FixedStaticBagModelLoader
      */
     private $fixedStaticBagModelLoader;
@@ -52,6 +59,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
     /**
      * @param ConfigParser $configParser
      * @param ChildWidgetDefinitionCollectionLoaderInterface $childWidgetDefinitionCollectionLoader
+     * @param ExpressionBagLoaderInterface $expressionBagLoader
      * @param FixedStaticBagModelLoader $fixedStaticBagModelLoader
      * @param EventDefinitionReferenceLoaderInterface $eventDefinitionReferenceLoader
      * @param WidgetLoaderInterface $widgetLoader
@@ -59,6 +67,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
     public function __construct(
         ConfigParser $configParser,
         ChildWidgetDefinitionCollectionLoaderInterface $childWidgetDefinitionCollectionLoader,
+        ExpressionBagLoaderInterface $expressionBagLoader,
         FixedStaticBagModelLoader $fixedStaticBagModelLoader,
         EventDefinitionReferenceLoaderInterface $eventDefinitionReferenceLoader,
         WidgetLoaderInterface $widgetLoader
@@ -66,6 +75,7 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         $this->childWidgetDefinitionCollectionLoader = $childWidgetDefinitionCollectionLoader;
         $this->configParser = $configParser;
         $this->eventDefinitionReferenceLoader = $eventDefinitionReferenceLoader;
+        $this->expressionBagLoader = $expressionBagLoader;
         $this->fixedStaticBagModelLoader = $fixedStaticBagModelLoader;
         $this->widgetLoader = $widgetLoader;
     }
@@ -94,7 +104,11 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
                     $widgetDefinitionConfig
                 );
             default:
-                return new UnknownWidgetDefinitionTypeNode();
+                return new UnknownWidgetDefinitionTypeNode(
+                    $libraryName,
+                    $widgetDefinitionName,
+                    $type
+                );
         }
     }
 
@@ -115,6 +129,13 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
             $widgetDefinitionConfig,
             'attributes',
             'compound "' . $widgetDefinitionName . '" widget definition attribute model config',
+            [],
+            'array'
+        );
+        $valueExpressionBagConfig = $this->configParser->getOptionalElement(
+            $widgetDefinitionConfig,
+            'values',
+            'compound "' . $widgetDefinitionName . '" widget definition value expression config',
             [],
             'array'
         );
@@ -145,12 +166,14 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         $eventDefinitionReferenceNodes = $this->eventDefinitionReferenceLoader->loadCollection($eventDefinitionTypes);
 
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load($attributeModelConfig);
+        $valueExpressionBagNode = $this->expressionBagLoader->load($valueExpressionBagConfig);
         $rootWidgetNode = $this->widgetLoader->loadWidget($rootWidgetConfig, 'root');
 
         return new CompoundWidgetDefinitionNode(
             $libraryName,
             $widgetDefinitionName,
             $attributeBagModelNode,
+            $valueExpressionBagNode,
             $childDefinitionNodes,
             $eventDefinitionReferenceNodes,
             $rootWidgetNode
@@ -177,6 +200,13 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
             [],
             'array'
         );
+        $valueModelConfig = $this->configParser->getOptionalElement(
+            $widgetDefinitionConfig,
+            'values',
+            'primitive "' . $widgetDefinitionName . '" widget definition value model config',
+            [],
+            'array'
+        );
         // Children that this widget expects to be passed
         $childDefinitionConfigs = $this->configParser->getOptionalElement(
             $widgetDefinitionConfig,
@@ -198,11 +228,13 @@ class WidgetDefinitionLoader implements WidgetDefinitionLoaderInterface
         $eventDefinitionReferenceNodes = $this->eventDefinitionReferenceLoader->loadCollection($eventDefinitionTypes);
 
         $attributeBagModelNode = $this->fixedStaticBagModelLoader->load($attributeModelConfig);
+        $valueBagModelNode = $this->fixedStaticBagModelLoader->load($valueModelConfig);
 
         return new PrimitiveWidgetDefinitionNode(
             $libraryName,
             $widgetDefinitionName,
             $attributeBagModelNode,
+            $valueBagModelNode,
             $childDefinitionNodes,
             $eventDefinitionReferenceNodes
         );

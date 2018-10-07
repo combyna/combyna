@@ -11,14 +11,17 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
 use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 
 /**
  * Class CompoundWidgetDefinition
@@ -60,26 +63,40 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     private $rootWidget;
 
     /**
+     * @var UiEvaluationContextFactoryInterface
+     */
+    private $uiEvaluationContextFactory;
+
+    /**
      * @var UiStateFactoryInterface
      */
     private $uiStateFactory;
 
     /**
+     * @var ExpressionBagInterface
+     */
+    private $valueExpressionBag;
+
+    /**
      * @param UiStateFactoryInterface $uiStateFactory
+     * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      * @param EventFactoryInterface $eventFactory
      * @param EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param ExpressionBagInterface $valueExpressionBag
      * @param WidgetInterface $rootWidget
      */
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
+        UiEvaluationContextFactoryInterface $uiEvaluationContextFactory,
         EventFactoryInterface $eventFactory,
         EventDefinitionReferenceCollectionInterface $eventDefinitionReferenceCollection,
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
+        ExpressionBagInterface $valueExpressionBag,
         WidgetInterface $rootWidget
     ) {
         $this->attributeBagModel = $attributeBagModel;
@@ -88,7 +105,9 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         $this->libraryName = $libraryName;
         $this->name = $name;
         $this->rootWidget = $rootWidget;
+        $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
         $this->uiStateFactory = $uiStateFactory;
+        $this->valueExpressionBag = $valueExpressionBag;
     }
 
     /**
@@ -97,6 +116,22 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     public function assertValidAttributeStaticBag(StaticBagInterface $attributeStaticBag)
     {
         $this->attributeBagModel->assertValidStaticBag($attributeStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createEvaluationContextForWidget(
+        ViewEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget,
+        DefinedWidgetStateInterface $widgetState
+    ) {
+        return $this->uiEvaluationContextFactory->createCompoundWidgetEvaluationContext(
+            $parentContext,
+            $widget,
+            $widgetState->getAttributeStaticBag(),
+            $this->valueExpressionBag
+        );
     }
 
     /**
@@ -121,7 +156,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(
+    public function createInitialStateForWidget(
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
@@ -130,18 +165,30 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     ) {
         // Create a sub-evaluation context for the compound widget itself,
         // so that its attributes may be fetched by expressions inside the root widget's structure
-        $compoundDefinitionRootWidgetSubEvaluationContext = $evaluationContext->createSubWidgetEvaluationContext(
-            $widget
+        $compoundWidgetSubEvaluationContext = $this->uiEvaluationContextFactory->createCompoundWidgetEvaluationContext(
+            $evaluationContext,
+            $widget,
+            $attributeStaticBag,
+            $this->valueExpressionBag
         );
         $rootWidgetState = $this->rootWidget->createInitialState(
             'root',
-            $compoundDefinitionRootWidgetSubEvaluationContext
+            $compoundWidgetSubEvaluationContext
+        );
+
+        /*
+         * Evaluate the expressions for the values of this widget -
+         * values can reference attributes of this widget
+         */
+        $valueStaticBag = $this->valueExpressionBag->toStaticBag(
+            $compoundWidgetSubEvaluationContext
         );
 
         return $this->uiStateFactory->createDefinedCompoundWidgetState(
             $name,
             $widget,
             $attributeStaticBag,
+            $valueStaticBag,
             $childWidgetStates,
             $rootWidgetState
         );

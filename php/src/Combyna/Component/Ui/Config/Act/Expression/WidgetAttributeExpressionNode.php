@@ -14,8 +14,8 @@ namespace Combyna\Component\Ui\Config\Act\Expression;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
 use Combyna\Component\Ui\Expression\WidgetAttributeExpression;
-use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasAttributeConstraint;
-use Combyna\Component\Ui\Validation\Constraint\InsideCompoundWidgetDefinitionRootWidgetConstraint;
+use Combyna\Component\Ui\Validation\Constraint\InsideWidgetDefinitionConstraint;
+use Combyna\Component\Ui\Validation\Constraint\WidgetDefinitionHasAttributeConstraint;
 use Combyna\Component\Ui\Validation\Query\WidgetAttributeTypeQuery;
 use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
@@ -49,10 +49,10 @@ class WidgetAttributeExpressionNode extends AbstractExpressionNode
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addConstraint(
-            new InsideCompoundWidgetDefinitionRootWidgetConstraint()
+            new InsideWidgetDefinitionConstraint()
         );
         $specBuilder->addConstraint(
-            new CompoundWidgetDefinitionHasAttributeConstraint($this->attributeName)
+            new WidgetDefinitionHasAttributeConstraint($this->attributeName)
         );
     }
 

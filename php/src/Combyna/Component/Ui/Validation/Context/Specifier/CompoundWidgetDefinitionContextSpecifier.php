@@ -14,10 +14,10 @@ namespace Combyna\Component\Ui\Validation\Context\Specifier;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 
 /**
- * Class CompoundWidgetContextSpecifier
+ * Class CompoundWidgetDefinitionContextSpecifier
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CompoundWidgetContextSpecifier implements SubValidationContextSpecifierInterface
+class CompoundWidgetDefinitionContextSpecifier implements SubValidationContextSpecifierInterface
 {
 }

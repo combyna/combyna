@@ -22,7 +22,9 @@ use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQ
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Ui\Validation\Query\PageViewExistsQuery;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionHasValueQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionNodeQuery;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionValueTypeQuery;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -115,7 +117,9 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             SignalDefinitionExistsQuery::class => [$this, 'queryForSignalDefinitionExistence'],
             SignalDefinitionHasPayloadStaticQuery::class => [$this, 'queryForSignalPayloadStaticExistence'],
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
-            WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode']
+            WidgetDefinitionHasValueQuery::class => [$this, 'queryForWidgetValueExistence'],
+            WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode'],
+            WidgetDefinitionValueTypeQuery::class => [$this, 'queryForWidgetValueType']
         ];
     }
 
@@ -271,5 +275,59 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             $query->getWidgetDefinitionName(),
             $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom)
         );
+    }
+
+    /**
+     * Fetches the return type of the specified value of a widget defined by a library
+     *
+     * @param WidgetDefinitionValueTypeQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return TypeInterface
+     */
+    public function queryForWidgetValueType(
+        WidgetDefinitionValueTypeQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        // Only handle widget definitions defined by the special "app" library for the current app
+        if ($query->getLibraryName() !== LibraryInterface::APP) {
+            // App doesn't define the specified widget definition - return null, so that we can bubble
+            // up to the parent node (the Environment) to look for the widget definition
+            return null;
+        }
+
+        $queryRequirement = $validationContext->createTypeQueryRequirement($query);
+
+        $widgetDefinitionNode = $this->appNode->getWidgetDefinition(
+            $query->getWidgetDefinitionName(),
+            $queryRequirement
+        );
+
+        return $widgetDefinitionNode->getValueType($query->getValueName(), $queryRequirement);
+    }
+
+    /**
+     * Determines whether the specified widget definition defines the specified value
+     *
+     * @param WidgetDefinitionHasValueQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool
+     */
+    public function queryForWidgetValueExistence(
+        WidgetDefinitionHasValueQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        // Only handle widget definitions defined by the special "app" library for the current app
+        if ($query->getLibraryName() !== LibraryInterface::APP) {
+            // App doesn't define the specified widget definition - return null, so that we can bubble
+            // up to the parent node (the Environment) to look for the widget definition
+            return null;
+        }
+
+        $widgetDefinitionNode = $this->appNode->getWidgetDefinition(
+            $query->getWidgetDefinitionName(),
+            $validationContext->createBooleanQueryRequirement($query)
+        );
+
+        return $widgetDefinitionNode->definesValue($query->getValueName());
     }
 }

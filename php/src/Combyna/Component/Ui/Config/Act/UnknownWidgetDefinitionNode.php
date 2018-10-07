@@ -11,11 +11,12 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -77,9 +78,17 @@ class UnknownWidgetDefinitionNode extends AbstractActNode implements WidgetDefin
     /**
      * {@inheritdoc}
      */
+    public function definesValue($valueName)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAttributeBagModel()
     {
-        return new UnknownFixedStaticBagModelNode(
+        return new DynamicUnknownFixedStaticBagModelNode(
             sprintf(
                 'Attribute static bag for undefined widget "%s" of defined library "%s"',
                 $this->widgetDefinitionName,
@@ -112,6 +121,21 @@ class UnknownWidgetDefinitionNode extends AbstractActNode implements WidgetDefin
     public function getLibraryName()
     {
         return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValueType($valueName, QueryRequirementInterface $queryRequirement)
+    {
+        return new UnresolvedType(
+            sprintf(
+                'Value "%s" for undefined widget "%s" of undefined library "%s"',
+                $valueName,
+                $this->widgetDefinitionName,
+                $this->libraryName
+            )
+        );
     }
 
     /**

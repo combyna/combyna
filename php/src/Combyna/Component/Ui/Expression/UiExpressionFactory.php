@@ -27,11 +27,6 @@ use Combyna\Component\Ui\Store\Expression\ViewStoreQueryExpression;
 class UiExpressionFactory extends AbstractExpressionFactory implements UiExpressionFactoryInterface
 {
     /**
-     * @var ExpressionFactoryInterface
-     */
-    private $parentExpressionFactory;
-
-    /**
      * @param ExpressionFactoryInterface $parentExpressionFactory
      */
     public function __construct(ExpressionFactoryInterface $parentExpressionFactory)
@@ -61,5 +56,13 @@ class UiExpressionFactory extends AbstractExpressionFactory implements UiExpress
     public function createWidgetAttributeExpression($attributeName)
     {
         return new WidgetAttributeExpression($this, $attributeName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createWidgetValueExpression($valueName)
+    {
+        return new WidgetValueExpression($this, $valueName);
     }
 }

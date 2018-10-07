@@ -14,7 +14,6 @@ namespace Combyna\Component\Ui\Evaluation;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class ViewEvaluationContext
@@ -72,17 +71,18 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
     /**
      * {@inheritdoc}
      */
-    public function createSubWidgetEvaluationContext(WidgetInterface $widget)
+    public function getChildWidget($childName)
     {
-        return $widget->createEvaluationContext($this, $this->evaluationContextFactory);
+        return $this->parentContext->getChildWidget($childName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getPath()
     {
-        return $this->parentContext->getChildWidget($childName);
+        // RootViewEvaluationContext will already have provided the view's name
+        return $this->parentContext->getPath();
     }
 
     /**

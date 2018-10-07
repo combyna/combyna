@@ -38,3 +38,9 @@ services:
     combyna.ui.promoter.widget_node:
         class: Combyna\Component\Ui\Config\Act\WidgetNodePromoter
         autowire: true
+
+    combyna.ui.promoter.widget_value_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\WidgetValueExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

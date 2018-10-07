@@ -83,11 +83,16 @@ class WidgetDefinitionNodePromoter
         );
 
         if ($widgetDefinitionNode instanceof CompoundWidgetDefinitionNode) {
+            $valueExpressionBag = $this->bagNodePromoter->promoteExpressionBag(
+                $widgetDefinitionNode->getValueExpressionBag()
+            );
+
             return $this->widgetDefinitionFactory->createCompoundWidgetDefinition(
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
                 $attributeBagModel,
+                $valueExpressionBag,
                 $this->widgetNodePromoter->promoteWidget(
                     'root',
                     $widgetDefinitionNode->getRootWidget(),
@@ -97,11 +102,17 @@ class WidgetDefinitionNodePromoter
         }
 
         if ($widgetDefinitionNode instanceof PrimitiveWidgetDefinitionNode) {
+            $valueBagModel = $this->bagNodePromoter->promoteFixedStaticBagModel(
+                $widgetDefinitionNode->getValueBagModel()
+            );
+
             return $this->widgetDefinitionFactory->createPrimitiveWidgetDefinition(
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
-                $attributeBagModel
+                $attributeBagModel,
+                $valueBagModel,
+                $widgetDefinitionNode->getValueNameToProviderCallableMap()
             );
         }
 

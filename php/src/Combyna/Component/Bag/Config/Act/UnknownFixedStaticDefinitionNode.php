@@ -88,6 +88,14 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
     /**
      * {@inheritdoc}
      */
+    public function getResolvedStaticType()
+    {
+        return new UnresolvedType('Unknown fixed static "' . $this->name . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStaticTypeDeterminer()
     {
         return new PresolvedTypeDeterminer(

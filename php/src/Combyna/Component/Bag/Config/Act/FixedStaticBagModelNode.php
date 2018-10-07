@@ -74,6 +74,14 @@ class FixedStaticBagModelNode extends AbstractActNode implements FixedStaticBagM
     /**
      * {@inheritdoc}
      */
+    public function getStaticDefinitionNames()
+    {
+        return array_keys($this->staticDefinitionNodes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStaticDefinitions()
     {
         return $this->staticDefinitionNodes;

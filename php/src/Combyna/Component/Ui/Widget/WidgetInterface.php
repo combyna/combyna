@@ -33,11 +33,13 @@ interface WidgetInterface
      *
      * @param ViewEvaluationContextInterface $parentContext
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @param WidgetStateInterface $widgetState
      * @return WidgetEvaluationContextInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        UiEvaluationContextFactoryInterface $evaluationContextFactory
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState
     );
 
     /**

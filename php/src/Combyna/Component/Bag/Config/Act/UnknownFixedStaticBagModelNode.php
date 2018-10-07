@@ -33,21 +33,11 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
     private $contextDescription;
 
     /**
-     * @var QueryRequirementInterface
-     */
-    private $queryRequirement;
-
-    /**
      * @param string $contextDescription
-     * @param QueryRequirementInterface $queryRequirement
      */
-    public function __construct($contextDescription, QueryRequirementInterface $queryRequirement)
+    public function __construct($contextDescription)
     {
         $this->contextDescription = $contextDescription;
-        $this->queryRequirement = $queryRequirement;
-
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
     }
 
     /**
@@ -73,7 +63,15 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
     public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement)
     {
         // Unknown static bag model cannot define any statics
-        return new UnknownFixedStaticDefinitionNode($definitionName, $this->queryRequirement);
+        return new UnknownFixedStaticDefinitionNode($definitionName, $queryRequirement);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticDefinitionNames()
+    {
+        return []; // Unknown static bag model cannot define any statics
     }
 
     /**

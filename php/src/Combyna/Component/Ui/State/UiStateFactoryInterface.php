@@ -57,6 +57,7 @@ interface UiStateFactoryInterface
      * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param StaticBagInterface $valueStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
      * @param WidgetStateInterface $rootWidgetState
      * @return DefinedCompoundWidgetStateInterface
@@ -65,6 +66,7 @@ interface UiStateFactoryInterface
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates,
         WidgetStateInterface $rootWidgetState
     );
@@ -75,6 +77,7 @@ interface UiStateFactoryInterface
      * @param string|int $name
      * @param DefinedWidgetInterface $widget
      * @param StaticBagInterface $attributeStaticBag
+     * @param StaticBagInterface $valueStaticBag
      * @param WidgetStateInterface[] $childWidgetStates
      * @return DefinedPrimitiveWidgetStateInterface
      */
@@ -82,6 +85,7 @@ interface UiStateFactoryInterface
         $name,
         DefinedWidgetInterface $widget,
         StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
         array $childWidgetStates
     );
 
