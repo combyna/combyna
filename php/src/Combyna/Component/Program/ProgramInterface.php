@@ -13,6 +13,7 @@ namespace Combyna\Component\Program;
 
 use Combyna\Component\Expression\Evaluation\RootEvaluationContext;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
@@ -26,6 +27,14 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface ProgramInterface
 {
+    /**
+     * Creates an initial state for the program
+     *
+     * @param RouterStateInterface $routerState
+     * @return ProgramStateInterface
+     */
+    public function createInitialState(RouterStateInterface $routerState);
+
     /**
      * Fetches a page view by its unique name
      *

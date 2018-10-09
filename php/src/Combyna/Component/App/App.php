@@ -18,7 +18,6 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventDispatcherInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Program\ProgramInterface;
-use Combyna\Component\Program\State\ProgramState;
 use Combyna\Component\Router\RouterInterface;
 use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
@@ -135,14 +134,7 @@ class App implements AppInterface
     {
         $routerState = $this->router->createInitialState($this->program->getRootEvaluationContext());
 
-        return new AppState(
-            // TODO: Factor this part out into Program::createInitialState()
-            new ProgramState(
-                $routerState,
-                $this->pageViewCollection->createInitialState($routerState, $this->program->getRootEvaluationContext()),
-                $this->overlayViewCollection->createInitialStates()
-            )
-        );
+        return new AppState($this->program->createInitialState($routerState));
     }
 
     /**

@@ -14,7 +14,9 @@ namespace Combyna\Component\Program;
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\State\ProgramState;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
@@ -72,6 +74,18 @@ class Program implements ProgramInterface
         $this->pageViewCollection = $pageViewCollection;
         $this->resourceRepository = $resourceRepository;
         $this->rootEvaluationContext = $rootEvaluationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createInitialState(RouterStateInterface $routerState)
+    {
+        return new ProgramState(
+            $routerState,
+            $this->pageViewCollection->createInitialState($routerState, $this->rootEvaluationContext),
+            $this->overlayViewCollection->createInitialStates()
+        );
     }
 
     /**
