@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "79fad376e2bbdef9704127ce8689ec11",
+    "content-hash": "8fdf8d46d430c1f9a3ae69b055cf6726",
     "packages": [
         {
             "name": "combyna/php-peg",
@@ -817,30 +817,40 @@
     "packages-dev": [
         {
             "name": "combyna/gui-plugin",
-            "version": "v2.1.1",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/combyna/gui-plugin.git",
-                "reference": "80b66d1917fbf4f240015db9cff1b85a9d8e0f98"
+                "reference": "377e2d0fc7b21894f05ef4fc51a93158b6d2061d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/80b66d1917fbf4f240015db9cff1b85a9d8e0f98",
-                "reference": "80b66d1917fbf4f240015db9cff1b85a9d8e0f98",
+                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/377e2d0fc7b21894f05ef4fc51a93158b6d2061d",
+                "reference": "377e2d0fc7b21894f05ef4fc51a93158b6d2061d",
                 "shasum": ""
             },
             "require-dev": {
-                "combyna/combyna": "dev-rush"
+                "combyna/combyna": "dev-rush",
+                "phpunit/phpunit": "^4.6"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Combyna\\Plugin\\Gui\\": "php/src"
+                    "Combyna\\Plugin\\Gui\\": "php/src",
+                    "Combyna\\": "php/dist/Combyna"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
+            "scripts": {
+                "build:expression-parser": [
+                    "mkdir -p ./php/dist/Combyna/Component/ExpressionLanguage && peg ./vendor/combyna/combyna/php/src/Combyna/Component/ExpressionLanguage/PegExpressionParser.php.inc ./php/dist/Combyna/Component/ExpressionLanguage/PegExpressionParser.php"
+                ]
+            },
             "description": "A plugin for Combyna that provides basic GUI components",
-            "time": "2018-08-29T23:03:05+00:00"
+            "support": {
+                "source": "https://github.com/combyna/gui-plugin/tree/master",
+                "issues": "https://github.com/combyna/gui-plugin/issues"
+            },
+            "time": "2019-01-28T22:05:42+00:00"
         },
         {
             "name": "doctrine/instantiator",
@@ -2027,7 +2037,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "combyna/gui-plugin": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
