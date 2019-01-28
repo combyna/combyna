@@ -130,6 +130,14 @@ class SubBehaviourSpec implements SubBehaviourSpecInterface
     {
         $matchingSpecs = [];
 
+        // Check whether validation of one of this spec's constraints will make the query
+        foreach ($this->constraints as $constraint) {
+            if ($constraint->makesQuery($querySpecifier)) {
+                $matchingSpecs[] = $this;
+                break;
+            }
+        }
+
         foreach ($this->childSpecs as $childSpec) {
             $matchingSpecs = array_merge($matchingSpecs, $childSpec->getDescendantSpecsWithQuery($querySpecifier));
         }

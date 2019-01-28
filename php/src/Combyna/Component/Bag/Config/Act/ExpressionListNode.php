@@ -14,7 +14,9 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\VoidType;
 use Combyna\Component\Validator\Type\AdditiveDeterminer;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
@@ -60,7 +62,21 @@ class ExpressionListNode extends AbstractActNode
      */
     public function getElementResultTypeDeterminer()
     {
-        // An expression list should never be empty, so this should always be resolvable
+        if (count($this->expressionNodes) === 0) {
+            // We cannot determine the type of the elements in an empty expression list,
+            // as there are no elements to look at the types of
+            return new PresolvedTypeDeterminer(new VoidType('expression list element type'));
+        }
+
+        /*
+         * Otherwise, take all of the elements in the list and combine their types into one that would
+         * accept any of their values, eg:
+         * - if (the result types of all element expressions) are text, the element type would be `text`
+         * - if (the result types of all element expressions) are numbers, the element type would be `number`
+         * - if there are two elements, one whose expression result type is text and one whose is number,
+         *   the element type would be `text|number`
+         */
+
         return new AdditiveDeterminer(
             array_map(
                 function (ExpressionNodeInterface $expressionNode) {

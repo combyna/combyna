@@ -25,7 +25,7 @@ class WidgetGroupState implements WidgetGroupStateInterface
     /**
      * @var WidgetStateInterface[]
      */
-    private $childWidgetStates = [];
+    private $childWidgetStates;
 
     /**
      * @var int|string
@@ -40,21 +40,16 @@ class WidgetGroupState implements WidgetGroupStateInterface
     /**
      * @param string|int $name
      * @param WidgetGroupInterface $widgetGroup
+     * @param array $childWidgetStates
      */
     public function __construct(
         $name,
-        WidgetGroupInterface $widgetGroup
+        WidgetGroupInterface $widgetGroup,
+        array $childWidgetStates
     ) {
+        $this->childWidgetStates = $childWidgetStates;
         $this->name = $name;
         $this->widgetGroup = $widgetGroup;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChild($childName, WidgetStateInterface $childWidgetState)
-    {
-        $this->childWidgetStates[$childName] = $childWidgetState;
     }
 
     /**
@@ -71,6 +66,14 @@ class WidgetGroupState implements WidgetGroupStateInterface
     public function getChildState($name)
     {
         return $this->childWidgetStates[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildStates()
+    {
+        return $this->childWidgetStates;
     }
 
     /**
@@ -171,5 +174,28 @@ class WidgetGroupState implements WidgetGroupStateInterface
         }
 
         return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        return array_key_exists($name, $this->childWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(array $childWidgetStates)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->childWidgetStates === $childWidgetStates) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->widgetGroup, $childWidgetStates);
     }
 }

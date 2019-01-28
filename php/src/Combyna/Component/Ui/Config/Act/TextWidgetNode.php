@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
@@ -19,6 +21,8 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -29,6 +33,16 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
 {
     const TYPE = 'text-widget';
+
+    /**
+     * @var ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
 
     /**
      * @var array
@@ -47,17 +61,39 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
 
     /**
      * @param ExpressionNodeInterface $textExpressionNode
+     * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
+     * @param ExpressionBagNode $captureExpressionBagNode
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
     public function __construct(
         ExpressionNodeInterface $textExpressionNode,
+        FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
+        ExpressionBagNode $captureExpressionBagNode,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
+        $this->captureExpressionBagNode = $captureExpressionBagNode;
+        $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->tags = $tags;
         $this->textExpressionNode = $textExpressionNode;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModelNode;
     }
 
     /**
@@ -108,6 +144,11 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addChildNode($this->textExpressionNode);
+
+        $specBuilder->addChildNode($this->captureExpressionBagNode);
+        $specBuilder->addChildNode($this->captureStaticBagModelNode);
+        $specBuilder->addModifier(new ValidCaptureDefinitionsSpecModifier($this->captureStaticBagModelNode));
+        $specBuilder->addModifier(new ValidCaptureSetsSpecModifier($this->captureExpressionBagNode));
 
         // Make sure the text expression always evaluates to some text
         $specBuilder->addConstraint(

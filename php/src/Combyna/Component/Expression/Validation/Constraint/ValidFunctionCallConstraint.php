@@ -12,6 +12,7 @@
 namespace Combyna\Component\Expression\Validation\Constraint;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 
 /**
  * Class ValidFunctionCallConstraint
@@ -78,5 +79,13 @@ class ValidFunctionCallConstraint implements ExpressionValidationConstraintInter
     public function getLibraryName()
     {
         return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

@@ -43,10 +43,6 @@ class ExpressionList implements ExpressionListInterface
     {
         $this->assertValidExpressions($expressions);
 
-        if (count($expressions) === 0) {
-            throw new InvalidArgumentException('An expression list cannot be empty');
-        }
-
         $this->bagFactory = $bagFactory;
         $this->expressions = $expressions;
     }

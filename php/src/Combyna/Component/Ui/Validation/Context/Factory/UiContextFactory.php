@@ -14,17 +14,26 @@ namespace Combyna\Component\Ui\Validation\Context\Factory;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\ConditionalWidgetNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\RepeaterWidgetNode;
 use Combyna\Component\Ui\Config\Act\ViewNodeInterface;
+use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use Combyna\Component\Ui\Validation\Context\CompoundWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\ConditionalWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\DefinedWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\PrimitiveWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\RepeaterWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetDefinitionContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\ConditionalWidgetContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\DefinedWidgetContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\PrimitiveWidgetDefinitionContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\RepeaterWidgetContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\ViewContextSpecifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\WidgetGroupContextSpecifier;
 use Combyna\Component\Ui\Validation\Context\ViewSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\WidgetGroupSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\UiValidationFactoryInterface;
 use Combyna\Component\Validator\Context\Factory\SubValidationContextFactoryInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
@@ -69,6 +78,31 @@ class UiContextFactory implements SubValidationContextFactoryInterface
         return $this->validationFactory->createCompoundWidgetDefinitionContext(
             $parentContext,
             $compoundWidgetDefinitionNode,
+            $behaviourSpec,
+            $subjectNode
+        );
+    }
+
+    /**
+     * Creates a ConditionalWidgetSubValidationContext
+     *
+     * @param ConditionalWidgetContextSpecifier $specifier
+     * @param SubValidationContextInterface $parentContext
+     * @param ConditionalWidgetNode $conditionalWidgetNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return ConditionalWidgetSubValidationContextInterface
+     */
+    public function createConditionalWidgetContext(
+        ConditionalWidgetContextSpecifier $specifier,
+        SubValidationContextInterface $parentContext,
+        ConditionalWidgetNode $conditionalWidgetNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    ) {
+        return $this->validationFactory->createConditionalWidgetContext(
+            $parentContext,
+            $conditionalWidgetNode,
             $behaviourSpec,
             $subjectNode
         );
@@ -125,6 +159,31 @@ class UiContextFactory implements SubValidationContextFactoryInterface
     }
 
     /**
+     * Creates a RepeaterWidgetSubValidationContext
+     *
+     * @param RepeaterWidgetContextSpecifier $specifier
+     * @param SubValidationContextInterface $parentContext
+     * @param RepeaterWidgetNode $repeaterWidgetNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return RepeaterWidgetSubValidationContextInterface
+     */
+    public function createRepeaterWidgetContext(
+        RepeaterWidgetContextSpecifier $specifier,
+        SubValidationContextInterface $parentContext,
+        RepeaterWidgetNode $repeaterWidgetNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    ) {
+        return $this->validationFactory->createRepeaterWidgetContext(
+            $parentContext,
+            $repeaterWidgetNode,
+            $behaviourSpec,
+            $subjectNode
+        );
+    }
+
+    /**
      * Creates a ViewSubValidationContext
      *
      * @param ViewContextSpecifier $specifier
@@ -145,15 +204,43 @@ class UiContextFactory implements SubValidationContextFactoryInterface
     }
 
     /**
+     * Creates a WidgetGroupSubValidationContext
+     *
+     * @param WidgetGroupContextSpecifier $specifier
+     * @param SubValidationContextInterface $parentContext
+     * @param WidgetGroupNode $widgetGroupNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return WidgetGroupSubValidationContextInterface
+     */
+    public function createWidgetGroupContext(
+        WidgetGroupContextSpecifier $specifier,
+        SubValidationContextInterface $parentContext,
+        WidgetGroupNode $widgetGroupNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    ) {
+        return $this->validationFactory->createWidgetGroupContext(
+            $parentContext,
+            $widgetGroupNode,
+            $behaviourSpec,
+            $subjectNode
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSpecifierClassToContextFactoryCallableMap()
     {
         return [
             CompoundWidgetDefinitionContextSpecifier::class => [$this, 'createCompoundWidgetDefinitionContext'],
+            ConditionalWidgetContextSpecifier::class => [$this, 'createConditionalWidgetContext'],
             DefinedWidgetContextSpecifier::class => [$this, 'createDefinedWidgetContext'],
             PrimitiveWidgetDefinitionContextSpecifier::class => [$this, 'createPrimitiveWidgetDefinitionContext'],
-            ViewContextSpecifier::class => [$this, 'createViewContext']
+            RepeaterWidgetContextSpecifier::class => [$this, 'createRepeaterWidgetContext'],
+            ViewContextSpecifier::class => [$this, 'createViewContext'],
+            WidgetGroupContextSpecifier::class => [$this, 'createWidgetGroupContext']
         ];
     }
 }

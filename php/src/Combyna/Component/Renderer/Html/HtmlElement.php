@@ -43,7 +43,7 @@ class HtmlElement implements HtmlNodeInterface
     /**
      * @var string[]
      */
-    private static $selfClosingTags = ['img', 'input'];
+    private static $selfClosingTags = ['hr', 'img', 'input'];
 
     /**
      * @var string
@@ -56,7 +56,7 @@ class HtmlElement implements HtmlNodeInterface
      * @param string[] $attributes
      * @param HtmlNodeInterface[] $childNodes
      */
-    public function __construct($tagName, array $path, array $attributes, array $childNodes = [])
+    public function __construct($tagName, array $path, array $attributes = [], array $childNodes = [])
     {
         $this->attributes = $attributes;
         $this->childNodes = $childNodes;

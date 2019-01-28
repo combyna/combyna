@@ -22,7 +22,7 @@ use Combyna\Component\Environment\Config\Act\LibraryNode;
 use Combyna\Component\Environment\Config\Act\NativeFunctionNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Instruction\Config\Act\UnknownInstructionNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
@@ -155,7 +155,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                             )
                         ]),
                         new ExpressionBagNode([
-                            'my-invalid-widget-value' => new UnknownExpressionNode('unknown widget value expression type')
+                            'my-invalid-widget-value' => new UnknownExpressionTypeNode('unknown widget value expression type')
                         ]),
                         [
                             new ChildWidgetDefinitionNode('a_child')
@@ -170,11 +170,17 @@ class EnvironmentValidationIntegratedTest extends TestCase
                             'some_undefined_lib',
                             'some_widget',
                             new ExpressionBagNode([
-                                'some_attr' => new UnknownExpressionNode('unknown_expr_type')
+                                'some_attr' => new UnknownExpressionTypeNode('unknown_expr_type')
                             ]),
+                            new FixedStaticBagModelNode([]),
+                            new ExpressionBagNode([]),
                             'root',
                             [
-                                'some_child' => new TextWidgetNode(new UnknownExpressionNode('unknown_type'))
+                                'some_child' => new TextWidgetNode(
+                                    new UnknownExpressionTypeNode('unknown_type'),
+                                    new FixedStaticBagModelNode([]),
+                                    new ExpressionBagNode([])
+                                )
                             ],
                             [
                                 new TriggerNode(

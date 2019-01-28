@@ -22,7 +22,7 @@ use Combyna\Component\Expression\Config\Act\ListExpressionNode;
 use Combyna\Component\Expression\Config\Act\NothingExpressionNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
@@ -115,7 +115,7 @@ class ConcatenationExpressionIntegratedTest extends TestCase
     public function testTheOperandListExpressionMustBeValid()
     {
         $expressionNode = new ConcatenationExpressionNode(
-            new UnknownExpressionNode('my-unknown-expr-type')
+            new UnknownExpressionTypeNode('my-unknown-expr-type')
         );
 
         $this->setExpectedException(

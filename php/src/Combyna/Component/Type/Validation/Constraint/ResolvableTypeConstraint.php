@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Type\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
@@ -42,5 +43,13 @@ class ResolvableTypeConstraint implements ConstraintInterface
     public function getTypeDeterminer()
     {
         return $this->typeDeterminer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

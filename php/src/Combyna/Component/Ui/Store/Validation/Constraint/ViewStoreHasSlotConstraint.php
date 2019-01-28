@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Store\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -41,5 +42,13 @@ class ViewStoreHasSlotConstraint implements ConstraintInterface
     public function getSlotName()
     {
         return $this->slotName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Event\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -41,5 +42,13 @@ class EventDefinitionHasPayloadStaticConstraint implements ConstraintInterface
     public function getPayloadStaticName()
     {
         return $this->staticName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

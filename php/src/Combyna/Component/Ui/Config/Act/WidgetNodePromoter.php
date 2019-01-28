@@ -17,6 +17,8 @@ use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNodePromoter;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
+use Combyna\Component\Ui\Widget\ConditionalWidget;
+use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidget;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
@@ -73,7 +75,7 @@ class WidgetNodePromoter
     /**
      * Promotes a WidgetNode to a Widget
      *
-     * @param string $name
+     * @param string|int $name
      * @param WidgetNodeInterface $widgetNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
@@ -95,8 +97,10 @@ class WidgetNodePromoter
             $widget = $this->promoteChildReferenceWidgetNode($name, $widgetNode, $parentWidget);
         } elseif ($widgetNode instanceof RepeaterWidgetNode) {
             $widget = $this->promoteRepeaterWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
+        } elseif ($widgetNode instanceof ConditionalWidgetNode) {
+            $widget = $this->promoteConditionalWidgetNode($name, $widgetNode, $resourceRepository, $parentWidget);
         } else {
-            throw new InvalidArgumentException('Unsupported widget type given');
+            throw new InvalidArgumentException(sprintf('Unsupported widget type "%s" given', $widgetNode->getType()));
         }
 
         return $widget;
@@ -105,7 +109,7 @@ class WidgetNodePromoter
     /**
      * Promotes a ChildReferenceWidgetNode to the referenced child widget
      *
-     * @param string $name
+     * @param string|int $name
      * @param ChildReferenceWidgetNode $childReferenceWidgetNode
      * @param WidgetInterface|null $parentWidget
      * @return ChildReferenceWidgetInterface
@@ -118,6 +122,8 @@ class WidgetNodePromoter
         return $this->viewFactory->createChildReferenceWidget(
             $name,
             $childReferenceWidgetNode->getChildName(),
+            $this->bagNodePromoter->promoteFixedStaticBagModel($childReferenceWidgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($childReferenceWidgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $childReferenceWidgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($childReferenceWidgetNode->getVisibilityExpression()) :
@@ -127,9 +133,56 @@ class WidgetNodePromoter
     }
 
     /**
+     * Promotes a ConditionalWidgetNode to a ConditionalWidget
+     *
+     * @param string|int $name
+     * @param ConditionalWidgetNode $conditionalWidgetNode
+     * @param ResourceRepositoryInterface $resourceRepository
+     * @param WidgetInterface|null $parentWidget
+     * @return ConditionalWidgetInterface
+     */
+    private function promoteConditionalWidgetNode(
+        $name,
+        ConditionalWidgetNode $conditionalWidgetNode,
+        ResourceRepositoryInterface $resourceRepository,
+        WidgetInterface $parentWidget = null
+    ) {
+        $conditionalWidget = $this->viewFactory->createConditionalWidget(
+            $name,
+            $this->expressionNodePromoter->promote($conditionalWidgetNode->getConditionExpression()),
+            $this->bagNodePromoter->promoteFixedStaticBagModel($conditionalWidgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($conditionalWidgetNode->getCaptureExpressionBag()),
+            $parentWidget,
+            $conditionalWidgetNode->getTags()
+        );
+
+        $conditionalWidget->setConsequentWidget(
+            $this->promoteWidget(
+                ConditionalWidget::CONSEQUENT_WIDGET_NAME,
+                $conditionalWidgetNode->getConsequentWidget(),
+                $resourceRepository,
+                $conditionalWidget
+            )
+        );
+
+        if ($conditionalWidgetNode->getAlternateWidget() !== null) {
+            $conditionalWidget->setAlternateWidget(
+                $this->promoteWidget(
+                    ConditionalWidget::ALTERNATE_WIDGET_NAME,
+                    $conditionalWidgetNode->getAlternateWidget(),
+                    $resourceRepository,
+                    $conditionalWidget
+                )
+            );
+        }
+
+        return $conditionalWidget;
+    }
+
+    /**
      * Promotes a DefinedWidgetNode to a DefinedWidget
      *
-     * @param string $name
+     * @param string|int $name
      * @param DefinedWidgetNode $widgetNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
@@ -157,6 +210,8 @@ class WidgetNodePromoter
                 $widgetNode->getAttributeExpressionBag()
             ),
             $triggerCollection,
+            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($widgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $widgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($widgetNode->getVisibilityExpression()) :
@@ -176,7 +231,7 @@ class WidgetNodePromoter
     /**
      * Promotes a RepeaterWidgetNode to a RepeaterWidget
      *
-     * @param string $name
+     * @param string|int $name
      * @param RepeaterWidgetNode $repeaterWidgetNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
@@ -193,6 +248,8 @@ class WidgetNodePromoter
             $this->expressionNodePromoter->promote($repeaterWidgetNode->getItemListExpression()),
             $repeaterWidgetNode->getIndexVariableName(),
             $repeaterWidgetNode->getItemVariableName(),
+            $this->bagNodePromoter->promoteFixedStaticBagModel($repeaterWidgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($repeaterWidgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $repeaterWidgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($repeaterWidgetNode->getVisibilityExpression()) :
@@ -215,7 +272,7 @@ class WidgetNodePromoter
     /**
      * Promotes a TextWidgetNode to a TextWidget
      *
-     * @param string $name
+     * @param string|int $name
      * @param TextWidgetNode $textWidgetNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
@@ -232,6 +289,8 @@ class WidgetNodePromoter
         return $this->viewFactory->createTextWidget(
             $name,
             $textExpression,
+            $this->bagNodePromoter->promoteFixedStaticBagModel($textWidgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($textWidgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $textWidgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($textWidgetNode->getVisibilityExpression()) :
@@ -243,7 +302,7 @@ class WidgetNodePromoter
     /**
      * Promotes a WidgetGroupNode to a WidgetGroup
      *
-     * @param string $name
+     * @param string|int $name
      * @param WidgetGroupNode $widgetGroupNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @param WidgetInterface|null $parentWidget
@@ -257,6 +316,8 @@ class WidgetNodePromoter
     ) {
         $widget = $this->viewFactory->createWidgetGroup(
             $name,
+            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetGroupNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($widgetGroupNode->getCaptureExpressionBag()),
             $parentWidget,
             $widgetGroupNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($widgetGroupNode->getVisibilityExpression()) :

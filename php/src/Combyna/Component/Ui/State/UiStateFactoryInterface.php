@@ -16,6 +16,7 @@ use Combyna\Component\Ui\State\Store\NullViewStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\ViewStateInterface;
 use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\ConditionalWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\RepeaterWidgetStateInterface;
@@ -25,6 +26,7 @@ use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
+use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
@@ -42,13 +44,29 @@ interface UiStateFactoryInterface
      *
      * @param string|int $name
      * @param ChildReferenceWidgetInterface $widget
-     * @param WidgetStateInterface $childWidgetState
+     * @param WidgetStateInterface $referencedChildWidgetState The state of the referenced compound widget child
      * @return ChildReferenceWidgetStateInterface
      */
     public function createChildReferenceWidgetState(
         $name,
         ChildReferenceWidgetInterface $widget,
-        WidgetStateInterface $childWidgetState
+        WidgetStateInterface $referencedChildWidgetState
+    );
+
+    /**
+     * Creates a ConditionalWidgetState
+     *
+     * @param string|int $name
+     * @param ConditionalWidgetInterface $widget
+     * @param WidgetStateInterface|null $consequentChildWidgetState The state of the consequent widget, if present
+     * @param WidgetStateInterface|null $alternateChildWidgetState The state of the alternate widget, if defined & present
+     * @return ConditionalWidgetStateInterface
+     */
+    public function createConditionalWidgetState(
+        $name,
+        ConditionalWidgetInterface $widget,
+        WidgetStateInterface $consequentChildWidgetState = null,
+        WidgetStateInterface $alternateChildWidgetState = null
     );
 
     /**
@@ -154,11 +172,13 @@ interface UiStateFactoryInterface
      *
      * @param string|int $name
      * @param WidgetGroupInterface $widgetGroup
+     * @param WidgetStateInterface[] $childWidgetStates
      * @return WidgetGroupStateInterface
      */
     public function createWidgetGroupState(
         $name,
-        WidgetGroupInterface $widgetGroup
+        WidgetGroupInterface $widgetGroup,
+        array $childWidgetStates
     );
 
     /**

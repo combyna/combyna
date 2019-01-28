@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Trigger\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -20,4 +21,11 @@ use Combyna\Component\Validator\Constraint\ConstraintInterface;
  */
 class InsideTriggerConstraint implements ConstraintInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
+    }
 }

@@ -36,7 +36,6 @@ use Combyna\Component\Validator\ValidatorComponent;
 use Combyna\Plugin\Core\CorePlugin;
 use Symfony\Component\Config\ConfigCache;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
 
 /**
@@ -44,7 +43,7 @@ use Symfony\Component\DependencyInjection\Dumper\PhpDumper;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CombynaBootstrap
+class CombynaBootstrap implements CombynaBootstrapInterface
 {
     /**
      * @var string
@@ -87,11 +86,7 @@ class CombynaBootstrap
     }
 
     /**
-     * Allows the compiled Symfony DI container to be customised
-     *
-     * @param string|null $compiledContainerPath
-     * @param string|null $compiledContainerNamespace
-     * @param string $compiledContainerClass
+     * {@inheritdoc}
      */
     public function configureContainer(
         $compiledContainerPath = null,
@@ -112,10 +107,7 @@ class CombynaBootstrap
     }
 
     /**
-     * Fetches or builds the service container
-     *
-     * @param bool $isDebug
-     * @return ContainerInterface
+     * {@inheritdoc}
      */
     public function getContainer($isDebug = true)
     {

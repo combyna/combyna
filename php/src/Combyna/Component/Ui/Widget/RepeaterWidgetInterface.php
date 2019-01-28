@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
+
 /**
  * Interface RepeaterWidgetInterface
  *
@@ -18,6 +20,22 @@ namespace Combyna\Component\Ui\Widget;
  */
 interface RepeaterWidgetInterface extends CoreWidgetInterface
 {
+    /**
+     * Fetches the widget to be repeated by this repeater
+     *
+     * @return WidgetInterface
+     */
+    public function getRepeatedWidget();
+
+    /**
+     * Evaluates the item list for the repeater and maps it to an arbitrary result array
+     *
+     * @param callable $mapCallback
+     * @param WidgetEvaluationContextInterface $evaluationContext
+     * @return array
+     */
+    public function mapItemStaticList(callable $mapCallback, WidgetEvaluationContextInterface $evaluationContext);
+
     /**
      * Sets the widget to be repeated by this repeater
      *

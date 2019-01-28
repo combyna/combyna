@@ -13,7 +13,9 @@ namespace Combyna\Client;
 
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
+use Combyna\Component\Ui\Environment\Library\GenericWidgetValueProviderInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class ClientFactory
@@ -33,13 +35,36 @@ class ClientFactory
     private $combyna;
 
     /**
+     * @var GenericWidgetValueProviderInterface
+     */
+    private $widgetValueProvider;
+
+    /**
      * @param Combyna $combyna
      * @param ArrayRenderer $arrayRenderer
+     * @param GenericWidgetValueProviderInterface $widgetValueProvider
      */
-    public function __construct(Combyna $combyna, ArrayRenderer $arrayRenderer)
-    {
+    public function __construct(
+        Combyna $combyna,
+        ArrayRenderer $arrayRenderer,
+        GenericWidgetValueProviderInterface $widgetValueProvider
+    ) {
         $this->arrayRenderer = $arrayRenderer;
         $this->combyna = $combyna;
+        $this->widgetValueProvider = $widgetValueProvider;
+    }
+
+    /**
+     * Adds a provider for a specific widget value of a primitive widget definition
+     *
+     * @param string $libraryName
+     * @param string $widgetDefinitionName
+     * @param string $valueName
+     * @param callable $callable
+     */
+    public function addWidgetValueProvider($libraryName, $widgetDefinitionName, $valueName, callable $callable)
+    {
+        $this->widgetValueProvider->addProvider($libraryName, $widgetDefinitionName, $valueName, $callable);
     }
 
     /**
@@ -56,6 +81,17 @@ class ClientFactory
         $app = $this->combyna->createApp($appConfig, $environmentNode);
 
         return new Client($this->arrayRenderer, $app);
+    }
+
+    /**
+     * Fetches the service container. This allows external code to inspect and modify
+     * the service container (in debug mode) as needed.
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->combyna->getContainer();
     }
 
     /**

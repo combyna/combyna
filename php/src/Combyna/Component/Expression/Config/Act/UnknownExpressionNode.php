@@ -19,7 +19,7 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 /**
  * Class UnknownExpressionNode
  *
- * Represents a node in the ACT with an unknown type, making it invalid
+ * Represents an expression node in the ACT that cannot be loaded for some reason
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -28,16 +28,16 @@ class UnknownExpressionNode extends AbstractExpressionNode
     const TYPE = 'unknown';
 
     /**
-     * @var string|null
+     * @var string
      */
-    private $type;
+    private $contextDescription;
 
     /**
-     * @param string|null $type
+     * @param string $contextDescription
      */
-    public function __construct($type)
+    public function __construct($contextDescription)
     {
-        $this->type = $type;
+        $this->contextDescription = $contextDescription;
     }
 
     /**
@@ -45,9 +45,7 @@ class UnknownExpressionNode extends AbstractExpressionNode
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        $type = $this->type !== null ? $this->type : '[missing]';
-
-        $specBuilder->addConstraint(new KnownFailureConstraint('Expression is of unknown type "' . $type . '"'));
+        $specBuilder->addConstraint(new KnownFailureConstraint($this->contextDescription));
     }
 
     /**
@@ -55,8 +53,6 @@ class UnknownExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        $type = $this->type !== null ? $this->type : '[missing]';
-
-        return new PresolvedTypeDeterminer(new UnresolvedType('Expression type "' . $type . '"'));
+        return new PresolvedTypeDeterminer(new UnresolvedType($this->contextDescription));
     }
 }

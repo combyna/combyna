@@ -43,6 +43,13 @@ interface ProgramStateInterface extends StateInterface
     public function getRouterState();
 
     /**
+     * Fetches the state of the currently visible overlay views
+     *
+     * @return ViewStateInterface[]
+     */
+    public function getVisibleOverlayViewStates();
+
+    /**
      * Fetches the state of the current page view and any visible overlay views
      *
      * @return ViewStateInterface[]
@@ -75,12 +82,12 @@ interface ProgramStateInterface extends StateInterface
      * Creates a new ProgramState, with its sub-states set to the specified ones
      *
      * @param RouterStateInterface $routerState
-     * @param ViewStateInterface $pageViewState
+     * @param PageViewStateInterface $pageViewState
      * @return ProgramStateInterface
      */
     public function withPage(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState
+        PageViewStateInterface $pageViewState
     );
 
     /**

@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
@@ -35,6 +37,16 @@ class RepeaterWidget implements RepeaterWidgetInterface
 {
     const DEFINITION = 'repeater';
     const REPEATED_WIDGET_NAME = 'repeated';
+
+    /**
+     * @var ExpressionBagInterface
+     */
+    private $captureExpressionBag;
+
+    /**
+     * @var FixedStaticBagModelInterface
+     */
+    private $captureStaticBagModel;
 
     /**
      * @var string|null
@@ -88,6 +100,8 @@ class RepeaterWidget implements RepeaterWidgetInterface
      * @param string|null $indexVariableName
      * @param string $itemVariableName
      * @param UiStateFactoryInterface $uiStateFactory
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
@@ -98,9 +112,13 @@ class RepeaterWidget implements RepeaterWidgetInterface
         $indexVariableName,
         $itemVariableName,
         UiStateFactoryInterface $uiStateFactory,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
+        $this->captureExpressionBag = $captureExpressionBag;
+        $this->captureStaticBagModel = $captureStaticBagModel;
         $this->indexVariableName = $indexVariableName;
         $this->itemListExpression = $itemListExpression;
         $this->itemVariableName = $itemVariableName;
@@ -117,9 +135,9 @@ class RepeaterWidget implements RepeaterWidgetInterface
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        WidgetStateInterface $widgetState
+        WidgetStateInterface $widgetState = null
     ) {
-        if (!$widgetState instanceof RepeaterWidgetStateInterface) {
+        if ($widgetState && !$widgetState instanceof RepeaterWidgetStateInterface) {
             throw new LogicException(
                 sprintf(
                     'Expected a %s, got %s',
@@ -129,7 +147,11 @@ class RepeaterWidget implements RepeaterWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+            $parentContext,
+            $this,
+            $widgetState
+        );
     }
 
     /**
@@ -145,51 +167,49 @@ class RepeaterWidget implements RepeaterWidgetInterface
      */
     public function createInitialState(
         $name,
-        ViewEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
         if ($this->repeatedWidget === null) {
             // This should never happen, but just in case
             throw new LogicException('Repeated widget has not been set for repeater');
         }
 
-        $itemStaticList = $this->itemListExpression->toStatic($evaluationContext);
-
-        if (!$itemStaticList instanceof StaticListExpression) {
-            // This should never happen as it should be caught by validation, but just in case
-            throw new LogicException(
-                sprintf(
-                    'Repeated widget item list should have evaluated to a "%s", but it was a "%s"',
-                    StaticListExpression::TYPE,
-                    $itemStaticList->getType()
-                )
-            );
-        }
+        // Make any capture-definitions (that this repeater defines) and any capture-sets
+        // that this widget or any child widget makes available to its other child widgets
+        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
 
         // Create one instance of the repeated widget's state for each item in the list
-        $repeatedWidgetStates = $itemStaticList->mapArray(
-            $this->itemVariableName,
-            $this->indexVariableName,
+        $repeatedWidgetStates = $this->mapItemStaticList(
             function (
                 ViewEvaluationContextInterface $itemEvaluationContext,
                 StaticInterface $static,
                 $index
-            ) use ($evaluationContext) {
+            ) use ($evaluationContextFactory) {
                 // Use the index of each repeated instance as its name
                 return $this->repeatedWidget->createInitialState(
                     $index,
-                    $itemEvaluationContext
+                    $itemEvaluationContext,
+                    $evaluationContextFactory
                 );
             },
-            $evaluationContext
+            $subEvaluationContext
         );
 
-        $state = $this->uiStateFactory->createRepeaterWidgetState(
+        return $this->uiStateFactory->createRepeaterWidgetState(
             $name,
             $this,
             $repeatedWidgetStates
         );
+    }
 
-        return $state;
+    /**
+     * {@inheritdoc}
+     */
+    public function descendantsSetCaptureInclusive($captureName)
+    {
+        return $this->captureExpressionBag->hasExpression($captureName) ||
+            $this->repeatedWidget->descendantsSetCaptureInclusive($captureName);
     }
 
     /**
@@ -215,6 +235,30 @@ class RepeaterWidget implements RepeaterWidgetInterface
     }
 
     /**
+     * Evaluates the item list expression to a static list
+     *
+     * @param WidgetEvaluationContextInterface $evaluationContext
+     * @return StaticListExpression
+     */
+    private function evaluateItemStaticList(WidgetEvaluationContextInterface $evaluationContext)
+    {
+        $itemStaticList = $this->itemListExpression->toStatic($evaluationContext);
+
+        if (!$itemStaticList instanceof StaticListExpression) {
+            // This should never happen as it should be caught by validation, but just in case
+            throw new LogicException(
+                sprintf(
+                    'Repeated widget item list should have evaluated to a "%s", but it was a "%s"',
+                    StaticListExpression::TYPE,
+                    $itemStaticList->getType()
+                )
+            );
+        }
+
+        return $itemStaticList;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
@@ -223,6 +267,22 @@ class RepeaterWidget implements RepeaterWidgetInterface
             'RepeaterWidgets cannot have attributes, so attribute "%s" cannot be fetched',
             $attributeName
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModel;
     }
 
     /**
@@ -293,6 +353,14 @@ class RepeaterWidget implements RepeaterWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getRepeatedWidget()
+    {
+        return $this->repeatedWidget;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasTag($tag)
     {
         return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
@@ -303,7 +371,83 @@ class RepeaterWidget implements RepeaterWidgetInterface
      */
     public function isRenderable()
     {
-        return true; // Widget groups have a renderer
+        return true; // Repeaters have a renderer
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mapItemStaticList(callable $mapCallback, WidgetEvaluationContextInterface $evaluationContext)
+    {
+        $itemStaticList = $this->evaluateItemStaticList($evaluationContext);
+
+        return $itemStaticList->mapArray(
+            $this->itemVariableName,
+            $this->indexVariableName,
+            $mapCallback,
+            $evaluationContext
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if ($this->repeatedWidget === null) {
+            // This should never happen, but just in case
+            throw new LogicException('Repeated widget has not been set for repeater');
+        }
+
+        if (!$oldState instanceof RepeaterWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    RepeaterWidgetStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        // Make any capture-definitions (that this repeater defines) and any capture-sets
+        // that this widget or any child widget makes available to its other child widgets
+        $subEvaluationContext = $this->createEvaluationContext(
+            $evaluationContext,
+            $evaluationContextFactory,
+            $oldState
+        );
+
+        // Create one instance of the repeated widget's state for each item in the list
+        $repeatedWidgetStates = $this->mapItemStaticList(
+            function (
+                ViewEvaluationContextInterface $itemEvaluationContext,
+                StaticInterface $static,
+                $index
+            ) use ($evaluationContextFactory, $oldState) {
+                if (!$oldState->hasChildState($index)) {
+                    // This repeated item did not exist before (ie. the number of items repeated
+                    // has changed) - so we need to create a new initial state for the newly added item(s)
+                    return $this->repeatedWidget->createInitialState(
+                        $index,
+                        $itemEvaluationContext,
+                        $evaluationContextFactory
+                    );
+                }
+
+                // Use the index of each repeated instance as its name
+                return $this->repeatedWidget->reevaluateState(
+                    $oldState->getChildState($index),
+                    $itemEvaluationContext,
+                    $evaluationContextFactory
+                );
+            },
+            $subEvaluationContext
+        );
+
+        return $oldState->with($repeatedWidgetStates);
     }
 
     /**

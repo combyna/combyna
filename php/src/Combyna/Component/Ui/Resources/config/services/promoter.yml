@@ -1,4 +1,10 @@
 services:
+    combyna.ui.promoter.capture_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\CaptureExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
     combyna.ui.promoter.view_node:
         class: Combyna\Component\Ui\Config\Act\ViewNodePromoter
         autowire: true

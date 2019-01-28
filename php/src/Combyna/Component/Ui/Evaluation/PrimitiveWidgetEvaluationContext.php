@@ -15,15 +15,17 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
+use LogicException;
 
 /**
  * Class PrimitiveWidgetEvaluationContext
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class PrimitiveWidgetEvaluationContext extends AbstractEvaluationContext implements CompoundWidgetEvaluationContextInterface
+class PrimitiveWidgetEvaluationContext extends AbstractEvaluationContext implements PrimitiveWidgetEvaluationContextInterface
 {
     /**
      * @var UiEvaluationContextFactoryInterface
@@ -46,21 +48,29 @@ class PrimitiveWidgetEvaluationContext extends AbstractEvaluationContext impleme
     private $widgetDefinition;
 
     /**
+     * @var DefinedPrimitiveWidgetStateInterface|null
+     */
+    private $widgetState;
+
+    /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @param ViewEvaluationContextInterface $parentContext
      * @param PrimitiveWidgetDefinition $widgetDefinition
      * @param DefinedWidgetInterface $widget
+     * @param DefinedPrimitiveWidgetStateInterface|null $widgetState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewEvaluationContextInterface $parentContext,
         PrimitiveWidgetDefinition $widgetDefinition,
-        DefinedWidgetInterface $widget
+        DefinedWidgetInterface $widget,
+        DefinedPrimitiveWidgetStateInterface $widgetState = null
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
         $this->widget = $widget;
         $this->widgetDefinition = $widgetDefinition;
+        $this->widgetState = $widgetState;
     }
 
     /**
@@ -98,9 +108,85 @@ class PrimitiveWidgetEvaluationContext extends AbstractEvaluationContext impleme
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getCaptureLeafwise($captureName)
     {
-        return $this->widget->getChildWidget($childName);
+        if ($this->widget->getCaptureExpressionBag()->hasExpression($captureName)) {
+            $definitionSubEvaluationContext = $this->evaluationContextFactory
+                ->createPrimitiveWidgetDefinitionEvaluationContext(
+                    $this,
+                    $this->widgetDefinition,
+                    $this->widget,
+                    $this->widgetState
+                );
+
+            // This widget sets the capture - evaluate and return. Evaluate in the context
+            // of the widget definition, so that the expression has access to widget values
+            return $this->widget->getCaptureExpressionBag()
+                ->getExpression($captureName)
+                ->toStatic($definitionSubEvaluationContext);
+        }
+
+        foreach ($this->widget->getChildWidgets() as $childWidget) {
+            // Fetch the child widget state if it has been created already - during the initial state tree build,
+            // child widgets' states are created and added to the parent widget's state in sequence, which works well
+            // for backward-references (eg. of captures) as the referenced widget's state will already exist.
+            // For forward-references, a transient state will need to be created just for evaluating the initial
+            // state (eg. to evaluate any expression that a capture-set uses), which will then be discarded
+            // and recreated when that child is reached in the sequence during initial state tree creation
+            $childWidgetState = $this->widgetState ?
+                $this->widgetState->getChildStates()[$childWidget->getName()] :
+                null;
+
+            $childWidgetEvaluationContext = $childWidget
+                ->createEvaluationContext(
+                    $this,
+                    $this->evaluationContextFactory,
+                    $childWidgetState
+                );
+
+            $captureStatic = $childWidgetEvaluationContext->getCaptureLeafwise($captureName);
+
+            if ($captureStatic !== null) {
+                return $captureStatic;
+            }
+        }
+
+        // No descendants set the capture
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureRootwise($captureName)
+    {
+        if (!$this->widget->getCaptureStaticBagModel()->definesStatic($captureName)) {
+            // This widget does not define the capture - it should be defined by an ancestor further up
+            return $this->parentContext->getCaptureRootwise($captureName);
+        }
+
+        // This widget defines the capture - it should be set by a descendant (or itself)
+        $captureStatic = $this->getCaptureLeafwise($captureName);
+
+        if ($captureStatic === null) {
+            // If this widget defines the capture, a descendant _must_ set it
+            throw new LogicException(
+                sprintf(
+                    'Capture "%s" was not set',
+                    $captureName
+                )
+            );
+        }
+
+        return $captureStatic;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildOfCurrentCompoundWidget($childName)
+    {
+        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
     }
 
     /**
@@ -122,16 +208,8 @@ class PrimitiveWidgetEvaluationContext extends AbstractEvaluationContext impleme
     /**
      * {@inheritdoc}
      */
-    public function getWidgetAttribute($attributeName)
+    public function getWidgetState()
     {
-        return $this->widget->getAttribute($attributeName, $this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWidgetValue($valueName)
-    {
-        return $this->widgetDefinition->getWidgetValue($valueName, $this->getPath());
+        return $this->widgetState;
     }
 }

@@ -24,4 +24,19 @@ interface WidgetGroupInterface extends CoreWidgetInterface
      * @param WidgetInterface $childWidget
      */
     public function addChildWidget(WidgetInterface $childWidget);
+
+    /**
+     * Fetches the specified child widget of this one
+     *
+     * @param int $childIndex
+     * @return WidgetInterface
+     */
+    public function getChildWidget($childIndex);
+
+    /**
+     * Fetches all child widgets of this one
+     *
+     * @return WidgetInterface[]
+     */
+    public function getChildWidgets();
 }

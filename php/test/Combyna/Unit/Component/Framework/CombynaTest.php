@@ -31,6 +31,7 @@ use Combyna\Harness\TestCase;
 use LogicException;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -105,6 +106,11 @@ class CombynaTest extends TestCase
      */
     private $rootValidationContext;
 
+    /**
+     * @var ObjectProphecy|ContainerInterface
+     */
+    private $serviceContainer;
+
     public function setUp()
     {
         $this->app = $this->prophesize(AppInterface::class);
@@ -119,6 +125,7 @@ class CombynaTest extends TestCase
         $this->libraryConfigCollection = $this->prophesize(LibraryConfigCollection::class);
         $this->modeContext = $this->prophesize(ModeContext::class);
         $this->rootValidationContext = $this->prophesize(RootValidationContextInterface::class);
+        $this->serviceContainer = $this->prophesize(ContainerInterface::class);
 
         $this->appLoader->loadApp($this->environmentNode, ['my_app' => true])
             ->willReturn($this->appNode);
@@ -145,6 +152,7 @@ class CombynaTest extends TestCase
             ->willReturn();
 
         $this->combyna = new Combyna(
+            $this->serviceContainer->reveal(),
             $this->eventDispatcher->reveal(),
             $this->environmentFactory->reveal(),
             $this->environmentLoader->reveal(),
@@ -225,6 +233,11 @@ class CombynaTest extends TestCase
             }));
 
         $this->combyna->createEnvironment();
+    }
+
+    public function testGetContainerFetchesTheServiceContainer()
+    {
+        $this->assert($this->combyna->getContainer())->exactlyEquals($this->serviceContainer->reveal());
     }
 
     public function testUseProductionModeShouldAskTheModeContextToUseProduction()

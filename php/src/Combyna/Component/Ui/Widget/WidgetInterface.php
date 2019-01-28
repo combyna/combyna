@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\StaticInterface;
@@ -33,13 +35,13 @@ interface WidgetInterface
      *
      * @param ViewEvaluationContextInterface $parentContext
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
-     * @param WidgetStateInterface $widgetState
+     * @param WidgetStateInterface|null $widgetState
      * @return WidgetEvaluationContextInterface
      */
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        WidgetStateInterface $widgetState
+        WidgetStateInterface $widgetState = null
     );
 
     /**
@@ -57,9 +59,22 @@ interface WidgetInterface
      *
      * @param string|int $name
      * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @return WidgetStateInterface
      */
-    public function createInitialState($name, ViewEvaluationContextInterface $evaluationContext);
+    public function createInitialState(
+        $name,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
+
+    /**
+     * Determines whether this widget, or any of its descendants, define the specified capture
+     *
+     * @param string $captureName
+     * @return bool
+     */
+    public function descendantsSetCaptureInclusive($captureName);
 
     /**
      * Dispatches an event
@@ -85,6 +100,20 @@ interface WidgetInterface
      * @return StaticInterface
      */
     public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext);
+
+    /**
+     * Fetches the capture expression bag
+     *
+     * @return ExpressionBagInterface
+     */
+    public function getCaptureExpressionBag();
+
+    /**
+     * Fetches the capture static bag model
+     *
+     * @return FixedStaticBagModelInterface
+     */
+    public function getCaptureStaticBagModel();
 
     /**
      * Fetches the unique name for the definition of this widget
@@ -137,4 +166,20 @@ interface WidgetInterface
      * @return bool
      */
     public function isRenderable();
+
+    /**
+     * Re-evaluates the state for the widget, using the old state as a base.
+     * If the newly evaluated state is the same as the old one,
+     * the original state object will be returned
+     *
+     * @param WidgetStateInterface $oldState
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return WidgetStateInterface
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
 }

@@ -1,0 +1,6 @@
+services:
+    combyna.ui.environment.library.widget_value_provider:
+        class: Combyna\Component\Ui\Environment\Library\GenericWidgetValueProvider
+        autowire: true
+        tags:
+            - {name: combyna.widget_value_provider}

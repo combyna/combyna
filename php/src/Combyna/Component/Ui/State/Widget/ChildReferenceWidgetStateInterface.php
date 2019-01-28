@@ -26,4 +26,13 @@ interface ChildReferenceWidgetStateInterface extends CoreWidgetStateInterface, P
      * @return string
      */
     public function getChildName();
+
+    /**
+     * Either creates a new widget state with the specified new sub-states
+     * or just returns the current one, if it already has all of the same sub-states
+     *
+     * @param WidgetStateInterface $referencedWidgetState
+     * @return ChildReferenceWidgetStateInterface
+     */
+    public function with(WidgetStateInterface $referencedWidgetState);
 }

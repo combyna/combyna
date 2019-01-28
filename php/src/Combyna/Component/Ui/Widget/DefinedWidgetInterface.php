@@ -43,4 +43,11 @@ interface DefinedWidgetInterface extends WidgetInterface
      * @return WidgetInterface
      */
     public function getChildWidget($childName);
+
+    /**
+     * Fetches all child widgets of this one
+     *
+     * @return WidgetInterface[]
+     */
+    public function getChildWidgets();
 }

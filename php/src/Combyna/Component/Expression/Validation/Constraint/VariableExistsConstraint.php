@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Expression\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Class VariableExistsConstraint
  *
@@ -39,5 +41,13 @@ class VariableExistsConstraint implements ExpressionValidationConstraintInterfac
     public function getVariableName()
     {
         return $this->variableName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

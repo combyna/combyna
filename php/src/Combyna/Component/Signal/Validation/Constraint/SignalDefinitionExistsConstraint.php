@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Signal\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -58,5 +59,13 @@ class SignalDefinitionExistsConstraint implements ConstraintInterface
     public function getSignalName()
     {
         return $this->signalName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

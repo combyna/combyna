@@ -67,6 +67,47 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     /**
      * {@inheritdoc}
      */
+    public function createBag(
+        ExpressionBagInterface $expressionBag,
+        EvaluationContextInterface $explicitEvaluationContext,
+        EvaluationContextInterface $defaultsEvaluationContext
+    ) {
+        $statics = [];
+
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            $statics[$staticDefinition->getName()] = $expressionBag->hasExpression($staticDefinition->getName()) ?
+                $expressionBag->getExpression($staticDefinition->getName())->toStatic($explicitEvaluationContext) :
+                $staticDefinition->getDefaultStatic($defaultsEvaluationContext);
+        }
+
+        $staticBag = $this->bagFactory->createStaticBag($statics);
+
+        $this->assertValidStaticBag($staticBag);
+
+        return $staticBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createBagWithCallback(callable $staticFetcher)
+    {
+        $statics = [];
+
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            $statics[$staticDefinition->getName()] = $staticFetcher($staticDefinition->getName());
+        }
+
+        $staticBag = $this->bagFactory->createStaticBag($statics);
+
+        $this->assertValidStaticBag($staticBag);
+
+        return $staticBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createDefaultStaticBag(EvaluationContextInterface $evaluationContext)
     {
         $statics = [];
@@ -84,6 +125,23 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     public function definesStatic($name)
     {
         return array_key_exists($name, $this->staticDefinitions);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultStatic($name, EvaluationContextInterface $evaluationContext)
+    {
+        if (!$this->definesStatic($name)) {
+            throw new LogicException(
+                sprintf(
+                    'Bag model does not define static %s',
+                    $name
+                )
+            );
+        }
+
+        return $this->staticDefinitions[$name]->getDefaultStatic($evaluationContext);
     }
 
     /**

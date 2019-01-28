@@ -73,6 +73,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsVoidType(VoidType $candidateType)
+    {
+        return true; // Void type can be passed anywhere, including to a special Any type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByAnyType()
     {
         return true;
@@ -100,6 +108,14 @@ class AnyType implements TypeInterface
     public function isAllowedByStaticType(StaticType $superType)
     {
         return $superType->allowsAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByVoidType(VoidType $otherType)
+    {
+        return $otherType->allowsAnyType($this);
     }
 
     /**
@@ -163,6 +179,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithVoidType(VoidType $otherType)
+    {
+        return $this; // Void types cannot be passed, so only keep the Any type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithAnyType($this);
@@ -196,6 +220,14 @@ class AnyType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType)
     {
         return $candidateType->mergeWithAnyType($this);
     }

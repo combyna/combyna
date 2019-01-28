@@ -14,15 +14,21 @@ namespace Combyna\Component\Ui\Validation;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\ConditionalWidgetNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
+use Combyna\Component\Ui\Config\Act\RepeaterWidgetNode;
 use Combyna\Component\Ui\Config\Act\ViewNodeInterface;
+use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
 use Combyna\Component\Ui\Store\Validation\Context\ViewStoreSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\CompoundWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\ConditionalWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\DefinedWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\PrimitiveWidgetDefinitionSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\RepeaterWidgetSubValidationContextInterface;
 use Combyna\Component\Ui\Validation\Context\ViewSubValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\WidgetGroupSubValidationContextInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 
 /**
@@ -45,6 +51,22 @@ interface UiValidationFactoryInterface
         SubValidationContextInterface $parentContext,
         CompoundWidgetDefinitionNode $definitionNode,
         BehaviourSpecInterface $definitionNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a ConditionalWidgetSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param ConditionalWidgetNode $conditionalWidgetNode
+     * @param BehaviourSpecInterface $conditionalWidgetNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return ConditionalWidgetSubValidationContextInterface
+     */
+    public function createConditionalWidgetContext(
+        SubValidationContextInterface $parentContext,
+        ConditionalWidgetNode $conditionalWidgetNode,
+        BehaviourSpecInterface $conditionalWidgetNodeBehaviourSpec,
         ActNodeInterface $subjectNode
     );
 
@@ -81,6 +103,22 @@ interface UiValidationFactoryInterface
     );
 
     /**
+     * Creates a RepeaterWidgetSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param RepeaterWidgetNode $repeaterWidgetNode
+     * @param BehaviourSpecInterface $repeaterWidgetNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return RepeaterWidgetSubValidationContextInterface
+     */
+    public function createRepeaterWidgetContext(
+        SubValidationContextInterface $parentContext,
+        RepeaterWidgetNode $repeaterWidgetNode,
+        BehaviourSpecInterface $repeaterWidgetNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
      * Creates a ViewSubValidationContext
      *
      * @param SubValidationContextInterface $parentContext
@@ -109,6 +147,22 @@ interface UiValidationFactoryInterface
         SubValidationContextInterface $parentContext,
         ViewStoreNode $viewStoreNode,
         BehaviourSpecInterface $viewStoreNodeBehaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a WidgetGroupSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param WidgetGroupNode $widgetGroupNode
+     * @param BehaviourSpecInterface $widgetGroupNodeBehaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return WidgetGroupSubValidationContextInterface
+     */
+    public function createWidgetGroupContext(
+        SubValidationContextInterface $parentContext,
+        WidgetGroupNode $widgetGroupNode,
+        BehaviourSpecInterface $widgetGroupNodeBehaviourSpec,
         ActNodeInterface $subjectNode
     );
 }

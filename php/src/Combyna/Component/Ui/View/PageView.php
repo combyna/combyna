@@ -117,19 +117,36 @@ class PageView implements PageViewInterface
     /**
      * {@inheritdoc}
      */
+    public function createEvaluationContext(
+        EvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        PageViewStateInterface $pageViewState = null
+    ) {
+        return $this->uiEvaluationContextFactory->createRootViewEvaluationContext(
+            $this,
+            $parentContext,
+            $parentContext->getEnvironment(),
+            $pageViewState
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createInitialState(EvaluationContextInterface $rootEvaluationContext)
     {
         $storeState = $this->store->createInitialState($rootEvaluationContext);
         $viewAttributeStaticBag = new StaticBag([]); // FIXME
-        $rootViewEvaluationContext = $this->uiEvaluationContextFactory->createRootViewEvaluationContext(
-            $this,
-            $storeState,
-            $viewAttributeStaticBag,
+        $rootViewEvaluationContext = $this->createEvaluationContext(
             $rootEvaluationContext,
-            $rootEvaluationContext->getEnvironment()
+            $this->uiEvaluationContextFactory
         );
 
-        $rootWidgetState = $this->rootWidget->createInitialState('root', $rootViewEvaluationContext);
+        $rootWidgetState = $this->rootWidget->createInitialState(
+            'root',
+            $rootViewEvaluationContext,
+            $this->uiEvaluationContextFactory
+        );
 
         return $this->uiStateFactory->createPageViewState(
             $this,
@@ -153,6 +170,14 @@ class PageView implements PageViewInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStore()
+    {
+        return $this->store;
     }
 
     /**
@@ -185,11 +210,10 @@ class PageView implements PageViewInterface
     ) {
         $originalPageViewState = $pageViewState;
 
-        /** @var ViewEvaluationContextInterface $evaluationContext */
-        $evaluationContext = $this->uiEvaluationContextTreeFactory->createPageViewEvaluationContextTree(
-            $pageViewState,
-            $program,
-            $environment
+        $evaluationContext = $this->createEvaluationContext(
+            $program->getRootEvaluationContext(),
+            $this->uiEvaluationContextFactory,
+            $pageViewState
         );
 
         $newStoreState = $this->store->handleSignal(
@@ -206,13 +230,18 @@ class PageView implements PageViewInterface
             // Store has updated - rerender all widgets in the view, but maintain
             // the state of any stores where the widget was visible before and remains visible now
 
-            // FIXME: This won't preserve any widget store states
-            $newEvaluationContext = $this->uiEvaluationContextTreeFactory->createPageViewEvaluationContextTree(
-                $pageViewState,
-                $program,
-                $environment
+            // Create a new evaluation context with the updated page view state
+            $evaluationContext = $this->createEvaluationContext(
+                $program->getRootEvaluationContext(),
+                $this->uiEvaluationContextFactory,
+                $pageViewState
             );
-            $newRootWidgetState = $this->rootWidget->createInitialState('root', $newEvaluationContext);
+
+            $newRootWidgetState = $this->rootWidget->reevaluateState(
+                $pageViewState->getRootWidgetState(),
+                $evaluationContext,
+                $this->uiEvaluationContextFactory
+            );
 
             // TODO: Just use a ->withRootWidgetState(...) method - we already have the new store state from above
             return $pageViewState->withState($newStoreState, $newRootWidgetState);
@@ -236,5 +265,28 @@ class PageView implements PageViewInterface
             $evaluationContext,
             $viewStoreState
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        PageViewStateInterface $oldState,
+        EvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        $evaluationContext = $this->createEvaluationContext(
+            $evaluationContext,
+            $this->uiEvaluationContextFactory,
+            $oldState
+        );
+
+        $newRootWidgetState = $this->rootWidget->reevaluateState(
+            $oldState->getRootWidgetState(),
+            $evaluationContext,
+            $this->uiEvaluationContextFactory
+        );
+
+        return $oldState->withRootWidgetState($newRootWidgetState);
     }
 }

@@ -15,6 +15,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
+use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
@@ -37,6 +38,13 @@ interface ViewInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Fetches the store for this view
+     *
+     * @return ViewStoreInterface
+     */
+    public function getStore();
 
     /**
      * Fetches a widget in this view by its name-based path

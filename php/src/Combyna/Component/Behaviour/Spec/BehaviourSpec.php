@@ -133,7 +133,16 @@ class BehaviourSpec implements BehaviourSpecInterface
         $matchingSpecs = [];
 
         if ($this->node->makesQuery($querySpecifier)) {
+            // This node makes the query directly (probably an expression node)
             $matchingSpecs[] = $this;
+        } else {
+            // Otherwise, check whether validation of one of its constraints will make the query
+            foreach ($this->constraints as $constraint) {
+                if ($constraint->makesQuery($querySpecifier)) {
+                    $matchingSpecs[] = $this;
+                    break;
+                }
+            }
         }
 
         foreach ($this->childSpecs as $childSpec) {

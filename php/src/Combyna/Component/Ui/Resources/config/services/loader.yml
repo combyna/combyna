@@ -3,6 +3,12 @@ services:
         class: Combyna\Component\Ui\Config\Loader\ViewLoader
         autowire: true
 
+    combyna.ui.loader.capture_expression:
+        class: Combyna\Component\Ui\Config\Loader\Expression\CaptureExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
     combyna.ui.loader.child_widget_definition:
         class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionLoader
         autowire: true

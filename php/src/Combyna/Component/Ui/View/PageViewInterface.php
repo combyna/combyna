@@ -15,6 +15,8 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Ui\Evaluation\RootViewEvaluationContext;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
 
 /**
@@ -24,6 +26,20 @@ use Combyna\Component\Ui\State\View\PageViewStateInterface;
  */
 interface PageViewInterface extends ViewInterface
 {
+    /**
+     * Creates a RootViewEvaluationContext
+     *
+     * @param EvaluationContextInterface $parentContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @param PageViewStateInterface|null $pageViewState
+     * @return RootViewEvaluationContext
+     */
+    public function createEvaluationContext(
+        EvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        PageViewStateInterface $pageViewState = null
+    );
+
     /**
      * Creates an initial state for the page view
      *
@@ -46,5 +62,21 @@ interface PageViewInterface extends ViewInterface
         SignalInterface $signal,
         ProgramInterface $program,
         EnvironmentInterface $environment
+    );
+
+    /**
+     * Re-evaluates the state for the widget, using the old state as a base.
+     * If the newly evaluated state is the same as the old one,
+     * the original state object will be returned
+     *
+     * @param PageViewStateInterface $oldState
+     * @param EvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return PageViewStateInterface
+     */
+    public function reevaluateState(
+        PageViewStateInterface $oldState,
+        EvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     );
 }

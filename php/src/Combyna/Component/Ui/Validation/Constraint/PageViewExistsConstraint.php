@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -41,5 +42,13 @@ class PageViewExistsConstraint implements ConstraintInterface
     public function getPageViewName()
     {
         return $this->pageViewName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

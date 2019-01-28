@@ -14,6 +14,7 @@ namespace Combyna\Component\Program;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
@@ -24,6 +25,19 @@ use Combyna\Component\Ui\View\PageViewCollectionInterface;
  */
 class ProgramFactory implements ProgramFactoryInterface
 {
+    /**
+     * @var UiEvaluationContextFactoryInterface
+     */
+    private $uiEvaluationContextFactory;
+
+    /**
+     * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
+     */
+    public function __construct(UiEvaluationContextFactoryInterface $uiEvaluationContextFactory)
+    {
+        $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +53,8 @@ class ProgramFactory implements ProgramFactoryInterface
             $resourceRepository,
             $pageViewCollection,
             $overlayViewCollection,
-            $rootEvaluationContext
+            $rootEvaluationContext,
+            $this->uiEvaluationContextFactory
         );
     }
 

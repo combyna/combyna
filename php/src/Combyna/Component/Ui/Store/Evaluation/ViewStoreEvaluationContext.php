@@ -57,7 +57,7 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getChildOfCurrentCompoundWidget($childName)
     {
         // TODO: Restructure interfaces so that this method stub is not needed here
         throw new LogicException('View stores cannot define child widgets');

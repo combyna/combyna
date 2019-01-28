@@ -101,6 +101,24 @@ interface EvaluationContextInterface
     public function getAssuredStatic($assuredStaticName);
 
     /**
+     * Descends to the node that sets the specified capture and evaluates it to a static,
+     * if found, otherwise returns null
+     *
+     * @param string $captureName
+     * @return StaticInterface|null
+     */
+    public function getCaptureLeafwise($captureName);
+
+    /**
+     * Ascends the ACT to find the node that defines the specified capture,
+     * then descends to the node that sets and evaluates it to a static
+     *
+     * @param string $captureName
+     * @return StaticInterface
+     */
+    public function getCaptureRootwise($captureName);
+
+    /**
      * Fetches the environment
      *
      * @return EnvironmentInterface

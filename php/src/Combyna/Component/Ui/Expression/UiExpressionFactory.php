@@ -37,6 +37,14 @@ class UiExpressionFactory extends AbstractExpressionFactory implements UiExpress
     /**
      * {@inheritdoc}
      */
+    public function createCaptureExpression($captureName)
+    {
+        return new CaptureExpression($captureName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createStoreSlotExpression($slotName)
     {
         return new SlotExpression($slotName);

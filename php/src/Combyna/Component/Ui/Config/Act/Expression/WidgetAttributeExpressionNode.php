@@ -22,7 +22,7 @@ use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 /**
  * Class WidgetAttributeExpressionNode
  *
- * Fetches the value of an attribute specified for the compound widget
+ * Fetches the value of an attribute specified for the current widget definition
  *
  * @author Dan Phillimore <dan@ovms.co>
  */

@@ -11,16 +11,22 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
 use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\PrimitiveWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use LogicException;
 
@@ -59,6 +65,11 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     private $name;
 
     /**
+     * @var StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
+    /**
      * @var UiEvaluationContextFactoryInterface
      */
     private $uiEvaluationContextFactory;
@@ -87,6 +98,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
      * @param FixedStaticBagModelInterface $valueBagModel
+     * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param callable[] $valueNameToProviderCallableMap
      */
     public function __construct(
@@ -98,6 +110,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
         FixedStaticBagModelInterface $valueBagModel,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
         array $valueNameToProviderCallableMap
     ) {
         $this->attributeBagModel = $attributeBagModel;
@@ -105,6 +118,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         $this->eventFactory = $eventFactory;
         $this->libraryName = $libraryName;
         $this->name = $name;
+        $this->staticExpressionFactory = $staticExpressionFactory;
         $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
         $this->uiStateFactory = $uiStateFactory;
         $this->valueBagModel = $valueBagModel;
@@ -122,16 +136,53 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
+    public function createDefinitionEvaluationContextForWidget(
+        DefinedWidgetEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget,
+        DefinedWidgetStateInterface $widgetState = null
+    ) {
+        if (!$parentContext instanceof PrimitiveWidgetEvaluationContextInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    PrimitiveWidgetEvaluationContextInterface::class,
+                    get_class($parentContext)
+                )
+            );
+        }
+
+        return $this->uiEvaluationContextFactory
+            ->createPrimitiveWidgetDefinitionEvaluationContext(
+                $parentContext,
+                $this,
+                $widget,
+                $widgetState
+            );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createEvaluationContextForWidget(
         ViewEvaluationContextInterface $parentContext,
         DefinedWidgetInterface $widget,
-        DefinedWidgetStateInterface $widgetState
+        DefinedWidgetStateInterface $widgetState = null
     ) {
+        if ($widgetState && !$widgetState instanceof DefinedPrimitiveWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    DefinedPrimitiveWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
         return $this->uiEvaluationContextFactory->createPrimitiveWidgetEvaluationContext(
             $parentContext,
             $this,
             $widget,
-            $widgetState->getAttributeStaticBag()
+            $widgetState
         );
     }
 
@@ -160,17 +211,43 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     public function createInitialStateForWidget(
         $name,
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag,
-        array $childWidgetStates,
-        ViewEvaluationContextInterface $evaluationContext
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
         // Create a sub-evaluation context for the primitive widget itself,
         // so that its attributes may be fetched by default expressions for the widget values
-        $primitiveWidgetSubEvaluationContext = $this->uiEvaluationContextFactory->createPrimitiveWidgetEvaluationContext(
+        $widgetSubEvaluationContext = $this->createEvaluationContextForWidget(
             $evaluationContext,
-            $this,
-            $widget,
-            $attributeStaticBag
+            $widget
+        );
+
+        $childWidgetStates = [];
+
+        foreach ($widget->getChildWidgets() as $childName => $childWidget) {
+            $childWidgetStates[$childName] = $childWidget->createInitialState(
+                $childName,
+                // Child widgets only get the PrimitiveWidgetEvaluationContext
+                // and not the *Definition one, as they do not have access to the attributes
+                // and values of the primitive widget
+                $widgetSubEvaluationContext,
+                $evaluationContextFactory
+            );
+        }
+
+        $definitionSubEvaluationContext = $this->createDefinitionEvaluationContextForWidget(
+            $widgetSubEvaluationContext,
+            $widget
+        );
+
+        /*
+         * Evaluate the expressions for the attributes of this widget -
+         * attributes can reference values of this widget
+         */
+        $attributeStaticBag = $this->attributeBagModel->createBag(
+            $attributeExpressionBag,
+            $widgetSubEvaluationContext,
+            $definitionSubEvaluationContext
         );
 
         /*
@@ -179,7 +256,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
          * so that eg. a TextBox widget's "text" value can use a "text" attribute as the default
          */
         $valueStaticBag = $this->valueBagModel->createDefaultStaticBag(
-            $primitiveWidgetSubEvaluationContext
+            $definitionSubEvaluationContext
         );
 
         return $this->uiStateFactory->createDefinedPrimitiveWidgetState(
@@ -189,6 +266,18 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
             $valueStaticBag,
             $childWidgetStates
         );
+    }
+
+    /**
+     * Evaluates and returns the default expression for a widget value
+     *
+     * @param string $valueName
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getDefaultWidgetValue($valueName, EvaluationContextInterface $evaluationContext)
+    {
+        return $this->valueBagModel->getDefaultStatic($valueName, $evaluationContext);
     }
 
     /**
@@ -231,7 +320,10 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         // Call the provider, passing the unique path to the widget state
         // (the widget state's path could be different to the widget's path,
         // if the widget is inside a repeater, as each repeated instance will get a different state)
-        $valueStatic = $valueProvider($widgetStatePath);
+        $result = $valueProvider($widgetStatePath);
+
+        // Coerce the result to a static if needed, to allow it to return a non-static
+        $valueStatic = $this->staticExpressionFactory->coerce($result);
 
         // Value providers must return a static as their result
         if (!$valueStatic instanceof StaticInterface) {
@@ -265,5 +357,80 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     public function isRenderable()
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateStateForWidget(
+        DefinedWidgetStateInterface $oldState,
+        DefinedWidgetInterface $widget,
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if (!$oldState instanceof DefinedPrimitiveWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    DefinedPrimitiveWidgetStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        // Create a sub-evaluation context for the primitive widget itself,
+        // so that its attributes may be fetched by default expressions for the widget values
+        $widgetSubEvaluationContext = $this->createEvaluationContextForWidget(
+            $evaluationContext,
+            $widget,
+            $oldState
+        );
+
+        $childWidgetStates = [];
+
+        foreach ($widget->getChildWidgets() as $childName => $childWidget) {
+            $childWidgetStates[$childName] = $childWidget->reevaluateState(
+                $oldState->getChildState($childName),
+                // Child widgets only get the PrimitiveWidgetEvaluationContext
+                // and not the *Definition one, as they do not have access to the attributes
+                // and values of the primitive widget
+                $widgetSubEvaluationContext,
+                $evaluationContextFactory
+            );
+        }
+
+        $definitionSubEvaluationContext = $this->createDefinitionEvaluationContextForWidget(
+            $widgetSubEvaluationContext,
+            $widget,
+            $oldState
+        );
+
+        /*
+         * Evaluate the expressions for the attributes of this widget -
+         * attributes can reference values of this widget
+         */
+        $attributeStaticBag = $this->attributeBagModel->createBag(
+            $attributeExpressionBag,
+            $widgetSubEvaluationContext,
+            $definitionSubEvaluationContext
+        );
+
+        /*
+         * Evaluate the values of this widget using their registered providers
+         */
+        $valueStaticBag = $this->valueBagModel->createBagWithCallback(function (
+            $valueName
+        ) use (
+            $definitionSubEvaluationContext
+        ) {
+            return $definitionSubEvaluationContext->getWidgetValue($valueName);
+        });
+
+        return $oldState->with(
+            $attributeStaticBag,
+            $valueStaticBag,
+            $childWidgetStates
+        );
     }
 }

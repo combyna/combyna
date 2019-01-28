@@ -122,6 +122,15 @@ interface ValidationContextInterface
     public function getCurrentActNode();
 
     /**
+     * Fetches the parent of the current ACT node that the current context represents.
+     * This is not necessarily the same as the parent of the original node being validated -
+     * to fetch that, see ::getSubjectActNode()
+     *
+     * @return ActNodeInterface
+     */
+    public function getCurrentParentActNode();
+
+    /**
      * Fetches all descendant nodes of the current ACT node (which is not necessarily an expression node)
      * that perform a query matching the given query specifier
      *

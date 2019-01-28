@@ -12,7 +12,6 @@
 namespace Combyna\Component\Config\DependencyInjection;
 
 use Combyna\Component\Common\AbstractComponentExtension;
-use Combyna\Component\Framework\DelegatorInitialiser;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -41,17 +40,15 @@ class ConfigExtension extends AbstractComponentExtension implements CompilerPass
             return;
         }
 
-        $initialiserDefinition = $containerBuilder->findDefinition(DelegatorInitialiser::SERVICE_ID);
-
         // Find all service IDs with the node visitor tag
         $taggedServices = $containerBuilder->findTaggedServiceIds(self::DELEGATEE_TAG);
 
         foreach ($taggedServices as $id => $tags) {
+            $delegatorDefinition = $containerBuilder->findDefinition(self::DELEGATOR_SERVICE_ID);
+
             // Add the node visitor service to the delegator
-            $initialiserDefinition->addMethodCall('addDelegatee', [
-                new Reference(self::DELEGATOR_SERVICE_ID),
-                new Reference($id),
-                'addVisitor'
+            $delegatorDefinition->addMethodCall('addVisitor', [
+                new Reference($id)
             ]);
         }
     }

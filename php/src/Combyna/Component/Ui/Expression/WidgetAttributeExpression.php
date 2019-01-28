@@ -17,8 +17,11 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 /**
  * Class WidgetAttributeExpression
  *
- * Fetches an attribute for the current compound widget.
- * May only be used inside a compound widget definition
+ * Fetches an attribute for the current widget definition.
+ * May be used inside a compound widget definition to refer to an attribute of it
+ * either inside its root widget tree or from one of its widget value expressions.
+ * May be used inside a primitive widget definition to refer to an attribute
+ * from one of its widget value expressions.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */

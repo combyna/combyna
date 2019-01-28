@@ -11,14 +11,17 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\WidgetDefinitionEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
-use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
 /**
  * Interface WidgetDefinitionInterface
@@ -35,17 +38,31 @@ interface WidgetDefinitionInterface
     public function assertValidAttributeStaticBag(StaticBagInterface $attributeStaticBag);
 
     /**
+     * Creates a WidgetDefinitionEvaluationContext
+     *
+     * @param DefinedWidgetEvaluationContextInterface $parentContext
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedWidgetStateInterface|null $widgetState
+     * @return WidgetDefinitionEvaluationContextInterface
+     */
+    public function createDefinitionEvaluationContextForWidget(
+        DefinedWidgetEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget,
+        DefinedWidgetStateInterface $widgetState = null
+    );
+
+    /**
      * Creates a WidgetEvaluationContext
      *
      * @param ViewEvaluationContextInterface $parentContext
      * @param DefinedWidgetInterface $widget
-     * @param DefinedWidgetStateInterface $widgetState
+     * @param DefinedWidgetStateInterface|null $widgetState
      * @return WidgetEvaluationContextInterface
      */
     public function createEvaluationContextForWidget(
         ViewEvaluationContextInterface $parentContext,
         DefinedWidgetInterface $widget,
-        DefinedWidgetStateInterface $widgetState
+        DefinedWidgetStateInterface $widgetState = null
     );
 
     /**
@@ -61,21 +78,21 @@ interface WidgetDefinitionInterface
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag);
 
     /**
-     * Creates a DefinedPrimitiveWidgetState
+     * Creates a DefinedCompoundWidgetState or DefinedPrimitiveWidgetState
      *
      * @param string|int $name
      * @param DefinedWidgetInterface $widget
-     * @param StaticBagInterface $attributeStaticBag
-     * @param WidgetStateInterface[] $childWidgetStates
+     * @param ExpressionBagInterface $attributeExpressionBag
      * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @return DefinedWidgetStateInterface
      */
     public function createInitialStateForWidget(
         $name,
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag,
-        array $childWidgetStates,
-        ViewEvaluationContextInterface $evaluationContext
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     );
 
     /**
@@ -101,4 +118,23 @@ interface WidgetDefinitionInterface
      * @return bool
      */
     public function isRenderable();
+
+    /**
+     * Reevaluates the state of a widget of this definition, and returns a new state object
+     * if needed. If nothing has changed, the same state object will be returned as it is immutable
+     *
+     * @param DefinedWidgetStateInterface $oldState
+     * @param DefinedWidgetInterface $widget
+     * @param ExpressionBagInterface $attributeExpressionBag
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return DefinedWidgetStateInterface
+     */
+    public function reevaluateStateForWidget(
+        DefinedWidgetStateInterface $oldState,
+        DefinedWidgetInterface $widget,
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
 }

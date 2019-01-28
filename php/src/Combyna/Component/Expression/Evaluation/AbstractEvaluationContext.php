@@ -111,6 +111,22 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCaptureLeafwise($captureName)
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureRootwise($captureName)
+    {
+        return $this->parentContext->getCaptureRootwise($captureName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
         return $this->parentContext->getEnvironment();

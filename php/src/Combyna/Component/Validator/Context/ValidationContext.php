@@ -29,6 +29,7 @@ use Combyna\Component\Validator\Query\Requirement\TypeQueryRequirement;
 use Combyna\Component\Validator\Query\ResultTypeQueryInterface;
 use Combyna\Component\Validator\ValidationFactoryInterface;
 use Combyna\Component\Validator\ViolationInterface;
+use LogicException;
 
 /**
  * Class ValidationContext
@@ -189,6 +190,20 @@ class ValidationContext implements ValidationContextInterface
     public function getCurrentActNode()
     {
         return $this->subValidationContext->getCurrentActNode();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCurrentParentActNode()
+    {
+        $parentSubValidationContext = $this->subValidationContext->getParentContext();
+
+        if ($parentSubValidationContext === null) {
+            throw new LogicException('Sub-validation context has no parent');
+        }
+
+        return $parentSubValidationContext->getCurrentActNode();
     }
 
     /**

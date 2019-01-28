@@ -87,7 +87,10 @@ class StaticListType implements TypeInterface
     public function allowsStaticListType(StaticListType $candidateType, TypeInterface $elementType)
     {
         // As long as the candidate sub-static-list type's element type is allowed
-        // by our own element type, then let it through
+        // by our own element type, then let it through. If the source list was empty,
+        // its element type would be the special Void type, which will be allowed
+        // for any target list element type. This is to allow a list with any possible element type
+        // to be passed an empty list.
         return $this->elementType->allows($elementType);
     }
 
@@ -97,6 +100,14 @@ class StaticListType implements TypeInterface
     public function allowsStaticType(StaticType $candidateType)
     {
         return false; // We require a list, which a non-list static type can never be
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsVoidType(VoidType $candidateType)
+    {
+        return true; // Void type can be passed anywhere
     }
 
     /**
@@ -129,6 +140,14 @@ class StaticListType implements TypeInterface
     public function isAllowedByStaticType(StaticType $superType)
     {
         return $superType->allowsStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByVoidType(VoidType $otherType)
+    {
+        return $otherType->allowsStaticListType($this, $this->elementType);
     }
 
     /**
@@ -210,6 +229,14 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithVoidType(VoidType $otherType)
+    {
+        return $this; // Void types cannot be passed, so only keep the static list type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithStaticListType($this, $this->elementType);
@@ -243,6 +270,14 @@ class StaticListType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType)
     {
         return $candidateType->mergeWithStaticListType($this, $this->elementType);
     }

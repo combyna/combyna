@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Store\Validation\Constraint;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Expression\Validation\Constraint\ExpressionValidationConstraintInterface;
 
 /**
@@ -61,5 +62,13 @@ class ValidViewStoreQueryConstraint implements ExpressionValidationConstraintInt
     public function getQueryName()
     {
         return $this->queryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

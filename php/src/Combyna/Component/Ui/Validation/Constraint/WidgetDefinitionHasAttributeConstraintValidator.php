@@ -60,7 +60,7 @@ class WidgetDefinitionHasAttributeConstraintValidator implements ConstraintValid
 
         if (!$attributeExists) {
             $validationContext->addGenericViolation(
-                'Compound widget definition does not define an attribute with name "' .
+                'Current widget definition does not define an attribute with name "' .
                 $constraint->getAttributeName() .
                 '"'
             );

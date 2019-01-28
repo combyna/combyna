@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
-use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 
@@ -60,6 +59,14 @@ class RepeaterWidgetState implements RepeaterWidgetStateInterface
     public function getChildState($name)
     {
         return $this->repeatedWidgetStates[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildStates()
+    {
+        return $this->repeatedWidgetStates;
     }
 
     /**
@@ -124,29 +131,6 @@ class RepeaterWidgetState implements RepeaterWidgetStateInterface
     public function getWidgetStatePathByPath(array $path, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
         throw new \Exception('Not implemented');
-
-        $widgetName = array_shift($path);
-
-        if ($widgetName === $this->getStateName()) {
-            if (count($path) === 0) {
-                return $stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]));
-            }
-
-            foreach ($this->childWidgetStates as $childWidgetState) {
-                try {
-                    return $childWidgetState->getWidgetStatePathByPath(
-                        $path,
-                        array_merge($parentStates, [$this]),
-                        $stateFactory
-                    );
-                } catch (NotFoundException $exception) {
-                }
-            }
-        }
-
-        throw new NotFoundException(
-            'Widget "' . $this->getStateName() . '" does not contain widget with path "' . implode('-', $path) . '"'
-        );
     }
 
     /**
@@ -154,8 +138,6 @@ class RepeaterWidgetState implements RepeaterWidgetStateInterface
      */
     public function getWidgetStatePathsByTag($tag, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
-//        throw new \Exception('Not implemented');
-
         $widgetStatePaths = $this->widget->hasTag($tag) ?
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
@@ -172,5 +154,28 @@ class RepeaterWidgetState implements RepeaterWidgetStateInterface
         }
 
         return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        return array_key_exists($name, $this->repeatedWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(array $repeatedWidgetStates)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->repeatedWidgetStates === $repeatedWidgetStates) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->widget, $repeatedWidgetStates);
     }
 }

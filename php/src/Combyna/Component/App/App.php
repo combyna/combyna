@@ -229,4 +229,16 @@ class App implements AppInterface
 
         return $appState->withProgramState($newProgramState);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateUiState(AppStateInterface $appState)
+    {
+        return $appState->withProgramState(
+            $this->program->reevaluateUiState(
+                $appState->getProgramState()
+            )
+        );
+    }
 }

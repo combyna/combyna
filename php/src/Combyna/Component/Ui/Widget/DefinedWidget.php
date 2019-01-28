@@ -12,12 +12,14 @@
 namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Trigger\TriggerCollectionInterface;
+use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
@@ -37,6 +39,16 @@ class DefinedWidget implements DefinedWidgetInterface
      * @var ExpressionBagInterface
      */
     private $attributeExpressions;
+
+    /**
+     * @var ExpressionBagInterface
+     */
+    private $captureExpressionBag;
+
+    /**
+     * @var FixedStaticBagModelInterface
+     */
+    private $captureStaticBagModel;
 
     /**
      * @var WidgetInterface[]
@@ -69,6 +81,11 @@ class DefinedWidget implements DefinedWidgetInterface
     private $triggerCollection;
 
     /**
+     * @var UiEvaluationContextFactoryInterface
+     */
+    private $uiEvaluationContextFactory;
+
+    /**
      * @var UiStateFactoryInterface
      */
     private $uiStateFactory;
@@ -84,7 +101,10 @@ class DefinedWidget implements DefinedWidgetInterface
      * @param WidgetDefinitionInterface $definition
      * @param ExpressionBagInterface $attributeExpressions
      * @param UiStateFactoryInterface $uiStateFactory
+     * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      * @param TriggerCollectionInterface $triggerCollection
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
@@ -94,16 +114,22 @@ class DefinedWidget implements DefinedWidgetInterface
         WidgetDefinitionInterface $definition,
         ExpressionBagInterface $attributeExpressions,
         UiStateFactoryInterface $uiStateFactory,
+        UiEvaluationContextFactoryInterface $uiEvaluationContextFactory,
         TriggerCollectionInterface $triggerCollection,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
         $this->attributeExpressions = $attributeExpressions;
+        $this->captureExpressionBag = $captureExpressionBag;
+        $this->captureStaticBagModel = $captureStaticBagModel;
         $this->childWidgets = [];
         $this->definition = $definition;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
+        $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
         $this->triggerCollection = $triggerCollection;
@@ -131,9 +157,9 @@ class DefinedWidget implements DefinedWidgetInterface
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        WidgetStateInterface $widgetState
+        WidgetStateInterface $widgetState = null
     ) {
-        if (!$widgetState instanceof DefinedWidgetStateInterface) {
+        if ($widgetState && !$widgetState instanceof DefinedWidgetStateInterface) {
             throw new LogicException(
                 sprintf(
                     'Expected a %s, got %s',
@@ -159,26 +185,35 @@ class DefinedWidget implements DefinedWidgetInterface
      */
     public function createInitialState(
         $name,
-        ViewEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
-        $attributeStaticBag = $this->attributeExpressions->toStaticBag($evaluationContext);
-
-        $childStates = [];
-
-        foreach ($this->childWidgets as $childName => $childWidget) {
-            $childStates[$childName] = $childWidget->createInitialState(
-                $childName,
-                $evaluationContext
-            );
-        }
-
         return $this->definition->createInitialStateForWidget(
             $name,
             $this,
-            $attributeStaticBag,
-            $childStates,
-            $evaluationContext
+            $this->attributeExpressions,
+            $evaluationContext,
+            $evaluationContextFactory
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function descendantsSetCaptureInclusive($captureName)
+    {
+        if ($this->captureExpressionBag->hasExpression($captureName)) {
+            // This widget sets the capture
+            return true;
+        }
+
+        foreach ($this->childWidgets as $childWidget) {
+            if ($childWidget->descendantsSetCaptureInclusive($captureName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -190,6 +225,16 @@ class DefinedWidget implements DefinedWidgetInterface
         EventInterface $event,
         WidgetEvaluationContextInterface $widgetEvaluationContext
     ) {
+        if (!$widgetEvaluationContext instanceof DefinedWidgetEvaluationContextInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    DefinedWidgetEvaluationContextInterface::class,
+                    get_class($widgetEvaluationContext)
+                )
+            );
+        }
+
         // Widget must be visible - if it was not, its state would have been an InvisibleWidgetState,
         // whose ->invokeTriggersForEvent() method will do nothing
 
@@ -202,7 +247,13 @@ class DefinedWidget implements DefinedWidgetInterface
         if ($this->triggerCollection->hasByEventName($event->getLibraryName(), $event->getName())) {
             $trigger = $this->triggerCollection->getByEventName($event->getLibraryName(), $event->getName());
 
-            $programState = $trigger->invoke($programState, $program, $event, $widgetEvaluationContext);
+            $definitionSubEvaluationContext = $this->definition->createDefinitionEvaluationContextForWidget(
+                $widgetEvaluationContext,
+                $this,
+                $widgetEvaluationContext->getWidgetState()
+            );
+
+            $programState = $trigger->invoke($programState, $program, $event, $definitionSubEvaluationContext);
         }
 
         return $programState;
@@ -219,9 +270,33 @@ class DefinedWidget implements DefinedWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getChildWidget($childName)
     {
         return $this->childWidgets[$childName];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidgets()
+    {
+        return $this->childWidgets;
     }
 
     /**
@@ -289,5 +364,32 @@ class DefinedWidget implements DefinedWidgetInterface
     public function isRenderable()
     {
         return $this->definition->isRenderable();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if (!$oldState instanceof DefinedWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    DefinedWidgetStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        return $this->definition->reevaluateStateForWidget(
+            $oldState,
+            $this,
+            $this->attributeExpressions,
+            $evaluationContext,
+            $evaluationContextFactory
+        );
     }
 }

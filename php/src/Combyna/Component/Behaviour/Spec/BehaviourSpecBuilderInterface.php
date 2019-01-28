@@ -40,6 +40,13 @@ interface BehaviourSpecBuilderInterface
     public function addConstraint(ConstraintInterface $constraint);
 
     /**
+     * Adds a modifier to be run before the spec is built
+     *
+     * @param BehaviourSpecModifierInterface $specModifier
+     */
+    public function addModifier(BehaviourSpecModifierInterface $specModifier);
+
+    /**
      * Adds a sub-spec to be built by the provided callback.
      * Used for creating nested validation contexts within one ACT node.
      *

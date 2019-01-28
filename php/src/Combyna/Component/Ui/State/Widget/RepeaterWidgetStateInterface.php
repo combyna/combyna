@@ -28,4 +28,13 @@ interface RepeaterWidgetStateInterface extends CoreWidgetStateInterface, ParentW
      * @return WidgetStateInterface[]
      */
     public function getRepeatedWidgetStates();
+
+    /**
+     * Either creates a new widget state with the specified new sub-states
+     * or just returns the current one, if it already has all of the same sub-states
+     *
+     * @param WidgetStateInterface[] $repeatedWidgetStates
+     * @return RepeaterWidgetStateInterface
+     */
+    public function with(array $repeatedWidgetStates);
 }

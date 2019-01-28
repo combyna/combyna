@@ -23,6 +23,42 @@ services:
         tags:
             - {name: combyna.sub_validation_context_factory}
 
+    combyna.ui.validation.capture_has_correct_type_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureHasCorrectTypeConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.capture_has_default_if_optional_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureHasDefaultIfOptionalConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.capture_has_no_default_if_not_optional_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureHasNoDefaultIfNotOptionalConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.capture_is_defined_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureIsDefinedConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.capture_is_not_shadowed_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureIsNotShadowedConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.ui.validation.capture_is_set_exactly_once_constraint_validator:
+        class: Combyna\Component\Ui\Validation\Constraint\CaptureIsSetExactlyOnceConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
     combyna.ui.validation.compound_widget_definition_has_child_constraint_validator:
         class: Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraintValidator
         autowire: true

@@ -46,6 +46,11 @@ class SubBehaviourSpecBuilder implements SubBehaviourSpecBuilderInterface
     private $owningNode;
 
     /**
+     * @var BehaviourSpecModifierInterface[]
+     */
+    private $specModifiers = [];
+
+    /**
      * @var callable[]
      */
     private $subSpecBuilders = [];
@@ -94,6 +99,14 @@ class SubBehaviourSpecBuilder implements SubBehaviourSpecBuilderInterface
     /**
      * {@inheritdoc}
      */
+    public function addModifier(BehaviourSpecModifierInterface $specModifier)
+    {
+        $this->specModifiers[] = $specModifier;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function addSubSpec(callable $builder)
     {
         $this->subSpecBuilders[] = $builder;
@@ -104,6 +117,11 @@ class SubBehaviourSpecBuilder implements SubBehaviourSpecBuilderInterface
      */
     public function build()
     {
+        // Allow any modifiers to modify the spec before continuing
+        foreach ($this->specModifiers as $specModifier) {
+            $specModifier->modifySpecBuilder($this);
+        }
+
         $childSpecs = array_map(function (StructuredNodeInterface $childNode) {
             $childSpecBuilder = $this->behaviourFactory->createBehaviourSpecBuilder($childNode);
 

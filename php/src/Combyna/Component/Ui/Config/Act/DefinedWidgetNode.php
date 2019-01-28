@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
@@ -20,6 +21,8 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidWidgetConstraint;
 use Combyna\Component\Ui\Validation\Context\Specifier\DefinedWidgetContextSpecifier;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
@@ -39,14 +42,24 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     private $attributeExpressionBagNode;
 
     /**
+     * @var ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
+
+    /**
      * @var WidgetNodeInterface[]
      */
     private $childWidgetNodes;
 
     /**
-     * The name of this widget, if set, unique amongst its siblings
+     * The name of this widget, unique amongst its siblings
      *
-     * @var string|null
+     * @var string|int
      */
     private $name;
 
@@ -79,7 +92,9 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @param string $widgetDefinitionLibraryName
      * @param string $widgetDefinitionName
      * @param ExpressionBagNode $attributeExpressionBagNode
-     * @param string|null $name
+     * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
+     * @param ExpressionBagNode $captureExpressionBagNode
+     * @param string|int $name
      * @param WidgetNodeInterface[] $childWidgetNodes
      * @param TriggerNode[] $triggerNodes
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
@@ -89,13 +104,17 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
         $widgetDefinitionLibraryName,
         $widgetDefinitionName,
         ExpressionBagNode $attributeExpressionBagNode,
-        $name = null,
+        FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
+        ExpressionBagNode $captureExpressionBagNode,
+        $name,
         array $childWidgetNodes = [],
         array $triggerNodes = [],
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
         $this->attributeExpressionBagNode = $attributeExpressionBagNode;
+        $this->captureExpressionBagNode = $captureExpressionBagNode;
+        $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->childWidgetNodes = $childWidgetNodes;
         $this->name = $name;
         $this->tags = $tags;
@@ -135,6 +154,11 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
                 $subSpecBuilder->addChildNode($childWidgetNode);
             }
 
+            $subSpecBuilder->addChildNode($this->captureExpressionBagNode);
+            $subSpecBuilder->addChildNode($this->captureStaticBagModelNode);
+            $subSpecBuilder->addModifier(new ValidCaptureDefinitionsSpecModifier($this->captureStaticBagModelNode));
+            $subSpecBuilder->addModifier(new ValidCaptureSetsSpecModifier($this->captureExpressionBagNode));
+
             // Validate the visibility expression, if specified
             if ($this->visibilityExpressionNode) {
                 $subSpecBuilder->addChildNode($this->visibilityExpressionNode);
@@ -158,6 +182,22 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     public function getAttributeExpressionBag()
     {
         return $this->attributeExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModelNode;
     }
 
     /**

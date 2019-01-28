@@ -12,6 +12,7 @@
 namespace Combyna\Unit\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
@@ -31,6 +32,16 @@ class DefinedWidgetNodeTest extends TestCase
      * @var ObjectProphecy|ExpressionBagNode
      */
     private $attributeExpressionBagNode;
+
+    /**
+     * @var ObjectProphecy|ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var ObjectProphecy|FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
 
     /**
      * @var ObjectProphecy|WidgetNodeInterface
@@ -65,6 +76,8 @@ class DefinedWidgetNodeTest extends TestCase
     public function setUp()
     {
         $this->attributeExpressionBagNode = $this->prophesize(ExpressionBagNode::class);
+        $this->captureExpressionBagNode = $this->prophesize(ExpressionBagNode::class);
+        $this->captureStaticBagModelNode = $this->prophesize(FixedStaticBagModelNodeInterface::class);
         $this->childWidgetNode1 = $this->prophesize(WidgetNodeInterface::class);
         $this->childWidgetNode2 = $this->prophesize(WidgetNodeInterface::class);
         $this->subValidationContext = $this->prophesize(ActNodeSubValidationContextInterface::class);
@@ -76,6 +89,8 @@ class DefinedWidgetNodeTest extends TestCase
             'my_lib',
             'my_widget',
             $this->attributeExpressionBagNode->reveal(),
+            $this->captureStaticBagModelNode->reveal(),
+            $this->captureExpressionBagNode->reveal(),
             'my-widget',
             [$this->childWidgetNode1->reveal(), $this->childWidgetNode2->reveal()],
             [$this->triggerNode1->reveal(), $this->triggerNode2->reveal()],

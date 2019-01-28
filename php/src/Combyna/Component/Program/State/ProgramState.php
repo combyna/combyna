@@ -25,7 +25,7 @@ use Combyna\Component\Ui\State\View\ViewStateInterface;
 class ProgramState implements ProgramStateInterface
 {
     /**
-     * @var ViewStateInterface
+     * @var PageViewStateInterface
      */
     private $pageViewState;
 
@@ -41,12 +41,12 @@ class ProgramState implements ProgramStateInterface
 
     /**
      * @param RouterStateInterface $routerState
-     * @param ViewStateInterface $pageViewState
+     * @param PageViewStateInterface $pageViewState
      * @param ViewStateInterface[] $visibleOverlayViewStates
      */
     public function __construct(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState,
+        PageViewStateInterface $pageViewState,
         array $visibleOverlayViewStates
     ) {
         $this->pageViewState = $pageViewState;
@@ -84,6 +84,14 @@ class ProgramState implements ProgramStateInterface
     public function getVisibleViewStates()
     {
         return array_merge([$this->pageViewState], $this->visibleOverlayViewStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVisibleOverlayViewStates()
+    {
+        return $this->visibleOverlayViewStates;
     }
 
     /**
@@ -137,7 +145,7 @@ class ProgramState implements ProgramStateInterface
      */
     public function withPage(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState
+        PageViewStateInterface $pageViewState
     ) {
         return new self($routerState, $pageViewState, $this->visibleOverlayViewStates);
     }

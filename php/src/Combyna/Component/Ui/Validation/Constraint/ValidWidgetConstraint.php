@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Validation\Constraint;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
@@ -98,5 +99,13 @@ class ValidWidgetConstraint implements ConstraintInterface
     public function getWidgetDefinitionName()
     {
         return $this->widgetDefinitionName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

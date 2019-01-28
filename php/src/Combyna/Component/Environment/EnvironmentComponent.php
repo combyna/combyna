@@ -13,6 +13,7 @@ namespace Combyna\Component\Environment;
 
 use Combyna\Component\Common\AbstractComponent;
 use Combyna\Component\Environment\DependencyInjection\RegisterNativeFunctionProvidersPass;
+use Combyna\Component\Environment\DependencyInjection\RegisterWidgetValueProvidersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -29,5 +30,8 @@ class EnvironmentComponent extends AbstractComponent
     {
         // Register the native PHP implementation for native functions
         $containerBuilder->addCompilerPass(new RegisterNativeFunctionProvidersPass());
+
+        // Register the providers for widget values
+        $containerBuilder->addCompilerPass(new RegisterWidgetValueProvidersPass());
     }
 }

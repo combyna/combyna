@@ -26,6 +26,14 @@ use Combyna\Component\Ui\Store\Expression\ViewStoreQueryExpression;
 interface UiExpressionFactoryInterface extends ExpressionFactoryInterface
 {
     /**
+     * Creates a CaptureExpression
+     *
+     * @param string $captureName
+     * @return CaptureExpression
+     */
+    public function createCaptureExpression($captureName);
+
+    /**
      * Creates a store SlotExpression
      *
      * @param string $slotName

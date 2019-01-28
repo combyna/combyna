@@ -9,8 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-use Combyna\CombynaBootstrap;
-use Combyna\Plugin\Gui\GuiPlugin;
+use Combyna\Harness\TestCombynaBootstrap;
 
 // Load Composer's autoloader
 $autoloader = require __DIR__ . '/../../vendor/autoload.php';
@@ -27,11 +26,7 @@ if (file_exists($compiledContainer)) {
     unlink($compiledContainer);
 }
 
-$combynaBootstrap = new CombynaBootstrap([
-    // Install the basic GUI plugin for integrated tests to use
-    new GuiPlugin()
-]);
-$combynaBootstrap->getContainer(false);
-
 // Make sure the expression parser is up-to-date for each test run
 shell_exec('composer run-script build:expression-parser');
+
+$combynaBootstrap = new TestCombynaBootstrap();

@@ -124,12 +124,28 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getChildStates()
+    {
+        return $this->childWidgetStates;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEventualRenderableDescendantStatePath()
     {
         return array_merge(
             [$this->rootWidgetState],
             $this->rootWidgetState->getEventualRenderableDescendantStatePath()
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRootWidgetState()
+    {
+        return $this->rootWidgetState;
     }
 
     /**
@@ -230,5 +246,44 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
         }
 
         return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        return array_key_exists($name, $this->childWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(
+        StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
+        array $childWidgetStates,
+        WidgetStateInterface $rootWidgetState
+    ) {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        // TODO: Standardise on an `->equals(...)` or `->isEqualTo(...)` method for bag comparisons like this
+        if ($this->attributeStaticBag->toNativeArray() === $attributeStaticBag->toNativeArray() &&
+            $this->valueStaticBag->toNativeArray() === $valueStaticBag->toNativeArray() &&
+            $this->childWidgetStates === $childWidgetStates &&
+            $this->rootWidgetState === $rootWidgetState
+        ) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self(
+            $this->name,
+            $this->widget,
+            $attributeStaticBag,
+            $valueStaticBag,
+            $childWidgetStates,
+            $rootWidgetState
+        );
     }
 }

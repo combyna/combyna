@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
@@ -19,6 +21,8 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraint;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -29,6 +33,16 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInterface
 {
     const TYPE = 'child-reference-widget';
+
+    /**
+     * @var ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
 
     /**
      * @var string
@@ -47,14 +61,20 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
 
     /**
      * @param string $childName
+     * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
+     * @param ExpressionBagNode $captureExpressionBagNode
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
     public function __construct(
         $childName,
+        FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
+        ExpressionBagNode $captureExpressionBagNode,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
+        $this->captureExpressionBagNode = $captureExpressionBagNode;
+        $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->childName = $childName;
         $this->tags = $tags;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
@@ -68,6 +88,12 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
         // Check that the compound widget we are inside actually has a child with this name
         $specBuilder->addConstraint(new CompoundWidgetDefinitionHasChildConstraint($this->childName));
 
+        // TODO: Remove captures support for this type of node?
+        $specBuilder->addChildNode($this->captureExpressionBagNode);
+        $specBuilder->addChildNode($this->captureStaticBagModelNode);
+        $specBuilder->addModifier(new ValidCaptureDefinitionsSpecModifier($this->captureStaticBagModelNode));
+        $specBuilder->addModifier(new ValidCaptureSetsSpecModifier($this->captureExpressionBagNode));
+
         if ($this->visibilityExpressionNode !== null) {
             $specBuilder->addChildNode($this->visibilityExpressionNode);
 
@@ -80,6 +106,22 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
                 )
             );
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModelNode;
     }
 
     /**

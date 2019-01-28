@@ -17,6 +17,7 @@ use Combyna\Component\Ui\State\Store\ViewStoreState;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewState;
 use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetState;
+use Combyna\Component\Ui\State\Widget\ConditionalWidgetState;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetState;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetState;
 use Combyna\Component\Ui\State\Widget\RepeaterWidgetState;
@@ -26,6 +27,7 @@ use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePath;
 use Combyna\Component\Ui\View\PageViewInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
+use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
@@ -44,9 +46,21 @@ class UiStateFactory implements UiStateFactoryInterface
     public function createChildReferenceWidgetState(
         $name,
         ChildReferenceWidgetInterface $widget,
-        WidgetStateInterface $childWidgetState
+        WidgetStateInterface $referencedChildWidgetState
     ) {
-        return new ChildReferenceWidgetState($name, $widget, $childWidgetState);
+        return new ChildReferenceWidgetState($name, $widget, $referencedChildWidgetState);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createConditionalWidgetState(
+        $name,
+        ConditionalWidgetInterface $widget,
+        WidgetStateInterface $consequentChildWidgetState = null,
+        WidgetStateInterface $alternateChildWidgetState = null
+    ) {
+        return new ConditionalWidgetState($name, $widget, $consequentChildWidgetState, $alternateChildWidgetState);
     }
 
     /**
@@ -152,9 +166,10 @@ class UiStateFactory implements UiStateFactoryInterface
      */
     public function createWidgetGroupState(
         $name,
-        WidgetGroupInterface $widgetGroup
+        WidgetGroupInterface $widgetGroup,
+        array $childWidgetStates
     ) {
-        return new WidgetGroupState($name, $widgetGroup);
+        return new WidgetGroupState($name, $widgetGroup, $childWidgetStates);
     }
 
     /**

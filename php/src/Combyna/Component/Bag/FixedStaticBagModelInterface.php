@@ -40,6 +40,31 @@ interface FixedStaticBagModelInterface
     public function assertValidStaticBag(StaticBagInterface $staticBag);
 
     /**
+     * Creates a new StaticBag from a set of statics that is guaranteed to meet this fixed model.
+     * Any optional statics in the model (those which have a default expression set) are missing
+     * from the statics array provided, their default expressions will be evaluated to give their values.
+     * The default expressions may be evaluated using a different evaluation context.
+     *
+     * @param ExpressionBagInterface $expressionBag
+     * @param EvaluationContextInterface $explicitEvaluationContext
+     * @param EvaluationContextInterface $defaultsEvaluationContext
+     * @return StaticBagInterface
+     */
+    public function createBag(
+        ExpressionBagInterface $expressionBag,
+        EvaluationContextInterface $explicitEvaluationContext,
+        EvaluationContextInterface $defaultsEvaluationContext
+    );
+
+    /**
+     * Creates a new StaticBag from a callback that retrieves statics that is guaranteed to meet this fixed model
+     *
+     * @param callable $staticFetcher
+     * @return StaticBagInterface
+     */
+    public function createBagWithCallback(callable $staticFetcher);
+
+    /**
      * Creates a StaticBag with all the default statics of definitions in this model
      *
      * @param EvaluationContextInterface $evaluationContext
@@ -54,6 +79,15 @@ interface FixedStaticBagModelInterface
      * @return bool
      */
     public function definesStatic($name);
+
+    /**
+     * Evaluates and returns the default expression for the specified static of the model
+     *
+     * @param string $name
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getDefaultStatic($name, EvaluationContextInterface $evaluationContext);
 
     /**
      * Fetches the type of the specified static in the model

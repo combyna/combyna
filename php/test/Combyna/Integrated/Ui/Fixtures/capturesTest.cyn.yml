@@ -1,0 +1,111 @@
+name: Captures test app
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Captures test'
+        description: A test of the captures feature
+        widget:
+            type: group
+            captures:
+                define:
+                    the_phone_number_from_textbox: text
+                    some_hardcoded_value: text
+                    multiple_captured_things:
+                        type: list
+                        element: number
+                        default: !expr []
+                    set_but_widget_always_not_present:
+                        type: text
+                        default: !expr 'My default capture value'
+                    set_and_widget_always_present:
+                        type: text
+                        default: !expr 'My required default capture value that will never be used'
+            children:
+                # This widget exists _before_ the widget that sets the value
+                # of the capture it references, to check support for forward-referencing
+                - type: text
+                  text: !expr 'The hardcoded value is: ' ~ capture('some_hardcoded_value') ~ '.'
+                - type: gui.textbox
+                  attributes:
+                      value: !expr '[Enter a phone number]'
+                  captures:
+                      set:
+                          the_phone_number_from_textbox: !expr widget_value('text')
+                - type: text
+                  text: !expr 'I exist only to hardcode the value of a capture, as a demo'
+                  captures:
+                      set:
+                          some_hardcoded_value: !expr 'I am hardcoded'
+                # This widget exists _after_ the widget that sets the value
+                # of the capture it references, to check support for backward-referencing
+                - type: text
+                  text: !expr 'The phone number is: ' ~ capture('the_phone_number_from_textbox') ~ '.'
+
+                - type: text
+                  text:
+                      type: concatenation
+                      list:
+                          type: list
+                          elements:
+                              - "!expr 'Captured things: ['"
+                              - type: concatenation
+                                list: !expr capture('multiple_captured_things')
+                                glue: !expr ', '
+                              - !expr ']'
+
+                - type: repeater
+                  items: !expr [4, 5, 6]
+                  index_variable: this_item_index
+                  item_variable: this_item
+                  repeated:
+                      type: group
+                      children:
+                          - type: text
+                            text: "!expr 'Enter a multiplier for item #' ~ this_item_index ~ ' - ' ~ this_item ~ ':'"
+                          - type: gui.textbox
+                            attributes:
+                                value: !expr '2'
+                            captures:
+                                set:
+                                    # Multiply the item and add that to the list
+                                    multiple_captured_things: !expr this_item * number(widget_value('text'))
+
+                - type: text
+                  # Rely on the default expression for the capture
+                  text: !expr 'The capture that is never set: "' ~ capture('set_but_widget_always_not_present') ~ '"'
+                - type: conditional
+                  condition: !expr false
+                  then:
+                      type: text
+                      text: !expr 'I am never present, but will count as setting the capture'
+                      captures:
+                          set:
+                              # Set the capture to pass validation (as we do not attempt to determine
+                              # whether a conditional widget's condition will always evaluate to false) -
+                              # as there is a conditional widget involved between the capture definition
+                              # and where it is set, it will need to have a default expression set,
+                              # which should be used here
+                              set_but_widget_always_not_present: !expr 'I will never be used as my widget is not present'
+
+                - type: text
+                  # Will never use the default expression for the capture
+                  text: !expr 'The capture that is always set: "' ~ capture('set_and_widget_always_present') ~ '"'
+                - type: conditional
+                  condition: !expr true
+                  then:
+                      type: text
+                      text: !expr 'I am always present, so will set the capture'
+                      captures:
+                          set:
+                              # Set the capture to pass validation (as we do not attempt to determine
+                              # whether a conditional widget's condition will always evaluate to false) -
+                              # as there is a conditional widget involved between the capture definition
+                              # and where it is set, it will need to have a default expression set,
+                              # but that should _not_ be used here
+                              set_and_widget_always_present: !expr 'I will always be used as my widget is present'

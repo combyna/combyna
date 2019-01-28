@@ -12,6 +12,8 @@
 namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
@@ -38,6 +40,16 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
      * @var BagFactoryInterface
      */
     private $bagFactory;
+
+    /**
+     * @var ExpressionBagInterface
+     */
+    private $captureExpressionBag;
+
+    /**
+     * @var FixedStaticBagModelInterface
+     */
+    private $captureStaticBagModel;
 
     /**
      * @var string
@@ -75,6 +87,8 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
      * @param string $childName
      * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
@@ -84,10 +98,14 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
         $childName,
         BagFactoryInterface $bagFactory,
         UiStateFactoryInterface $uiStateFactory,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
         $this->bagFactory = $bagFactory;
+        $this->captureExpressionBag = $captureExpressionBag;
+        $this->captureStaticBagModel = $captureStaticBagModel;
         $this->childName = $childName;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
@@ -102,9 +120,9 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        WidgetStateInterface $widgetState
+        WidgetStateInterface $widgetState = null
     ) {
-        if (!$widgetState instanceof ChildReferenceWidgetStateInterface) {
+        if ($widgetState && !$widgetState instanceof ChildReferenceWidgetStateInterface) {
             throw new LogicException(
                 sprintf(
                     'Expected a %s, got %s',
@@ -114,7 +132,11 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+            $parentContext,
+            $this,
+            $widgetState
+        );
     }
 
     /**
@@ -130,18 +152,28 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
      */
     public function createInitialState(
         $name,
-        ViewEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
-        $childWidget = $evaluationContext->getChildWidget($this->childName);
+        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
+
+        $childWidget = $evaluationContext->getChildOfCurrentCompoundWidget($this->childName);
 
         return $this->uiStateFactory->createChildReferenceWidgetState(
             $name,
             $this,
-            $childWidget->createInitialState(
-                'child',
-                $evaluationContext
-            )
+            // Each embedded instance of a compound widget's child will get a separate state. This allows
+            // eg. a self-incrementing button to maintain a separate counter for each place it is embedded.
+            $childWidget->createInitialState($name, $subEvaluationContext, $evaluationContextFactory)
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function descendantsSetCaptureInclusive($captureName)
+    {
+        return $this->captureExpressionBag->hasExpression($captureName);
     }
 
     /**
@@ -165,6 +197,22 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
             'ChildReferenceWidgets cannot have attributes, so attribute "%s" cannot be fetched',
             $attributeName
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModel;
     }
 
     /**
@@ -229,5 +277,40 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     public function isRenderable()
     {
         return true; // ChildReferenceWidgets cannot be resolved further, so they are always renderable
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if (!$oldState instanceof ChildReferenceWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    ChildReferenceWidgetStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        $subEvaluationContext = $this->createEvaluationContext(
+            $evaluationContext,
+            $evaluationContextFactory,
+            $oldState
+        );
+
+        $childWidget = $evaluationContext->getChildOfCurrentCompoundWidget($this->childName);
+
+        return $oldState->with(
+            $childWidget->reevaluateState(
+                $oldState->getChildState('child'),
+                $subEvaluationContext,
+                $evaluationContextFactory
+            )
+        );
     }
 }

@@ -23,6 +23,7 @@ use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use LogicException;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
@@ -80,6 +81,12 @@ class Combyna
     private $modeContext;
 
     /**
+     * @var ContainerInterface
+     */
+    private $serviceContainer;
+
+    /**
+     * @param ContainerInterface $serviceContainer
      * @param EventDispatcherInterface $eventDispatcher
      * @param EnvironmentFactoryInterface $environmentFactory
      * @param EnvironmentLoaderInterface $environmentLoader
@@ -90,6 +97,7 @@ class Combyna
      * @param ModeContext $modeContext
      */
     public function __construct(
+        ContainerInterface $serviceContainer,
         EventDispatcherInterface $eventDispatcher,
         EnvironmentFactoryInterface $environmentFactory,
         EnvironmentLoaderInterface $environmentLoader,
@@ -107,6 +115,7 @@ class Combyna
         $this->eventDispatcher = $eventDispatcher;
         $this->libraryConfigCollection = $libraryConfigCollection;
         $this->modeContext = $modeContext;
+        $this->serviceContainer = $serviceContainer;
     }
 
     /**
@@ -164,6 +173,17 @@ class Combyna
         );
 
         return $environmentNode;
+    }
+
+    /**
+     * Fetches the service container. This allows external code to inspect and modify
+     * the service container (in debug mode) as needed.
+     *
+     * @return ContainerInterface
+     */
+    public function getContainer()
+    {
+        return $this->serviceContainer;
     }
 
     /**

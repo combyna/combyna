@@ -47,7 +47,7 @@ class CurrentWidgetDefinitionHasAttributeQuery implements BooleanQueryInterface
      */
     public function getDescription()
     {
-        return 'Whether the compound widget definition has an attribute called "' . $this->attributeName . '"';
+        return 'Whether the current widget definition has an attribute called "' . $this->attributeName . '"';
     }
 
     /**

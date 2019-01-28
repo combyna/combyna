@@ -2,3 +2,5 @@ services:
     combyna:
         class: Combyna\Component\Framework\Combyna
         autowire: true
+        arguments:
+            - '@service_container'

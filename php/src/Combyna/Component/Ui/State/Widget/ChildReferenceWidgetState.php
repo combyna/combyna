@@ -29,29 +29,29 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
     private $childReferenceWidget;
 
     /**
-     * @var WidgetStateInterface
-     */
-    private $childWidgetState;
-
-    /**
      * @var string|int
      */
     private $name;
 
     /**
+     * @var WidgetStateInterface
+     */
+    private $referencedChildWidgetState;
+
+    /**
      * @param string|int $name
      * @param ChildReferenceWidgetInterface $childReferenceWidget
-     * @param WidgetStateInterface $childWidgetState
+     * @param WidgetStateInterface $referencedChildWidgetState
      */
     public function __construct(
         $name,
         ChildReferenceWidgetInterface $childReferenceWidget,
-        WidgetStateInterface $childWidgetState
+        WidgetStateInterface $referencedChildWidgetState
     ) {
         // FIXME: Remove references from state objects back to the entities like this!
         $this->childReferenceWidget = $childReferenceWidget;
-        $this->childWidgetState = $childWidgetState;
         $this->name = $name;
+        $this->referencedChildWidgetState = $referencedChildWidgetState;
     }
 
     /**
@@ -71,7 +71,15 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
             throw new InvalidArgumentException('Only the "child" child is supported for ChildReferenceWidgetStates');
         }
 
-        return $this->childWidgetState;
+        return $this->referencedChildWidgetState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildStates()
+    {
+        return [$this->referencedChildWidgetState];
     }
 
     /**
@@ -146,5 +154,29 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
         return $this->childReferenceWidget->hasTag($tag) ?
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        // Only the "child" child is supported for ChildReferenceWidgetStates
+        return $name === 'child';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(WidgetStateInterface $referencedWidgetState)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->referencedChildWidgetState === $referencedWidgetState) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->childReferenceWidget, $this->referencedChildWidgetState);
     }
 }

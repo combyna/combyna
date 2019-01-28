@@ -11,12 +11,12 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
-use Combyna\Component\Bag\ExpressionBagInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
-use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
+use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use LogicException;
 
 /**
  * Class CompoundWidgetEvaluationContext
@@ -25,11 +25,6 @@ use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
  */
 class CompoundWidgetEvaluationContext extends AbstractEvaluationContext implements CompoundWidgetEvaluationContextInterface
 {
-    /**
-     * @var StaticBagInterface
-     */
-    private $attributeStaticBag;
-
     /**
      * @var UiEvaluationContextFactoryInterface
      */
@@ -41,58 +36,39 @@ class CompoundWidgetEvaluationContext extends AbstractEvaluationContext implemen
     protected $parentContext;
 
     /**
-     * @var ExpressionBagInterface
-     */
-    private $valueExpressionBag;
-
-    /**
      * @var DefinedWidgetInterface
      */
     private $widget;
 
     /**
+     * @var CompoundWidgetDefinition
+     */
+    private $widgetDefinition;
+
+    /**
+     * @var DefinedCompoundWidgetStateInterface|null
+     */
+    private $widgetState;
+
+    /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @param ViewEvaluationContextInterface $parentContext
+     * @param CompoundWidgetDefinition $widgetDefinition
      * @param DefinedWidgetInterface $widget
-     * @param StaticBagInterface $attributeStaticBag
-     * @param ExpressionBagInterface $valueExpressionBag
+     * @param DefinedCompoundWidgetStateInterface|null $widgetState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewEvaluationContextInterface $parentContext,
+        CompoundWidgetDefinition $widgetDefinition,
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag,
-        ExpressionBagInterface $valueExpressionBag
+        DefinedCompoundWidgetStateInterface $widgetState = null
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
-        $this->attributeStaticBag = $attributeStaticBag;
-        $this->valueExpressionBag = $valueExpressionBag;
         $this->widget = $widget;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubAssuredContext(StaticBagInterface $assuredStaticBag)
-    {
-        return $this->evaluationContextFactory->createAssuredContext($this, $assuredStaticBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubExpressionContext(ExpressionInterface $expression)
-    {
-        return $this->evaluationContextFactory->createExpressionContext($this, $expression);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createSubScopeContext(StaticBagInterface $variableStaticBag)
-    {
-        return $this->evaluationContextFactory->createScopeContext($this, $variableStaticBag);
+        $this->widgetDefinition = $widgetDefinition;
+        $this->widgetState = $widgetState;
     }
 
     /**
@@ -106,9 +82,80 @@ class CompoundWidgetEvaluationContext extends AbstractEvaluationContext implemen
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getCaptureLeafwise($captureName)
     {
-        return $this->widget->getChildWidget($childName);
+        if ($this->widget->getCaptureExpressionBag()->hasExpression($captureName)) {
+            $definitionSubEvaluationContext = $this->evaluationContextFactory
+                ->createCompoundWidgetDefinitionEvaluationContext(
+                    $this,
+                    $this->widgetDefinition,
+                    $this->widget,
+                    $this->widgetState
+                );
+
+            // This widget sets the capture - evaluate and return. Evaluate in the context
+            // of the widget definition, so that the expression has access to widget values
+            return $this->widget->getCaptureExpressionBag()
+                ->getExpression($captureName)
+                ->toStatic($definitionSubEvaluationContext);
+        }
+
+        foreach ($this->widget->getChildWidgets() as $childWidget) {
+            // Fetch the child widget state if it has been created already
+            $childWidgetState = $this->widgetState ?
+                $this->widgetState->getChildState($childWidget->getName()) :
+                null;
+
+            $childWidgetEvaluationContext = $childWidget
+                ->createEvaluationContext(
+                    $this,
+                    $this->evaluationContextFactory,
+                    $childWidgetState
+                );
+
+            $captureStatic = $childWidgetEvaluationContext->getCaptureLeafwise($captureName);
+
+            if ($captureStatic !== null) {
+                return $captureStatic;
+            }
+        }
+
+        // No descendants set the capture
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureRootwise($captureName)
+    {
+        if (!$this->widget->getCaptureStaticBagModel()->definesStatic($captureName)) {
+            // This widget does not define the capture - it should be defined by an ancestor further up
+            return $this->parentContext->getCaptureRootwise($captureName);
+        }
+
+        // This widget defines the capture - it should be set by a descendant (or itself)
+        $captureStatic = $this->getCaptureLeafwise($captureName);
+
+        if ($captureStatic === null) {
+            // If this widget defines the capture, a descendant _must_ set it
+            throw new LogicException(
+                sprintf(
+                    'Capture "%s" was not set',
+                    $captureName
+                )
+            );
+        }
+
+        return $captureStatic;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildOfCurrentCompoundWidget($childName)
+    {
+        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
     }
 
     /**
@@ -130,16 +177,8 @@ class CompoundWidgetEvaluationContext extends AbstractEvaluationContext implemen
     /**
      * {@inheritdoc}
      */
-    public function getWidgetAttribute($attributeName)
+    public function getWidgetState()
     {
-        return $this->widget->getAttribute($attributeName, $this);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWidgetValue($valueName)
-    {
-        return $this->valueExpressionBag->getExpression($valueName)->toStatic($this);
+        return $this->widgetState;
     }
 }

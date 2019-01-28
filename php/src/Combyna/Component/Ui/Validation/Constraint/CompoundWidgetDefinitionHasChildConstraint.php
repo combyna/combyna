@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -41,5 +42,13 @@ class CompoundWidgetDefinitionHasChildConstraint implements ConstraintInterface
     public function getChildName()
     {
         return $this->childName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

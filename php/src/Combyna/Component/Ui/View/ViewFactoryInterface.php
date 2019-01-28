@@ -12,10 +12,12 @@
 namespace Combyna\Component\Ui\View;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Trigger\TriggerCollectionInterface;
 use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
+use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
@@ -35,6 +37,8 @@ interface ViewFactoryInterface
      *
      * @param string $name
      * @param string $childName
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -43,8 +47,30 @@ interface ViewFactoryInterface
     public function createChildReferenceWidget(
         $name,
         $childName,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
+        array $tags = []
+    );
+
+    /**
+     * Creates a new conditional widget
+     *
+     * @param string $name
+     * @param ExpressionInterface $conditionExpression
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
+     * @param WidgetInterface|null $parentWidget
+     * @param array $tags
+     * @return ConditionalWidgetInterface
+     */
+    public function createConditionalWidget(
+        $name,
+        ExpressionInterface $conditionExpression,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
+        WidgetInterface $parentWidget = null,
         array $tags = []
     );
 
@@ -55,6 +81,8 @@ interface ViewFactoryInterface
      * @param WidgetDefinitionInterface $widgetDefinition
      * @param ExpressionBagInterface $attributeExpressionBag
      * @param TriggerCollectionInterface $triggerCollection
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -65,6 +93,8 @@ interface ViewFactoryInterface
         WidgetDefinitionInterface $widgetDefinition,
         ExpressionBagInterface $attributeExpressionBag,
         TriggerCollectionInterface $triggerCollection,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
@@ -111,6 +141,8 @@ interface ViewFactoryInterface
      * @param ExpressionInterface $itemListExpression
      * @param string|null $indexVariableName
      * @param string $itemVariableName
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -121,6 +153,8 @@ interface ViewFactoryInterface
         ExpressionInterface $itemListExpression,
         $indexVariableName,
         $itemVariableName,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
@@ -131,6 +165,8 @@ interface ViewFactoryInterface
      *
      * @param string $name
      * @param ExpressionInterface $textExpression
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -139,6 +175,8 @@ interface ViewFactoryInterface
     public function createTextWidget(
         $name,
         ExpressionInterface $textExpression,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
@@ -148,6 +186,8 @@ interface ViewFactoryInterface
      * Creates a new widget group
      *
      * @param string $name
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -155,6 +195,8 @@ interface ViewFactoryInterface
      */
     public function createWidgetGroup(
         $name,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []

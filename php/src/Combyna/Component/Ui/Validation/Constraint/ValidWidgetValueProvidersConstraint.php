@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -98,5 +99,13 @@ class ValidWidgetValueProvidersConstraint implements ConstraintInterface
     public function getWidgetDefinitionName()
     {
         return $this->widgetDefinitionName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Event\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -58,5 +59,13 @@ class EventDefinitionExistsConstraint implements ConstraintInterface
     public function getEventName()
     {
         return $this->eventName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

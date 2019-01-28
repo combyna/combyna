@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 
@@ -119,5 +120,13 @@ class PossibleMatchingResultTypesConstraint implements ExpressionValidationConst
     public function getRightOperandExpressionNode()
     {
         return $this->rightOperandExpressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

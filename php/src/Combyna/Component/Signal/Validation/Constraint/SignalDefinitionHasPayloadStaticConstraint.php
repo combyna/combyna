@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Signal\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
@@ -41,5 +42,13 @@ class SignalDefinitionHasPayloadStaticConstraint implements ConstraintInterface
     public function getPayloadStaticName()
     {
         return $this->staticName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

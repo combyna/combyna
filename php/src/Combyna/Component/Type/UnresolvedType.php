@@ -87,6 +87,14 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsVoidType(VoidType $candidateType)
+    {
+        return false; // Unresolved types cannot match any others, including the special Void type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByAnyType()
     {
         // Unresolved types cannot match any others, including the special "any" type
@@ -115,6 +123,14 @@ class UnresolvedType implements TypeInterface
      * {@inheritdoc}
      */
     public function isAllowedByStaticType(StaticType $superType)
+    {
+        return false; // Unresolved types cannot match any others
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByVoidType(VoidType $otherType)
     {
         return false; // Unresolved types cannot match any others
     }
@@ -186,6 +202,16 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithVoidType(VoidType $otherType)
+    {
+        // Keep both the unresolved and void types, as each will probably have
+        // a different useful context description
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithUnresolvedType($this);
@@ -219,6 +245,14 @@ class UnresolvedType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithUnresolvedType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType)
     {
         return $candidateType->mergeWithUnresolvedType($this);
     }

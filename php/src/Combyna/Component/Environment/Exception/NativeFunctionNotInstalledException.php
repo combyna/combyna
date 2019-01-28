@@ -39,7 +39,11 @@ class NativeFunctionNotInstalledException extends Exception
      */
     public function __construct($libraryName, $functionName)
     {
-        parent::__construct('Native function "' . $libraryName . '" was never installed');
+        parent::__construct(sprintf(
+            'Native function "%s" for library "%s" was never installed',
+            $functionName,
+            $libraryName
+        ));
 
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;

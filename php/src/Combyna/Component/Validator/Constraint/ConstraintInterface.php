@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Validator\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Interface ConstraintInterface
  *
@@ -18,4 +20,11 @@ namespace Combyna\Component\Validator\Constraint;
  */
 interface ConstraintInterface
 {
+    /**
+     * Determines whether the validation of this constraint makes the specified query directly
+     *
+     * @param QuerySpecifierInterface $querySpecifier
+     * @return bool
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier);
 }

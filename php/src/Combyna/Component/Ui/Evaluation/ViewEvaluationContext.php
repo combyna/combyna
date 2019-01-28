@@ -71,9 +71,9 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
     /**
      * {@inheritdoc}
      */
-    public function getChildWidget($childName)
+    public function getChildOfCurrentCompoundWidget($childName)
     {
-        return $this->parentContext->getChildWidget($childName);
+        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
     }
 
     /**

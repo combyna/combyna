@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Expression\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Class AssuredStaticExistsConstraint
  *
@@ -39,5 +41,13 @@ class AssuredStaticExistsConstraint implements ExpressionValidationConstraintInt
     public function getStaticName()
     {
         return $this->staticName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

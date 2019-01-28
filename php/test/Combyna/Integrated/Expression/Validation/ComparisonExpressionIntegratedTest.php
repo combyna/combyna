@@ -20,7 +20,7 @@ use Combyna\Component\Expression\Config\Act\BooleanExpressionNode;
 use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
@@ -221,9 +221,9 @@ class ComparisonExpressionIntegratedTest extends TestCase
     public function testTheOperandsMustBeValid()
     {
         $expressionNode = new ComparisonExpressionNode(
-            new UnknownExpressionNode('left-unknown-type'),
+            new UnknownExpressionTypeNode('left-unknown-type'),
             ComparisonExpression::EQUAL,
-            new UnknownExpressionNode('right-unknown-type')
+            new UnknownExpressionTypeNode('right-unknown-type')
         );
 
         $this->setExpectedException(

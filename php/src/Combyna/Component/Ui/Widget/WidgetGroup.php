@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
@@ -32,6 +34,16 @@ use LogicException;
 class WidgetGroup implements WidgetGroupInterface
 {
     const DEFINITION = 'widget-group';
+
+    /**
+     * @var ExpressionBagInterface
+     */
+    private $captureExpressionBag;
+
+    /**
+     * @var FixedStaticBagModelInterface
+     */
+    private $captureStaticBagModel;
 
     /**
      * @var WidgetInterface[]
@@ -66,6 +78,8 @@ class WidgetGroup implements WidgetGroupInterface
     /**
      * @param UiStateFactoryInterface $uiStateFactory
      * @param string|int $name
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param WidgetInterface|null $parentWidget
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
@@ -73,13 +87,18 @@ class WidgetGroup implements WidgetGroupInterface
     public function __construct(
         UiStateFactoryInterface $uiStateFactory,
         $name,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         WidgetInterface $parentWidget = null,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
+        $this->captureExpressionBag = $captureExpressionBag;
+        $this->captureStaticBagModel = $captureStaticBagModel;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
+        // TODO: Pass this into ->createInitialState(), assuming that's the only place it's ever used??
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
     }
@@ -98,9 +117,9 @@ class WidgetGroup implements WidgetGroupInterface
     public function createEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        WidgetStateInterface $widgetState
+        WidgetStateInterface $widgetState = null
     ) {
-        if (!$widgetState instanceof WidgetGroupStateInterface) {
+        if ($widgetState && !$widgetState instanceof WidgetGroupStateInterface) {
             throw new LogicException(
                 sprintf(
                     'Expected a %s, got %s',
@@ -110,7 +129,11 @@ class WidgetGroup implements WidgetGroupInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+            $parentContext,
+            $this,
+            $widgetState
+        );
     }
 
     /**
@@ -126,21 +149,47 @@ class WidgetGroup implements WidgetGroupInterface
      */
     public function createInitialState(
         $name,
-        ViewEvaluationContextInterface $evaluationContext
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
-        $state = $this->uiStateFactory->createWidgetGroupState($name, $this);
+        // Make any capture-definitions (that this widget group defines) and any capture-sets
+        // that this widget or any child widget makes available to its other child widgets
+        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
+
+        $childWidgetStates = [];
 
         foreach ($this->childWidgets as $childIndex => $childWidget) {
-            $state->addChild(
-                $childWidget->getName(),
-                $childWidget->createInitialState(
-                    $childIndex,
-                    $evaluationContext
-                )
+            $childWidgetStates[$childIndex] = $childWidget->createInitialState(
+                $childIndex,
+                $subEvaluationContext,
+                $evaluationContextFactory
             );
         }
 
-        return $state;
+        return $this->uiStateFactory->createWidgetGroupState(
+            $name,
+            $this,
+            $childWidgetStates
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function descendantsSetCaptureInclusive($captureName)
+    {
+        if ($this->captureExpressionBag->hasExpression($captureName)) {
+            // This widget sets the capture
+            return true;
+        }
+
+        foreach ($this->childWidgets as $childWidget) {
+            if ($childWidget->descendantsSetCaptureInclusive($captureName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -174,6 +223,47 @@ class WidgetGroup implements WidgetGroupInterface
             'WidgetGroups cannot have attributes, so attribute "%s" cannot be fetched',
             $attributeName
         ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidget($childIndex)
+    {
+        if (!array_key_exists($childIndex, $this->childWidgets)) {
+            throw new LogicException(
+                sprintf(
+                    'Widget group has no child #%d',
+                    $childIndex
+                )
+            );
+        }
+
+        return $this->childWidgets[$childIndex];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildWidgets()
+    {
+        return $this->childWidgets;
     }
 
     /**
@@ -241,5 +331,44 @@ class WidgetGroup implements WidgetGroupInterface
     public function isRenderable()
     {
         return true; // Widget groups have a renderer
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if (!$oldState instanceof WidgetGroupStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    WidgetGroupStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        // Make any capture-definitions (that this widget group defines) and any capture-sets
+        // that this widget or any child widget makes available to its other child widgets
+        $subEvaluationContext = $this->createEvaluationContext(
+            $evaluationContext,
+            $evaluationContextFactory,
+            $oldState
+        );
+
+        $childWidgetStates = [];
+
+        foreach ($this->childWidgets as $childIndex => $childWidget) {
+            $childWidgetStates[$childIndex] = $childWidget->reevaluateState(
+                $oldState->getChildState($childIndex),
+                $subEvaluationContext,
+                $evaluationContextFactory
+            );
+        }
+
+        return $oldState->with($childWidgetStates);
     }
 }

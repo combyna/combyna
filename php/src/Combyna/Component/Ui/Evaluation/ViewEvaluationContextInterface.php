@@ -38,7 +38,7 @@ interface ViewEvaluationContextInterface extends EvaluationContextInterface
      * @param string $childName
      * @return WidgetInterface
      */
-    public function getChildWidget($childName);
+    public function getChildOfCurrentCompoundWidget($childName);
 
     /**
      * Fetches the path to the current UI component

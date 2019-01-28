@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Validator\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Class CallbackConstraint
  *
@@ -39,5 +41,13 @@ class CallbackConstraint implements ConstraintInterface
     public function getCallback()
     {
         return $this->callback;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

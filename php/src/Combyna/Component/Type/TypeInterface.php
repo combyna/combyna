@@ -71,6 +71,14 @@ interface TypeInterface
     public function allowsStaticType(StaticType $candidateType);
 
     /**
+     * Returns true if this type would allow a VoidType (currently only another VoidType), false otherwise
+     *
+     * @param VoidType $candidateType
+     * @return bool
+     */
+    public function allowsVoidType(VoidType $candidateType);
+
+    /**
      * Returns a summary of the type represented
      * eg. ListExpression<NumberExpression|TextExpression>
      *
@@ -109,6 +117,14 @@ interface TypeInterface
      * @return bool
      */
     public function isAllowedByStaticType(StaticType $otherType);
+
+    /**
+     * Returns true if both types are void, false otherwise
+     *
+     * @param VoidType $otherType
+     * @return bool
+     */
+    public function isAllowedByVoidType(VoidType $otherType);
 
     /**
      * Returns a new type that will match everything the current type does and also everything
@@ -166,6 +182,15 @@ interface TypeInterface
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType);
 
     /**
+     * For void types, this will just return whichever type is not void, unless both are void
+     * in which case that will be returned
+     *
+     * @param VoidType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithVoidType(VoidType $otherType);
+
+    /**
      * Returns a new type that matches everything the current type does,
      * after a special "any" type
      *
@@ -209,4 +234,13 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType);
+
+    /**
+     * For void types, this will just return whichever type is not void, unless both are void
+     * in which case that will be returned
+     *
+     * @param VoidType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType);
 }

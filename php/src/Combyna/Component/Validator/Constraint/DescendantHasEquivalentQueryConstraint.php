@@ -42,4 +42,13 @@ class DescendantHasEquivalentQueryConstraint implements ConstraintInterface
     {
         return $this->querySpecifier;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        // (NB: Deliberately do a loose comparison)
+        return $querySpecifier == $this->querySpecifier;
+    }
 }

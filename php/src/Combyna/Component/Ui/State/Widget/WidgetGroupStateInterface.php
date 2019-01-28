@@ -23,17 +23,18 @@ interface WidgetGroupStateInterface extends CoreWidgetStateInterface, ParentWidg
     const TYPE = WidgetGroupNode::TYPE;
 
     /**
-     * Adds a widget state to this group
-     *
-     * @param string $childName
-     * @param WidgetStateInterface $childWidgetState
-     */
-    public function addChild($childName, WidgetStateInterface $childWidgetState);
-
-    /**
      * Fetches all child widget states of this one
      *
      * @return WidgetStateInterface[]
      */
     public function getChildren();
+
+    /**
+     * Either creates a new widget state with the specified new sub-states
+     * or just returns the current one, if it already has all of the same sub-states
+     *
+     * @param WidgetStateInterface[] $childWidgetStates
+     * @return WidgetGroupStateInterface
+     */
+    public function with(array $childWidgetStates);
 }

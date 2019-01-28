@@ -12,8 +12,6 @@
 namespace Combyna\Component\App\State;
 
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Router\State\RouterStateInterface;
-use Combyna\Component\Ui\State\View\ViewStateInterface;
 
 /**
  * Class AppState
@@ -81,16 +79,6 @@ class AppState implements AppStateInterface
     public function getWidgetStatePathByTag($tag)
     {
         return $this->programState->getWidgetStatePathByTag($tag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function withPage(
-        RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState
-    ) {
-        return new self($this->programState->withPage($routerState, $pageViewState));
     }
 
     /**

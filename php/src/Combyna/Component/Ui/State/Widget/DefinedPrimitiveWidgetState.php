@@ -117,6 +117,14 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
     /**
      * {@inheritdoc}
      */
+    public function getChildStates()
+    {
+        return $this->childWidgetStates;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEventualRenderableDescendantStatePath()
     {
         return []; // Primitive widgets can always be rendered: no need to resolve further
@@ -220,5 +228,41 @@ class DefinedPrimitiveWidgetState implements DefinedPrimitiveWidgetStateInterfac
         }
 
         return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        return array_key_exists($name, $this->childWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(
+        StaticBagInterface $attributeStaticBag,
+        StaticBagInterface $valueStaticBag,
+        array $childWidgetStates
+    ) {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        // TODO: Standardise on an `->equals(...)` or `->isEqualTo(...)` method for bag comparisons like this
+        if ($this->attributeStaticBag->toNativeArray() === $attributeStaticBag->toNativeArray() &&
+            $this->valueStaticBag->toNativeArray() === $valueStaticBag->toNativeArray() &&
+            $this->childWidgetStates === $childWidgetStates
+        ) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self(
+            $this->name,
+            $this->widget,
+            $attributeStaticBag,
+            $valueStaticBag,
+            $childWidgetStates
+        );
     }
 }

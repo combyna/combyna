@@ -12,7 +12,7 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Common\DelegatorInterface;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 
 /**
  * Class DelegatingExpressionLoader
@@ -41,14 +41,14 @@ class DelegatingExpressionLoader implements ExpressionLoaderInterface, Delegator
     {
         if (!array_key_exists('type', $config)) {
             // Missing "type" element
-            return new UnknownExpressionNode(null);
+            return new UnknownExpressionTypeNode(null);
         }
 
         $type = $config['type'];
 
         if (!array_key_exists($type, $this->loaders)) {
             // No loader is registered for expressions of this type
-            return new UnknownExpressionNode($type);
+            return new UnknownExpressionTypeNode($type);
         }
 
         return $this->loaders[$type]->load($config);

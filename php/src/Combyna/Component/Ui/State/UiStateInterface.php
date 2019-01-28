@@ -25,7 +25,7 @@ interface UiStateInterface extends StateInterface
      * For a named child widget's state, this would be the name of the widget (eg. "body"),
      * but for a generated child of a Repeater, this will be its zero-based index
      *
-     * @return string
+     * @return string|int
      */
     public function getStateName();
 }

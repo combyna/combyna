@@ -14,6 +14,7 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
@@ -72,6 +73,15 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
     {
         if ($this->defaultExpressionNode) {
             $specBuilder->addChildNode($this->defaultExpressionNode);
+
+            // Make sure the default expression is allowed by the type of the definition
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->defaultExpressionNode,
+                    $this->staticTypeDeterminer,
+                    'default expression'
+                )
+            );
         }
 
         // Make sure the static's type is a resolved, valid type

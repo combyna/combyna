@@ -113,6 +113,22 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCaptureLeafwise($captureName)
+    {
+        throw new LogicException('Root evaluation context cannot set capture "' . $captureName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureRootwise($captureName)
+    {
+        throw new LogicException('No capture is defined with name "' . $captureName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
         return $this->environment;

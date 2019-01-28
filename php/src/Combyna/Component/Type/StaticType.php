@@ -117,6 +117,14 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsVoidType(VoidType $candidateType)
+    {
+        return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByAnyType()
     {
         return true; // "Any" type allows any other type
@@ -144,6 +152,14 @@ class StaticType implements TypeInterface
     public function isAllowedByStaticType(StaticType $superType)
     {
         return $superType->allowsStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByVoidType(VoidType $otherType)
+    {
+        return $otherType->allowsStaticType($this);
     }
 
     /**
@@ -220,6 +236,14 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithVoidType(VoidType $otherType)
+    {
+        return $this; // Void types cannot be passed, so only keep the static type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithStaticType($this);
@@ -253,6 +277,14 @@ class StaticType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType)
     {
         return $candidateType->mergeWithStaticType($this);
     }

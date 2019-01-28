@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression\Validation\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
@@ -79,5 +80,13 @@ class ResultTypeConstraint implements ExpressionValidationConstraintInterface
     public function getExpressionNode()
     {
         return $this->expressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

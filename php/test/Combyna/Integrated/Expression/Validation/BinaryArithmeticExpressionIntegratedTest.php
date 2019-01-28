@@ -19,7 +19,7 @@ use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
@@ -195,9 +195,9 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
     public function testTheOperandsMustBeValid()
     {
         $expressionNode = new BinaryArithmeticExpressionNode(
-            new UnknownExpressionNode('left-unknown-type'),
+            new UnknownExpressionTypeNode('left-unknown-type'),
             BinaryArithmeticExpression::ADD,
-            new UnknownExpressionNode('right-unknown-type')
+            new UnknownExpressionTypeNode('right-unknown-type')
         );
 
         $this->setExpectedException(

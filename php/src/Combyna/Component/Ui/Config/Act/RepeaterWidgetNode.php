@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
@@ -22,6 +24,9 @@ use Combyna\Component\Expression\Validation\Context\Specifier\ScopeContextSpecif
 use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\RepeaterWidgetContextSpecifier;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
@@ -31,9 +36,19 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
+class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeInterface, WidgetNodeInterface
 {
     const TYPE = 'repeater';
+
+    /**
+     * @var ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
 
     /**
      * @var string|null
@@ -51,7 +66,7 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
     private $itemVariableName;
 
     /**
-     * @var string|null
+     * @var string|int
      */
     private $name;
 
@@ -75,7 +90,9 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @param string|null $indexVariableName
      * @param string $itemVariableName
      * @param WidgetNodeInterface $repeatedWidgetNode
-     * @param string|null $name
+     * @param string|int $name
+     * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
+     * @param ExpressionBagNode $captureExpressionBagNode
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
@@ -85,9 +102,13 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
         $itemVariableName,
         WidgetNodeInterface $repeatedWidgetNode,
         $name,
+        FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
+        ExpressionBagNode $captureExpressionBagNode,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
+        $this->captureExpressionBagNode = $captureExpressionBagNode;
+        $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->indexVariableName = $indexVariableName;
         $this->itemListExpressionNode = $itemListExpressionNode;
         $this->itemVariableName = $itemVariableName;
@@ -102,6 +123,8 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->defineValidationContext(new RepeaterWidgetContextSpecifier());
+
         $specBuilder->addChildNode($this->itemListExpressionNode);
         // Make sure the item list expression evaluates to a list so that we can iterate over it
         $specBuilder->addConstraint(
@@ -124,6 +147,11 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
             $specBuilder->addConstraint(new KnownFailureConstraint('Empty item variable name given'));
         }
 
+        $specBuilder->addChildNode($this->captureExpressionBagNode);
+        $specBuilder->addChildNode($this->captureStaticBagModelNode);
+        $specBuilder->addModifier(new ValidCaptureDefinitionsSpecModifier($this->captureStaticBagModelNode));
+        $specBuilder->addModifier(new ValidCaptureSetsSpecModifier($this->captureExpressionBagNode));
+
         // Validate the repeated widget in a sub-context that has access to the item and/or index vars
         $specBuilder->addSubSpec(function (SubBehaviourSpecBuilderInterface $subSpecBuilder) {
             $scopeContextSpecifier = new ScopeContextSpecifier();
@@ -143,6 +171,22 @@ class RepeaterWidgetNode extends AbstractActNode implements WidgetNodeInterface
 
             $subSpecBuilder->addChildNode($this->repeatedWidgetNode);
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModelNode;
     }
 
     /**

@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
@@ -18,6 +20,9 @@ use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
+use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
+use Combyna\Component\Ui\Validation\Context\Specifier\WidgetGroupContextSpecifier;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -30,12 +35,22 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     const TYPE = 'widget-group';
 
     /**
+     * @var ExpressionBagNode
+     */
+    private $captureExpressionBagNode;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $captureStaticBagModelNode;
+
+    /**
      * @var WidgetNodeInterface[]
      */
     private $childWidgetNodes;
 
     /**
-     * @var string|null
+     * @var string|int
      */
     private $name;
 
@@ -51,16 +66,22 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
 
     /**
      * @param WidgetNodeInterface[] $childWidgetNodes
-     * @param string|null $name
+     * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
+     * @param ExpressionBagNode $captureExpressionBagNode
+     * @param string|int $name
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
      * @param array $tags
      */
     public function __construct(
         array $childWidgetNodes,
-        $name = null,
+        FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
+        ExpressionBagNode $captureExpressionBagNode,
+        $name,
         ExpressionNodeInterface $visibilityExpressionNode = null,
         array $tags = []
     ) {
+        $this->captureExpressionBagNode = $captureExpressionBagNode;
+        $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->childWidgetNodes = $childWidgetNodes;
         $this->name = $name;
         $this->tags = $tags;
@@ -72,6 +93,13 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->defineValidationContext(new WidgetGroupContextSpecifier());
+
+        $specBuilder->addChildNode($this->captureExpressionBagNode);
+        $specBuilder->addChildNode($this->captureStaticBagModelNode);
+        $specBuilder->addModifier(new ValidCaptureDefinitionsSpecModifier($this->captureStaticBagModelNode));
+        $specBuilder->addModifier(new ValidCaptureSetsSpecModifier($this->captureExpressionBagNode));
+
         if ($this->visibilityExpressionNode) {
             $specBuilder->addChildNode($this->visibilityExpressionNode);
 
@@ -88,6 +116,22 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
         foreach ($this->childWidgetNodes as $childWidgetNode) {
             $specBuilder->addChildNode($childWidgetNode);
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBagNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModelNode;
     }
 
     /**

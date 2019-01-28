@@ -133,4 +133,19 @@ class TextWidgetState implements TextWidgetStateInterface
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with($text)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->text === $text) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->textWidget, $text);
+    }
 }

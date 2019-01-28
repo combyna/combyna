@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Validator\Constraint;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Class KnownFailureConstraint
  *
@@ -39,5 +41,13 @@ class KnownFailureConstraint implements ConstraintInterface
     public function getFailureDescription()
     {
         return $this->failureDescription;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

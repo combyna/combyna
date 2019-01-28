@@ -21,7 +21,7 @@ use Combyna\Component\Config\Act\UnknownNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Act\LibraryNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
-use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Type\StaticType;
@@ -100,7 +100,7 @@ class AppValidationIntegratedTest extends TestCase
                         new FixedStaticDefinitionNode(
                             'invalid-attr',
                             new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
-                            new UnknownExpressionNode('invalid-type-for-page-attr')
+                            new UnknownExpressionTypeNode('invalid-type-for-page-attr')
                         )
                     ]),
                     new WidgetGroupNode(
@@ -109,12 +109,16 @@ class AppValidationIntegratedTest extends TestCase
                                 'invalid-lib',
                                 'invalid-widget',
                                 new ExpressionBagNode([
-                                    'some-attr' => new UnknownExpressionNode('invalid-type-for-widget-attr')
+                                    'some-attr' => new UnknownExpressionTypeNode('invalid-type-for-widget-attr')
                                 ]),
+                                new FixedStaticBagModelNode([]),
+                                new ExpressionBagNode([]),
                                 0,
                                 [
                                     new TextWidgetNode(
                                         new NumberExpressionNode(101), // Wrong type, should evaluate to text
+                                        new FixedStaticBagModelNode([]),
+                                        new ExpressionBagNode([]),
                                         new NumberExpressionNode(9022) // Wrong type, should evaluate to bool
                                     )
                                 ],
@@ -123,6 +127,8 @@ class AppValidationIntegratedTest extends TestCase
                                 ]
                             )
                         ],
+                        new FixedStaticBagModelNode([]),
+                        new ExpressionBagNode([]),
                         'my-invalid-group',
                         new NumberExpressionNode(101) // Wrong type, visibility should evaluate to bool
                     )
