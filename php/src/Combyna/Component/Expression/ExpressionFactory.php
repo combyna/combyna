@@ -14,9 +14,6 @@ namespace Combyna\Component\Expression;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
-use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
-use Combyna\Component\Expression\Assurance\NonNothingValueAssurance;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
@@ -206,7 +203,7 @@ class ExpressionFactory implements ExpressionFactoryInterface
         $assuredStaticName
     ) {
         switch ($constraint) {
-            case AssuranceInterface::NON_ZERO_NUMBER:
+            case NonZeroNumberAssurance::TYPE:
                 return new NonZeroNumberAssurance($expression, $assuredStaticName);
             default:
                 throw new InvalidArgumentException(

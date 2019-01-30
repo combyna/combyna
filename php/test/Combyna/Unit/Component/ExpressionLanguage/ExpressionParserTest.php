@@ -142,6 +142,21 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
+            'adding two numbers across multiple lines' => [
+                "12\n \n+\n \n4",
+                [
+                    'type' => 'binary-arithmetic',
+                    'left' => [
+                        'type' => 'number',
+                        'number' => 12
+                    ],
+                    'operator' => '+',
+                    'right' => [
+                        'type' => 'number',
+                        'number' => 4
+                    ]
+                ]
+            ],
             'adding three numbers' => [
                 '12 + 10 + 7',
                 [

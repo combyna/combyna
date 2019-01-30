@@ -293,4 +293,23 @@ class PegExpressionParser extends Basic
             'right' => $right
         ];
     }
+
+    /**
+     * Copied from \hafriedlander\Peg\Parser\Basic.
+     * Edited to allow newlines to be matched by whitespace gobbling.
+     *
+     * @return bool|string
+     */
+    public function whitespace()
+    {
+        $matched = preg_match('/\s+/', $this->string, $matches, PREG_OFFSET_CAPTURE, $this->pos);
+
+        if ($matched && $matches[0][1] === $this->pos) {
+            $this->pos += strlen($matches[0][0]);
+
+            return $matches[0][0];
+        }
+
+        return false;
+    }
 }

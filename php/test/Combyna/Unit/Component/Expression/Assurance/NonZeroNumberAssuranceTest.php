@@ -81,7 +81,7 @@ class NonZeroNumberAssuranceTest extends TestCase
 
     public function testGetConstraintReturnsCorrectValue()
     {
-        $this->assert($this->assurance->getConstraint())->exactlyEquals(AssuranceInterface::NON_ZERO_NUMBER);
+        $this->assert($this->assurance->getConstraint())->exactlyEquals(NonZeroNumberAssurance::TYPE);
     }
 
     public function testEvaluateReturnsTrueWhenTheExpressionEvaluatesToANonZeroNumber()

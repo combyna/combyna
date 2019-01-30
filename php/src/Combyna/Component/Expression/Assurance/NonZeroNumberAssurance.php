@@ -26,6 +26,8 @@ use LogicException;
  */
 class NonZeroNumberAssurance implements AssuranceInterface
 {
+    const TYPE = 'non-zero-number';
+
     /**
      * @var ExpressionInterface
      */
@@ -83,7 +85,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
      */
     public function getConstraint()
     {
-        return self::NON_ZERO_NUMBER;
+        return self::TYPE;
     }
 
     /**

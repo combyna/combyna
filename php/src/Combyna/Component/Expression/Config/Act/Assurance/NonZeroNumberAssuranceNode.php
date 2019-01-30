@@ -14,6 +14,7 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
@@ -92,7 +93,7 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
      */
     public function getConstraint()
     {
-        return AssuranceInterface::NON_ZERO_NUMBER;
+        return NonZeroNumberAssurance::TYPE;
     }
 
     /**

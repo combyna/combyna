@@ -1,0 +1,47 @@
+name: Non-zero guard assurance test app
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Non-zero guard assurance test'
+        description: A test of the non-zero guard assurance feature
+        widget:
+            type: group
+            captures:
+                define:
+                    dividend: number # number|nothing
+                    divisor: number
+            children:
+                - type: text
+                  text: !expr ''
+                - type: gui.textbox
+                  attributes:
+                      value: !expr '100'
+                  captures:
+                      set:
+                          dividend: !expr number(widget_value('text'))
+
+                - type: text
+                  text: !expr '/'
+
+                - type: gui.textbox
+                  attributes:
+                      value: !expr '5'
+                  captures:
+                      set:
+                          divisor: !expr number(widget_value('text'))
+
+                - type: text
+                  text: >
+                      !expr guard(
+                          name: 'my_valid_divisor',
+                          constraint: 'non-zero-number',
+                          expression: capture('divisor'),
+                          then: 'The quotient is: ' ~ (capture('dividend') / assured('my_valid_divisor')) ~ '.',
+                          else: 'The divisor is zero, so the quotient cannot be determined'
+                      )

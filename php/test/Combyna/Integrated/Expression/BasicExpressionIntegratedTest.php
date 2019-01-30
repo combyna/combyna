@@ -21,6 +21,7 @@ use Combyna\Component\Environment\Library\Library;
 use Combyna\Component\Environment\Library\NativeFunction;
 use Combyna\Component\Event\EventDefinitionCollection;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\ComparisonExpression;
 use Combyna\Component\Expression\ConversionExpression;
@@ -151,7 +152,7 @@ class BasicExpressionIntegratedTest extends TestCase
                                         $this->expressionFactory->createTextExpression('0'),
                                         ConversionExpression::TEXT_TO_NUMBER
                                     ),
-                                    AssuranceInterface::NON_ZERO_NUMBER,
+                                    NonZeroNumberAssurance::TYPE,
                                     'myNonZeroValue'
                                 )
                             ],

@@ -3,6 +3,12 @@ services:
         class: Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter
         autowire: true
 
+    combyna.expression.act.assured_promoter:
+        class: Combyna\Component\Expression\Config\Act\AssuredExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
     combyna.expression.act.basic_promoter:
         class: Combyna\Component\Expression\Config\Act\BasicExpressionNodePromoter
         autowire: true
