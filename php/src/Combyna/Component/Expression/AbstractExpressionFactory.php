@@ -179,21 +179,6 @@ abstract class AbstractExpressionFactory implements ExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createGuardAssurance(
-        ExpressionInterface $expression,
-        $constraint,
-        $assuredStaticName
-    ) {
-        return $this->parentExpressionFactory->createGuardAssurance(
-            $expression,
-            $constraint,
-            $assuredStaticName
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function createGuardExpression(
         array $assurances,
         ExpressionInterface $consequentExpression,

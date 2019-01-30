@@ -14,10 +14,8 @@ namespace Combyna\Component\Expression;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
-use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
-use InvalidArgumentException;
 
 /**
  * Class ExpressionFactory
@@ -192,24 +190,6 @@ class ExpressionFactory implements ExpressionFactoryInterface
         TypeInterface $returnType
     ) {
         return new FunctionExpression($this, $libraryName, $functionName, $argumentExpressionBag, $returnType);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createGuardAssurance(
-        ExpressionInterface $expression,
-        $constraint,
-        $assuredStaticName
-    ) {
-        switch ($constraint) {
-            case NonZeroNumberAssurance::TYPE:
-                return new NonZeroNumberAssurance($expression, $assuredStaticName);
-            default:
-                throw new InvalidArgumentException(
-                    'Invalid assurance constraint "' . $constraint . '" given'
-                );
-        }
     }
 
     /**

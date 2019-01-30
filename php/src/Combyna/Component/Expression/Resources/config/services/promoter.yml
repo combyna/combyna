@@ -20,3 +20,19 @@ services:
         autowire: true
         tags:
             - {name: combyna.expression_promoter}
+
+    combyna.expression.act.assurance_promoter:
+        class: Combyna\Component\Expression\Config\Act\Assurance\DelegatingAssuranceNodePromoter
+        autowire: true
+
+    combyna.expression.act.non_zero_number_assurance_promoter:
+        class: Combyna\Component\Expression\Config\Act\Assurance\NonZeroNumberAssuranceNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.assurance_promoter}
+
+    combyna.expression.act.unknown_constraint_assurance_promoter:
+        class: Combyna\Component\Expression\Config\Act\Assurance\UnknownAssuranceConstraintNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.assurance_promoter}

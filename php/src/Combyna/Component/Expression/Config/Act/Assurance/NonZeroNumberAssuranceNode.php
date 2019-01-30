@@ -13,11 +13,8 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
-use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
@@ -89,24 +86,20 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
     }
 
     /**
-     * {@inheritdoc}
+     * Fetches the input expression to be assured
+     *
+     * @return ExpressionNodeInterface
      */
-    public function getConstraint()
+    public function getInputExpression()
     {
-        return NonZeroNumberAssurance::TYPE;
+        return $this->inputExpressionNode;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function promote(
-        ExpressionFactoryInterface $expressionFactory,
-        DelegatingExpressionNodePromoter $expressionNodePromoter
-    ) {
-        return $expressionFactory->createGuardAssurance(
-            $expressionNodePromoter->promote($this->inputExpressionNode),
-            $this->getConstraint(),
-            $this->staticName
-        );
+    public function getConstraint()
+    {
+        return NonZeroNumberAssurance::TYPE;
     }
 }

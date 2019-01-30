@@ -13,6 +13,7 @@ namespace Combyna\Component\Expression;
 
 use Combyna\Component\Common\AbstractComponent;
 use Combyna\Component\Expression\DependencyInjection\Compiler\RegisterAssuranceLoadersPass;
+use Combyna\Component\Expression\DependencyInjection\Compiler\RegisterAssuranceNodePromotersPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -28,6 +29,7 @@ class ExpressionComponent extends AbstractComponent
     public function build(ContainerBuilder $containerBuilder)
     {
         $containerBuilder->addCompilerPass(new RegisterAssuranceLoadersPass());
+        $containerBuilder->addCompilerPass(new RegisterAssuranceNodePromotersPass());
 
         // TODO: Factor the other delegator setups out of ExpressionExtension
     }

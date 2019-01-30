@@ -164,20 +164,6 @@ interface ExpressionFactoryInterface
     );
 
     /**
-     * Creates an assurance for a guard expression
-     *
-     * @param ExpressionInterface $expression
-     * @param string $constraint
-     * @param string $assuredStaticName
-     * @return AssuranceInterface
-     */
-    public function createGuardAssurance(
-        ExpressionInterface $expression,
-        $constraint,
-        $assuredStaticName
-    );
-
-    /**
      * Creates a GuardExpression
      *
      * @param AssuranceInterface[] $assurances

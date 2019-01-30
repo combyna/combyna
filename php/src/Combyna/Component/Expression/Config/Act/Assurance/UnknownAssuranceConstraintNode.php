@@ -13,12 +13,9 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
-use LogicException;
 
 /**
  * Class UnknownAssuranceConstraintNode
@@ -97,24 +94,5 @@ class UnknownAssuranceConstraintNode extends AbstractActNode implements Assuranc
     public function getConstraint()
     {
         return $this->constraintName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function promote(
-        ExpressionFactoryInterface $expressionFactory,
-        DelegatingExpressionNodePromoter $expressionNodePromoter
-    ) {
-        $constraintName = $this->constraintName !== null ? $this->constraintName : '[missing]';
-        $assuredStaticName = $this->constraintName !== null ? $this->constraintName : '[missing]';
-
-        throw new LogicException(
-            sprintf(
-                'Assurance for assured static "%s" with unknown constraint "%s" cannot be promoted',
-                $assuredStaticName,
-                $constraintName
-            )
-        );
     }
 }

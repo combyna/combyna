@@ -12,9 +12,6 @@
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
-use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
@@ -45,16 +42,4 @@ interface AssuranceNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getConstraint();
-
-    /**
-     * Promotes this node to an actual Assurance
-     *
-     * @param ExpressionFactoryInterface $expressionFactory
-     * @param DelegatingExpressionNodePromoter $expressionNodePromoter
-     * @return AssuranceInterface
-     */
-    public function promote(
-        ExpressionFactoryInterface $expressionFactory,
-        DelegatingExpressionNodePromoter $expressionNodePromoter
-    );
 }

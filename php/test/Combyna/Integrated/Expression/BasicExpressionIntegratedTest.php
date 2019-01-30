@@ -20,7 +20,6 @@ use Combyna\Component\Environment\Library\FunctionCollection;
 use Combyna\Component\Environment\Library\Library;
 use Combyna\Component\Environment\Library\NativeFunction;
 use Combyna\Component\Event\EventDefinitionCollection;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\ComparisonExpression;
@@ -147,12 +146,11 @@ class BasicExpressionIntegratedTest extends TestCase
                         $this->expressionFactory->createTextExpression(' is my result'),
                         $this->expressionFactory->createGuardExpression(
                             [
-                                $this->expressionFactory->createGuardAssurance(
+                                new NonZeroNumberAssurance(
                                     $this->expressionFactory->createConversionExpression(
                                         $this->expressionFactory->createTextExpression('0'),
                                         ConversionExpression::TEXT_TO_NUMBER
                                     ),
-                                    NonZeroNumberAssurance::TYPE,
                                     'myNonZeroValue'
                                 )
                             ],

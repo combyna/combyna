@@ -12,7 +12,6 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Common\DelegatorInterface;
-use Combyna\Component\Expression\ExpressionInterface;
 use InvalidArgumentException;
 
 /**
@@ -20,7 +19,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DelegatingExpressionNodePromoter implements DelegatorInterface
+class DelegatingExpressionNodePromoter implements ExpressionNodePromoterInterface, DelegatorInterface
 {
     /**
      * @var ExpressionNodeTypePromoterInterface[]
@@ -28,9 +27,7 @@ class DelegatingExpressionNodePromoter implements DelegatorInterface
     private $typePromoters = [];
 
     /**
-     * Adds a promoter for a new type of expression node type
-     *
-     * @param ExpressionNodeTypePromoterInterface $typePromoter
+     * {@inheritdoc}
      */
     public function addPromoter(ExpressionNodeTypePromoterInterface $typePromoter)
     {
@@ -46,10 +43,7 @@ class DelegatingExpressionNodePromoter implements DelegatorInterface
     }
 
     /**
-     * Promotes an ExpressionNodeInterface to an Expression
-     *
-     * @param ExpressionNodeInterface $expressionNode
-     * @return ExpressionInterface
+     * {@inheritdoc}
      */
     public function promote(ExpressionNodeInterface $expressionNode)
     {
