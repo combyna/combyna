@@ -55,7 +55,7 @@ class PegExpressionParser extends Basic
         function NumberLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'number',
-                'number' => (float) $sub['value']['text']
+                'number' => is_numeric($sub['value']['text']) ? $sub['value']['text'] * 1 : 0
             ];
         }
         function BooleanLiteral(&$result, $sub) {

@@ -42,6 +42,22 @@ class ExpressionParserTest extends TestCase
         $this->assert($this->parser->parse($expression))->equals($expectedAst);
     }
 
+    public function testParseReturnsNativeIntegerForIntegerLiterals()
+    {
+        $this->assert($this->parser->parse('21'))->exactlyEquals([
+            'type' => 'number',
+            'number' => 21
+        ]);
+    }
+
+    public function testParseReturnsNativeFloatForFloatLiterals()
+    {
+        $this->assert($this->parser->parse('199.1234'))->exactlyEquals([
+            'type' => 'number',
+            'number' => 199.1234
+        ]);
+    }
+
     public function testParseThrowsExceptionWhenUnableToParseExpression()
     {
         $this->setExpectedException(
