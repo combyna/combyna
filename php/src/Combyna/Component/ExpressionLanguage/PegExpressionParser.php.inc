@@ -253,22 +253,34 @@ class PegExpressionParser extends Basic
         {
             $result['node']['arguments'] = $sub['arguments'];
         }
-    Expression: > Comparison
+    ConsequentAndAlternate: '?' > consequent:Conditional > ':' > alternate:Conditional >
+    Conditional: Comparison > ( ConsequentAndAlternate ) *
         function Comparison(&$result, $sub) {
+            $result['node'] = $sub['node'];
+        }
+        function ConsequentAndAlternate(&$result, $sub) {
+            $result['node'] = $this->buildTernaryConditionalExpression(
+                $result['node'],
+                $sub['consequent']['node'],
+                $sub['alternate']['node']
+            );
+        }
+    Expression: > Conditional
+        function Conditional(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
     */
 
-    // Comparison just happens to currently be the expression with the highest precedence,
+    // "Conditional" just happens to currently be the expression with the lowest precedence,
     // which is why the top-level Expression references it
 
     /**
-     * @param string $left
+     * @param array $left
      * @param string $operator
-     * @param string $right
+     * @param array $right
      * @return array
      */
-    private function buildBinaryArithmeticExpression($left, $operator, $right)
+    private function buildBinaryArithmeticExpression(array $left, $operator, array $right)
     {
         return [
             'type' => 'binary-arithmetic',
@@ -279,18 +291,34 @@ class PegExpressionParser extends Basic
     }
 
     /**
-     * @param string $left
+     * @param array $left
      * @param string $operator
-     * @param string $right
+     * @param array $right
      * @return array
      */
-    private function buildComparisonExpression($left, $operator, $right)
+    private function buildComparisonExpression(array $left, $operator, array $right)
     {
         return [
             'type' => 'comparison',
             'operator' => $operator,
             'left' => $left,
             'right' => $right
+        ];
+    }
+
+    /**
+     * @param array $condition
+     * @param array $consequent
+     * @param array $alternate
+     * @return array
+     */
+    private function buildTernaryConditionalExpression(array $condition, array $consequent, array $alternate)
+    {
+        return [
+            'type' => 'conditional',
+            'condition' => $condition,
+            'consequent' => $consequent,
+            'alternate' => $alternate
         ];
     }
 

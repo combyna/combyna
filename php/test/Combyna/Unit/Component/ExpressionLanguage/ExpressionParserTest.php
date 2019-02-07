@@ -640,6 +640,125 @@ class ExpressionParserTest extends TestCase
                         ]
                     ]
                 ]
+            ],
+            'bare conditional operator' => [
+                'my_condition = 21 ? my_consequent + 2 : my_alternate * 5',
+                [
+                    'type' => 'conditional',
+                    'condition' => [
+                        'type' => 'comparison',
+                        'left' => [
+                            'type' => 'variable',
+                            'variable' => 'my_condition'
+                        ],
+                        'operator' => '=',
+                        'right' => [
+                            'type' => 'number',
+                            'number' => 21
+                        ]
+                    ],
+                    'consequent' => [
+                        'type' => 'binary-arithmetic',
+                        'left' => [
+                            'type' => 'variable',
+                            'variable' => 'my_consequent'
+                        ],
+                        'operator' => '+',
+                        'right' => [
+                            'type' => 'number',
+                            'number' => 2
+                        ]
+                    ],
+                    'alternate' => [
+                        'type' => 'binary-arithmetic',
+                        'left' => [
+                            'type' => 'variable',
+                            'variable' => 'my_alternate'
+                        ],
+                        'operator' => '*',
+                        'right' => [
+                            'type' => 'number',
+                            'number' => 5
+                        ]
+                    ]
+                ]
+            ],
+            'nested conditional operator inside calculation (precedence test)' => [
+                '1111 + (outer_condition = 21 ? inner_condition = 27 ? my_consequent + 2 : first_alternate * 5 : second_alternate * 10)',
+                [
+                    'type' => 'binary-arithmetic',
+                    'left' => [
+                        'type' => 'number',
+                        'number' => 1111
+                    ],
+                    'operator' => '+',
+                    'right' => [
+                        'type' => 'conditional',
+                        'condition' => [
+                            'type' => 'comparison',
+                            'left' => [
+                                'type' => 'variable',
+                                'variable' => 'outer_condition'
+                            ],
+                            'operator' => '=',
+                            'right' => [
+                                'type' => 'number',
+                                'number' => 21
+                            ]
+                        ],
+                        'consequent' => [
+                            'type' => 'conditional',
+                            'condition' => [
+                                'type' => 'comparison',
+                                'left' => [
+                                    'type' => 'variable',
+                                    'variable' => 'inner_condition'
+                                ],
+                                'operator' => '=',
+                                'right' => [
+                                    'type' => 'number',
+                                    'number' => 27
+                                ]
+                            ],
+                            'consequent' => [
+                                'type' => 'binary-arithmetic',
+                                'left' => [
+                                    'type' => 'variable',
+                                    'variable' => 'my_consequent'
+                                ],
+                                'operator' => '+',
+                                'right' => [
+                                    'type' => 'number',
+                                    'number' => 2
+                                ]
+                            ],
+                            'alternate' => [
+                                'type' => 'binary-arithmetic',
+                                'left' => [
+                                    'type' => 'variable',
+                                    'variable' => 'first_alternate'
+                                ],
+                                'operator' => '*',
+                                'right' => [
+                                    'type' => 'number',
+                                    'number' => 5
+                                ]
+                            ]
+                        ],
+                        'alternate' => [
+                            'type' => 'binary-arithmetic',
+                            'left' => [
+                                'type' => 'variable',
+                                'variable' => 'second_alternate'
+                            ],
+                            'operator' => '*',
+                            'right' => [
+                                'type' => 'number',
+                                'number' => 10
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ];
     }
