@@ -90,7 +90,7 @@ class BinaryArithmeticExpression extends AbstractExpression
                 $result = $leftOperandStatic->toNative() * $rightOperandStatic->toNative();
                 break;
             case self::DIVIDE:
-                if ($rightOperandStatic->toNative() === 0) {
+                if ((float)$rightOperandStatic->toNative() === .0) {
                     // Sanity check - this operand should only be provided by an AssuredExpression
                     // (if complex, unless a simple NumberExpression) that ensures it is not zero
                     throw new LogicException('Divide by zero - divisor operand should have been assured');

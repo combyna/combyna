@@ -84,10 +84,19 @@ class ComparisonExpression extends AbstractExpression
 
         switch ($this->operator) {
             case self::EQUAL:
+                $leftNative = $leftOperandStatic->toNative();
+                $rightNative = $rightOperandStatic->toNative();
+
+                if (
+                    (is_int($leftNative) || is_float($leftNative)) &&
+                    (is_int($rightNative) || is_float($rightNative))
+                ) {
+                    $leftNative = (float)$leftNative;
+                    $rightNative = (float)$rightNative;
+                }
+
                 // For text expressions, this will be a case-sensitive comparison
-                return $this->expressionFactory->createBooleanExpression(
-                    $leftOperandStatic->toNative() === $rightOperandStatic->toNative()
-                );
+                return $this->expressionFactory->createBooleanExpression($leftNative === $rightNative);
             case self::EQUAL_CASE_INSENSITIVE:
                 return $this->expressionFactory->createBooleanExpression(
                     strtolower($leftOperandStatic->toNative()) === strtolower($rightOperandStatic->toNative())

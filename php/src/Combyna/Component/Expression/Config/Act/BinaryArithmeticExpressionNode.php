@@ -106,7 +106,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
         if ($this->operator === BinaryArithmeticExpression::DIVIDE) {
             if ($this->rightOperandExpression instanceof NumberExpressionNode) {
                 // Right operand is a number constant - we can just check statically whether it is zero
-                if ($this->rightOperandExpression->toNative() === 0) {
+                if ((float)$this->rightOperandExpression->toNative() === .0) {
                     $specBuilder->addConstraint(
                         new CallbackConstraint(
                             function (ValidationContextInterface $validationContext) {

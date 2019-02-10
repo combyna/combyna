@@ -70,7 +70,7 @@ class NonZeroNumberAssurance implements AssuranceInterface
             );
         }
 
-        if ($resultStatic->toNative() === 0) {
+        if ((float)$resultStatic->toNative() === .0) {
             // Constraint not met
             return false;
         }

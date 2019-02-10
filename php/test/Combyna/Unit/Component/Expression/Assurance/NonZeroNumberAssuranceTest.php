@@ -91,16 +91,34 @@ class NonZeroNumberAssuranceTest extends TestCase
         )->isTrue;
     }
 
-    public function testEvaluateStoresTheStaticInTheBagWhenItEvaluatesToANonZeroNumber()
+    public function testEvaluateStoresTheStaticInTheBagWhenItEvaluatesToANonZeroIntegerNumber()
     {
         $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
 
         $this->staticBag->setStatic('my-static', Argument::is($this->resultStatic->reveal()))->shouldHaveBeenCalled();
     }
 
-    public function testEvaluateReturnsFalseWhenTheExpressionEvaluatesToZero()
+    public function testEvaluateStoresTheStaticInTheBagWhenItEvaluatesToANonZeroFloatNumber()
+    {
+        $this->resultStatic->toNative()->willReturn(14.2);
+
+        $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal());
+
+        $this->staticBag->setStatic('my-static', Argument::is($this->resultStatic->reveal()))->shouldHaveBeenCalled();
+    }
+
+    public function testEvaluateReturnsFalseWhenTheExpressionEvaluatesToIntegerZero()
     {
         $this->resultStatic->toNative()->willReturn(0);
+
+        $this->assert(
+            $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
+        )->isFalse;
+    }
+
+    public function testEvaluateReturnsFalseWhenTheExpressionEvaluatesToFloatZero()
+    {
+        $this->resultStatic->toNative()->willReturn(.0);
 
         $this->assert(
             $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())

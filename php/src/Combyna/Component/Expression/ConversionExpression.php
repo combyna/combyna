@@ -88,12 +88,18 @@ class ConversionExpression extends AbstractExpression
 
                 $nativeNumber = $inputStatic->toNative();
 
+                // Cast to the relevant type (float for a decimal, int otherwise)
+                if (!is_numeric($nativeNumber)) {
+                    $nativeNumber = 0;
+                } elseif ((float)(int)$nativeNumber === (float)$nativeNumber) {
+                    $nativeNumber = (int)$nativeNumber;
+                } else {
+                    $nativeNumber = (float)$nativeNumber;
+                }
+
                 // Just use PHP's standard string-to-number coercion
                 // TODO: Extend in future with options for how to behave when no number can be coerced out
-                return $this->expressionFactory->createNumberExpression(
-                    // Cast to the relevant type (float for a decimal, int otherwise)
-                    is_numeric($nativeNumber) ? $nativeNumber * 1 : 0
-                );
+                return $this->expressionFactory->createNumberExpression($nativeNumber);
             default:
                 throw new InvalidArgumentException(
                     'ConversionExpression :: Invalid conversion "' . $this->conversion . '" provided'
