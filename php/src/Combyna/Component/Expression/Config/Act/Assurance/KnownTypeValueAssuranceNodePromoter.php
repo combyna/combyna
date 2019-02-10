@@ -11,15 +11,16 @@
 
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
+use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
 use Combyna\Component\Expression\Config\Act\ExpressionNodePromoterInterface;
-use LogicException;
+use Combyna\Component\Validator\Context\NullValidationContext;
 
 /**
- * Class UnknownAssuranceConstraintNodePromoter
+ * Class KnownTypeValueAssuranceNodePromoter
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownAssuranceConstraintNodePromoter implements AssuranceNodeTypePromoterInterface
+class KnownTypeValueAssuranceNodePromoter implements AssuranceNodeTypePromoterInterface
 {
     /**
      * @var ExpressionNodePromoterInterface
@@ -41,30 +42,26 @@ class UnknownAssuranceConstraintNodePromoter implements AssuranceNodeTypePromote
     public function getTypeToPromoterCallableMap()
     {
         return [
-            UnknownAssuranceNode::TYPE => [$this, 'promote']
+            KnownTypeValueAssuranceNode::TYPE => [$this, 'promote']
         ];
     }
 
     /**
-     * Ensures that attempting to promote an UnknownAssuranceNode raises an error
+     * Promotes a KnownTypeValueAssuranceNode to a KnownTypeValueAssurance
      *
-     * @param UnknownAssuranceNode $assuranceNode
+     * @param KnownTypeValueAssuranceNode $assuranceNode
+     * @return KnownTypeValueAssurance
      */
-    public function promote(UnknownAssuranceNode $assuranceNode)
+    public function promote(KnownTypeValueAssuranceNode $assuranceNode)
     {
-        $constraintName = $assuranceNode->getConstraint() !== null ?
-            $assuranceNode->getConstraint() :
-            '[missing]';
-        $assuredStaticName = $assuranceNode->getAssuredStaticName() !== null ?
-            $assuranceNode->getAssuredStaticName() :
-            '[missing]';
+        $inputExpression = $this->expressionNodePromoter->promote($assuranceNode->getInputExpression());
+        $knownType = $assuranceNode->getAssuredStaticTypeDeterminer()
+            ->determine(new NullValidationContext());
 
-        throw new LogicException(
-            sprintf(
-                'Assurance for assured static "%s" with unknown constraint "%s" cannot be promoted',
-                $assuredStaticName,
-                $constraintName
-            )
+        return new KnownTypeValueAssurance(
+            $inputExpression,
+            $assuranceNode->getAssuredStaticName(),
+            $knownType
         );
     }
 }

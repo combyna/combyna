@@ -25,6 +25,12 @@ services:
         class: Combyna\Component\Expression\Config\Act\Assurance\DelegatingAssuranceNodePromoter
         autowire: true
 
+    combyna.expression.act.known_type_value_assurance_promoter:
+        class: Combyna\Component\Expression\Config\Act\Assurance\KnownTypeValueAssuranceNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.assurance_promoter}
+
     combyna.expression.act.non_zero_number_assurance_promoter:
         class: Combyna\Component\Expression\Config\Act\Assurance\NonZeroNumberAssuranceNodePromoter
         autowire: true

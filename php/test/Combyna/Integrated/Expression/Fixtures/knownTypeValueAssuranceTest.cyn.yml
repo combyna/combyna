@@ -1,0 +1,38 @@
+name: Known type value guard assurance test app
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Known type value guard assurance test'
+        description: A test of the known type value guard assurance feature
+        widget:
+            type: group
+            captures:
+                define:
+                    value_to_perhaps_double: number|text
+            children:
+                - type: gui.textbox
+                  attributes:
+                      value: !expr 'not a number'
+                  captures:
+                      set:
+                          value_to_perhaps_double: >
+                              !expr number(widget_value('text')) = 40.0 ?
+                                  number(widget_value('text')) :
+                                  widget_value('text')
+
+                - type: text
+                  text: >
+                      !expr guard(
+                          name: 'my_definite_number_to_double',
+                          constraint: 'known-type-value',
+                          expression: capture('value_to_perhaps_double'),
+                          type: 'number',
+                          then: 'Double is: ' ~ (assured('my_definite_number_to_double') * 2) ~ '.',
+                          else: 'The capture is not a number, so it cannot be doubled'
+                      )

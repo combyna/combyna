@@ -12,6 +12,7 @@
 namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
@@ -42,4 +43,11 @@ interface AssuranceNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getConstraint();
+
+    /**
+     * Fetches the input expression to be assured
+     *
+     * @return ExpressionNodeInterface
+     */
+    public function getInputExpression();
 }

@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Act\ConversionExpressionNode;
 use Combyna\Component\Expression\ConversionExpression;
 
@@ -25,7 +25,7 @@ class TextConversionExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'text';
 
     /**
-     * @var ConfigParser
+     * @var ExpressionConfigParser
      */
     private $configParser;
 
@@ -35,11 +35,11 @@ class TextConversionExpressionLoader implements BuiltinLoaderInterface
     private $expressionLoader;
 
     /**
-     * @param ConfigParser $configParser
+     * @param ExpressionConfigParser $configParser
      * @param ExpressionLoaderInterface $expressionLoader
      */
     public function __construct(
-        ConfigParser $configParser,
+        ExpressionConfigParser $configParser,
         ExpressionLoaderInterface $expressionLoader
     ) {
         $this->configParser = $configParser;
@@ -51,13 +51,11 @@ class TextConversionExpressionLoader implements BuiltinLoaderInterface
      */
     public function load(array $config)
     {
-        $expressionConfig = $this->configParser->getElement(
+        $expressionNode = $this->configParser->getPositionalArgument(
             $config,
-            'expression',
+            0,
             'number-to-text conversion expression'
         );
-
-        $expressionNode = $this->expressionLoader->load($expressionConfig);
 
         return new ConversionExpressionNode(
             $expressionNode,

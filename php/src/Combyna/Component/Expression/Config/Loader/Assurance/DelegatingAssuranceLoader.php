@@ -12,7 +12,7 @@
 namespace Combyna\Component\Expression\Config\Loader\Assurance;
 
 use Combyna\Component\Common\DelegatorInterface;
-use Combyna\Component\Expression\Config\Act\Assurance\UnknownAssuranceConstraintNode;
+use Combyna\Component\Expression\Config\Act\Assurance\UnknownAssuranceNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 
 /**
@@ -46,7 +46,11 @@ class DelegatingAssuranceLoader implements AssuranceLoaderInterface, DelegatorIn
     ) {
         if (!array_key_exists($constraintName, $this->loaders)) {
             // No loader is registered for assurances of this type
-            return new UnknownAssuranceConstraintNode($assuredStaticName, $constraintName);
+            return new UnknownAssuranceNode(
+                $assuredStaticName,
+                $constraintName,
+                'constraint is unknown'
+            );
         }
 
         return $this->loaders[$constraintName]->load(

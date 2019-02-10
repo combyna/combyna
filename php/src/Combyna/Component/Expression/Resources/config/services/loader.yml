@@ -6,6 +6,12 @@ services:
         # rather than its sub-interfaces/classes like NonZeroNumberAssuranceLoader etc.
         autowiring_types: Combyna\Component\Expression\Config\Loader\Assurance\AssuranceLoaderInterface
 
+    combyna.expression.loader.assurance.known_type_value:
+        class: Combyna\Component\Expression\Config\Loader\Assurance\KnownTypeValueAssuranceLoader
+        autowire: true
+        tags:
+            - {name: combyna.assurance_loader}
+
     combyna.expression.loader.assurance.non_zero_number:
         class: Combyna\Component\Expression\Config\Loader\Assurance\NonZeroNumberAssuranceLoader
         autowire: true

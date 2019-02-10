@@ -12,7 +12,6 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\NumberExpression;

@@ -12,7 +12,6 @@
 namespace Combyna\Unit\Component\Expression\Assurance;
 
 use Combyna\Component\Bag\MutableStaticBagInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;

@@ -14,7 +14,7 @@ page_views:
             type: group
             captures:
                 define:
-                    dividend: number # number|nothing
+                    dividend: number
                     divisor: number
             children:
                 - type: text

@@ -13,28 +13,30 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
+use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
- * Class NonZeroNumberAssuranceNode
+ * Class KnownTypeValueAssuranceNode
  *
- * Ensures that the given expression doesn't evaluate to zero
+ * Ensures that the given expression evaluates to a specific type
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNodeInterface
+class KnownTypeValueAssuranceNode extends AbstractActNode implements AssuranceNodeInterface
 {
-    const TYPE = 'non-zero-number-assurance';
+    const TYPE = 'known-type-value-assurance';
 
     /**
      * @var ExpressionNodeInterface
      */
     private $inputExpressionNode;
+
+    /**
+     * @var TypeDeterminerInterface
+     */
+    private $knownTypeDeterminer;
 
     /**
      * @var string
@@ -44,10 +46,15 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
     /**
      * @param ExpressionNodeInterface $inputExpressionNode
      * @param string $name Name to expose the assured static to sub-expressions as
+     * @param TypeDeterminerInterface $knownTypeDeterminer
      */
-    public function __construct(ExpressionNodeInterface $inputExpressionNode, $name)
-    {
+    public function __construct(
+        ExpressionNodeInterface $inputExpressionNode,
+        $name,
+        TypeDeterminerInterface $knownTypeDeterminer
+    ) {
         $this->inputExpressionNode = $inputExpressionNode;
+        $this->knownTypeDeterminer = $knownTypeDeterminer;
         $this->staticName = $name;
     }
 
@@ -58,14 +65,9 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
     {
         $specBuilder->addChildNode($this->inputExpressionNode);
 
-        // Check at compile-time that the expression can only resolve to a number
-        $specBuilder->addConstraint(
-            new ResultTypeConstraint(
-                $this->inputExpressionNode,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
-                'non-zero assurance'
-            )
-        );
+        // TODO: Check that the input expression can possibly resolve to the known type
+        //       (the reverse of the ResultTypeConstraint) - if it cannot then there is a known bug
+        //       with the logic of the app
     }
 
     /**
@@ -81,8 +83,16 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
      */
     public function getAssuredStaticTypeDeterminer()
     {
-        // The only possible type this assured static can evaluate to is the result type of its expression
-        return $this->inputExpressionNode->getResultTypeDeterminer();
+        // The only possible type this assured static can evaluate to is the known type
+        return $this->knownTypeDeterminer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getConstraint()
+    {
+        return KnownTypeValueAssurance::TYPE;
     }
 
     /**
@@ -91,13 +101,5 @@ class NonZeroNumberAssuranceNode extends AbstractActNode implements AssuranceNod
     public function getInputExpression()
     {
         return $this->inputExpressionNode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConstraint()
-    {
-        return NonZeroNumberAssurance::TYPE;
     }
 }
