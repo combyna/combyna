@@ -9,6 +9,12 @@ services:
         tags:
             - {name: combyna.type_loader}
 
+    combyna.type.loader.multiple:
+        class: Combyna\Component\Type\Config\Loader\MultipleTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}
+
     combyna.type.loader.static_list:
         class: Combyna\Component\Type\Config\Loader\StaticListTypeLoader
         autowire: true
