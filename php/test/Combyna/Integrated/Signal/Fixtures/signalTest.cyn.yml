@@ -1,0 +1,94 @@
+name: Signal test app
+signals:
+    my_implicit_non_broadcaster:
+        payload:
+            new_text: text
+    my_explicit_non_broadcaster:
+        payload:
+            new_text: text
+        broadcast: false
+    my_broadcaster:
+        payload:
+            new_text: text
+        broadcast: true
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Signal test'
+        description: A test of the signal feature when a signal is/is not a broadcaster
+        widget:
+            type: group
+            children:
+                - type: gui.button
+                  attributes:
+                      label: !expr 'Dispatch implicit non-broadcaster'
+                  tags:
+                      - dispatch_implicit_non_broadcaster_button
+                  triggers:
+                      gui.click:
+                          instructions:
+                              - type: signal
+                                signal: app.my_implicit_non_broadcaster
+                                payload:
+                                    new_text: !expr 'From the implicit non-broadcaster'
+                - type: gui.button
+                  attributes:
+                      label: !expr 'Dispatch explicit non-broadcaster'
+                  tags:
+                      - dispatch_explicit_non_broadcaster_button
+                  triggers:
+                      gui.click:
+                          instructions:
+                              - type: signal
+                                signal: app.my_explicit_non_broadcaster
+                                payload:
+                                    new_text: !expr 'From the explicit non-broadcaster'
+                - type: gui.button
+                  attributes:
+                      label: !expr 'Dispatch broadcaster'
+                  tags:
+                      - dispatch_broadcaster_button
+                  triggers:
+                      gui.click:
+                          instructions:
+                              - type: signal
+                                signal: app.my_broadcaster
+                                payload:
+                                    new_text: !expr 'From the broadcaster'
+                - type: text
+                  text: !expr view_query('get_current_text')
+        store:
+            slots:
+                current_text:
+                    type: text
+                    default: !expr '(Nothing has been dispatched yet)'
+            commands: ~
+            queries:
+                get_current_text:
+                    parameters: ~
+                    expression: !expr slot('current_text')
+            signal_handlers:
+                app.my_implicit_non_broadcaster:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: current_text
+                          value: !expr signal_payload('new_text')
+                app.my_explicit_non_broadcaster:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: current_text
+                          value: !expr signal_payload('new_text')
+                app.my_broadcaster:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: current_text
+                          value: !expr signal_payload('new_text')

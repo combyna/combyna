@@ -15,8 +15,8 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
 use Combyna\Component\Signal\Expression\SignalPayloadExpression;
 use Combyna\Component\Signal\Validation\Constraint\InsideSignalHandlerConstraint;
-use Combyna\Component\Signal\Validation\Constraint\SignalDefinitionHasPayloadStaticConstraint;
-use Combyna\Component\Signal\Validation\Query\CurrentSignalPayloadStaticTypeQuery;
+use Combyna\Component\Signal\Validation\Constraint\SourceSignalHasPayloadStaticConstraint;
+use Combyna\Component\Signal\Validation\Query\SourceSignalPayloadStaticTypeQuery;
 use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
@@ -49,7 +49,7 @@ class SignalPayloadExpressionNode extends AbstractExpressionNode
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addConstraint(new InsideSignalHandlerConstraint());
-        $specBuilder->addConstraint(new SignalDefinitionHasPayloadStaticConstraint($this->staticName));
+        $specBuilder->addConstraint(new SourceSignalHasPayloadStaticConstraint($this->staticName));
     }
 
     /**
@@ -57,7 +57,7 @@ class SignalPayloadExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new QueriedResultTypeDeterminer(new CurrentSignalPayloadStaticTypeQuery($this->staticName), $this);
+        return new QueriedResultTypeDeterminer(new SourceSignalPayloadStaticTypeQuery($this->staticName), $this);
     }
 
     /**

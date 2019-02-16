@@ -26,6 +26,7 @@ use Combyna\Component\Framework\Mode\DevelopmentMode;
 use Combyna\Component\Framework\Mode\ProductionMode;
 use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
+use Combyna\Component\Signal\SignalEvents;
 use Combyna\Component\Validator\Context\RootValidationContextInterface;
 use Combyna\Harness\TestCase;
 use LogicException;
@@ -238,6 +239,16 @@ class CombynaTest extends TestCase
     public function testGetContainerFetchesTheServiceContainer()
     {
         $this->assert($this->combyna->getContainer())->exactlyEquals($this->serviceContainer->reveal());
+    }
+
+    public function testOnBroadcastSignalAddsTheListenerForTheCorrectEvent()
+    {
+        $callback = function () {};
+
+        $this->combyna->onBroadcastSignal($callback);
+
+        $this->eventDispatcher->addListener(SignalEvents::BROADCAST_SIGNAL_DISPATCHED, Argument::is($callback))
+            ->shouldHaveBeenCalledOnce();
     }
 
     public function testUseProductionModeShouldAskTheModeContextToUseProduction()

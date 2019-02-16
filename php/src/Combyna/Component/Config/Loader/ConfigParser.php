@@ -86,4 +86,27 @@ class ConfigParser
 
         return $this->getElement($config, $key, $context, $requiredType);
     }
+
+    /**
+     * Ensures that the value is either an array or null, returning an empty array if null
+     *
+     * @param mixed $value
+     * @return array
+     * @throws InvalidArgumentException Throws when neither null nor an array is given
+     */
+    public function toArray($value)
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+
+        if ($value === null) {
+            return [];
+        }
+
+        throw new InvalidArgumentException(sprintf(
+            'Config should be null or array but is of type "%s"',
+            gettype($value)
+        ));
+    }
 }

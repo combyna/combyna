@@ -95,6 +95,16 @@ class ClientFactory
     }
 
     /**
+     * Adds a callback to be called when any broadcast signal is dispatched
+     *
+     * @param callable $callback
+     */
+    public function onBroadcastSignal(callable $callback)
+    {
+        $this->combyna->onBroadcastSignal($callback);
+    }
+
+    /**
      * Switches to production mode (non-reversible, and can only be done before any app is loaded)
      */
     public function useProductionMode()

@@ -13,7 +13,9 @@ namespace Combyna\Component\Signal\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Signal\Config\Act\InvalidSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use InvalidArgumentException;
 
 /**
  * Class SignalDefinitionLoader
@@ -48,18 +50,32 @@ class SignalDefinitionLoader implements SignalDefinitionLoaderInterface
     public function load(
         $libraryName,
         $signalName,
-        array $signalDefinitionConfig
+        $signalDefinitionConfig
     ) {
-        $payloadStaticBagModelConfig = $this->configParser->getOptionalElement(
-            $signalDefinitionConfig,
-            'payload',
-            'signal payload model',
-            [],
-            'array'
-        );
+        try {
+            // Ensure the config is an array or null
+            $signalDefinitionConfig = $this->configParser->toArray($signalDefinitionConfig);
+
+            $payloadStaticBagModelConfig = $this->configParser->getOptionalElement(
+                $signalDefinitionConfig,
+                'payload',
+                'signal payload model',
+                [],
+                'array'
+            );
+            $isBroadcast = $this->configParser->getOptionalElement(
+                $signalDefinitionConfig,
+                'broadcast',
+                'whether to broadcast the signal externally',
+                false,
+                'boolean'
+            );
+        } catch (InvalidArgumentException $exception) {
+            return new InvalidSignalDefinitionNode($libraryName, $signalName, $exception->getMessage());
+        }
 
         $payloadStaticBagModelNode = $this->fixedStaticBagModelLoader->load($payloadStaticBagModelConfig);
 
-        return new SignalDefinitionNode($signalName, $payloadStaticBagModelNode);
+        return new SignalDefinitionNode($signalName, $payloadStaticBagModelNode, $isBroadcast);
     }
 }

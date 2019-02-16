@@ -9,18 +9,16 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Component\Signal\Validation\Query;
+namespace Combyna\Component\Signal\Behaviour\Query\Specifier;
 
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
-use Combyna\Component\Signal\Behaviour\Query\Specifier\CurrentSignalHasPayloadStaticQuerySpecifier;
-use Combyna\Component\Validator\Query\BooleanQueryInterface;
 
 /**
- * Class CurrentSignalHasPayloadStaticQuery
+ * Class SourceSignalHasPayloadStaticQuerySpecifier
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CurrentSignalHasPayloadStaticQuery implements BooleanQueryInterface
+class SourceSignalHasPayloadStaticQuerySpecifier implements QuerySpecifierInterface
 {
     /**
      * @var string
@@ -38,17 +36,9 @@ class CurrentSignalHasPayloadStaticQuery implements BooleanQueryInterface
     /**
      * {@inheritdoc}
      */
-    public function getDefaultResult()
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getDescription()
     {
-        return 'Whether the signal payload has a static called "' . $this->staticName . '"';
+        return 'A query for whether the signal payload has a static called "' . $this->staticName . '"';
     }
 
     /**
@@ -59,14 +49,5 @@ class CurrentSignalHasPayloadStaticQuery implements BooleanQueryInterface
     public function getPayloadStaticName()
     {
         return $this->staticName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function makesQuery(QuerySpecifierInterface $querySpecifier)
-    {
-        return $querySpecifier instanceof CurrentSignalHasPayloadStaticQuerySpecifier &&
-            $querySpecifier->getPayloadStaticName() === $this->staticName;
     }
 }

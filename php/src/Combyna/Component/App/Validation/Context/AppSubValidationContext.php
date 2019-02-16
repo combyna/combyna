@@ -219,7 +219,9 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             $queryRequirement
         );
 
-        return $signalDefinitionNode->getPayloadStaticBagModel()->definesStatic($query->getPayloadStaticName());
+        return $signalDefinitionNode
+            ->getPayloadStaticBagModel($queryRequirement)
+            ->definesStatic($query->getPayloadStaticName());
     }
 
     /**

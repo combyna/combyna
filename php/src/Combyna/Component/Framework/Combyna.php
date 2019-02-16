@@ -21,6 +21,7 @@ use Combyna\Component\Framework\Context\ModeContext;
 use Combyna\Component\Framework\EventDispatcher\Event\EnvironmentLoadedEvent;
 use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
+use Combyna\Component\Signal\SignalEvents;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -184,6 +185,16 @@ class Combyna
     public function getContainer()
     {
         return $this->serviceContainer;
+    }
+
+    /**
+     * Adds a callback to be called when any broadcast signal is dispatched
+     *
+     * @param callable $callback
+     */
+    public function onBroadcastSignal(callable $callback)
+    {
+        $this->eventDispatcher->addListener(SignalEvents::BROADCAST_SIGNAL_DISPATCHED, $callback);
     }
 
     /**

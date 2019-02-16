@@ -24,24 +24,58 @@ class SignalDefinitionHasPayloadStaticConstraint implements ConstraintInterface
     /**
      * @var string
      */
+    private $libraryName;
+
+    /**
+     * @var string
+     */
+    private $signalName;
+
+    /**
+     * @var string
+     */
     private $staticName;
 
     /**
+     * @param string $libraryName
+     * @param string $signalName
      * @param string $staticName
      */
-    public function __construct($staticName)
+    public function __construct($libraryName, $signalName, $staticName)
     {
+        $this->libraryName = $libraryName;
+        $this->signalName = $signalName;
         $this->staticName = $staticName;
     }
 
     /**
-     * Fetches the name of the payload static to check for existence of
+     * Fetches the name of the library that should define the signal
+     *
+     * @return string
+     */
+    public function getLibraryName()
+    {
+        return $this->libraryName;
+    }
+
+    /**
+     * Fetches the name of the payload static
      *
      * @return string
      */
     public function getPayloadStaticName()
     {
         return $this->staticName;
+    }
+
+    /**
+     * Fetches the name of the signal
+     *
+     * @return string
+     */
+    public function getSignalName()
+    {
+        return $this->signalName;
     }
 
     /**

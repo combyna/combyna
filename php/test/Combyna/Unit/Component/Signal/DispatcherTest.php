@@ -76,10 +76,12 @@ class DispatcherTest extends TestCase
         $this->signalDefinition = $this->prophesize(SignalDefinitionInterface::class);
         $this->signalFactory = $this->prophesize(SignalFactoryInterface::class);
 
+        $this->signalDefinition->isBroadcast()->willReturn(false);
+
         $this->dispatcher = new Dispatcher($this->signalFactory->reveal(), $this->eventDispatcher->reveal());
     }
 
-    public function testDispatchSignalDispatchesAnEventForTheSignal()
+    public function testDispatchSignalDispatchesAnEventForTheSignalWhenMarkedForBroadcast()
     {
         /** @var ObjectProphecy|SignalInterface $signal */
         $signal = $this->prophesize(SignalInterface::class);
@@ -87,6 +89,7 @@ class DispatcherTest extends TestCase
             Argument::is($this->signalDefinition->reveal()),
             Argument::is($this->payloadStaticBag->reveal())
         )->willReturn($signal);
+        $this->signalDefinition->isBroadcast()->willReturn(true);
 
         $this->dispatcher->dispatchSignal(
             $this->program->reveal(),
@@ -96,9 +99,33 @@ class DispatcherTest extends TestCase
         );
 
         $this->eventDispatcher->dispatch(
-            SignalEvents::SIGNAL_DISPATCHED,
+            SignalEvents::BROADCAST_SIGNAL_DISPATCHED,
             new SignalDispatchedEvent($signal->reveal())
         )
             ->shouldHaveBeenCalledTimes(1);
+    }
+
+    public function testDispatchSignalDoesNotDispatchAnEventForTheSignalWhenNotMarkedForBroadcast()
+    {
+        /** @var ObjectProphecy|SignalInterface $signal */
+        $signal = $this->prophesize(SignalInterface::class);
+        $this->signalFactory->createSignal(
+            Argument::is($this->signalDefinition->reveal()),
+            Argument::is($this->payloadStaticBag->reveal())
+        )->willReturn($signal);
+        $this->signalDefinition->isBroadcast()->willReturn(false);
+
+        $this->dispatcher->dispatchSignal(
+            $this->program->reveal(),
+            $this->programState->reveal(),
+            $this->signalDefinition->reveal(),
+            $this->payloadStaticBag->reveal()
+        );
+
+        $this->eventDispatcher->dispatch(
+            SignalEvents::BROADCAST_SIGNAL_DISPATCHED,
+            new SignalDispatchedEvent($signal->reveal())
+        )
+            ->shouldNotHaveBeenCalled();
     }
 }

@@ -20,5 +20,5 @@ namespace Combyna\Component\Signal;
  */
 final class SignalEvents
 {
-    const SIGNAL_DISPATCHED = 'combyna.signal_dispatched';
+    const BROADCAST_SIGNAL_DISPATCHED = 'combyna.broadcast_signal_dispatched';
 }

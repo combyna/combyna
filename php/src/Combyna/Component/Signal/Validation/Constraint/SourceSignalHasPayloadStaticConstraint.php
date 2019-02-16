@@ -9,16 +9,17 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Component\Signal\Behaviour\Query\Specifier;
+namespace Combyna\Component\Signal\Validation\Constraint;
 
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+use Combyna\Component\Validator\Constraint\ConstraintInterface;
 
 /**
- * Class CurrentSignalHasPayloadStaticQuerySpecifier
+ * Class SourceSignalHasPayloadStaticConstraint
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CurrentSignalHasPayloadStaticQuerySpecifier implements QuerySpecifierInterface
+class SourceSignalHasPayloadStaticConstraint implements ConstraintInterface
 {
     /**
      * @var string
@@ -34,20 +35,20 @@ class CurrentSignalHasPayloadStaticQuerySpecifier implements QuerySpecifierInter
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getDescription()
-    {
-        return 'A query for whether the signal payload has a static called "' . $this->staticName . '"';
-    }
-
-    /**
-     * Fetches the name of the payload static to query the existence of
+     * Fetches the name of the payload static to check for existence of
      *
      * @return string
      */
     public function getPayloadStaticName()
     {
         return $this->staticName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

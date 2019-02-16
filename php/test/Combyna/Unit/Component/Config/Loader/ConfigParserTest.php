@@ -14,6 +14,7 @@ namespace Combyna\Unit\Component\Config\Loader;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
+use stdClass;
 
 /**
  * Class ConfigParserTest
@@ -336,6 +337,46 @@ class ConfigParserTest extends TestCase
                 'Config element "my-element" should be of one of the type(s) ["array", "boolean"] ' .
                 'but is "string" for some context of this fetch'
             ]
+        ];
+    }
+
+    public function testToArrayReturnsAnArrayPassedIn()
+    {
+        $this->assert($this->parser->toArray([21, 'my_key' => 'my value']))
+            ->exactlyEquals([21, 'my_key' => 'my value']);
+    }
+
+    public function testToArrayReturnsAnEmptyArrayWhenNullGiven()
+    {
+        $this->assert($this->parser->toArray(null))
+            ->exactlyEquals([]);
+    }
+
+    /**
+     * @dataProvider toArrayThrowsWhenNonArrayAndNonNullGiven_dataProvider
+     * @param mixed $value
+     * @param string $type
+     */
+    public function testToArrayThrowsWhenNonArrayAndNonNullGiven($value, $type)
+    {
+        $this->setExpectedException(
+            InvalidArgumentException::class,
+            'Config should be null or array but is of type "' . $type . '"'
+        );
+
+        $this->parser->toArray($value);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArrayThrowsWhenNonArrayAndNonNullGiven_dataProvider()
+    {
+        return [
+            'integer' => [21, 'integer'],
+            'float' => [101.456, 'double'],
+            'object' => [new stdClass(), 'object'],
+            'string' => ['some string', 'string']
         ];
     }
 }

@@ -1,0 +1,41 @@
+name: Signal validation test app
+signals:
+    my_signal_with_no_defined_payload: ~
+    my_signal_with_invalid_broadcast_value:
+        payload:
+            new_text: text
+        broadcast: 'not a boolean'
+    my_signal_with_valid_broadcast_value:
+        broadcast: true
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Signal validation test'
+        description: A test of the validation of the signal feature
+        widget:
+            type: group
+            children:
+                - type: gui.button
+                  attributes:
+                      label: !expr 'My button'
+                  triggers:
+                      gui.click:
+                          instructions:
+                              - type: signal
+                                signal: app.my_signal_with_no_defined_payload
+                                payload:
+                                    an_undefined_static: !expr 'I cannot be set'
+        store:
+            signal_handlers:
+                app.my_unknown_signal:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: an_unknown_slot
+                          value: !expr signal_payload('an_unknown_payload_static')

@@ -26,6 +26,11 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     const TYPE = 'signal-definition';
 
     /**
+     * @var bool
+     */
+    private $isBroadcast;
+
+    /**
      * @var FixedStaticBagModelNode
      */
     private $payloadStaticBagModelNode;
@@ -38,9 +43,11 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     /**
      * @param string $signalName
      * @param FixedStaticBagModelNode $payloadStaticBagModelNode
+     * @param bool $isBroadcast
      */
-    public function __construct($signalName, FixedStaticBagModelNode $payloadStaticBagModelNode)
+    public function __construct($signalName, FixedStaticBagModelNode $payloadStaticBagModelNode, $isBroadcast = false)
     {
+        $this->isBroadcast = $isBroadcast;
         $this->payloadStaticBagModelNode = $payloadStaticBagModelNode;
         $this->signalName = $signalName;
     }
@@ -64,7 +71,7 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticBagModel()
+    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->payloadStaticBagModelNode;
     }
@@ -87,6 +94,14 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     public function getSignalName()
     {
         return $this->signalName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBroadcast()
+    {
+        return $this->isBroadcast;
     }
 
     /**

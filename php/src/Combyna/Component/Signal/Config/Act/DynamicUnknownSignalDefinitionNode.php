@@ -20,11 +20,11 @@ use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
- * Class UnknownSignalDefinitionNode
+ * Class DynamicUnknownSignalDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefinitionNodeInterface, DynamicActNodeInterface
+class DynamicUnknownSignalDefinitionNode extends AbstractActNode implements SignalDefinitionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-signal-definition';
 
@@ -32,11 +32,6 @@ class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefin
      * @var string
      */
     private $libraryName;
-
-    /**
-     * @var QueryRequirementInterface
-     */
-    private $queryRequirement;
 
     /**
      * @var string
@@ -51,7 +46,6 @@ class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefin
     public function __construct($libraryName, $signalName, QueryRequirementInterface $queryRequirement)
     {
         $this->libraryName = $libraryName;
-        $this->queryRequirement = $queryRequirement;
         $this->signalName = $signalName;
 
         // Apply the validation for this dynamically created ACT node
@@ -78,7 +72,7 @@ class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefin
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticBagModel()
+    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return new DynamicUnknownFixedStaticBagModelNode(
             sprintf(
@@ -86,7 +80,7 @@ class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefin
                 $this->signalName,
                 $this->libraryName
             ),
-            $this->queryRequirement
+            $queryRequirement
         );
     }
 
@@ -113,6 +107,14 @@ class UnknownSignalDefinitionNode extends AbstractActNode implements SignalDefin
     public function getSignalName()
     {
         return $this->signalName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBroadcast()
+    {
+        return false; // Unknown signals cannot be dispatched, let alone broadcast
     }
 
     /**

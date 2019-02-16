@@ -20,8 +20,8 @@ use Combyna\Component\Environment\Validation\Context\Specifier\EnvironmentContex
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownLibraryForEventDefinitionNode;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
+use Combyna\Component\Signal\Config\Act\DynamicUnknownLibraryForSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
-use Combyna\Component\Signal\Config\Act\UnknownLibraryForSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownLibraryForWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
@@ -120,9 +120,9 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
 
     /**
      * Fetches a signal definition defined by a library installed into the environment.
-     * If the library is not installed then an UnknownLibraryForSignalDefinitionNode,
+     * If the library is not installed then an DynamicUnknownLibraryForSignalDefinitionNode,
      * or if it is but does not define the specified definition,
-     * then an UnknownSignalDefinitionNode will be returned
+     * then an DynamicUnknownSignalDefinitionNode will be returned
      *
      * @param string $libraryName
      * @param string $signalDefinitionName
@@ -136,7 +136,7 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
     ) {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             // Not even the library was found
-            return new UnknownLibraryForSignalDefinitionNode($libraryName, $signalDefinitionName, $queryRequirement);
+            return new DynamicUnknownLibraryForSignalDefinitionNode($libraryName, $signalDefinitionName, $queryRequirement);
         }
 
         return $this->libraryNodes[$libraryName]->getSignalDefinition($signalDefinitionName, $queryRequirement);

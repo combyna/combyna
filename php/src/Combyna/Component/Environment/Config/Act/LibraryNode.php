@@ -15,12 +15,10 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
-use Combyna\Component\Event\Config\Act\EventDefinitionNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownEventDefinitionNode;
-use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use Combyna\Component\Signal\Config\Act\DynamicUnknownSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
-use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
@@ -42,7 +40,7 @@ class LibraryNode extends AbstractActNode
     private $description;
 
     /**
-     * @var EventDefinitionNode[]
+     * @var EventDefinitionNodeInterface[]
      */
     private $eventDefinitionNodes = [];
 
@@ -62,7 +60,7 @@ class LibraryNode extends AbstractActNode
     private $name;
 
     /**
-     * @var SignalDefinitionNode[]
+     * @var SignalDefinitionNodeInterface[]
      */
     private $signalDefinitionNodes = [];
 
@@ -76,7 +74,7 @@ class LibraryNode extends AbstractActNode
      * @param string $description
      * @param string[] $libraryNamesDependedOn
      * @param FunctionNodeInterface[] $functionNodes
-     * @param EventDefinitionNode[] $eventDefinitionNodes
+     * @param EventDefinitionNodeInterface[] $eventDefinitionNodes
      * @param SignalDefinitionNodeInterface[] $signalDefinitionNodes
      * @param WidgetDefinitionNodeInterface[] $widgetDefinitionNodes
      */
@@ -166,7 +164,7 @@ class LibraryNode extends AbstractActNode
     /**
      * Fetches all event definitions defined by this library
      *
-     * @return EventDefinitionNode[]
+     * @return EventDefinitionNodeInterface[]
      */
     public function getEventDefinitions()
     {
@@ -232,7 +230,7 @@ class LibraryNode extends AbstractActNode
     public function getSignalDefinition($signalName, QueryRequirementInterface $queryRequirement)
     {
         if (!array_key_exists($signalName, $this->signalDefinitionNodes)) {
-            return new UnknownSignalDefinitionNode($this->name, $signalName, $queryRequirement);
+            return new DynamicUnknownSignalDefinitionNode($this->name, $signalName, $queryRequirement);
         }
 
         return $this->signalDefinitionNodes[$signalName];

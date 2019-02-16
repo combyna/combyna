@@ -25,6 +25,11 @@ use Combyna\Component\Bag\StaticBagInterface;
 class SignalDefinition implements SignalDefinitionInterface
 {
     /**
+     * @var bool
+     */
+    private $isBroadcast;
+
+    /**
      * @var string
      */
     private $libraryName;
@@ -47,9 +52,11 @@ class SignalDefinition implements SignalDefinitionInterface
      * @param string $libraryName
      * @param string $name
      * @param FixedStaticBagModelInterface $payloadStaticBagModel
+     * @param bool $isBroadcast
      */
-    public function __construct($libraryName, $name, FixedStaticBagModelInterface $payloadStaticBagModel)
+    public function __construct($libraryName, $name, FixedStaticBagModelInterface $payloadStaticBagModel, $isBroadcast)
     {
+        $this->isBroadcast = (bool) $isBroadcast;
         $this->libraryName = $libraryName;
         $this->name = $name;
         $this->payloadStaticBagModel = $payloadStaticBagModel;
@@ -85,5 +92,13 @@ class SignalDefinition implements SignalDefinitionInterface
     public function getPayloadStaticBagModel()
     {
         return $this->payloadStaticBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBroadcast()
+    {
+        return $this->isBroadcast;
     }
 }

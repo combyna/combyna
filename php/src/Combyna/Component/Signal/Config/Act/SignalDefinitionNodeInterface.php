@@ -26,9 +26,10 @@ interface SignalDefinitionNodeInterface extends ActNodeInterface
     /**
      * Fetches the model for the static bag of payload data the signal expects
      *
+     * @param QueryRequirementInterface $queryRequirement
      * @return FixedStaticBagModelNode
      */
-    public function getPayloadStaticBagModel();
+    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement);
 
     /**
      * Fetches the type of the specified static for this signal's payload
@@ -45,6 +46,13 @@ interface SignalDefinitionNodeInterface extends ActNodeInterface
      * @return string
      */
     public function getSignalName();
+
+    /**
+     * Determines whether signals of this definition should be broadcast externally
+     *
+     * @return bool
+     */
+    public function isBroadcast();
 
     /**
      * Returns whether or not this signal definition is defined

@@ -15,11 +15,11 @@ use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Validator\Query\ResultTypeQueryInterface;
 
 /**
- * Class CurrentSignalPayloadStaticTypeQuery
+ * Class SourceSignalPayloadStaticTypeQuery
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class CurrentSignalPayloadStaticTypeQuery implements ResultTypeQueryInterface
+class SourceSignalPayloadStaticTypeQuery implements ResultTypeQueryInterface
 {
     /**
      * @var string

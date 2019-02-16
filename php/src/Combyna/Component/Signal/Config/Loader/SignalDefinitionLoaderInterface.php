@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Signal\Config\Loader;
 
-use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
 
 /**
  * Interface SignalDefinitionLoaderInterface
@@ -25,12 +25,12 @@ interface SignalDefinitionLoaderInterface
      *
      * @param string $libraryName
      * @param string $signalName
-     * @param array $signalDefinitionConfig
-     * @return SignalDefinitionNode
+     * @param mixed $signalDefinitionConfig
+     * @return SignalDefinitionNodeInterface
      */
     public function load(
         $libraryName,
         $signalName,
-        array $signalDefinitionConfig
+        $signalDefinitionConfig
     );
 }

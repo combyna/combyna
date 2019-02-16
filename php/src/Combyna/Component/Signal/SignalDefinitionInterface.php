@@ -53,4 +53,11 @@ interface SignalDefinitionInterface
      * @return FixedStaticBagModelInterface
      */
     public function getPayloadStaticBagModel();
+
+    /**
+     * Determines whether signals of this definition should be broadcast externally
+     *
+     * @return bool
+     */
+    public function isBroadcast();
 }

@@ -70,6 +70,16 @@ class SignalDefinitionHasPayloadStaticQuery implements BooleanQueryInterface
     }
 
     /**
+     * Fetches the name of the payload static to query the result type of
+     *
+     * @return string
+     */
+    public function getPayloadStaticName()
+    {
+        return $this->staticName;
+    }
+
+    /**
      * Fetches the name of the library that defines the signal
      *
      * @return string
@@ -87,16 +97,6 @@ class SignalDefinitionHasPayloadStaticQuery implements BooleanQueryInterface
     public function getSignalName()
     {
         return $this->signalName;
-    }
-
-    /**
-     * Fetches the name of the payload static to query the result type of
-     *
-     * @return string
-     */
-    public function getPayloadStaticName()
-    {
-        return $this->staticName;
     }
 
     /**

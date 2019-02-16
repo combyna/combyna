@@ -11,6 +11,7 @@
 
 namespace Combyna\Unit\Client;
 
+use Closure;
 use Combyna\Client\Client;
 use Combyna\Client\ClientFactory;
 use Combyna\Component\App\AppInterface;
@@ -19,6 +20,7 @@ use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
 use Combyna\Component\Ui\Environment\Library\GenericWidgetValueProviderInterface;
 use Combyna\Harness\TestCase;
+use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -78,6 +80,7 @@ class ClientFactoryTest extends TestCase
                 ]]
             )
             ->willReturn($this->environmentNode);
+        $this->combyna->onBroadcastSignal(Argument::type(Closure::class))->willReturn();
         $this->combyna->useProductionMode()->willReturn();
 
         $this->factory = new ClientFactory(
@@ -151,6 +154,16 @@ class ClientFactoryTest extends TestCase
         $this->combyna->getContainer()->willReturn($serviceContainer);
 
         $this->assert($this->factory->getContainer())->exactlyEquals($serviceContainer->reveal());
+    }
+
+    public function testOnBroadcastSignalAsksCombynaToAddTheListener()
+    {
+        $callback = function () {};
+
+        $this->factory->onBroadcastSignal($callback);
+
+        $this->combyna->onBroadcastSignal(Argument::is($callback))
+            ->shouldHaveBeenCalledOnce();
     }
 
     public function testUseProductionModeAsksCombynaToUseProduction()

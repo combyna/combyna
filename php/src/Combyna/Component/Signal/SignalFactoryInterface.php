@@ -39,12 +39,14 @@ interface SignalFactoryInterface
      * @param string $libraryName
      * @param string $signalName
      * @param FixedStaticBagModelInterface $payloadStaticBagModel
+     * @param bool $isBroadcast
      * @return SignalDefinitionInterface
      */
     public function createSignalDefinition(
         $libraryName,
         $signalName,
-        FixedStaticBagModelInterface $payloadStaticBagModel
+        FixedStaticBagModelInterface $payloadStaticBagModel,
+        $isBroadcast
     );
 
     /**

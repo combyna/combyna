@@ -20,9 +20,8 @@ use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
 use Combyna\Component\Router\Config\Act\RouteNode;
-use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
+use Combyna\Component\Signal\Config\Act\DynamicUnknownSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
-use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
@@ -63,13 +62,13 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     private $routeNodes = [];
 
     /**
-     * @var SignalDefinitionNode[]
+     * @var SignalDefinitionNodeInterface[]
      */
     private $signalDefinitionNodes = [];
 
     /**
      * @param EnvironmentNode $environmentNode
-     * @param SignalDefinitionNode[] $signalDefinitionNodes
+     * @param SignalDefinitionNodeInterface[] $signalDefinitionNodes
      * @param RouteNode[] $routeNodes
      * @param HomeNode $homeNode
      * @param PageViewNode[] $pageViewNodes
@@ -209,13 +208,13 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     {
         return array_key_exists($signalName, $this->signalDefinitionNodes) ?
             $this->signalDefinitionNodes[$signalName] :
-            new UnknownSignalDefinitionNode(LibraryInterface::APP, $signalName, $queryRequirement);
+            new DynamicUnknownSignalDefinitionNode(LibraryInterface::APP, $signalName, $queryRequirement);
     }
 
     /**
      * Fetches the collection of signal definitions in the app
      *
-     * @return SignalDefinitionNode[]
+     * @return SignalDefinitionNodeInterface[]
      */
     public function getSignalDefinitions()
     {

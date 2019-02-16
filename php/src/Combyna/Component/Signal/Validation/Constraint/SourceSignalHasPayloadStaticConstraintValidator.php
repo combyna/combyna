@@ -11,16 +11,16 @@
 
 namespace Combyna\Component\Signal\Validation\Constraint;
 
-use Combyna\Component\Signal\Validation\Query\SignalDefinitionHasPayloadStaticQuery;
+use Combyna\Component\Signal\Validation\Query\SourceSignalHasPayloadStaticQuery;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
- * Class SignalDefinitionHasPayloadStaticConstraintValidator
+ * Class SourceSignalHasPayloadStaticConstraintValidator
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class SignalDefinitionHasPayloadStaticConstraintValidator implements ConstraintValidatorInterface
+class SourceSignalHasPayloadStaticConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * {@inheritdoc}
@@ -28,7 +28,7 @@ class SignalDefinitionHasPayloadStaticConstraintValidator implements ConstraintV
     public function getConstraintClassToValidatorCallableMap()
     {
         return [
-            SignalDefinitionHasPayloadStaticConstraint::class => [$this, 'validate']
+            SourceSignalHasPayloadStaticConstraint::class => [$this, 'validate']
         ];
     }
 
@@ -44,17 +44,15 @@ class SignalDefinitionHasPayloadStaticConstraintValidator implements ConstraintV
      * Validates this constraint in the given validation context. If the constraint is not met,
      * one or more violations will be added to the context to make the validation fail
      *
-     * @param SignalDefinitionHasPayloadStaticConstraint $constraint
+     * @param SourceSignalHasPayloadStaticConstraint $constraint
      * @param ValidationContextInterface $validationContext
      */
     public function validate(
-        SignalDefinitionHasPayloadStaticConstraint $constraint,
+        SourceSignalHasPayloadStaticConstraint $constraint,
         ValidationContextInterface $validationContext
     ) {
         $payloadStaticExists = $validationContext->queryForBoolean(
-            new SignalDefinitionHasPayloadStaticQuery(
-                $constraint->getLibraryName(),
-                $constraint->getSignalName(),
+            new SourceSignalHasPayloadStaticQuery(
                 $constraint->getPayloadStaticName()
             ),
             $validationContext->getCurrentActNode()
@@ -62,7 +60,7 @@ class SignalDefinitionHasPayloadStaticConstraintValidator implements ConstraintV
 
         if (!$payloadStaticExists) {
             $validationContext->addGenericViolation(
-                'Payload does not define a static with name "' .
+                'Payload does not contain a static with name "' .
                 $constraint->getPayloadStaticName() .
                 '"'
             );

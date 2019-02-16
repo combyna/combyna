@@ -14,11 +14,11 @@ namespace Combyna\Component\Signal\Validation\Context;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
-use Combyna\Component\Signal\Validation\Query\CurrentSignalHasPayloadStaticQuery;
-use Combyna\Component\Signal\Validation\Query\CurrentSignalPayloadStaticTypeQuery;
 use Combyna\Component\Signal\Validation\Query\InsideSignalHandlerQuery;
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionHasPayloadStaticQuery;
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQuery;
+use Combyna\Component\Signal\Validation\Query\SourceSignalHasPayloadStaticQuery;
+use Combyna\Component\Signal\Validation\Query\SourceSignalPayloadStaticTypeQuery;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -119,8 +119,8 @@ class SignalHandlerSubValidationContext implements SignalHandlerSubValidationCon
     {
         return [
             InsideSignalHandlerQuery::class => [$this, 'queryForInsideSignalHandler'],
-            CurrentSignalHasPayloadStaticQuery::class => [$this, 'queryForSignalPayloadStaticExistence'],
-            CurrentSignalPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType']
+            SourceSignalHasPayloadStaticQuery::class => [$this, 'queryForSignalPayloadStaticExistence'],
+            SourceSignalPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType']
         ];
     }
 
@@ -145,12 +145,12 @@ class SignalHandlerSubValidationContext implements SignalHandlerSubValidationCon
     /**
      * Determines whether the signal being handled defines the specified payload static
      *
-     * @param CurrentSignalHasPayloadStaticQuery $query
+     * @param SourceSignalHasPayloadStaticQuery $query
      * @param ValidationContextInterface $validationContext
      * @return bool
      */
     public function queryForSignalPayloadStaticExistence(
-        CurrentSignalHasPayloadStaticQuery $query,
+        SourceSignalHasPayloadStaticQuery $query,
         ValidationContextInterface $validationContext
     ) {
         $signalDefinitionReferenceNode = $this->signalHandlerNode->getSignalDefinitionReference();
@@ -168,12 +168,12 @@ class SignalHandlerSubValidationContext implements SignalHandlerSubValidationCon
     /**
      * Fetches the type of the specified payload static for the current handler's signal
      *
-     * @param CurrentSignalPayloadStaticTypeQuery $query
+     * @param SourceSignalPayloadStaticTypeQuery $query
      * @param ValidationContextInterface $validationContext
      * @return TypeInterface|null
      */
     public function queryForSignalPayloadStaticType(
-        CurrentSignalPayloadStaticTypeQuery $query,
+        SourceSignalPayloadStaticTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
         $signalDefinitionReferenceNode = $this->signalHandlerNode->getSignalDefinitionReference();

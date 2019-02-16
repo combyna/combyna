@@ -57,13 +57,15 @@ class Dispatcher implements DispatcherInterface
     ) {
         $signal = $this->signalFactory->createSignal($signalDefinition, $payloadStaticBag);
 
-        // Dispatch an event to provide an extension point for triggering RPC Ajax requests, etc.
-        $this->eventDispatcher->dispatch(
-            SignalEvents::SIGNAL_DISPATCHED,
-            new SignalDispatchedEvent(
-                $signal
-            )
-        );
+        if ($signalDefinition->isBroadcast()) {
+            // Dispatch an event to provide an extension point for triggering RPC Ajax requests, etc.
+            $this->eventDispatcher->dispatch(
+                SignalEvents::BROADCAST_SIGNAL_DISPATCHED,
+                new SignalDispatchedEvent(
+                    $signal
+                )
+            );
+        }
 
         return $program->handleSignal($programState, $signal);
     }

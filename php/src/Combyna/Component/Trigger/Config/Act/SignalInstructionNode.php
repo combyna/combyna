@@ -15,6 +15,7 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Signal\Validation\Constraint\SignalDefinitionExistsConstraint;
+use Combyna\Component\Signal\Validation\Constraint\ValidSignalPayloadSetsSpecModifier;
 
 /**
  * Class SignalInstructionNode
@@ -58,6 +59,13 @@ class SignalInstructionNode extends AbstractActNode implements InstructionNodeIn
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addChildNode($this->payloadExpressionBagNode);
+        $specBuilder->addModifier(
+            new ValidSignalPayloadSetsSpecModifier(
+                $this->signalLibraryName,
+                $this->signalName,
+                $this->payloadExpressionBagNode
+            )
+        );
 
         $specBuilder->addConstraint(
             new SignalDefinitionExistsConstraint($this->signalLibraryName, $this->signalName)
