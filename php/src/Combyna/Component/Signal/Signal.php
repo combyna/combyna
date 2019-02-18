@@ -69,4 +69,12 @@ class Signal implements SignalInterface
     {
         return $this->payloadStaticBag->getStatic($staticName);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticBag()
+    {
+        return $this->payloadStaticBag;
+    }
 }

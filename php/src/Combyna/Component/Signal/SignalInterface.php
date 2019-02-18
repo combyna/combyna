@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
 
 /**
@@ -43,4 +44,11 @@ interface SignalInterface
      * @return StaticInterface
      */
     public function getPayloadStatic($staticName);
+
+    /**
+     * Fetches the entire payload for this signal
+     *
+     * @return StaticBagInterface
+     */
+    public function getPayloadStaticBag();
 }
