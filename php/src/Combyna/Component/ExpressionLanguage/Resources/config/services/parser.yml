@@ -1,7 +1,3 @@
-parameters:
-    # This is set in CombynaBootstrap when building the container
-    combyna.cache_path: ~
-
 services:
     combyna.expression_language.parser:
         class: Combyna\Component\ExpressionLanguage\ExpressionParser
