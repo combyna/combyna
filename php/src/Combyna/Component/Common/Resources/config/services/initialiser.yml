@@ -1,0 +1,5 @@
+services:
+    combyna.common.delegator_initialiser:
+        class: Combyna\Component\Common\Delegator\DelegatorInitialiser
+        arguments:
+            - '@service_container'

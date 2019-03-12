@@ -42,7 +42,7 @@ class ArgumentParserIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap;
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $this->parser = $this->container->get('combyna.config.loader.argument_parser');
     }

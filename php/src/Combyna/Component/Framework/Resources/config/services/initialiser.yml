@@ -1,3 +1,0 @@
-services:
-    combyna.framework.delegator_initialiser:
-        class: Combyna\Component\Framework\DelegatorInitialiser

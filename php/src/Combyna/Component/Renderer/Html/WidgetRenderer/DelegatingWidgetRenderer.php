@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Renderer\Html\HtmlNodeInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;

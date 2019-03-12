@@ -12,8 +12,8 @@
 namespace Combyna\Component\Expression;
 
 use Combyna\Component\Common\AbstractComponent;
-use Combyna\Component\Expression\DependencyInjection\Compiler\RegisterAssuranceLoadersPass;
-use Combyna\Component\Expression\DependencyInjection\Compiler\RegisterAssuranceNodePromotersPass;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -28,9 +28,32 @@ class ExpressionComponent extends AbstractComponent
      */
     public function build(ContainerBuilder $containerBuilder)
     {
-        $containerBuilder->addCompilerPass(new RegisterAssuranceLoadersPass());
-        $containerBuilder->addCompilerPass(new RegisterAssuranceNodePromotersPass());
-
-        // TODO: Factor the other delegator setups out of ExpressionExtension
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            new DelegateeTagDefinition(
+                'combyna.assurance_loader',
+                'combyna.expression.loader.assurance',
+                'addLoader'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.assurance_promoter',
+                'combyna.expression.act.assurance_promoter',
+                'addPromoter'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.builtin_expression_loader',
+                'combyna.expression.loader.builtin',
+                'addBuiltinLoader'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.expression_loader',
+                'combyna.expression.loader',
+                'addLoader'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.expression_promoter',
+                'combyna.expression.act.promoter',
+                'addPromoter'
+            )
+        ]));
     }
 }

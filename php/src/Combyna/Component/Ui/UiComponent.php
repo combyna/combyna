@@ -12,6 +12,9 @@
 namespace Combyna\Component\Ui;
 
 use Combyna\Component\Common\AbstractComponent;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class UiComponent
@@ -20,4 +23,17 @@ use Combyna\Component\Common\AbstractComponent;
  */
 class UiComponent extends AbstractComponent
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            new DelegateeTagDefinition(
+                'combyna.view_store_instruction_promoter',
+                'combyna.ui.promoter.view_store_instruction_node',
+                'addPromoter'
+            )
+        ]));
+    }
 }

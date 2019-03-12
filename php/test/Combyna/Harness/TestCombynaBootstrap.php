@@ -40,12 +40,12 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
      * {@inheritdoc}
      */
     public function configureContainer(
-        $compiledContainerPath = null,
+        $cachePath = null,
         $compiledContainerNamespace = null,
         $compiledContainerClass = null
     ) {
         $this->combynaBootstrap->configureContainer(
-            $compiledContainerPath,
+            $cachePath,
             $compiledContainerNamespace,
             $compiledContainerClass
         );
@@ -54,9 +54,9 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
     /**
      * {@inheritdoc}
      */
-    public function getContainer($isDebug = true)
+    public function createContainer()
     {
-        $container = $this->combynaBootstrap->getContainer(false);
+        $container = $this->combynaBootstrap->createContainer();
 
         $testGuiWidgetProviders = new TestGuiWidgetProviders($container->get('combyna.expression.static_factory'));
         $container->get('combyna.environment.event_listener.widget_value_provider_installer')->addProvider(
@@ -66,5 +66,37 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
         $container->set('combyna_test.gui_widget_providers', $testGuiWidgetProviders);
 
         return $container;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCommonCachePath()
+    {
+        return $this->combynaBootstrap->getCommonCachePath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContainerBuilder()
+    {
+        return $this->combynaBootstrap->getContainerBuilder();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getContainerCachePath()
+    {
+        return $this->combynaBootstrap->getContainerCachePath();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUp()
+    {
+        $this->combynaBootstrap->warmUp();
     }
 }

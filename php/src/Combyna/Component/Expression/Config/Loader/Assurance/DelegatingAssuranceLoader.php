@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Loader\Assurance;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Expression\Config\Act\Assurance\UnknownAssuranceNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 

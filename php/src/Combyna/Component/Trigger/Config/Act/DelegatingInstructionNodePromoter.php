@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Trigger\Config\Act;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Trigger\Instruction\InstructionFactoryInterface;
 use InvalidArgumentException;

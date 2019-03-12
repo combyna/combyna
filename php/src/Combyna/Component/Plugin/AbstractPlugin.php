@@ -39,6 +39,14 @@ abstract class AbstractPlugin extends AbstractComponent implements PluginInterfa
     }
 
     /**
+     * {@inheritdoc]
+     */
+    public function getSubPlugins()
+    {
+        return [];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
@@ -47,17 +55,21 @@ abstract class AbstractPlugin extends AbstractComponent implements PluginInterfa
         $yamlParser = $container->get(static::YAML_PARSER_SERVICE);
         $libraryCollectionServiceDefinition = $container->getDefinition(static::PLUGIN_LIBRARY_COLLECTION_SERVICE);
 
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator(
-                $this->getDirectory() . '/Resources/config/libraries',
-                RecursiveDirectoryIterator::SKIP_DOTS
-            )
-        );
+        $librariesPath = $this->getDirectory() . '/Resources/config/libraries';
 
-        foreach ($files as $path => $file) {
-            /** @var SplFileInfo $file */
-            $libraryConfig = $yamlParser->parse(file_get_contents($file->getPathname()));
-            $libraryCollectionServiceDefinition->addMethodCall('addLibraryConfig', [$libraryConfig]);
+        if (is_dir($librariesPath)) {
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator(
+                    $librariesPath,
+                    RecursiveDirectoryIterator::SKIP_DOTS
+                )
+            );
+
+            foreach ($files as $path => $file) {
+                /** @var SplFileInfo $file */
+                $libraryConfig = $yamlParser->parse(file_get_contents($file->getPathname()));
+                $libraryCollectionServiceDefinition->addMethodCall('addLibraryConfig', [$libraryConfig]);
+            }
         }
     }
 }

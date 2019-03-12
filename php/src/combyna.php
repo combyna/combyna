@@ -10,13 +10,10 @@
  */
 
 use Combyna\CombynaBootstrap;
-use Combyna\Plugin\Bootstrap\BootstrapPlugin;
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../vendor/autoload.php';
 
-$combynaBootstrap = new CombynaBootstrap([
-    new BootstrapPlugin()
-]);
+$combynaBootstrap = new CombynaBootstrap();
 
-return $combynaBootstrap->getContainer()->get('combyna');
+return $combynaBootstrap->createContainer()->get('combyna');

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Environment\EventListener;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Environment\Library\NativeFunctionProviderInterface;
@@ -25,7 +26,7 @@ use Combyna\Component\Framework\EventDispatcher\Event\EnvironmentLoadedEvent;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NativeFunctionInstallerListener
+class NativeFunctionInstallerListener implements DelegatorInterface
 {
     /**
      * @var NativeFunctionProviderInterface[]

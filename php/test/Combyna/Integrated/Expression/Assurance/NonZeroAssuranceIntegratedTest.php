@@ -59,7 +59,7 @@ class NonZeroAssuranceIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap;
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $this->combyna = $this->container->get('combyna');
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');

@@ -88,7 +88,7 @@ class ExpressionValidationIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $staticExpressionFactory = $this->container->get('combyna.expression.static_factory');
         $this->validationFactory = $this->container->get('combyna.validator.factory');

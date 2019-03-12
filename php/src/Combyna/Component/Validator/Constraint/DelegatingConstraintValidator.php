@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Validator\Constraint;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use InvalidArgumentException;
 

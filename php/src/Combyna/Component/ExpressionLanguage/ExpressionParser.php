@@ -12,6 +12,7 @@
 namespace Combyna\Component\ExpressionLanguage;
 
 use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * Class ExpressionParser
@@ -20,6 +21,21 @@ use InvalidArgumentException;
  */
 class ExpressionParser
 {
+    const RELATIVE_CACHED_PARSER_PATH = '/ExpressionLanguage/PegExpressionParser.php';
+
+    /**
+     * @var string
+     */
+    private $cachePath;
+
+    /**
+     * @param string $cachePath
+     */
+    public function __construct($cachePath)
+    {
+        $this->cachePath = $cachePath;
+    }
+
     /**
      * Parses an expression string, returning an expression array structure
      *
@@ -28,6 +44,15 @@ class ExpressionParser
      */
     public function parse($expression)
     {
+        $pegExpressionParserPath = $this->cachePath . self::RELATIVE_CACHED_PARSER_PATH;
+
+        if (!is_file($pegExpressionParserPath) || !is_readable($pegExpressionParserPath)) {
+            throw new RuntimeException('Unable to find compiled ExpressionLanguage parser');
+        }
+
+        require_once $pegExpressionParserPath;
+
+        // Included just above rather than autoloaded
         $parser = new PegExpressionParser($expression);
 
         $result = $parser->match_Expression() ;

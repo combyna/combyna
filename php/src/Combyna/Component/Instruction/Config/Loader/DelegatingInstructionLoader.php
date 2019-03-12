@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Instruction\Config\Loader;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Instruction\Config\Act\UnknownInstructionNode;
 
 /**

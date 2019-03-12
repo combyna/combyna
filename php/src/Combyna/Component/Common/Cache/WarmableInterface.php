@@ -9,13 +9,19 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Component\Common;
+namespace Combyna\Component\Common\Cache;
 
 /**
- * Interface DelegatorInterface
+ * Interface WarmableInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface DelegatorInterface
+interface WarmableInterface
 {
+    /**
+     * Warms up the cache
+     *
+     * @param string $cachePath
+     */
+    public function warmUp($cachePath);
 }

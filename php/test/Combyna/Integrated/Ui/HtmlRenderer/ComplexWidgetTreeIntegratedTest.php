@@ -53,7 +53,7 @@ class ComplexWidgetTreeIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $this->combyna = $this->container->get('combyna');
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');

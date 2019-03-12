@@ -30,7 +30,7 @@ class ContainerIntegratedTest extends TestCase
     public function testServiceCanBeCreated($serviceId)
     {
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
-        $container = $combynaBootstrap->getContainer();
+        $container = $combynaBootstrap->createContainer();
 
         // Try to get the service to ensure it can be constructed
         $container->get($serviceId);
@@ -47,7 +47,7 @@ class ContainerIntegratedTest extends TestCase
         $calls = [];
 
         /** @var Container $container */
-        $container = $combynaBootstrap->getContainer();
+        $container = $combynaBootstrap->createContainer();
 
         foreach ($container->getServiceIds() as $id) {
             if (

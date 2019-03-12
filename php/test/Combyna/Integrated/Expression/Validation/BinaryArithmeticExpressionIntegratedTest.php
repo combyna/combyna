@@ -56,7 +56,7 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $this->environmentNode = new EnvironmentNode();
         $this->appNode = new AppNode(

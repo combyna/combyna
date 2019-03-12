@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Type\Config\Loader;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;

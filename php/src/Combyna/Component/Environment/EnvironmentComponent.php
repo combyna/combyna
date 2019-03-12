@@ -12,8 +12,8 @@
 namespace Combyna\Component\Environment;
 
 use Combyna\Component\Common\AbstractComponent;
-use Combyna\Component\Environment\DependencyInjection\RegisterNativeFunctionProvidersPass;
-use Combyna\Component\Environment\DependencyInjection\RegisterWidgetValueProvidersPass;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
@@ -28,10 +28,20 @@ class EnvironmentComponent extends AbstractComponent
      */
     public function build(ContainerBuilder $containerBuilder)
     {
-        // Register the native PHP implementation for native functions
-        $containerBuilder->addCompilerPass(new RegisterNativeFunctionProvidersPass());
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            // Register the native PHP implementation for native functions
+            new DelegateeTagDefinition(
+                'combyna.native_library_function_provider',
+                'combyna.environment.event_listener.native_function_installer',
+                'addProvider'
+            ),
 
-        // Register the providers for widget values
-        $containerBuilder->addCompilerPass(new RegisterWidgetValueProvidersPass());
+            // Register the providers for widget values
+            new DelegateeTagDefinition(
+                'combyna.widget_value_provider',
+                'combyna.environment.event_listener.widget_value_provider_installer',
+                'addProvider'
+            )
+        ]));
     }
 }

@@ -10,6 +10,7 @@
  */
 
 use Combyna\Harness\TestCombynaBootstrap;
+use Symfony\Component\Filesystem\Filesystem;
 
 // Load Composer's autoloader
 $autoloader = require __DIR__ . '/../../vendor/autoload.php';
@@ -19,14 +20,13 @@ $autoloader->addPsr4('Combyna\\Integrated\\', __DIR__ . '/Combyna/Integrated');
 $autoloader->addPsr4('Combyna\\Integration\\', __DIR__ . '/Combyna/Integration');
 $autoloader->addPsr4('Combyna\\Unit\\', __DIR__ . '/Combyna/Unit');
 
-$compiledContainer = __DIR__ . '/../../php/dist/Combyna/Container/CompiledCombynaContainer.php';
+$cachePath = __DIR__ . '/../dist';
 
-if (file_exists($compiledContainer)) {
-    // Make sure the compiled DI container is up-to-date for each test run
-    unlink($compiledContainer);
-}
-
-// Make sure the expression parser is up-to-date for each test run
-shell_exec('composer run-script build:expression-parser');
+// Make sure the cache is up-to-date for each test run
+$fileSystem = new Filesystem();
+$fileSystem->remove($cachePath);
 
 $combynaBootstrap = new TestCombynaBootstrap();
+$combynaBootstrap->configureContainer($cachePath);
+
+$combynaBootstrap->warmUp();

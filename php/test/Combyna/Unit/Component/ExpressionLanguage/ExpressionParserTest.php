@@ -29,7 +29,9 @@ class ExpressionParserTest extends TestCase
 
     public function setUp()
     {
-        $this->parser = new ExpressionParser();
+        global $combynaBootstrap;
+
+        $this->parser = new ExpressionParser($combynaBootstrap->getCommonCachePath());
     }
 
     /**

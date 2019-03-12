@@ -13,7 +13,7 @@ namespace Combyna\Component\Validator\Context\Factory;
 
 use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use InvalidArgumentException;

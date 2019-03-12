@@ -1,0 +1,9 @@
+services:
+    combyna_bundle.cache_warmer.expression_language_parser:
+        class: Combyna\Component\ExpressionLanguage\CacheWarmer\ExpressionLanguageParserCacheWarmer
+        autowire: true
+        tags:
+            # The expression language is needed in order to build the service container,
+            # as plugins are loaded as part of a compiler pass and they are able to use expressions.
+            # This means the parser needs to be warmed "early", as part of the container compilation.
+            - {name: combyna.early_cache_warmer}

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Environment\EventListener;
 
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Environment\Library\WidgetValueProviderProviderInterface;
@@ -24,7 +25,7 @@ use Combyna\Component\Framework\EventDispatcher\Event\EnvironmentLoadedEvent;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetValueProviderInstallerListener
+class WidgetValueProviderInstallerListener implements DelegatorInterface
 {
     /**
      * @var WidgetValueProviderProviderInterface[]

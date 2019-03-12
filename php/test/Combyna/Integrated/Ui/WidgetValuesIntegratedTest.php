@@ -57,7 +57,7 @@ class WidgetValuesIntegratedTest extends TestCase
     public function setUp()
     {
         global $combynaBootstrap;
-        $this->container = $combynaBootstrap->getContainer();
+        $this->container = $combynaBootstrap->createContainer();
 
         $this->container->get('combyna.renderer.html.widget')->addWidgetRenderer(new PokableButtonWidgetRenderer());
 
