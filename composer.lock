@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8fdf8d46d430c1f9a3ae69b055cf6726",
+    "content-hash": "f78b39d0f795df5c5c0ce0e495a72c40",
     "packages": [
         {
             "name": "combyna/php-peg",
@@ -821,12 +821,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/combyna/gui-plugin.git",
-                "reference": "377e2d0fc7b21894f05ef4fc51a93158b6d2061d"
+                "reference": "eff7cd2c39eac7231c6739773aaf1146590df4d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/377e2d0fc7b21894f05ef4fc51a93158b6d2061d",
-                "reference": "377e2d0fc7b21894f05ef4fc51a93158b6d2061d",
+                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/eff7cd2c39eac7231c6739773aaf1146590df4d6",
+                "reference": "eff7cd2c39eac7231c6739773aaf1146590df4d6",
                 "shasum": ""
             },
             "require-dev": {
@@ -840,17 +840,9 @@
                     "Combyna\\": "php/dist/Combyna"
                 }
             },
-            "scripts": {
-                "build:expression-parser": [
-                    "mkdir -p ./php/dist/Combyna/Component/ExpressionLanguage && peg ./vendor/combyna/combyna/php/src/Combyna/Component/ExpressionLanguage/PegExpressionParser.php.inc ./php/dist/Combyna/Component/ExpressionLanguage/PegExpressionParser.php"
-                ]
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "description": "A plugin for Combyna that provides basic GUI components",
-            "support": {
-                "source": "https://github.com/combyna/gui-plugin/tree/master",
-                "issues": "https://github.com/combyna/gui-plugin/issues"
-            },
-            "time": "2019-01-28T22:05:42+00:00"
+            "time": "2019-03-13T21:57:19+00:00"
         },
         {
             "name": "doctrine/instantiator",

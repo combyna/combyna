@@ -6,12 +6,6 @@
             "Combyna\\": ["php/src/Combyna/", "php/dist/Combyna/"]
         }
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/combyna/gui-plugin"
-        }
-    ],
     "require": {
         "symfony/event-dispatcher": "~2.8.0",
         "symfony/http-foundation": "~2.8.0",
