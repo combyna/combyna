@@ -160,8 +160,8 @@ interface WidgetInterface
     public function hasTag($tag);
 
     /**
-     * Returns true if the widget can be rendered directly,
-     * or false if only some of its descendants may be rendered
+     * Returns true if the widget can be rendered directly (ie. is primitive or core),
+     * or false if only some of its descendants may be rendered (eg. is compound)
      *
      * @return bool
      */

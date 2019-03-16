@@ -84,6 +84,14 @@ class AppState implements AppStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidgetStatePathsByTag($tag)
+    {
+        return $this->programState->getWidgetStatePathsByTag($tag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function withProgramState(ProgramStateInterface $newProgramState)
     {
         if ($this->programState === $newProgramState) {

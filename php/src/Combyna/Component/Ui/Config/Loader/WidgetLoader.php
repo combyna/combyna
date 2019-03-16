@@ -186,7 +186,8 @@ class WidgetLoader implements WidgetLoaderInterface
                     null,
                 $name,
                 $captureStaticBagModelNode,
-                $captureExpressionBagNode
+                $captureExpressionBagNode,
+                $this->buildTagMap($tagNames)
             );
         }
 

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
+use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 
@@ -130,7 +131,30 @@ class RepeaterWidgetState implements RepeaterWidgetStateInterface
      */
     public function getWidgetStatePathByPath(array $path, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
-        throw new \Exception('Not implemented');
+        $widgetName = array_shift($path);
+
+        if ($widgetName === $this->getStateName()) {
+            if (count($path) === 0) {
+                return $stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]));
+            }
+
+            foreach ($this->repeatedWidgetStates as $repeatedWidgetState) {
+                try {
+                    return $repeatedWidgetState->getWidgetStatePathByPath(
+                        $path,
+                        array_merge($parentStates, [$this]),
+                        $stateFactory
+                    );
+                } catch (NotFoundException $exception) {
+                }
+            }
+        }
+
+        throw new NotFoundException(
+            'Repeater widget "' . $this->getStateName() .
+            '" does not contain repeated widget with path "' .
+            implode('-', $path) . '"'
+        );
     }
 
     /**

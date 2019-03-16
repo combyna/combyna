@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
+use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use LogicException;
@@ -173,7 +174,41 @@ class ConditionalWidgetState implements ConditionalWidgetStateInterface
      */
     public function getWidgetStatePathByPath(array $path, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
-        throw new \Exception('Not implemented');
+        $widgetName = array_shift($path);
+
+        if ($widgetName === $this->getStateName()) {
+            if (count($path) === 0) {
+                return $stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]));
+            }
+
+            if ($this->consequentWidgetState !== null) {
+                try {
+                    return $this->consequentWidgetState->getWidgetStatePathByPath(
+                        $path,
+                        array_merge($parentStates, [$this]),
+                        $stateFactory
+                    );
+                } catch (NotFoundException $exception) {
+                }
+            }
+
+            if ($this->alternateWidgetState !== null) {
+                try {
+                    return $this->alternateWidgetState->getWidgetStatePathByPath(
+                        $path,
+                        array_merge($parentStates, [$this]),
+                        $stateFactory
+                    );
+                } catch (NotFoundException $exception) {
+                }
+            }
+        }
+
+        throw new NotFoundException(
+            'Conditional widget "' . $this->getStateName() .
+            '" does not contain widget with path "' .
+            implode('-', $path) . '"'
+        );
     }
 
     /**

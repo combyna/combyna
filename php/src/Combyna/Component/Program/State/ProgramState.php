@@ -119,11 +119,7 @@ class ProgramState implements ProgramStateInterface
      */
     public function getWidgetStatePathByTag($tag)
     {
-        $widgetStatePaths = $this->pageViewState->getWidgetStatePathsByTag($tag);
-
-        foreach ($this->visibleOverlayViewStates as $overlayViewState) {
-            $widgetStatePaths = array_merge($widgetStatePaths, $overlayViewState->getWidgetStatePathsByTag($tag));
-        }
+        $widgetStatePaths = $this->getWidgetStatePathsByTag($tag);
 
         if (count($widgetStatePaths) > 1) {
             throw new NonUniqueResultException(
@@ -138,6 +134,20 @@ class ProgramState implements ProgramStateInterface
         }
 
         return $widgetStatePaths[0];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWidgetStatePathsByTag($tag)
+    {
+        $widgetStatePaths = $this->pageViewState->getWidgetStatePathsByTag($tag);
+
+        foreach ($this->visibleOverlayViewStates as $overlayViewState) {
+            $widgetStatePaths = array_merge($widgetStatePaths, $overlayViewState->getWidgetStatePathsByTag($tag));
+        }
+
+        return $widgetStatePaths;
     }
 
     /**
