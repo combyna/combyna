@@ -30,8 +30,18 @@ class UiComponent extends AbstractComponent
     {
         $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
             new DelegateeTagDefinition(
+                'combyna.core_widget_loader',
+                'combyna.ui.loader.widget',
+                'addCoreWidgetLoader'
+            ),
+            new DelegateeTagDefinition(
                 'combyna.view_store_instruction_promoter',
                 'combyna.ui.promoter.view_store_instruction_node',
+                'addPromoter'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.widget_promoter',
+                'combyna.ui.promoter.widget_node',
                 'addPromoter'
             )
         ]));

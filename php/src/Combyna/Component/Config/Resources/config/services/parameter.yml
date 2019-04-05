@@ -3,6 +3,12 @@ services:
         class: Combyna\Component\Config\Parameter\DelegatingParameterParser
         autowire: true
 
+    combyna.config.parameter.callback_optional_parameter_parser:
+        class: Combyna\Component\Config\Parameter\CallbackOptionalParameterParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_parser}
+
     combyna.config.parameter.extra_parameter_parser:
         class: Combyna\Component\Config\Parameter\ExtraParameterParser
         autowire: true
@@ -25,14 +31,38 @@ services:
         class: Combyna\Component\Config\Parameter\Type\DelegatingParameterTypeParser
         autowire: true
 
+    combyna.config.parameter.array_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\ArrayParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
     combyna.config.parameter.expression_type_parser:
         class: Combyna\Component\Config\Parameter\Type\ExpressionParameterTypeParser
         autowire: true
         tags:
             - {name: combyna.parameter_type_parser}
 
+    combyna.config.parameter.fixed_static_bag_model_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
+    combyna.config.parameter.string_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\StringParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
     combyna.config.parameter.text_type_parser:
         class: Combyna\Component\Config\Parameter\Type\TextParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
+    combyna.config.parameter.widget_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\WidgetParameterTypeParser
         autowire: true
         tags:
             - {name: combyna.parameter_type_parser}

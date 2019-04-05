@@ -28,6 +28,14 @@ interface RouteInterface
     public function assertValidArgumentBag(StaticBagInterface $argumentBag);
 
     /**
+     * Generates a URL for this route given a set of arguments for its parameters
+     *
+     * @param StaticBagInterface $argumentBag
+     * @return string
+     */
+    public function generateUrl(StaticBagInterface $argumentBag);
+
+    /**
      * Fetches the unique name of this route within the app
      *
      * @return string
@@ -40,4 +48,11 @@ interface RouteInterface
      * @return string
      */
     public function getPageViewName();
+
+    /**
+     * Fetches the URL pattern for this route
+     *
+     * @return string
+     */
+    public function getUrlPattern();
 }

@@ -11,24 +11,21 @@
 
 namespace Combyna\Component\Router\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Router\Validation\Constraint\ValidParameterBagForUrlPatternConstraint;
 use Combyna\Component\Ui\Validation\Constraint\PageViewExistsConstraint;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class RouteNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class RouteNode extends AbstractActNode
+class RouteNode extends AbstractActNode implements RouteNodeInterface
 {
     const TYPE = 'route';
-
-    /**
-     * @var FixedStaticBagModelNode
-     */
-    private $attributeBagModelNode;
 
     /**
      * @var string
@@ -41,15 +38,27 @@ class RouteNode extends AbstractActNode
     private $pageViewName;
 
     /**
+     * @var FixedStaticBagModelNodeInterface
+     */
+    private $parameterBagModelNode;
+
+    /**
+     * @var string
+     */
+    private $urlPattern;
+
+    /**
      * @param string $name
-     * @param FixedStaticBagModelNode $attributeBagModelNode
+     * @param string $urlPattern
+     * @param FixedStaticBagModelNodeInterface $parameterBagModelNode
      * @param string $pageViewName
      */
-    public function __construct($name, FixedStaticBagModelNode $attributeBagModelNode, $pageViewName)
+    public function __construct($name, $urlPattern, FixedStaticBagModelNodeInterface $parameterBagModelNode, $pageViewName)
     {
-        $this->attributeBagModelNode = $attributeBagModelNode;
         $this->name = $name;
         $this->pageViewName = $pageViewName;
+        $this->parameterBagModelNode = $parameterBagModelNode;
+        $this->urlPattern = $urlPattern;
     }
 
     /**
@@ -57,25 +66,22 @@ class RouteNode extends AbstractActNode
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        $specBuilder->addChildNode($this->attributeBagModelNode);
+        $specBuilder->addChildNode($this->parameterBagModelNode);
 
+        $specBuilder->addConstraint(
+            // Make sure that all braced parameter placeholders in the URL pattern
+            // are defined as parameters with types, and that all parameter definitions
+            // have a matching placeholder in the URL pattern
+            new ValidParameterBagForUrlPatternConstraint(
+                $this->urlPattern,
+                $this->parameterBagModelNode
+            )
+        );
         $specBuilder->addConstraint(new PageViewExistsConstraint($this->pageViewName));
     }
 
     /**
-     * Fetches the model for the attribute static bag this route expects to be extracted from its route segments
-     *
-     * @return FixedStaticBagModelNode
-     */
-    public function getAttributeBagModel()
-    {
-        return $this->attributeBagModelNode;
-    }
-
-    /**
-     * Fetches the unique name of this route
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -83,12 +89,26 @@ class RouteNode extends AbstractActNode
     }
 
     /**
-     * Fetches the name of the page view that should be rendered for this route
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getPageViewName()
     {
         return $this->pageViewName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParameterBagModel(QueryRequirementInterface $queryRequirement)
+    {
+        return $this->parameterBagModelNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrlPattern()
+    {
+        return $this->urlPattern;
     }
 }

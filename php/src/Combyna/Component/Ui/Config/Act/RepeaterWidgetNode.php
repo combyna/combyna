@@ -28,6 +28,7 @@ use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifi
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\RepeaterWidgetContextSpecifier;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
@@ -36,9 +37,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeInterface, WidgetNodeInterface
+class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface, OptionalWidgetNodeInterface
 {
     const TYPE = 'repeater';
+    const WIDGET_TYPE = 'repeater';
 
     /**
      * @var ExpressionBagNode
@@ -176,7 +178,7 @@ class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeIn
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -184,7 +186,7 @@ class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeIn
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }
@@ -266,6 +268,6 @@ class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeIn
      */
     public function getWidgetDefinitionName()
     {
-        return 'repeater';
+        return self::WIDGET_TYPE;
     }
 }

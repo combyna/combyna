@@ -25,6 +25,7 @@ use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifi
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidWidgetConstraint;
 use Combyna\Component\Ui\Validation\Context\Specifier\DefinedWidgetContextSpecifier;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -187,7 +188,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -195,7 +196,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }

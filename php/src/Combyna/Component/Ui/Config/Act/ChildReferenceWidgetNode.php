@@ -23,6 +23,7 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraint;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -30,9 +31,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInterface
+class ChildReferenceWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
 {
     const TYPE = 'child-reference-widget';
+    const WIDGET_TYPE = 'child';
 
     /**
      * @var ExpressionBagNode
@@ -111,7 +113,7 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -119,7 +121,7 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }
@@ -163,6 +165,6 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
      */
     public function getWidgetDefinitionName()
     {
-        return 'child';
+        return self::WIDGET_TYPE;
     }
 }

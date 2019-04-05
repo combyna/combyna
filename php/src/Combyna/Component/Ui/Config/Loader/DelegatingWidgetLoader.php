@@ -13,37 +13,30 @@ namespace Combyna\Component\Ui\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Trigger\Config\Loader\TriggerLoaderInterface;
-use Combyna\Component\Ui\Config\Act\ChildReferenceWidgetNode;
-use Combyna\Component\Ui\Config\Act\ConditionalWidgetNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
-use Combyna\Component\Ui\Config\Act\RepeaterWidgetNode;
-use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetNode;
-use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
-use Combyna\Component\Ui\Widget\ConditionalWidget;
-use Combyna\Component\Ui\Widget\RepeaterWidget;
 
 /**
- * Class WidgetLoader
+ * Class DelegatingWidgetLoader
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetLoader implements WidgetLoaderInterface
+class DelegatingWidgetLoader implements DelegatorInterface, WidgetLoaderInterface
 {
-    const CHILD_REFERENCE_NAME = 'child';
-    const CONDITIONAL_NAME = 'conditional';
-    const GROUP_NAME = 'group';
-    const REPEATER_NAME = 'repeater';
-    const TEXT_NAME = 'text';
-
     /**
      * @var ConfigParser
      */
     private $configParser;
+
+    /**
+     * @var CoreWidgetTypeLoaderInterface[]
+     */
+    private $coreWidgetLoaderCallables = [];
 
     /**
      * @var ExpressionBagLoaderInterface
@@ -95,6 +88,18 @@ class WidgetLoader implements WidgetLoaderInterface
     }
 
     /**
+     * Adds a loader for a type of core widget
+     *
+     * @param CoreWidgetTypeLoaderInterface $coreWidgetLoader
+     */
+    public function addCoreWidgetLoader(CoreWidgetTypeLoaderInterface $coreWidgetLoader)
+    {
+        foreach ($coreWidgetLoader->getWidgetDefinitionToLoaderCallableMap() as $type => $loaderCallable) {
+            $this->coreWidgetLoaderCallables[$type] = $loaderCallable;
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function loadWidget(array $widgetConfig, $name = null)
@@ -114,6 +119,7 @@ class WidgetLoader implements WidgetLoaderInterface
 
         $type = $widgetConfig['type'];
 
+        // TODO: Remove visibility expressions in favour of ConditionalWidgets
         $visibilityExpressionNode = isset($widgetConfig['visible']) ?
             $this->expressionLoader->load($widgetConfig['visible']) :
             null;
@@ -137,76 +143,37 @@ class WidgetLoader implements WidgetLoaderInterface
             [];
         $captureExpressionBagNode = $this->expressionBagLoader->load($captureExpressionBagConfig);
 
-        if ($type === self::TEXT_NAME) {
-            return new TextWidgetNode(
-                $this->expressionLoader->load($widgetConfig['text']),
-                $captureStaticBagModelNode,
-                $captureExpressionBagNode,
-                $visibilityExpressionNode,
-                $this->buildTagMap($tagNames)
-            );
-        }
+        $parts = explode('.', $type, 2);
 
-        if ($type === self::CHILD_REFERENCE_NAME) {
-            return new ChildReferenceWidgetNode(
-                $widgetConfig['name'],
-                $captureStaticBagModelNode,
-                $captureExpressionBagNode,
-                $visibilityExpressionNode,
-                $this->buildTagMap($tagNames)
-            );
-        }
+        if (count($parts) === 1) {
+            if (!array_key_exists($type, $this->coreWidgetLoaderCallables)) {
+                $coreWidgetTypes = array_keys($this->coreWidgetLoaderCallables);
+                $lastCoreWidgetType = array_pop($coreWidgetTypes);
 
-        if ($type === self::CONDITIONAL_NAME) {
-            $conditionConfig = $this->configParser->getElement(
-                $widgetConfig,
-                'condition',
-                'condition',
-                'array'
-            );
-            $consequentWidgetConfig = $this->configParser->getElement(
-                $widgetConfig,
-                'then',
-                'consequent ("then") widget',
-                'array'
-            );
-            $alternateWidgetConfig = $this->configParser->getOptionalElement(
-                $widgetConfig,
-                'else',
-                'alternate ("else") widget',
-                null,
-                'array'
-            );
+                return new UnknownWidgetNode(
+                    'Widget definition type must either be in format <library>.<name> or be one of the core types ' .
+                    '"' . implode('", "', $coreWidgetTypes) . '" or "' . $lastCoreWidgetType . '" - "' . $type . '" given'
+                );
+            }
 
-            return new ConditionalWidgetNode(
-                $this->expressionLoader->load($conditionConfig),
-                $this->loadWidget($consequentWidgetConfig, ConditionalWidget::CONSEQUENT_WIDGET_NAME),
-                $alternateWidgetConfig !== null ?
-                    $this->loadWidget($alternateWidgetConfig, ConditionalWidget::ALTERNATE_WIDGET_NAME) :
-                    null,
+            return $this->coreWidgetLoaderCallables[$type](
                 $name,
-                $captureStaticBagModelNode,
-                $captureExpressionBagNode,
-                $this->buildTagMap($tagNames)
-            );
-        }
-
-        if ($type === self::REPEATER_NAME) {
-            $itemListConfig = $this->configParser->getElement($widgetConfig, 'items', 'items list', 'array');
-            $indexVariableName = $this->configParser->getOptionalElement($widgetConfig, 'index_variable', 'index variable');
-            $itemVariableName = $this->configParser->getElement($widgetConfig, 'item_variable', 'index variable');
-            $repeatedWidgetConfig = $this->configParser->getElement($widgetConfig, 'repeated', 'repeated widget', 'array');
-
-            return new RepeaterWidgetNode(
-                $this->expressionLoader->load($itemListConfig),
-                $indexVariableName,
-                $itemVariableName,
-                $this->loadWidget($repeatedWidgetConfig, RepeaterWidget::REPEATED_WIDGET_NAME),
-                $name,
+                $widgetConfig,
                 $captureStaticBagModelNode,
                 $captureExpressionBagNode,
                 $visibilityExpressionNode,
                 $this->buildTagMap($tagNames)
+            );
+        }
+
+        list($libraryName, $widgetDefinitionName) = $parts;
+
+        if ($libraryName === LibraryInterface::CORE) {
+            // Core widget definitions eg. `group` or `text` must be used unprefixed,
+            // eg. `group` rather than `core.group`
+            return new UnknownWidgetNode(
+                'Core widgets may not be used directly: tried to use "' . $type . '". ' .
+                'Did you mean to use "' . $widgetDefinitionName . '"?'
             );
         }
 
@@ -230,36 +197,6 @@ class WidgetLoader implements WidgetLoaderInterface
                 'array'
             )
         );
-
-        if ($type === self::GROUP_NAME) {
-            return new WidgetGroupNode(
-                $childWidgets,
-                $captureStaticBagModelNode,
-                $captureExpressionBagNode,
-                $name,
-                $visibilityExpressionNode,
-                $this->buildTagMap($tagNames)
-            );
-        }
-
-        $parts = explode('.', $type, 2);
-
-        if (count($parts) < 2) {
-            return new UnknownWidgetNode(
-                'Widget definition type must either be in format <library>.<name> or be one of the core types "child", "conditional", "group", "repeater" or "text" - "' . $type . '" given'
-            );
-        }
-
-        list($libraryName, $widgetDefinitionName) = $parts;
-
-        if ($libraryName === LibraryInterface::CORE) {
-            // Core widget definitions eg. `group` or `text` must be used unprefixed,
-            // eg. `group` rather than `core.group`
-            return new UnknownWidgetNode(
-                'Core widgets may not be used directly: tried to use "' . $type . '". ' .
-                'Did you mean to use "' . $widgetDefinitionName . '"?'
-            );
-        }
 
         return new DefinedWidgetNode(
             $libraryName,

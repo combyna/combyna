@@ -23,6 +23,7 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\WidgetGroupContextSpecifier;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -30,9 +31,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
+class WidgetGroupNode extends AbstractActNode implements CoreWidgetNodeInterface
 {
     const TYPE = 'widget-group';
+    const WIDGET_TYPE = 'group';
 
     /**
      * @var ExpressionBagNode
@@ -121,7 +123,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -129,7 +131,7 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }
@@ -181,6 +183,6 @@ class WidgetGroupNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return 'group';
+        return self::WIDGET_TYPE;
     }
 }

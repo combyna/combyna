@@ -18,15 +18,23 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
-use Combyna\Component\Ui\State\Widget\CoreWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\ConditionalWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\RepeaterWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\TextWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetGroupStateInterface;
 use Combyna\Component\Ui\Store\Evaluation\ViewStoreEvaluationContextInterface;
 use Combyna\Component\Ui\View\ViewInterface;
+use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
-use Combyna\Component\Ui\Widget\CoreWidgetInterface;
+use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
+use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
+use Combyna\Component\Ui\Widget\TextWidgetInterface;
+use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
  * Interface UiEvaluationContextFactoryInterface
@@ -35,6 +43,20 @@ use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
  */
 interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryInterface
 {
+    /**
+     * Creates a ChildReferenceWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param ChildReferenceWidgetInterface $widget
+     * @param ChildReferenceWidgetStateInterface|null $widgetState
+     * @return ChildReferenceWidgetEvaluationContextInterface
+     */
+    public function createChildReferenceWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        ChildReferenceWidgetInterface $widget,
+        ChildReferenceWidgetStateInterface $widgetState = null
+    );
+
     /**
      * Creates a CompoundWidgetDefinitionEvaluationContext
      *
@@ -68,17 +90,17 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     );
 
     /**
-     * Creates a CoreWidgetEvaluationContext
+     * Creates a ConditionalWidgetEvaluationContext
      *
      * @param ViewEvaluationContextInterface $parentContext
-     * @param CoreWidgetInterface $widget
-     * @param CoreWidgetStateInterface|null $widgetState
-     * @return CoreWidgetEvaluationContextInterface
+     * @param ConditionalWidgetInterface $widget
+     * @param ConditionalWidgetStateInterface|null $widgetState
+     * @return ConditionalWidgetEvaluationContextInterface
      */
-    public function createCoreWidgetEvaluationContext(
+    public function createConditionalWidgetEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        CoreWidgetInterface $widget,
-        CoreWidgetStateInterface $widgetState = null
+        ConditionalWidgetInterface $widget,
+        ConditionalWidgetStateInterface $widgetState = null
     );
 
     /**
@@ -130,6 +152,20 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     );
 
     /**
+     * Creates a RepeaterWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param RepeaterWidgetInterface $widget
+     * @param RepeaterWidgetStateInterface|null $widgetState
+     * @return RepeaterWidgetEvaluationContextInterface
+     */
+    public function createRepeaterWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        RepeaterWidgetInterface $widget,
+        RepeaterWidgetStateInterface $widgetState = null
+    );
+
+    /**
      * Creates a RootViewEvaluationContext
      *
      * @param ViewInterface $view
@@ -143,6 +179,20 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
         EvaluationContextInterface $parentContext,
         EnvironmentInterface $environment,
         PageViewStateInterface $pageViewState = null
+    );
+
+    /**
+     * Creates a TextWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param TextWidgetInterface $widget
+     * @param TextWidgetStateInterface|null $widgetState
+     * @return TextWidgetEvaluationContextInterface
+     */
+    public function createTextWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        TextWidgetInterface $widget,
+        TextWidgetStateInterface $widgetState = null
     );
 
     /**
@@ -167,5 +217,19 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     public function createViewEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag = null
+    );
+
+    /**
+     * Creates a WidgetGroupEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param WidgetGroupInterface $widget
+     * @param WidgetGroupStateInterface|null $widgetState
+     * @return WidgetGroupEvaluationContextInterface
+     */
+    public function createWidgetGroupEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        WidgetGroupInterface $widget,
+        WidgetGroupStateInterface $widgetState = null
     );
 }

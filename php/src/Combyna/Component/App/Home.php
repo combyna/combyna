@@ -25,7 +25,7 @@ class Home implements HomeInterface
     /**
      * @var ExpressionBagInterface
      */
-    private $attributeExpressionBag;
+    private $argumentExpressionBag;
 
     /**
      * @var RouteInterface
@@ -38,24 +38,24 @@ class Home implements HomeInterface
      */
     public function __construct(RouteInterface $route, ExpressionBagInterface $attributeExpressionBag)
     {
-        $this->attributeExpressionBag = $attributeExpressionBag;
+        $this->argumentExpressionBag = $attributeExpressionBag;
         $this->route = $route;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeExpressionBagToStaticBag(EvaluationContextInterface $evaluationContext)
+    public function argumentExpressionBagToStaticBag(EvaluationContextInterface $evaluationContext)
     {
-        return $this->attributeExpressionBag->toStaticBag($evaluationContext);
+        return $this->argumentExpressionBag->toStaticBag($evaluationContext);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAttributeExpressionBag()
+    public function getArgumentExpressionBag()
     {
-        return $this->attributeExpressionBag;
+        return $this->argumentExpressionBag;
     }
 
     /**

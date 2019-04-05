@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Config\Parameter\Type;
 
+use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 
 /**
@@ -71,12 +72,12 @@ class ExpressionParameterTypeParser implements ParameterTypeTypeParserInterface
      * Fetches the actual argument value for this type from its raw value
      *
      * @param ExpressionParameterType $type
-     * @param $rawValue
-     * @return mixed
+     * @param array $rawValue
+     * @return ExpressionNodeInterface
      */
     public function parseArgument(
         ExpressionParameterType $type,
-        $rawValue
+        array $rawValue
     ) {
         return $this->expressionLoader->load($rawValue);
     }

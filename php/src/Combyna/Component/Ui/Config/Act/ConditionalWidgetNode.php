@@ -23,6 +23,7 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\ConditionalWidgetContextSpecifier;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -30,9 +31,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNodeInterface, WidgetNodeInterface
+class ConditionalWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface, OptionalWidgetNodeInterface
 {
     const TYPE = 'conditional';
+    const WIDGET_TYPE = 'conditional';
 
     /**
      * @var WidgetNodeInterface|null
@@ -140,7 +142,7 @@ class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNod
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -148,7 +150,7 @@ class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNod
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }
@@ -210,6 +212,6 @@ class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNod
      */
     public function getWidgetDefinitionName()
     {
-        return self::TYPE;
+        return self::WIDGET_TYPE;
     }
 }

@@ -165,16 +165,20 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         ValidationContextInterface $validationContext,
         ActNodeInterface $nodeQueriedFrom
     ) {
-        if (!$this->widgetNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName())) {
+        $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
+
+        if (!$this->widgetNode->getCaptureStaticBagModel($queryRequirement)
+            ->definesStatic($query->getCaptureName())
+        ) {
             // The widget does not define the capture - nothing to do
             return null;
         }
 
         return $this->widgetNode
-            ->getCaptureStaticBagModel()
+            ->getCaptureStaticBagModel($queryRequirement)
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
-                $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom)
+                $queryRequirement
             );
     }
 
@@ -182,11 +186,18 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
      * Determines whether the current widget's definition defines the specified capture
      *
      * @param CaptureIsDefinedQuery $query
+     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
-    public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
-    {
-        return $this->widgetNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName()) ?: null;
+    public function queryForCaptureExistence(
+        CaptureIsDefinedQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        return $this->widgetNode
+            ->getCaptureStaticBagModel(
+                $validationContext->createBooleanQueryRequirement($query)
+            )
+            ->definesStatic($query->getCaptureName()) ?: null;
     }
 
     /**
@@ -200,7 +211,9 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         CaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel();
+        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel(
+            $validationContext->createTypeQueryRequirement($query)
+        );
 
         if (!$captureStaticBagModel->definesStatic($query->getCaptureName())) {
             return null;
@@ -225,7 +238,9 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         CorrectCaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel();
+        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel(
+            $validationContext->createTypeQueryRequirement($query)
+        );
 
         if ($captureStaticBagModel->definesStatic($query->getCaptureName())) {
             // This widget defines the capture - we can determine the correct type
@@ -250,19 +265,26 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
      * Determines whether the current widget is optional or defines the specified capture
      *
      * @param CaptureHasOptionalAncestorWidgetQuery $query
+     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
-    public function queryForWhetherCaptureHasOptionalAncestor(CaptureHasOptionalAncestorWidgetQuery $query)
-    {
+    public function queryForWhetherCaptureHasOptionalAncestor(
+        CaptureHasOptionalAncestorWidgetQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
         /*
          * If this widget defines the capture, return false as if this node was reached, no optional widget
          * was found between its setter widget and this one.
          * Otherwise, return null so that the query will continue on up the tree
          * until either an optional widget is found or the widget that defines the capture is found.
          */
-        return $this->widgetNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName()) ?
-            false :
-            null;
+        return $this->widgetNode
+            ->getCaptureStaticBagModel(
+                $validationContext->createBooleanQueryRequirement($query)
+            )
+            ->definesStatic($query->getCaptureName()) ?
+                false :
+                null;
     }
 
     /**

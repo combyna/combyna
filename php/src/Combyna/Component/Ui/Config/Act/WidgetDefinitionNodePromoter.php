@@ -15,6 +15,7 @@ use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
+use Combyna\Component\Ui\Config\Promoter\WidgetNodePromoterInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use LogicException;
@@ -47,7 +48,7 @@ class WidgetDefinitionNodePromoter
     private $widgetDefinitionFactory;
 
     /**
-     * @var WidgetNodePromoter
+     * @var WidgetNodePromoterInterface
      */
     private $widgetNodePromoter;
 
@@ -56,14 +57,14 @@ class WidgetDefinitionNodePromoter
      * @param EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter
      * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
-     * @param WidgetNodePromoter $widgetNodePromoter
+     * @param WidgetNodePromoterInterface $widgetNodePromoter
      */
     public function __construct(
         BagNodePromoter $bagNodePromoter,
         EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter,
         StaticExpressionFactoryInterface $staticExpressionFactory,
         WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
-        WidgetNodePromoter $widgetNodePromoter
+        WidgetNodePromoterInterface $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->eventDefinitionReferenceNodePromoter = $eventDefinitionReferenceNodePromoter;

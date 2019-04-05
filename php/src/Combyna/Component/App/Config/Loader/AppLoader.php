@@ -15,6 +15,7 @@ use Combyna\Component\App\AppFactoryInterface;
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Router\Config\Loader\RouteCollectionLoaderInterface;
 use Combyna\Component\Signal\Config\Loader\SignalDefinitionLoaderInterface;
 use Combyna\Component\Ui\Config\Loader\ViewCollectionLoaderInterface;
@@ -124,13 +125,14 @@ class AppLoader implements AppLoaderInterface
 
         foreach ($signalDefinitionConfigs as $signalName => $signalDefinitionConfig) {
             $signalDefinitionNodes[] = $this->signalDefinitionLoader->load(
-                AppNode::TYPE,
+                LibraryInterface::APP,
                 $signalName,
                 $signalDefinitionConfig
             );
         }
 
         $routeNodes = $this->routeCollectionLoader->loadRouteCollection(
+            LibraryInterface::APP,
             $appConfig['routes']
         );
 
