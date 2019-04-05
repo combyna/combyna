@@ -15,6 +15,7 @@ use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Program\ResourceRepositoryInterface;
+use Combyna\Component\Ui\Config\Promoter\WidgetNodePromoterInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNodePromoter;
 use Combyna\Component\Ui\View\EmbedViewInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
@@ -50,7 +51,7 @@ class ViewNodePromoter
     private $viewFactory;
 
     /**
-     * @var WidgetNodePromoter
+     * @var WidgetNodePromoterInterface
      */
     private $widgetNodePromoter;
 
@@ -59,14 +60,14 @@ class ViewNodePromoter
      * @param BagNodePromoter $bagNodePromoter
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      * @param ViewStoreNodePromoter $storeNodePromoter
-     * @param WidgetNodePromoter $widgetNodePromoter
+     * @param WidgetNodePromoterInterface $widgetNodePromoter
      */
     public function __construct(
         ViewFactoryInterface $viewFactory,
         BagNodePromoter $bagNodePromoter,
         DelegatingExpressionNodePromoter $expressionNodePromoter,
         ViewStoreNodePromoter $storeNodePromoter,
-        WidgetNodePromoter $widgetNodePromoter
+        WidgetNodePromoterInterface $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->expressionNodePromoter = $expressionNodePromoter;

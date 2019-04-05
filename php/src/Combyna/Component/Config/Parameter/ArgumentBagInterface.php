@@ -11,8 +11,10 @@
 
 namespace Combyna\Component\Config\Parameter;
 
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Exception\ExtraArgumentsNotCapturedException;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
 
 /**
  * Interface ArgumentBagInterface
@@ -30,6 +32,14 @@ interface ArgumentBagInterface
     public function getExtraArguments();
 
     /**
+     * Fetches a named, array-type argument by its parameter name
+     *
+     * @param string $name
+     * @return array
+     */
+    public function getNamedArrayArgument($name);
+
+    /**
      * Fetches a named, expression-type argument by its parameter name
      *
      * @param string $name
@@ -38,10 +48,26 @@ interface ArgumentBagInterface
     public function getNamedExpressionArgument($name);
 
     /**
-     * Fetches a named, text-type argument by its parameter name
+     * Fetches a named, fixed-static-bag-model-type argument by its parameter name
+     *
+     * @param string $name
+     * @return FixedStaticBagModelNodeInterface
+     */
+    public function getNamedFixedStaticBagModelArgument($name);
+
+    /**
+     * Fetches a named, string-type argument by its parameter name
      *
      * @param string $name
      * @return string
      */
-    public function getNamedTextArgument($name);
+    public function getNamedStringArgument($name);
+
+    /**
+     * Fetches a named, widget-type argument by its parameter name
+     *
+     * @param string $name
+     * @return WidgetNodeInterface
+     */
+    public function getNamedWidgetArgument($name);
 }

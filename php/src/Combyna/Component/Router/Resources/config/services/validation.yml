@@ -1,0 +1,6 @@
+services:
+    combyna.router.validation.valid_parameter_bag_for_url_pattern_constraint_validator:
+        class: Combyna\Component\Router\Validation\Constraint\ValidParameterBagForUrlPatternConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Config\Parameter;
 
 use Combyna\Component\Config\Exception\ArgumentMismatchExceptionInterface;
+use Combyna\Component\Config\Exception\RequiredArgumentMissingException;
 
 /**
  * Interface ParameterParserInterface
@@ -28,6 +29,7 @@ interface ParameterParserInterface
      * @param ParameterInterface[] $parameterList
      * @param array $extraArguments
      * @return mixed
+     * @throws RequiredArgumentMissingException
      */
     public function parseArgument(
         ParameterInterface $parameter,
@@ -42,6 +44,7 @@ interface ParameterParserInterface
      * @param ParameterInterface $parameter
      * @param array $config
      * @throws ArgumentMismatchExceptionInterface
+     * @throws RequiredArgumentMissingException
      */
     public function validateArgument(
         ParameterInterface $parameter,

@@ -16,6 +16,7 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class UnknownWidgetTypeNode
@@ -58,7 +59,7 @@ class UnknownWidgetTypeNode extends AbstractActNode implements WidgetNodeInterfa
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return new UnknownExpressionBagNode(sprintf('Unknown widget type <%s> capture set', $this->type));
     }
@@ -66,7 +67,7 @@ class UnknownWidgetTypeNode extends AbstractActNode implements WidgetNodeInterfa
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return new UnknownFixedStaticBagModelNode(sprintf('Unknown widget type <%s> capture model', $this->type));
     }

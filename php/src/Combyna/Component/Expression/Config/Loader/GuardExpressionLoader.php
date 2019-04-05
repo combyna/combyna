@@ -87,8 +87,8 @@ class GuardExpressionLoader implements BuiltinLoaderInterface
             return new UnknownExpressionNode($exception->getMessage());
         }
 
-        $assuredStaticName = $parsedArgumentBag->getNamedTextArgument('name');
-        $constraintName = $parsedArgumentBag->getNamedTextArgument('constraint');
+        $assuredStaticName = $parsedArgumentBag->getNamedStringArgument('name');
+        $constraintName = $parsedArgumentBag->getNamedStringArgument('constraint');
         $expressionNode = $parsedArgumentBag->getNamedExpressionArgument('expression');
         $consequentExpressionNode = $parsedArgumentBag->getNamedExpressionArgument('then');
         $alternateExpressionNode = $parsedArgumentBag->getNamedExpressionArgument('else');

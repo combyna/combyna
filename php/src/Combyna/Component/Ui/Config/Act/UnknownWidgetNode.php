@@ -11,11 +11,12 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class UnknownWidgetNode
@@ -51,17 +52,23 @@ class UnknownWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
-        return new UnknownExpressionBagNode(sprintf('%s capture set', $this->contextDescription));
+        return new DynamicUnknownExpressionBagNode(
+            sprintf('%s capture set', $this->contextDescription),
+            $queryRequirement
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
-        return new UnknownFixedStaticBagModelNode(sprintf('%s capture model', $this->contextDescription));
+        return new DynamicUnknownFixedStaticBagModelNode(
+            sprintf('%s capture model', $this->contextDescription),
+            $queryRequirement
+        );
     }
 
     /**

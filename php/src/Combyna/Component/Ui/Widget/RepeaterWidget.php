@@ -147,7 +147,7 @@ class RepeaterWidget implements RepeaterWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+        return $evaluationContextFactory->createRepeaterWidgetEvaluationContext(
             $parentContext,
             $this,
             $widgetState

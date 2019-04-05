@@ -23,6 +23,7 @@ use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -30,9 +31,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
+class TextWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
 {
     const TYPE = 'text-widget';
+    const WIDGET_TYPE = 'text';
 
     /**
      * @var ExpressionBagNode
@@ -83,7 +85,7 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag()
+    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureExpressionBagNode;
     }
@@ -91,7 +93,7 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel()
+    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
     {
         return $this->captureStaticBagModelNode;
     }
@@ -135,7 +137,7 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return 'text';
+        return self::WIDGET_TYPE;
     }
 
     /**

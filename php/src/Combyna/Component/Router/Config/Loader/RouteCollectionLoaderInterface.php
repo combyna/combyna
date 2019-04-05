@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Router\Config\Loader;
 
-use Combyna\Component\Router\Config\Act\RouteNode;
+use Combyna\Component\Router\Config\Act\RouteNodeInterface;
 
 /**
  * Interface RouteCollectionLoaderInterface
@@ -23,17 +23,19 @@ interface RouteCollectionLoaderInterface
     /**
      * Creates a RouteNode from the given config
      *
+     * @param string $libraryName
      * @param string $routeName
      * @param array $routeConfig
-     * @return RouteNode
+     * @return RouteNodeInterface
      */
-    public function loadRoute($routeName, array $routeConfig);
+    public function loadRoute($libraryName, $routeName, array $routeConfig);
 
     /**
      * Creates a collection of RouteNodes from the given environment config
      *
+     * @param string $libraryName
      * @param array $collectionConfig
-     * @return RouteNode[]
+     * @return RouteNodeInterface[]
      */
-    public function loadRouteCollection(array $collectionConfig);
+    public function loadRouteCollection($libraryName, array $collectionConfig);
 }

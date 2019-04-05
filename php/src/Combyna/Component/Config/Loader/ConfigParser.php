@@ -20,10 +20,25 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ConfigParser
+class ConfigParser implements ConfigParserInterface
 {
     /**
+     * @var ArgumentParserInterface
+     */
+    private $argumentParser;
+
+    /**
+     * @param ArgumentParserInterface $argumentParser
+     */
+    public function __construct(ArgumentParserInterface $argumentParser)
+    {
+        $this->argumentParser = $argumentParser;
+    }
+
+    /**
      * Fetches the value of the specified config element by its key
+     *
+     * @deprecated Use ::parseArguments() instead.
      *
      * @param array $config
      * @param string $key
@@ -69,6 +84,8 @@ class ConfigParser
     /**
      * Fetches the value of the specified config element by its key
      *
+     * @deprecated Use ::parseArguments() instead.
+     *
      * @param array $config
      * @param string $key
      * @param string $context
@@ -88,11 +105,22 @@ class ConfigParser
     }
 
     /**
-     * Ensures that the value is either an array or null, returning an empty array if null
-     *
-     * @param mixed $value
-     * @return array
-     * @throws InvalidArgumentException Throws when neither null nor an array is given
+     * {@inheritdoc}
+     */
+    public function parseArguments(array $config, array $parameterList)
+    {
+        return $this->argumentParser->parseArguments(
+            [
+                // Config arrays only support a set of named arguments,
+                // as they will usually come from a set of YAML {key: value} mappings
+                ArgumentParserInterface::NAMED_ARGUMENTS => $config
+            ],
+            $parameterList
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function toArray($value)
     {

@@ -11,20 +11,27 @@
 
 namespace Combyna\Component\Router\Config\Loader;
 
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Exception\ArgumentParseException;
+use Combyna\Component\Config\Loader\ConfigParserInterface;
+use Combyna\Component\Config\Parameter\CallbackOptionalParameter;
+use Combyna\Component\Config\Parameter\NamedParameter;
+use Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterType;
+use Combyna\Component\Config\Parameter\Type\StringParameterType;
 use Combyna\Component\Environment\Config\Loader\Library\LibraryLoaderInterface;
+use Combyna\Component\Router\Config\Act\InvalidRouteNode;
 use Combyna\Component\Router\Config\Act\RouteNode;
 
 /**
- * Class EnvironmentLoader
+ * Class RouteCollectionLoader
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
 class RouteCollectionLoader implements RouteCollectionLoaderInterface
 {
     /**
-     * @var ConfigParser
+     * @var ConfigParserInterface
      */
     private $configParser;
 
@@ -39,12 +46,12 @@ class RouteCollectionLoader implements RouteCollectionLoaderInterface
     private $libraryLoader;
 
     /**
-     * @param ConfigParser $configParser
+     * @param ConfigParserInterface $configParser
      * @param LibraryLoaderInterface $libraryLoader
      * @param FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader
      */
     public function __construct(
-        ConfigParser $configParser,
+        ConfigParserInterface $configParser,
         LibraryLoaderInterface $libraryLoader,
         FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader
     ) {
@@ -56,39 +63,42 @@ class RouteCollectionLoader implements RouteCollectionLoaderInterface
     /**
      * {@inheritdoc}
      */
-    public function loadRoute($routeName, array $routeConfig)
+    public function loadRoute($libraryName, $routeName, array $routeConfig)
     {
-        $pattern = $this->configParser->getElement(
-            $routeConfig,
-            'pattern',
-            'URL pattern'
-        );
-        $attributesConfig = $this->configParser->getOptionalElement(
-            $routeConfig,
-            'attributes',
-            'URL attribute model',
-            []
-        );
-        $pageViewName = $this->configParser->getElement(
-            $routeConfig,
-            'page_view',
-            'page view name'
-        );
+        try {
+            $parsedArgumentBag = $this->configParser->parseArguments($routeConfig, [
+                new NamedParameter('pattern', new StringParameterType('URL pattern')),
+                new CallbackOptionalParameter(
+                    new NamedParameter(
+                        'parameters',
+                        new FixedStaticBagModelParameterType('URL parameter model')
+                    ),
+                    function () {
+                        return new FixedStaticBagModelNode([]);
+                    }
+                ),
+                new NamedParameter('page_view', new StringParameterType('page view name'))
+            ]);
+        } catch (ArgumentParseException $exception) {
+            return new InvalidRouteNode($libraryName, $routeName, $exception->getMessage());
+        }
 
-        $attributeBagModelNode = $this->fixedStaticBagModelLoader->load($attributesConfig);
+        $urlPattern = $parsedArgumentBag->getNamedStringArgument('pattern');
+        $parameterBagModelNode = $parsedArgumentBag->getNamedFixedStaticBagModelArgument('parameters');
+        $pageViewName = $parsedArgumentBag->getNamedStringArgument('page_view');
 
-        return new RouteNode($routeName, $attributeBagModelNode, $pageViewName);
+        return new RouteNode($routeName, $urlPattern, $parameterBagModelNode, $pageViewName);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadRouteCollection(array $collectionConfig)
+    public function loadRouteCollection($libraryName, array $collectionConfig)
     {
         $routeNodes = [];
 
         foreach ($collectionConfig as $routeName => $routeConfig) {
-            $routeNodes[] = $this->loadRoute($routeName, $routeConfig);
+            $routeNodes[] = $this->loadRoute($libraryName, $routeName, $routeConfig);
         }
 
         return $routeNodes;

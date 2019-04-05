@@ -30,6 +30,11 @@ class ConfigComponent extends AbstractComponent
     {
         $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
             new DelegateeTagDefinition(
+                'combyna.config_node_visitor',
+                'combyna.config.node_visitor',
+                'addVisitor'
+            ),
+            new DelegateeTagDefinition(
                 'combyna.parameter_parser',
                 'combyna.config.parameter.parser',
                 'addParser'

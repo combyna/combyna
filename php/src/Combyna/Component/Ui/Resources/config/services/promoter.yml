@@ -1,9 +1,45 @@
 services:
+    combyna.ui.promoter.core_widget.child_reference_widget_node:
+        class: Combyna\Component\Ui\Config\Promoter\Core\ChildReferenceWidgetNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
+
+    combyna.ui.promoter.core_widget.conditional_widget_node:
+        class: Combyna\Component\Ui\Config\Promoter\Core\ConditionalWidgetNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
+
+    combyna.ui.promoter.core_widget.repeater_widget_node:
+        class: Combyna\Component\Ui\Config\Promoter\Core\RepeaterWidgetNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
+
+    combyna.ui.promoter.core_widget.text_widget_node:
+        class: Combyna\Component\Ui\Config\Promoter\Core\TextWidgetNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
+
+    combyna.ui.promoter.core_widget.widget_group_node:
+        class: Combyna\Component\Ui\Config\Promoter\Core\WidgetGroupNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
+
     combyna.ui.promoter.capture_expression_node:
         class: Combyna\Component\Ui\Config\Act\Expression\CaptureExpressionNodePromoter
         autowire: true
         tags:
             - {name: combyna.expression_promoter}
+
+    combyna.ui.promoter.defined_widget_node:
+        class: Combyna\Component\Ui\Config\Promoter\DefinedWidgetNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.widget_promoter}
 
     combyna.ui.promoter.view_node:
         class: Combyna\Component\Ui\Config\Act\ViewNodePromoter
@@ -42,7 +78,7 @@ services:
             - {name: combyna.expression_promoter}
 
     combyna.ui.promoter.widget_node:
-        class: Combyna\Component\Ui\Config\Act\WidgetNodePromoter
+        class: Combyna\Component\Ui\Config\Promoter\DelegatingWidgetNodePromoter
         autowire: true
 
     combyna.ui.promoter.widget_value_expression_node:

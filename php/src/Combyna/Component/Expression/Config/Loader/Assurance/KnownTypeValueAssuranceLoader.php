@@ -75,7 +75,7 @@ class KnownTypeValueAssuranceLoader implements AssuranceTypeLoaderInterface
             return new UnknownAssuranceNode($assuredStaticName, $constraintName, $exception->getMessage());
         }
 
-        $typeName = $parsedArgumentBag->getNamedTextArgument('type');
+        $typeName = $parsedArgumentBag->getNamedStringArgument('type');
         $typeDeterminer = $this->typeLoader->load($typeName);
 
         return new KnownTypeValueAssuranceNode(

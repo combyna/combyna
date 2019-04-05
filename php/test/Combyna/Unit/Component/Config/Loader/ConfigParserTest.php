@@ -11,9 +11,13 @@
 
 namespace Combyna\Unit\Component\Config\Loader;
 
+use Combyna\Component\Config\Loader\ArgumentParserInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Parameter\ArgumentBagInterface;
+use Combyna\Component\Config\Parameter\ParameterInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
+use Prophecy\Prophecy\ObjectProphecy;
 use stdClass;
 
 /**
@@ -24,13 +28,20 @@ use stdClass;
 class ConfigParserTest extends TestCase
 {
     /**
+     * @var ObjectProphecy|ArgumentParserInterface
+     */
+    private $argumentParser;
+
+    /**
      * @var ConfigParser
      */
     private $parser;
 
     public function setUp()
     {
-        $this->parser = new ConfigParser();
+        $this->argumentParser = $this->prophesize(ArgumentParserInterface::class);
+
+        $this->parser = new ConfigParser($this->argumentParser->reveal());
     }
 
     /**
@@ -338,6 +349,32 @@ class ConfigParserTest extends TestCase
                 'but is "string" for some context of this fetch'
             ]
         ];
+    }
+
+    public function testParseArgumentsDelegatesToArgumentParserAndReturnsResultCorrectly()
+    {
+        $argumentBag = $this->prophesize(ArgumentBagInterface::class);
+        $parameter1 = $this->prophesize(ParameterInterface::class);
+        $parameter2 = $this->prophesize(ParameterInterface::class);
+        $this->argumentParser->parseArguments(
+            [
+                ArgumentParserInterface::NAMED_ARGUMENTS => ['my' => 'config']
+            ],
+            [
+                $parameter1->reveal(),
+                $parameter2->reveal()
+            ]
+        )->willReturn($argumentBag);
+
+        $this->assert(
+            $this->parser->parseArguments(
+                ['my' => 'config'],
+                [
+                    $parameter1->reveal(),
+                    $parameter2->reveal()
+                ]
+            )
+        )->exactlyEquals($argumentBag->reveal());
     }
 
     public function testToArrayReturnsAnArrayPassedIn()

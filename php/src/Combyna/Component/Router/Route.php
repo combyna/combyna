@@ -22,11 +22,6 @@ use Combyna\Component\Bag\StaticBagInterface;
 class Route implements RouteInterface
 {
     /**
-     * @var FixedStaticBagModelInterface
-     */
-    private $attributeBagModel;
-
-    /**
      * @var string
      */
     private $name;
@@ -37,15 +32,27 @@ class Route implements RouteInterface
     private $pageViewName;
 
     /**
+     * @var FixedStaticBagModelInterface
+     */
+    private $parameterBagModel;
+
+    /**
+     * @var string
+     */
+    private $urlPattern;
+
+    /**
      * @param string $name
-     * @param FixedStaticBagModelInterface $attributeBagModel
+     * @param string $urlPattern
+     * @param FixedStaticBagModelInterface $parameterBagModel
      * @param string $pageViewName
      */
-    public function __construct($name, FixedStaticBagModelInterface $attributeBagModel, $pageViewName)
+    public function __construct($name, $urlPattern, FixedStaticBagModelInterface $parameterBagModel, $pageViewName)
     {
-        $this->attributeBagModel = $attributeBagModel;
         $this->name = $name;
         $this->pageViewName = $pageViewName;
+        $this->parameterBagModel = $parameterBagModel;
+        $this->urlPattern = $urlPattern;
     }
 
     /**
@@ -53,7 +60,25 @@ class Route implements RouteInterface
      */
     public function assertValidArgumentBag(StaticBagInterface $argumentBag)
     {
-        // TODO: Implement assertValidArgumentBag() method.
+        $this->parameterBagModel->assertValidStaticBag($argumentBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateUrl(StaticBagInterface $argumentBag)
+    {
+        $this->assertValidArgumentBag($argumentBag);
+
+        // Replace each instance of the parameter placeholder in the URL pattern with its value,
+        // eg. `/my/{parameter-placeholder}/path` -> `/my/replaced/path`
+        $parameterArgumentPairs = [];
+
+        foreach ($argumentBag->toNativeArray() as $parameterName => $argumentNative) {
+            $parameterArgumentPairs['{' . $parameterName . '}'] = $argumentNative;
+        }
+
+        return strtr($this->urlPattern, $parameterArgumentPairs);
     }
 
     /**
@@ -70,5 +95,13 @@ class Route implements RouteInterface
     public function getPageViewName()
     {
         return $this->pageViewName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUrlPattern()
+    {
+        return $this->urlPattern;
     }
 }

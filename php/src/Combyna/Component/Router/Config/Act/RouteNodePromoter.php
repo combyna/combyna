@@ -14,6 +14,7 @@ namespace Combyna\Component\Router\Config\Act;
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Router\RouteCollectionInterface;
 use Combyna\Component\Router\RouterFactoryInterface;
+use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class RouteNodePromoter
@@ -45,7 +46,7 @@ class RouteNodePromoter
     /**
      * Promotes the provided list of RouteNodes to actual Route instances
      *
-     * @param RouteNode[] $routeNodes
+     * @param RouteNodeInterface[] $routeNodes
      * @return RouteCollectionInterface
      */
     public function promoteCollection(array $routeNodes)
@@ -53,9 +54,14 @@ class RouteNodePromoter
         $routes = [];
 
         foreach ($routeNodes as $routeNode) {
+            $queryRequirement = new PromotionQueryRequirement($routeNode);
+
             $routes[$routeNode->getName()] = $this->routerFactory->createRoute(
                 $routeNode->getName(),
-                $this->bagNodePromoter->promoteFixedStaticBagModel($routeNode->getAttributeBagModel()),
+                $routeNode->getUrlPattern(),
+                $this->bagNodePromoter->promoteFixedStaticBagModel(
+                    $routeNode->getParameterBagModel($queryRequirement)
+                ),
                 $routeNode->getPageViewName()
             );
         }

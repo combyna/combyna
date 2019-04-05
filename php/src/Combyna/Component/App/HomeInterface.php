@@ -26,16 +26,17 @@ interface HomeInterface
     /**
      * Evaluates the home route expression bag to statics
      *
+     * @param EvaluationContextInterface $evaluationContext
      * @return StaticBagInterface
      */
-    public function attributeExpressionBagToStaticBag(EvaluationContextInterface $evaluationContext);
+    public function argumentExpressionBagToStaticBag(EvaluationContextInterface $evaluationContext);
 
     /**
-     * Fetches the bag of expressions to evaluate for the route's attributes
+     * Fetches the bag of expressions to evaluate for the route's parameter arguments
      *
      * @return ExpressionBagInterface
      */
-    public function getAttributeExpressionBag();
+    public function getArgumentExpressionBag();
 
     /**
      * Fetches the route to navigate to

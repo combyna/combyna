@@ -88,11 +88,12 @@ class Client
      * @param AppStateInterface $appState
      * @param string $libraryName
      * @param string $routeName
+     * @param array $routeArguments
      * @return AppStateInterface
      */
-    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName)
+    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName, $routeArguments = [])
     {
-        return $this->app->navigateTo($appState, $libraryName, $routeName);
+        return $this->app->navigateTo($appState, $libraryName, $routeName, $routeArguments);
     }
 
     /**
