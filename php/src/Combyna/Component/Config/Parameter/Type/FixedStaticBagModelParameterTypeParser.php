@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Config\Parameter\Type;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
 
 /**
@@ -84,7 +84,7 @@ class FixedStaticBagModelParameterTypeParser implements ParameterTypeTypeParserI
      *
      * @param FixedStaticBagModelParameterType $type
      * @param array $rawValue
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function parseArgument(
         FixedStaticBagModelParameterType $type,

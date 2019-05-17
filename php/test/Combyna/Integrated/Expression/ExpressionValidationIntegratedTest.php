@@ -119,6 +119,7 @@ class ExpressionValidationIntegratedTest extends TestCase
             $this->environmentNode,
             [],
             [],
+            [],
             new HomeNode('app', 'home', new ExpressionBagNode([])),
             [],
             []

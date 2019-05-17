@@ -22,8 +22,10 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class AdditiveDeterminer implements TypeDeterminerInterface
+class AdditiveDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'additive';
+
     /**
      * @var TypeDeterminerInterface[]
      */

@@ -11,12 +11,12 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class InvalidWidgetNode
@@ -31,6 +31,11 @@ class InvalidWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @var string
      */
     private $contextDescription;
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -50,6 +55,7 @@ class InvalidWidgetNode extends AbstractActNode implements WidgetNodeInterface
     public function __construct($libraryName, $widgetDefinitionName, $contextDescription)
     {
         $this->contextDescription = $contextDescription;
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->libraryName = $libraryName;
         $this->widgetDefinitionName = $widgetDefinitionName;
     }
@@ -59,6 +65,8 @@ class InvalidWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
@@ -75,22 +83,22 @@ class InvalidWidgetNode extends AbstractActNode implements WidgetNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
+    public function getCaptureExpressionBag()
     {
-        return new DynamicUnknownExpressionBagNode(
+        return new UnknownExpressionBagNode(
             sprintf('%s capture set', $this->contextDescription),
-            $queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getCaptureStaticBagModel()
     {
-        return new DynamicUnknownFixedStaticBagModelNode(
+        return new UnknownFixedStaticBagModelNode(
             sprintf('%s capture model', $this->contextDescription),
-            $queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
@@ -116,7 +124,10 @@ class InvalidWidgetNode extends AbstractActNode implements WidgetNodeInterface
     public function getVisibilityExpression()
     {
         // TODO: Remove visibility expressions
-        return new UnknownExpressionNode(sprintf('%s visibility expression', $this->contextDescription));
+        return new UnknownExpressionNode(
+            sprintf('%s visibility expression', $this->contextDescription),
+            $this->dynamicContainerNode
+        );
     }
 
     /**

@@ -13,13 +13,14 @@ namespace Combyna\Component\Program;
 
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionRepositoryInterface;
 
 /**
  * Class ResourceRepository
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ResourceRepository implements ResourceRepositoryInterface
+class ResourceRepository implements RootResourceRepositoryInterface
 {
     /**
      * @var EnvironmentInterface
@@ -27,20 +28,29 @@ class ResourceRepository implements ResourceRepositoryInterface
     private $environment;
 
     /**
-     * @var SignalDefinitionRepositoryInterface
+     * @var SignalDefinitionRepositoryInterface|null
      */
     private $signalDefinitionRepository;
 
     /**
-     * @param EnvironmentInterface $environment
-     * @param SignalDefinitionRepositoryInterface $signalDefinitionRepository
+     * @var WidgetDefinitionRepositoryInterface|null
      */
-    public function __construct(
-        EnvironmentInterface $environment,
-        SignalDefinitionRepositoryInterface $signalDefinitionRepository
-    ) {
+    private $widgetDefinitionRepository;
+
+    /**
+     * @param EnvironmentInterface $environment
+     */
+    public function __construct(EnvironmentInterface $environment)
+    {
         $this->environment = $environment;
-        $this->signalDefinitionRepository = $signalDefinitionRepository;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventDefinitionByName($libraryName, $eventName)
+    {
+        return $this->environment->getEventDefinitionByName($libraryName, $eventName);
     }
 
     /**
@@ -56,6 +66,22 @@ class ResourceRepository implements ResourceRepositoryInterface
      */
     public function getWidgetDefinitionByName($libraryName, $widgetDefinitionName)
     {
-        return $this->environment->getWidgetDefinitionByName($libraryName, $widgetDefinitionName);
+        return $this->widgetDefinitionRepository->getByName($libraryName, $widgetDefinitionName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setSignalDefinitionRepository(SignalDefinitionRepositoryInterface $signalDefinitionRepository)
+    {
+        $this->signalDefinitionRepository = $signalDefinitionRepository;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setWidgetDefinitionRepository(WidgetDefinitionRepositoryInterface $widgetDefinitionRepository)
+    {
+        $this->widgetDefinitionRepository = $widgetDefinitionRepository;
     }
 }

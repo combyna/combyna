@@ -52,6 +52,14 @@ class VariableExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->variableName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResultTypeDeterminer()
     {
         return new QueriedResultTypeDeterminer(new VariableTypeQuery($this->variableName), $this);

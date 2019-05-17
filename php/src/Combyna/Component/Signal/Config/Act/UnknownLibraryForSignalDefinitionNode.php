@@ -11,22 +11,28 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
- * Class DynamicUnknownLibraryForSignalDefinitionNode
+ * Class UnknownLibraryForSignalDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DynamicUnknownLibraryForSignalDefinitionNode extends AbstractActNode implements SignalDefinitionNodeInterface, DynamicActNodeInterface
+class UnknownLibraryForSignalDefinitionNode extends AbstractActNode implements SignalDefinitionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-library-for-signal-definition';
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -41,15 +47,15 @@ class DynamicUnknownLibraryForSignalDefinitionNode extends AbstractActNode imple
     /**
      * @param string $libraryName
      * @param string $signalName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($libraryName, $signalName, QueryRequirementInterface $queryRequirement)
+    public function __construct($libraryName, $signalName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->libraryName = $libraryName;
         $this->signalName = $signalName;
 
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**
@@ -57,6 +63,8 @@ class DynamicUnknownLibraryForSignalDefinitionNode extends AbstractActNode imple
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
@@ -72,22 +80,30 @@ class DynamicUnknownLibraryForSignalDefinitionNode extends AbstractActNode imple
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getLibraryName()
     {
-        return new DynamicUnknownFixedStaticBagModelNode(
+        return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticBagModel()
+    {
+        return new UnknownFixedStaticBagModelNode(
             sprintf(
                 'Payload static bag for undefined signal "%s" of undefined library "%s"',
                 $this->signalName,
                 $this->libraryName
             ),
-            $queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticType($staticName, QueryRequirementInterface $queryRequirement)
+    public function getPayloadStaticType($staticName)
     {
         return new UnresolvedType(
             sprintf(

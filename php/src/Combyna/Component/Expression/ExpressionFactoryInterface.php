@@ -34,6 +34,15 @@ interface ExpressionFactoryInterface
     public function createAssuredExpression($assuredStaticName);
 
     /**
+     * Creates an AttributeExpression
+     *
+     * @param ExpressionInterface $structureExpression
+     * @param string $attributeName
+     * @return AttributeExpression
+     */
+    public function createAttributeExpression(ExpressionInterface $structureExpression, $attributeName);
+
+    /**
      * Creates a BinaryArithmeticExpression, which performs an arithmetic calculation with two operands
      * 
      * @param ExpressionInterface $leftOperandExpression
@@ -215,6 +224,14 @@ interface ExpressionFactoryInterface
      * @return NumberExpression
      */
     public function createNumberExpression($number);
+
+    /**
+     * Creates a StructureExpression
+     *
+     * @param ExpressionBagInterface $expressionBag
+     * @return StructureExpression
+     */
+    public function createStructureExpression(ExpressionBagInterface $expressionBag);
 
     /**
      * Creates a TextExpression

@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Event;
 
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 
 /**
  * Class EventDefinitionReferenceCollection
@@ -22,23 +22,23 @@ use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
 class EventDefinitionReferenceCollection implements EventDefinitionReferenceCollectionInterface
 {
     /**
-     * @var EnvironmentInterface
-     */
-    private $environment;
-
-    /**
      * @var EventDefinitionReferenceInterface[]
      */
     private $eventDefinitionReferences = [];
 
     /**
-     * @param EventDefinitionReferenceInterface[] $eventDefinitionReferences
-     * @param EnvironmentInterface $environment
+     * @var ResourceRepositoryInterface
      */
-    public function __construct(array $eventDefinitionReferences, EnvironmentInterface $environment)
+    private $resourceRepository;
+
+    /**
+     * @param EventDefinitionReferenceInterface[] $eventDefinitionReferences
+     * @param ResourceRepositoryInterface $resourceRepository
+     */
+    public function __construct(array $eventDefinitionReferences, ResourceRepositoryInterface $resourceRepository)
     {
-        $this->environment = $environment;
         $this->eventDefinitionReferences = $eventDefinitionReferences;
+        $this->resourceRepository = $resourceRepository;
     }
 
     /**
@@ -50,7 +50,7 @@ class EventDefinitionReferenceCollection implements EventDefinitionReferenceColl
             if ($eventDefinitionReference->getLibraryName() === $libraryName &&
                 $eventDefinitionReference->getEventName() === $eventName
             ) {
-                return $this->environment->getEventDefinitionByName(
+                return $this->resourceRepository->getEventDefinitionByName(
                     $eventDefinitionReference->getLibraryName(),
                     $eventDefinitionReference->getEventName()
                 );

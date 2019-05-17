@@ -23,7 +23,6 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\ConditionalWidgetContextSpecifier;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -142,7 +141,7 @@ class ConditionalWidgetNode extends AbstractActNode implements CoreWidgetNodeInt
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
+    public function getCaptureExpressionBag()
     {
         return $this->captureExpressionBagNode;
     }
@@ -150,7 +149,7 @@ class ConditionalWidgetNode extends AbstractActNode implements CoreWidgetNodeInt
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getCaptureStaticBagModel()
     {
         return $this->captureStaticBagModelNode;
     }

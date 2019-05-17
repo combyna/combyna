@@ -21,7 +21,6 @@ use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\RepeaterWidget;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class RepeaterWidgetNodePromoter
@@ -93,18 +92,16 @@ class RepeaterWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
-        $queryRequirement = new PromotionQueryRequirement($widgetNode);
-
         $repeaterWidget = $this->viewFactory->createRepeaterWidget(
             $name,
             $this->expressionNodePromoter->promote($widgetNode->getItemListExpression()),
             $widgetNode->getIndexVariableName(),
             $widgetNode->getItemVariableName(),
             $this->bagNodePromoter->promoteFixedStaticBagModel(
-                $widgetNode->getCaptureStaticBagModel($queryRequirement)
+                $widgetNode->getCaptureStaticBagModel()
             ),
             $this->bagNodePromoter->promoteExpressionBag(
-                $widgetNode->getCaptureExpressionBag($queryRequirement)
+                $widgetNode->getCaptureExpressionBag()
             ),
             $parentWidget,
             $widgetNode->getVisibilityExpression() ?

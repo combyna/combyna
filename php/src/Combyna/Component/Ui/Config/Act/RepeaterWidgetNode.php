@@ -28,7 +28,6 @@ use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifi
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\RepeaterWidgetContextSpecifier;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
@@ -178,7 +177,7 @@ class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterf
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
+    public function getCaptureExpressionBag()
     {
         return $this->captureExpressionBagNode;
     }
@@ -186,7 +185,7 @@ class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterf
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getCaptureStaticBagModel()
     {
         return $this->captureStaticBagModelNode;
     }

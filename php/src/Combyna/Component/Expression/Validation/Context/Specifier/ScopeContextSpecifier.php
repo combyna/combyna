@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression\Validation\Context\Specifier;
 
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 use InvalidArgumentException;
@@ -26,6 +27,23 @@ class ScopeContextSpecifier implements SubValidationContextSpecifierInterface
      * @var TypeDeterminerInterface[]
      */
     private $variableTypeDeterminers = [];
+
+    /**
+     * Defines a variable in the scope for each static in the given model
+     *
+     * @param FixedStaticBagModelNodeInterface $staticBagModelNode
+     */
+    public function defineBagStaticsAsVariables(FixedStaticBagModelNodeInterface $staticBagModelNode)
+    {
+        foreach ($staticBagModelNode->getStaticDefinitions() as $name => $staticDefinition) {
+            if (array_key_exists($name, $this->variableTypeDeterminers)) {
+                // TODO: Catch & raise validation failure for this?
+                throw new InvalidArgumentException('Scope already has a variable "' . $name . '"');
+            }
+
+            $this->variableTypeDeterminers[$name] = $staticDefinition->getStaticTypeDeterminer();
+        }
+    }
 
     /**
      * Defines a new variable in the scope

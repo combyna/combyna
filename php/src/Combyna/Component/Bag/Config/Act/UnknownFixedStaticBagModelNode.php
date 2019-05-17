@@ -14,9 +14,11 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Config\Act\DynamicContainerNode;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use LogicException;
 
 /**
  * Class UnknownFixedStaticBagModelNode
@@ -28,16 +30,25 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
     const TYPE = 'unknown-fixed-static-bag-model';
 
     /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
+
+    /**
      * @var string
      */
     private $contextDescription;
 
     /**
      * @param string $contextDescription
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($contextDescription)
+    public function __construct($contextDescription, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->contextDescription = $contextDescription;
+        $this->dynamicContainerNode = new DynamicContainerNode();
+
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**
@@ -45,6 +56,8 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(new KnownFailureConstraint($this->contextDescription));
     }
@@ -60,10 +73,21 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
     /**
      * {@inheritdoc}
      */
-    public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement)
+    public function determine(ValidationContextInterface $validationContext)
+    {
+        throw new LogicException('Cannot determine an unknown fixed static bag model node');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticDefinitionByName($definitionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         // Unknown static bag model cannot define any statics
-        return new UnknownFixedStaticDefinitionNode($definitionName, $queryRequirement);
+        return new UnknownFixedStaticDefinitionNode(
+            $definitionName,
+            $this->dynamicContainerNode
+        );
     }
 
     /**

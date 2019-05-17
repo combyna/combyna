@@ -62,9 +62,11 @@ class StaticTypeLoader implements TypeTypeLoaderInterface
         $type = $this->configParser->getElement($config, 'type', 'type name');
 
         if (!array_key_exists($type, self::$typesToClasses)) {
-            return new UnresolvedType(
-                'Invalid static type "' . $type . '" given - valid types are "' .
-                implode('", "', array_keys(self::$typesToClasses)) . '"'
+            return new PresolvedTypeDeterminer(
+                new UnresolvedType(
+                    'Invalid static type "' . $type . '" given - valid types are "' .
+                    implode('", "', array_keys(self::$typesToClasses)) . '"'
+                )
             );
         }
 

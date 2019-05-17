@@ -63,6 +63,7 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             $this->environmentNode,
             [],
             [],
+            [],
             new HomeNode('app', 'home', new ExpressionBagNode([])),
             [],
             []

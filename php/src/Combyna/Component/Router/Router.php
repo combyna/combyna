@@ -126,7 +126,7 @@ class Router implements RouterInterface
             $program,
             $newAppState,
             $navigatedSignalDefinition,
-            $this->bagFactory->createStaticBag([
+            $this->bagFactory->coerceStaticBag([
                 'library' => $libraryName,
                 'route' => $routeName
             ])

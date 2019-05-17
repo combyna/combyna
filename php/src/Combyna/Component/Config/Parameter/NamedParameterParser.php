@@ -88,7 +88,12 @@ class NamedParameterParser implements ParameterTypeParserInterface
     {
         $namedArguments = $config[ArgumentParser::NAMED_ARGUMENTS];
 
-        if (!array_key_exists($parameter->getName(), $namedArguments)) {
+        if (
+            !array_key_exists($parameter->getName(), $namedArguments) ||
+            // Treat arguments set to null as though they were not specified at all
+            // so that we can fall back to evaluating their default value
+            $namedArguments[$parameter->getName()] === null
+        ) {
             throw new RequiredArgumentMissingException($parameter->getName(), array_keys($namedArguments));
         }
 

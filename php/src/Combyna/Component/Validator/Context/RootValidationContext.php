@@ -17,7 +17,7 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
-use Combyna\Component\Config\Act\DynamicUnknownNode;
+use Combyna\Component\Config\Act\UnknownNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
@@ -222,16 +222,11 @@ class RootValidationContext implements RootValidationContextInterface
             $subValidationContext
         );
 
-        $validationContext = $this->validationFactory->createContext(
-            $this,
-            $subValidationContext,
-            $this->behaviourSpecValidator
-        );
+        // Create and adopt the new unknown node into the ACT
+        $unknownNode = new UnknownNode($actNodeQuery->getDescription());
+        $this->adoptDynamicActNode($unknownNode, $subValidationContext);
 
-        return new DynamicUnknownNode(
-            $actNodeQuery->getDescription(),
-            $validationContext->createActNodeQueryRequirement($actNodeQuery, $nodeToQueryFrom)
-        );
+        return $unknownNode;
     }
 
     /**

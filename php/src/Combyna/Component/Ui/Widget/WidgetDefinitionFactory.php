@@ -13,6 +13,7 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
+use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
@@ -104,5 +105,23 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
             $staticExpressionFactory,
             $valueNameToProviderCallableMap
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createWidgetDefinitionCollection(array $widgetDefinitions, $libraryName)
+    {
+        return new WidgetDefinitionCollection($widgetDefinitions, $libraryName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createWidgetDefinitionRepository(
+        EnvironmentInterface $environment,
+        WidgetDefinitionCollectionInterface $appWidgetDefinitionCollection
+    ) {
+        return new WidgetDefinitionRepository($environment, $appWidgetDefinitionCollection);
     }
 }

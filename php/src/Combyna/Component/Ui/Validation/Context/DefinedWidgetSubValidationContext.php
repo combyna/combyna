@@ -167,7 +167,7 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
     ) {
         $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
 
-        if (!$this->widgetNode->getCaptureStaticBagModel($queryRequirement)
+        if (!$this->widgetNode->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName())
         ) {
             // The widget does not define the capture - nothing to do
@@ -175,7 +175,7 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         }
 
         return $this->widgetNode
-            ->getCaptureStaticBagModel($queryRequirement)
+            ->getCaptureStaticBagModel()
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
                 $queryRequirement
@@ -186,17 +186,12 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
      * Determines whether the current widget's definition defines the specified capture
      *
      * @param CaptureIsDefinedQuery $query
-     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
-    public function queryForCaptureExistence(
-        CaptureIsDefinedQuery $query,
-        ValidationContextInterface $validationContext
-    ) {
+    public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
+    {
         return $this->widgetNode
-            ->getCaptureStaticBagModel(
-                $validationContext->createBooleanQueryRequirement($query)
-            )
+            ->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName()) ?: null;
     }
 
@@ -211,9 +206,7 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         CaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel(
-            $validationContext->createTypeQueryRequirement($query)
-        );
+        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel();
 
         if (!$captureStaticBagModel->definesStatic($query->getCaptureName())) {
             return null;
@@ -238,9 +231,7 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
         CorrectCaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel(
-            $validationContext->createTypeQueryRequirement($query)
-        );
+        $captureStaticBagModel = $this->widgetNode->getCaptureStaticBagModel();
 
         if ($captureStaticBagModel->definesStatic($query->getCaptureName())) {
             // This widget defines the capture - we can determine the correct type
@@ -265,12 +256,10 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
      * Determines whether the current widget is optional or defines the specified capture
      *
      * @param CaptureHasOptionalAncestorWidgetQuery $query
-     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
     public function queryForWhetherCaptureHasOptionalAncestor(
-        CaptureHasOptionalAncestorWidgetQuery $query,
-        ValidationContextInterface $validationContext
+        CaptureHasOptionalAncestorWidgetQuery $query
     ) {
         /*
          * If this widget defines the capture, return false as if this node was reached, no optional widget
@@ -279,9 +268,7 @@ class DefinedWidgetSubValidationContext implements DefinedWidgetSubValidationCon
          * until either an optional widget is found or the widget that defines the capture is found.
          */
         return $this->widgetNode
-            ->getCaptureStaticBagModel(
-                $validationContext->createBooleanQueryRequirement($query)
-            )
+            ->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName()) ?
                 false :
                 null;

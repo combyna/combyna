@@ -20,6 +20,7 @@ use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Trigger\Config\Loader\TriggerLoaderInterface;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetNode;
+use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 
 /**
  * Class DelegatingWidgetLoader
@@ -199,8 +200,7 @@ class DelegatingWidgetLoader implements DelegatorInterface, WidgetLoaderInterfac
         );
 
         return new DefinedWidgetNode(
-            $libraryName,
-            $widgetDefinitionName,
+            new WidgetDefinitionReferenceNode($libraryName, $widgetDefinitionName),
             $attributeExpressionBag,
             $captureStaticBagModelNode,
             $captureExpressionBagNode,

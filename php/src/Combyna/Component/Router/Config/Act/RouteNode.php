@@ -16,7 +16,6 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Router\Validation\Constraint\ValidParameterBagForUrlPatternConstraint;
 use Combyna\Component\Ui\Validation\Constraint\PageViewExistsConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class RouteNode
@@ -99,7 +98,7 @@ class RouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameterBagModel(QueryRequirementInterface $queryRequirement)
+    public function getParameterBagModel()
     {
         return $this->parameterBagModelNode;
     }

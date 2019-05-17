@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 
 /**
@@ -65,6 +66,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        return true; // Any static structure type is allowed
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         return true; // Any static type is allowed
@@ -76,6 +85,14 @@ class AnyType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere, including to a special Any type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        return $static; // For an Any type, any value is possible
     }
 
     /**
@@ -100,6 +117,14 @@ class AnyType implements TypeInterface
     public function isAllowedByStaticListType(StaticListType $superType)
     {
         return $superType->allowsAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
+    {
+        return $otherType->allowsAnyType($this);
     }
 
     /**
@@ -163,6 +188,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         return new MultipleType([$this, $otherType]);
@@ -206,6 +239,14 @@ class AnyType implements TypeInterface
     public function whenMergedWithStaticListType(StaticListType $otherType)
     {
         return $otherType->mergeWithAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithAnyType($this);
     }
 
     /**

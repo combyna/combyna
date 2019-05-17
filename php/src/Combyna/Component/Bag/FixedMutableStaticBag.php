@@ -85,7 +85,15 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
-    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    public function withStatic($name, StaticInterface $newStatic)
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withStatics(array $newStatics)
     {
         throw new \Exception('Not implemented');
     }

@@ -25,6 +25,14 @@ use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 interface FixedStaticDefinitionNodeInterface extends ActNodeInterface
 {
     /**
+     * Creates a "determined" definition from this node, where the type has been resolved
+     *
+     * @param ValidationContextInterface $validationContext
+     * @return DeterminedFixedStaticDefinitionInterface
+     */
+    public function determine(ValidationContextInterface $validationContext);
+
+    /**
      * Fetches the expression evaluated as the default value for this static, if set
      *
      * @return ExpressionNodeInterface|null
@@ -39,7 +47,11 @@ interface FixedStaticDefinitionNodeInterface extends ActNodeInterface
     public function getName();
 
     /**
-     * Fetches the resolved type for the static
+     * Fetches the resolved type for the static. In development mode,
+     * validation will have run and so this is guaranteed to return the true type.
+     * In production mode, validation will not have run and so the true type may not
+     * have been resolved (eg. if determining it involves a validation query) -
+     * in that scenario, an Any type will be returned.
      *
      * @return TypeInterface
      */

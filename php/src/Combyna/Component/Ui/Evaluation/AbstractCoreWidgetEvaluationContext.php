@@ -106,17 +106,11 @@ abstract class AbstractCoreWidgetEvaluationContext extends AbstractEvaluationCon
             return $this->parentContext->getCaptureRootwise($captureName);
         }
 
-        // This widget defines the capture - it should be set by a descendant (or itself)
-        $captureStatic = $this->getCaptureLeafwise($captureName);
-
-        if ($captureStatic === null) {
-            // No descendant set the capture - use the default value for the capture if defined
-            // (if not defined, an exception will be thrown, as validation should have ensured
-            // that a capture that is able to not be set always has a default expression defined)
-            $captureStatic = $this->widget->getCaptureStaticBagModel()->getDefaultStatic($captureName, $this);
-        }
-
-        return $captureStatic;
+        // NB: If no descendant set the capture - use the default value for the capture if defined
+        // (if not defined, an exception will be thrown, as validation should have ensured
+        // that a capture that is able to not be set always has a default expression defined)
+        return $this->widget->getCaptureStaticBagModel()
+            ->coerceStatic($captureName, $this, $this->getCaptureLeafwise($captureName));
     }
 
     /**

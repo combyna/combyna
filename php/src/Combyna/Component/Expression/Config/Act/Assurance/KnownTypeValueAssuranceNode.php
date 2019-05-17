@@ -15,6 +15,7 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Assurance\KnownTypeValueAssurance;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\Config\Act\TypeNode;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
@@ -68,6 +69,9 @@ class KnownTypeValueAssuranceNode extends AbstractActNode implements AssuranceNo
         // TODO: Check that the input expression can possibly resolve to the known type
         //       (the reverse of the ResultTypeConstraint) - if it cannot then there is a known bug
         //       with the logic of the app
+
+        // Make sure the known type itself is validated as necessary
+        $specBuilder->addChildNode(new TypeNode($this->knownTypeDeterminer));
     }
 
     /**

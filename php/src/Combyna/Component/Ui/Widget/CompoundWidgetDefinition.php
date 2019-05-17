@@ -17,6 +17,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
 use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Ui\Evaluation\CompoundWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
@@ -263,6 +264,23 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
             $valueStaticBag,
             $childWidgetStates,
             $rootWidgetState
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttribute(
+        $name,
+        ExpressionBagInterface $attributeExpressionBag,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        return $this->attributeBagModel->coerceStatic(
+            $name,
+            $evaluationContext,
+            $attributeExpressionBag->hasExpression($name) ?
+                $attributeExpressionBag->getExpression($name)->toStatic($evaluationContext) :
+                null
         );
     }
 

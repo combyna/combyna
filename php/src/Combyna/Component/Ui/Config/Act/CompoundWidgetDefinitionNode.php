@@ -15,11 +15,12 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
 use Combyna\Component\Ui\Validation\Context\Specifier\CompoundWidgetDefinitionContextSpecifier;
 use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class CompoundWidgetDefinitionNode
@@ -39,6 +40,11 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
      * @var ChildWidgetDefinitionNodeInterface[]
      */
     private $childDefinitionNodes;
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var EventDefinitionReferenceNode[]
@@ -85,6 +91,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     ) {
         $this->attributeBagModelNode = $attributeBagModelNode;
         $this->childDefinitionNodes = $childDefinitionNodes;
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->eventDefinitionReferenceNodes = $eventDefinitionReferenceNodes;
         $this->libraryName = $libraryName;
         $this->name = $widgetDefinitionName;
@@ -98,6 +105,7 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addChildNode($this->attributeBagModelNode);
+        $specBuilder->addChildNode($this->dynamicContainerNode);
 
         foreach ($this->childDefinitionNodes as $childDefinitionNode) {
             $specBuilder->addChildNode($childDefinitionNode);
@@ -140,11 +148,11 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * {@inheritdoc}
      */
-    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement)
+    public function getChildDefinition($childName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         return array_key_exists($childName, $this->childDefinitionNodes) ?
             $this->childDefinitionNodes[$childName] :
-            new DynamicUnknownChildWidgetDefinitionNode($childName, $queryRequirement);
+            new UnknownChildWidgetDefinitionNode($childName, $dynamicActNodeAdopter);
     }
 
     /**
@@ -194,9 +202,9 @@ class CompoundWidgetDefinitionNode extends AbstractActNode implements WidgetDefi
     /**
      * {@inheritdoc}
      */
-    public function getValueType($valueName, QueryRequirementInterface $queryRequirement)
+    public function getValueType($valueName)
     {
-        return $queryRequirement->determineType(
+        return $this->dynamicContainerNode->determineType(
             $this->valueExpressionBagNode
                 ->getExpression($valueName)
                 ->getResultTypeDeterminer()

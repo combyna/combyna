@@ -15,7 +15,9 @@ use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
@@ -66,6 +68,14 @@ class NullValidationContext implements ValidationContextInterface
      * {@inheritdoc}
      */
     public function addViolation(ViolationInterface $violation)
+    {
+        throw new RuntimeException(self::MESSAGE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adoptDynamicActNode(DynamicActNodeInterface $actNode)
     {
         throw new RuntimeException(self::MESSAGE);
     }
@@ -188,7 +198,7 @@ class NullValidationContext implements ValidationContextInterface
         ResultTypeQueryInterface $resultTypeQuery,
         ActNodeInterface $nodeToQueryFrom
     ) {
-        throw new RuntimeException(self::MESSAGE);
+        return new AnyType();
     }
 
     /**

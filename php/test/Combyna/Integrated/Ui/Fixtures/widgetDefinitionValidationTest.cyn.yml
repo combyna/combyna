@@ -1,0 +1,35 @@
+name: Widget definitions validation test app
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+widgets:
+    my_invalid_app_primitive:
+        type: primitive
+        attributes:
+            primitives_label: my_invalid_primitive_attr_type
+
+    my_invalid_app_compound:
+        type: compound
+        attributes:
+            compounds_label: my_invalid_compound_attr_type
+        children:
+            compounds_child: ~
+        root:
+            type: my_invalid_lib.my_invalid_primitive_widget
+            attributes:
+                my_invalid_attr: !expr This (!) is not a valid expression inside definition!
+            children:
+                primitives_child:
+                    type: my_invalid_lib.my_invalid_widget_definition
+
+page_views:
+    my_view:
+        title: !expr 'Widget definitions validation test'
+        description: A test of the validation for the widget definitions feature
+        widget:
+            type: app.my_invalid_app_compound
+            attributes:
+                compounds_label: !expr This (!) is not a valid expression for label!

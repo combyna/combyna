@@ -67,6 +67,14 @@ class ExpressionFactory implements ExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createAttributeExpression(ExpressionInterface $structureExpression, $attributeName)
+    {
+        return new AttributeExpression($structureExpression, $attributeName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createBinaryArithmeticExpression(
         ExpressionInterface $leftOperandExpression,
         $operator,
@@ -244,6 +252,17 @@ class ExpressionFactory implements ExpressionFactoryInterface
     public function createNumberExpression($number)
     {
         return $this->staticExpressionFactory->createNumberExpression($number);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStructureExpression(ExpressionBagInterface $expressionBag)
+    {
+        return new StructureExpression(
+            $this->staticExpressionFactory,
+            $expressionBag
+        );
     }
 
     /**

@@ -14,16 +14,16 @@ namespace Combyna\Component\Ui\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
- * Class DynamicUnknownChildWidgetDefinitionNode
+ * Class UnknownChildWidgetDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DynamicUnknownChildWidgetDefinitionNode extends AbstractActNode implements ChildWidgetDefinitionNodeInterface, DynamicActNodeInterface
+class UnknownChildWidgetDefinitionNode extends AbstractActNode implements ChildWidgetDefinitionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-child-widget-definition';
 
@@ -34,14 +34,13 @@ class DynamicUnknownChildWidgetDefinitionNode extends AbstractActNode implements
 
     /**
      * @param string $childName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($childName, QueryRequirementInterface $queryRequirement)
+    public function __construct($childName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->childName = $childName;
 
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**

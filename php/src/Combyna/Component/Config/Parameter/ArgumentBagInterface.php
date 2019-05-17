@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Config\Parameter;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Exception\ExtraArgumentsNotCapturedException;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
@@ -46,6 +47,14 @@ interface ArgumentBagInterface
      * @return ExpressionNodeInterface
      */
     public function getNamedExpressionArgument($name);
+
+    /**
+     * Fetches a named, expression-bag-type argument by its parameter name
+     *
+     * @param string $name
+     * @return ExpressionBagNode
+     */
+    public function getNamedExpressionBagArgument($name);
 
     /**
      * Fetches a named, fixed-static-bag-model-type argument by its parameter name

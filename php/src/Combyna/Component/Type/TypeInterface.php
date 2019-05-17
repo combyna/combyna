@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 
 /**
@@ -63,6 +64,15 @@ interface TypeInterface
     public function allowsStaticListType(StaticListType $candidateType, TypeInterface $elementType);
 
     /**
+     * Returns true if this type allows a structure with the same attribute bag model
+     * as the provided one, false otherwise
+     *
+     * @param StaticStructureType $candidateType
+     * @return bool
+     */
+    public function allowsStaticStructureType(StaticStructureType $candidateType);
+
+    /**
      * Returns true if this type allows a static type that matches the specified one, false otherwise
      *
      * @param StaticType $candidateType
@@ -79,8 +89,17 @@ interface TypeInterface
     public function allowsVoidType(VoidType $candidateType);
 
     /**
+     * Coerces the given, potentially "incomplete" static to a "complete" one for this type
+     *
+     * @param StaticInterface $static
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext);
+
+    /**
      * Returns a summary of the type represented
-     * eg. ListExpression<NumberExpression|TextExpression>
+     * eg. `list<number|text>`
      *
      * @return string
      */
@@ -109,6 +128,18 @@ interface TypeInterface
      * @return bool
      */
     public function isAllowedByStaticListType(StaticListType $otherType);
+
+    /**
+     * Determines whether the required attributes of the structure type
+     * all exist in this structure (assuming this is a structure), and that there are no extras provided.
+     *
+     * If there are any optional attributes in the structure type, this structure
+     * does not need to specify them as they can use their default values.
+     *
+     * @param StaticStructureType $otherType
+     * @return bool
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType);
 
     /**
      * Returns true if this type is equivalent to the specified static type, false otherwise
@@ -165,6 +196,15 @@ interface TypeInterface
 
     /**
      * Returns a new type that will match everything the current type does and also everything
+     * the provided static structure type does
+     *
+     * @param StaticStructureType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType);
+
+    /**
+     * Returns a new type that will match everything the current type does and also everything
      * the provided static type does
      *
      * @param StaticType $otherType
@@ -194,10 +234,10 @@ interface TypeInterface
      * Returns a new type that matches everything the current type does,
      * after a special "any" type
      *
-     * @param AnyType $otherType
+     * @param AnyType $candidateType
      * @return TypeInterface
      */
-    public function whenMergedWithAnyType(AnyType $otherType);
+    public function whenMergedWithAnyType(AnyType $candidateType);
 
     /**
      * Returns a new type that matches everything the current type does,
@@ -216,6 +256,15 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithStaticListType(StaticListType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided static structure type does
+     *
+     * @param StaticStructureType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType);
 
     /**
      * Returns a new type that matches everything the current type does,

@@ -11,10 +11,9 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Type\TypeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface SignalDefinitionNodeInterface
@@ -24,21 +23,26 @@ use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 interface SignalDefinitionNodeInterface extends ActNodeInterface
 {
     /**
+     * Fetches the name of the library this definition belongs to
+     *
+     * @return string
+     */
+    public function getLibraryName();
+
+    /**
      * Fetches the model for the static bag of payload data the signal expects
      *
-     * @param QueryRequirementInterface $queryRequirement
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
-    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement);
+    public function getPayloadStaticBagModel();
 
     /**
      * Fetches the type of the specified static for this signal's payload
      *
      * @param string $staticName
-     * @param QueryRequirementInterface $queryRequirement
      * @return TypeInterface
      */
-    public function getPayloadStaticType($staticName, QueryRequirementInterface $queryRequirement);
+    public function getPayloadStaticType($staticName);
 
     /**
      * Fetches the unique name of the signal

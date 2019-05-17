@@ -15,7 +15,6 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface WidgetNodeInterface
@@ -27,18 +26,16 @@ interface WidgetNodeInterface extends ActNodeInterface
     /**
      * Fetches the bag of expressions to assign to captures defined by ancestors
      *
-     * @param QueryRequirementInterface $queryRequirement
      * @return ExpressionBagNode
      */
-    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement);
+    public function getCaptureExpressionBag();
 
     /**
      * Fetches the model for values to capture within this widget's context
      *
-     * @param QueryRequirementInterface $queryRequirement
      * @return FixedStaticBagModelNodeInterface
      */
-    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement);
+    public function getCaptureStaticBagModel();
 
     /**
      * Fetches the name of the library this widget's definition should be fetched from

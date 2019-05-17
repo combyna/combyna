@@ -17,6 +17,7 @@ use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\Factory\DelegatingSubValidationContextFactoryInterface;
@@ -132,6 +133,14 @@ class ValidationContext implements ValidationContextInterface
     public function addViolation(ViolationInterface $violation)
     {
         $this->rootValidationContext->addViolation($violation);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function adoptDynamicActNode(DynamicActNodeInterface $actNode)
+    {
+        $this->rootValidationContext->adoptDynamicActNode($actNode, $this->subValidationContext);
     }
 
     /**

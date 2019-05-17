@@ -85,7 +85,7 @@ class WidgetValuesIntegratedTest extends TestCase
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "0"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterPokingThePokableButton()
@@ -104,7 +104,7 @@ HTML;
     Value of the pokable button: "Bang: (my_view-root-1-1)"<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "0"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheAddableButton()
@@ -124,6 +124,6 @@ HTML;
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "61"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 }

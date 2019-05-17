@@ -135,6 +135,6 @@ class BasicHtmlRendererIntegratedTest extends TestCase
     Some of my text here <button name="combyna-widget-my_view-root-1">Click me</button>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $renderedHtml);
+        self::assertSame($expectedHtml, $renderedHtml);
     }
 }

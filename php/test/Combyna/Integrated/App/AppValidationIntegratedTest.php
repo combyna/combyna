@@ -28,7 +28,9 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
+use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
@@ -90,6 +92,7 @@ class AppValidationIntegratedTest extends TestCase
             $this->environmentNode,
             [],
             [],
+            [],
             new HomeNode('app', 'home', new ExpressionBagNode([])),
             [
                 new PageViewNode(
@@ -106,8 +109,7 @@ class AppValidationIntegratedTest extends TestCase
                     new WidgetGroupNode(
                         [
                             new DefinedWidgetNode(
-                                'invalid-lib',
-                                'invalid-widget',
+                                new WidgetDefinitionReferenceNode('invalid-lib', 'invalid-widget'),
                                 new ExpressionBagNode([
                                     'some-attr' => new UnknownExpressionTypeNode('invalid-type-for-widget-attr')
                                 ]),
@@ -123,7 +125,7 @@ class AppValidationIntegratedTest extends TestCase
                                     )
                                 ],
                                 [
-                                    new UnknownNode('invalid-trigger-type')
+                                    new UnknownNode('invalid-trigger-type', new NullActNodeAdopter())
                                 ]
                             )
                         ],
@@ -140,6 +142,9 @@ class AppValidationIntegratedTest extends TestCase
         $this->setExpectedException(
             ValidationFailureException::class,
 
+            'ACT node [app].[page-view].[fixed-static-bag-model].[fixed-static-definition:invalid-attr]' .
+            ' - default expression would get [unknown<Expression type "invalid-type-for-page-attr">], expects [text]. :: ' .
+
             'ACT node [app].[page-view].[fixed-static-bag-model].[fixed-static-definition:invalid-attr].[unknown]' .
             ' - Expression is of unknown type "invalid-type-for-page-attr". :: ' .
 
@@ -151,6 +156,9 @@ class AppValidationIntegratedTest extends TestCase
 
             'ACT node [app].[page-view].[view:my-very-invalid-app].[widget-group:my-invalid-group].[defined-widget:0].[unknown-library-for-widget-definition]' .
             ' - Library "invalid-lib" does not exist in order to define widget definition "invalid-widget". :: ' .
+
+            'ACT node [app].[page-view].[view:my-very-invalid-app].[widget-group:my-invalid-group].[defined-widget:0].[widget-definition-reference]' .
+            ' - Widget definition "invalid-lib.invalid-widget" is not defined. :: ' .
 
             'ACT node [app].[page-view].[view:my-very-invalid-app].[widget-group:my-invalid-group].[defined-widget:0].[expression-bag].[unknown]' .
             ' - Expression is of unknown type "invalid-type-for-widget-attr". :: ' .

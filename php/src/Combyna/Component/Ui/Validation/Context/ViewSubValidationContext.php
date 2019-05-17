@@ -166,9 +166,11 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
         ViewStoreQueryResultTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
+        $queryRequirement = $validationContext->createTypeQueryRequirement($query);
+
         $storeQuery = $this->viewNode->getStore()->getQueryByName(
             $query->getQueryName(),
-            $validationContext->createTypeQueryRequirement($query)
+            $queryRequirement
         );
 
         if ($storeQuery === null) {

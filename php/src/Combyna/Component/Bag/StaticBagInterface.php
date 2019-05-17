@@ -48,14 +48,21 @@ interface StaticBagInterface
     public function toNativeArray();
 
     /**
-     * Either creates a new static bag with the specified slot static value
+     * Either creates a new static bag with the specified static value
      * or just returns the current one, if it already has the same static value
      *
-     * TODO: Rename this to just ->withStatic(...)
-     *
-     * @param string $slotName
-     * @param StaticInterface $newSlotStatic
+     * @param string $name
+     * @param StaticInterface $newStatic
      * @return StaticBagInterface
      */
-    public function withSlotStatic($slotName, StaticInterface $newSlotStatic);
+    public function withStatic($name, StaticInterface $newStatic);
+
+    /**
+     * Either creates a new static bag with the specified static values
+     * or just returns the current one, if it already has the same static values
+     *
+     * @param StaticInterface[] $newStatics
+     * @return StaticBagInterface
+     */
+    public function withStatics(array $newStatics);
 }

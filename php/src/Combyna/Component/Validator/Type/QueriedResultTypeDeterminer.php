@@ -23,8 +23,10 @@ use Combyna\Component\Validator\Query\ResultTypeQueryInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class QueriedResultTypeDeterminer implements TypeDeterminerInterface
+class QueriedResultTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'queried';
+
     /**
      * @var ActNodeInterface
      */

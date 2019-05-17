@@ -15,6 +15,7 @@ use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
@@ -72,6 +73,13 @@ interface ValidationContextInterface
      * @param ViolationInterface $violation
      */
     public function addViolation(ViolationInterface $violation);
+
+    /**
+     * Applies the validation for the provided dynamically-created ACT node
+     *
+     * @param DynamicActNodeInterface $actNode
+     */
+    public function adoptDynamicActNode(DynamicActNodeInterface $actNode);
 
     /**
      * Creates a new ActNodeQueryRequirement

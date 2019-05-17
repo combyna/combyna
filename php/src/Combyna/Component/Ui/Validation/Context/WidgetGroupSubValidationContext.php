@@ -161,7 +161,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
     ) {
         $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
 
-        if (!$this->widgetGroupNode->getCaptureStaticBagModel($queryRequirement)
+        if (!$this->widgetGroupNode->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName())
         ) {
             // The widget group does not define the capture - nothing to do
@@ -169,7 +169,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
         }
 
         return $this->widgetGroupNode
-            ->getCaptureStaticBagModel($queryRequirement)
+            ->getCaptureStaticBagModel()
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
                 $queryRequirement
@@ -180,17 +180,12 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
      * Determines whether the current widget's definition defines the specified capture
      *
      * @param CaptureIsDefinedQuery $query
-     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
-    public function queryForCaptureExistence(
-        CaptureIsDefinedQuery $query,
-        ValidationContextInterface $validationContext
-    ) {
+    public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
+    {
         return $this->widgetGroupNode
-            ->getCaptureStaticBagModel(
-                $validationContext->createBooleanQueryRequirement($query)
-            )
+            ->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName()) ?: null;
     }
 
@@ -205,9 +200,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
         CaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetGroupNode->getCaptureStaticBagModel(
-            $validationContext->createTypeQueryRequirement($query)
-        );
+        $captureStaticBagModel = $this->widgetGroupNode->getCaptureStaticBagModel();
 
         if (!$captureStaticBagModel->definesStatic($query->getCaptureName())) {
             return null;
@@ -232,9 +225,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
         CorrectCaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
-        $captureStaticBagModel = $this->widgetGroupNode->getCaptureStaticBagModel(
-            $validationContext->createTypeQueryRequirement($query)
-        );
+        $captureStaticBagModel = $this->widgetGroupNode->getCaptureStaticBagModel();
 
         if ($captureStaticBagModel->definesStatic($query->getCaptureName())) {
             // This widget defines the capture - we can determine the correct type
@@ -249,12 +240,10 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
      * Determines whether the current widget is optional or defines the specified capture
      *
      * @param CaptureHasOptionalAncestorWidgetQuery $query
-     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
     public function queryForWhetherCaptureHasOptionalAncestor(
-        CaptureHasOptionalAncestorWidgetQuery $query,
-        ValidationContextInterface $validationContext
+        CaptureHasOptionalAncestorWidgetQuery $query
     ) {
         /*
          * If this widget defines the capture, return false as if this node was reached, no optional widget
@@ -263,9 +252,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
          * until either an optional widget is found or the widget that defines the capture is found.
          */
         return $this->widgetGroupNode
-            ->getCaptureStaticBagModel(
-                $validationContext->createBooleanQueryRequirement($query)
-            )
+            ->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName()) ?
                 false :
                 null;

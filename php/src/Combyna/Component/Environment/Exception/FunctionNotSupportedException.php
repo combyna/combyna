@@ -14,7 +14,7 @@ namespace Combyna\Component\Environment\Exception;
 use Exception;
 
 /**
- * Class LibraryNotInstalledException
+ * Class FunctionNotSupportedException
  *
  * Thrown when an attempt is made to fetch a function from a library
  * when that library implements no such function

@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Bag\Config\Loader;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 
 /**
  * Interface FixedStaticBagModelLoaderInterface
@@ -24,7 +24,7 @@ interface FixedStaticBagModelLoaderInterface
      * Creates a FixedStaticBagModel ACT node from the provided array structure
      *
      * @param array $modelConfig
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function load(array $modelConfig);
 }

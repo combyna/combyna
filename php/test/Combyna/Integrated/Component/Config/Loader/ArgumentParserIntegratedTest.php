@@ -126,6 +126,30 @@ class ArgumentParserIntegratedTest extends TestCase
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 
+    public function testParseArgumentsReturnsDefaultForOptionalArgumentsSetToNull()
+    {
+        $argumentBag = $this->parser->parseArguments([
+            ArgumentParser::NAMED_ARGUMENTS => [
+                'my_required_param' => ['type' => 'text', 'text' => 'required value'],
+                'my_optional_param' => null
+            ]
+        ], [
+            new NamedParameter('my_required_param', new TextParameterType('required param')),
+            new OptionalParameter(
+                new NamedParameter(
+                    'my_optional_param',
+                    new TextParameterType('optional param')
+                ),
+                'the default value'
+            )
+        ]);
+
+        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
+        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
+        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('the default value');
+        $this->assert($argumentBag->getExtraArguments())->equals([]);
+    }
+
     public function testParseArgumentsReturnsThePassedArgumentForASpecifiedOptionalArguments()
     {
         $argumentBag = $this->parser->parseArguments([

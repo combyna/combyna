@@ -11,10 +11,10 @@
 
 namespace Combyna\Component\Event\Config\Act;
 
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventDefinitionReferenceInterface;
 use Combyna\Component\Event\EventFactoryInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 
 /**
  * Class EventDefinitionReferenceNodePromoter
@@ -54,11 +54,13 @@ class EventDefinitionReferenceNodePromoter
      * Promotes a set of EventDefinitionReferenceNodes to an array of EventDefinitionReferences
      *
      * @param EventDefinitionReferenceNode[] $eventDefinitionReferenceNodes
-     * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      * @return EventDefinitionReferenceCollectionInterface
      */
-    public function promoteCollection(array $eventDefinitionReferenceNodes, EnvironmentInterface $environment)
-    {
+    public function promoteCollection(
+        array $eventDefinitionReferenceNodes,
+        ResourceRepositoryInterface $resourceRepository
+    ) {
         /** @var EventDefinitionReferenceInterface[] $eventDefinitionReferences */
         $eventDefinitionReferences = [];
 
@@ -68,7 +70,7 @@ class EventDefinitionReferenceNodePromoter
 
         return $this->eventFactory->createEventDefinitionReferenceCollection(
             $eventDefinitionReferences,
-            $environment
+            $resourceRepository
         );
     }
 }

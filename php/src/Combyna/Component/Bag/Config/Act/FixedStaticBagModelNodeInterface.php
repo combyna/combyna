@@ -12,8 +12,8 @@
 namespace Combyna\Component\Bag\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface FixedStaticBagModelNodeInterface
@@ -31,13 +31,22 @@ interface FixedStaticBagModelNodeInterface extends ActNodeInterface
     public function definesStatic($name);
 
     /**
+     * Determines all types for the static definitions in this model,
+     * returning a new DeterminedFixedStaticBagModelNode
+     *
+     * @param ValidationContextInterface $validationContext
+     * @return DeterminedFixedStaticBagModelNode
+     */
+    public function determine(ValidationContextInterface $validationContext);
+
+    /**
      * Fetches the definition for a static in bags of this model
      *
      * @param string $definitionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return FixedStaticDefinitionNodeInterface
      */
-    public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement);
+    public function getStaticDefinitionByName($definitionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter);
 
     /**
      * Fetches the names of the statics in bags of this model

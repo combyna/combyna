@@ -11,11 +11,11 @@
 
 namespace Combyna\Component\Router\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class InvalidRouteNode
@@ -30,6 +30,11 @@ class InvalidRouteNode extends AbstractActNode implements RouteNodeInterface
      * @var string
      */
     private $contextDescription;
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -49,6 +54,7 @@ class InvalidRouteNode extends AbstractActNode implements RouteNodeInterface
     public function __construct($libraryName, $routeName, $contextDescription)
     {
         $this->contextDescription = $contextDescription;
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->libraryName = $libraryName;
         $this->routeName = $routeName;
     }
@@ -58,6 +64,8 @@ class InvalidRouteNode extends AbstractActNode implements RouteNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
@@ -90,15 +98,15 @@ class InvalidRouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getParameterBagModel(QueryRequirementInterface $queryRequirement)
+    public function getParameterBagModel()
     {
-        return new DynamicUnknownFixedStaticBagModelNode(
+        return new UnknownFixedStaticBagModelNode(
             sprintf(
                 'Parameter bag model for route "%s" of library "%s"',
                 $this->routeName,
                 $this->libraryName
             ),
-            $queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
