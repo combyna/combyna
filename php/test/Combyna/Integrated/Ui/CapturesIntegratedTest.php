@@ -101,7 +101,7 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEnteringSomeTextInThePhoneNumberTextbox()
@@ -147,7 +147,7 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEnteringSomeTextInTheSecondRepeatedMultiplierTextbox()
@@ -195,6 +195,6 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 }

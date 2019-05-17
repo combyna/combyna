@@ -22,8 +22,10 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class PresolvedTypeDeterminer implements TypeDeterminerInterface
+class PresolvedTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'presolved';
+
     /**
      * @var TypeInterface
      */
@@ -43,6 +45,14 @@ class PresolvedTypeDeterminer implements TypeDeterminerInterface
     public function determine(ValidationContextInterface $validationContext)
     {
         return $this->presolvedType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return parent::getSummary() . ':' . $this->presolvedType->getSummary();
     }
 
     /**

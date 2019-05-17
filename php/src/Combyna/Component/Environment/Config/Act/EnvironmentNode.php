@@ -20,11 +20,11 @@ use Combyna\Component\Environment\Validation\Context\Specifier\EnvironmentContex
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownLibraryForEventDefinitionNode;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
-use Combyna\Component\Signal\Config\Act\DynamicUnknownLibraryForSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
+use Combyna\Component\Signal\Config\Act\UnknownLibraryForSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownLibraryForWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 
 /**
  * Class EnvironmentNode
@@ -71,41 +71,49 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
      *
      * @param string $libraryName
      * @param string $eventDefinitionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return EventDefinitionNodeInterface
      */
     public function getEventDefinition(
         $libraryName,
         $eventDefinitionName,
-        QueryRequirementInterface $queryRequirement
+        DynamicActNodeAdopterInterface $dynamicActNodeAdopter
     ) {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             // Not even the library was found
-            return new UnknownLibraryForEventDefinitionNode($libraryName, $eventDefinitionName, $queryRequirement);
+            return new UnknownLibraryForEventDefinitionNode(
+                $libraryName,
+                $eventDefinitionName,
+                $dynamicActNodeAdopter
+            );
         }
 
-        return $this->libraryNodes[$libraryName]->getEventDefinition($eventDefinitionName, $queryRequirement);
+        return $this->libraryNodes[$libraryName]->getEventDefinition($eventDefinitionName, $dynamicActNodeAdopter);
     }
 
     /**
      * Fetches a function defined by a library installed into the environment.
      * If the library is not installed then an UnknownLibraryForFunctionNode,
      * or if it is but does not define the specified function,
-     * then a DynamicUnknownFunctionNode will be returned
+     * then an UnknownFunctionNode will be returned
      *
      * @param string $libraryName
      * @param string $functionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return FunctionNodeInterface
      */
-    public function getGenericFunction($libraryName, $functionName, QueryRequirementInterface $queryRequirement)
+    public function getGenericFunction($libraryName, $functionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             // Not even the library was found
-            return new UnknownLibraryForFunctionNode($libraryName, $functionName, $queryRequirement);
+            return new UnknownLibraryForFunctionNode(
+                $libraryName,
+                $functionName,
+                $dynamicActNodeAdopter
+            );
         }
 
-        return $this->libraryNodes[$libraryName]->getGenericFunction($functionName, $queryRequirement);
+        return $this->libraryNodes[$libraryName]->getGenericFunction($functionName, $dynamicActNodeAdopter);
     }
 
     /**
@@ -120,26 +128,30 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
 
     /**
      * Fetches a signal definition defined by a library installed into the environment.
-     * If the library is not installed then an DynamicUnknownLibraryForSignalDefinitionNode,
+     * If the library is not installed then an UnknownLibraryForSignalDefinitionNode,
      * or if it is but does not define the specified definition,
-     * then an DynamicUnknownSignalDefinitionNode will be returned
+     * then an UnknownSignalDefinitionNode will be returned
      *
      * @param string $libraryName
      * @param string $signalDefinitionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return SignalDefinitionNodeInterface
      */
     public function getSignalDefinition(
         $libraryName,
         $signalDefinitionName,
-        QueryRequirementInterface $queryRequirement
+        DynamicActNodeAdopterInterface $dynamicActNodeAdopter
     ) {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             // Not even the library was found
-            return new DynamicUnknownLibraryForSignalDefinitionNode($libraryName, $signalDefinitionName, $queryRequirement);
+            return new UnknownLibraryForSignalDefinitionNode(
+                $libraryName,
+                $signalDefinitionName,
+                $dynamicActNodeAdopter
+            );
         }
 
-        return $this->libraryNodes[$libraryName]->getSignalDefinition($signalDefinitionName, $queryRequirement);
+        return $this->libraryNodes[$libraryName]->getSignalDefinition($signalDefinitionName, $dynamicActNodeAdopter);
     }
 
     /**
@@ -150,20 +162,24 @@ class EnvironmentNode extends AbstractActNode implements RootNodeInterface
      *
      * @param string $libraryName
      * @param string $widgetDefinitionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return WidgetDefinitionNodeInterface
      */
     public function getWidgetDefinition(
         $libraryName,
         $widgetDefinitionName,
-        QueryRequirementInterface $queryRequirement
+        DynamicActNodeAdopterInterface $dynamicActNodeAdopter
     ) {
         if (!array_key_exists($libraryName, $this->libraryNodes)) {
             // Not even the library was found
-            return new UnknownLibraryForWidgetDefinitionNode($libraryName, $widgetDefinitionName, $queryRequirement);
+            return new UnknownLibraryForWidgetDefinitionNode(
+                $libraryName,
+                $widgetDefinitionName,
+                $dynamicActNodeAdopter
+            );
         }
 
-        return $this->libraryNodes[$libraryName]->getWidgetDefinition($widgetDefinitionName, $queryRequirement);
+        return $this->libraryNodes[$libraryName]->getWidgetDefinition($widgetDefinitionName, $dynamicActNodeAdopter);
     }
 
     /**

@@ -65,6 +65,14 @@ class ArgumentBag implements ArgumentBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getNamedExpressionBagArgument($name)
+    {
+        return $this->arguments[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getNamedFixedStaticBagModelArgument($name)
     {
         return $this->arguments[$name];

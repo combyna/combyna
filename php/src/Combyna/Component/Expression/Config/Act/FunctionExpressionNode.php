@@ -16,11 +16,11 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\FunctionExpression;
 use Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraint;
 use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
+use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
-use LogicException;
 
 /**
  * Class FunctionExpressionNode
@@ -131,23 +131,20 @@ class FunctionExpressionNode extends AbstractExpressionNode
     }
 
     /**
-     * Fetches the resolved result type for the function call (the function call's return type)
+     * Fetches the resolved result type for the function call (the function call's return type).
+     * In development mode, validation will have run and so this is guaranteed to return the true type.
+     * In production mode, validation will not have run and so the true type cannot
+     * be resolved (as determining it involves a validation query) - so an Any type will be returned.
      *
      * @return TypeInterface
      */
     public function getResolvedResultType()
     {
-        if ($this->resolvedResultType === null) {
-            throw new LogicException(
-                sprintf(
-                    'Function "%s.%s" call expression result type was expected to be resolved but was not',
-                    $this->libraryName,
-                    $this->functionName
-                )
-            );
+        if ($this->resolvedResultType !== null) {
+            return $this->resolvedResultType;
         }
 
-        return $this->resolvedResultType;
+        return new AnyType();
     }
 
     /**

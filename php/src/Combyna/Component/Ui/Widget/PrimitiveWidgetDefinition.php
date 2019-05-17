@@ -269,6 +269,23 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAttribute(
+        $name,
+        ExpressionBagInterface $attributeExpressionBag,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        return $this->attributeBagModel->coerceStatic(
+            $name,
+            $evaluationContext,
+            $attributeExpressionBag->hasExpression($name) ?
+                $attributeExpressionBag->getExpression($name)->toStatic($evaluationContext) :
+                null
+        );
+    }
+
+    /**
      * Evaluates and returns the default expression for a widget value
      *
      * @param string $valueName

@@ -12,7 +12,7 @@
 namespace Combyna\Component\Store\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -41,7 +41,7 @@ interface QueryNodeInterface extends ActNodeInterface
     /**
      * Fetches the model for parameters to this query
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getParameterBagModel();
 

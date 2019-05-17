@@ -70,9 +70,16 @@ class StoreQuery implements StoreQueryInterface
         ViewEvaluationContextInterface $evaluationContext,
         UiStoreStateInterface $storeState
     ) {
-        $this->parameterStaticBagModel->assertValidStaticBag($argumentStaticBag);
+        $argumentStaticBag = $this->parameterStaticBagModel->coerceStaticBag(
+            $argumentStaticBag,
+            $evaluationContext
+        );
 
-        $subEvaluationContext = $evaluationContext->createSubStoreContext($storeState);
+        // Provide the store's context (for access to slots etc.)
+        $storeEvaluationContext = $evaluationContext->createSubStoreContext($storeState);
+
+        // Provide the arguments passed for the parameters of the query
+        $subEvaluationContext = $storeEvaluationContext->createSubScopeContext($argumentStaticBag);
 
         return $this->expression->toStatic($subEvaluationContext);
     }

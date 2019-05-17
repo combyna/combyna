@@ -13,7 +13,6 @@ namespace Combyna\Component\Router\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface RouteNodeInterface
@@ -39,10 +38,9 @@ interface RouteNodeInterface extends ActNodeInterface
     /**
      * Fetches the model for the parameter argument static bag this route expects to be extracted from its route segments
      *
-     * @param QueryRequirementInterface $queryRequirement
      * @return FixedStaticBagModelNodeInterface
      */
-    public function getParameterBagModel(QueryRequirementInterface $queryRequirement);
+    public function getParameterBagModel();
 
     /**
      * Fetches the URL pattern for this route

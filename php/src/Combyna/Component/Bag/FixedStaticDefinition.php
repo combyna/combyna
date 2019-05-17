@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticDefinitionInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
@@ -24,7 +25,7 @@ use LogicException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class FixedStaticDefinition
+class FixedStaticDefinition implements DeterminedFixedStaticDefinitionInterface, FixedStaticDefinitionInterface
 {
     /**
      * @var ExpressionInterface|null
@@ -57,6 +58,29 @@ class FixedStaticDefinition
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function allowsStaticDefinition(DeterminedFixedStaticDefinitionInterface $otherDefinition)
+    {
+        return $this->staticType->allows($otherDefinition->getStaticType());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(EvaluationContextInterface $evaluationContext, StaticInterface $static = null)
+    {
+        if ($static === null) {
+            // No value was provided for the defined static - use the default value for the static if defined
+            // (if not defined, an exception will be thrown, as validation should have ensured
+            // that a static that is able to not be set always has a default expression defined)
+            $static = $this->getDefaultStatic($evaluationContext);
+        }
+
+        return $this->staticType->coerceStatic($static, $evaluationContext);
+    }
+
+    /**
      * Fetches the default value for this static, if configured
      *
      * @param EvaluationContextInterface $evaluationContext
@@ -75,9 +99,7 @@ class FixedStaticDefinition
     }
 
     /**
-     * Fetches the name of the definition
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -85,9 +107,7 @@ class FixedStaticDefinition
     }
 
     /**
-     * Fetches the type of the static
-     *
-     * @return TypeInterface
+     * {@inheritdoc}
      */
     public function getStaticType()
     {
@@ -95,9 +115,15 @@ class FixedStaticDefinition
     }
 
     /**
-     * Determines whether this static must be defined in the bag or not
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function getStaticTypeSummary()
+    {
+        return $this->staticType->getSummary();
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isRequired()
     {

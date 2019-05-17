@@ -13,8 +13,8 @@ namespace Combyna\Component\Bag\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class FixedStaticBagModelNode
@@ -62,13 +62,29 @@ class FixedStaticBagModelNode extends AbstractActNode implements FixedStaticBagM
     /**
      * {@inheritdoc}
      */
-    public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement)
+    public function determine(ValidationContextInterface $validationContext)
+    {
+        $determinedStaticDefinitionNodes = [];
+
+        foreach ($this->staticDefinitionNodes as $staticDefinitionNode) {
+            $determinedStaticDefinitionNodes[] = $staticDefinitionNode->determine($validationContext);
+        }
+
+        $determinedModelNode = new DeterminedFixedStaticBagModelNode($determinedStaticDefinitionNodes);
+
+        return $determinedModelNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticDefinitionByName($definitionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (array_key_exists($definitionName, $this->staticDefinitionNodes)) {
             return $this->staticDefinitionNodes[$definitionName];
         }
 
-        return new UnknownFixedStaticDefinitionNode($definitionName, $queryRequirement);
+        return new UnknownFixedStaticDefinitionNode($definitionName, $dynamicActNodeAdopter);
     }
 
     /**

@@ -77,6 +77,10 @@ services:
         tags:
             - {name: combyna.expression_promoter}
 
+    combyna.ui.promoter.widget_definition_reference_node:
+        class: Combyna\Component\Ui\Config\Promoter\WidgetDefinitionReferenceNodePromoter
+        autowire: true
+
     combyna.ui.promoter.widget_node:
         class: Combyna\Component\Ui\Config\Promoter\DelegatingWidgetNodePromoter
         autowire: true

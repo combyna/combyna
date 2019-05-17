@@ -19,7 +19,6 @@ use Combyna\Component\Ui\Config\Promoter\WidgetNodeTypePromoterInterface;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class TextWidgetNodePromoter
@@ -83,14 +82,13 @@ class TextWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
-        $queryRequirement = new PromotionQueryRequirement($widgetNode);
         $textExpression = $this->expressionNodePromoter->promote($widgetNode->getTextExpression());
 
         return $this->viewFactory->createTextWidget(
             $name,
             $textExpression,
-            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetNode->getCaptureStaticBagModel($queryRequirement)),
-            $this->bagNodePromoter->promoteExpressionBag($widgetNode->getCaptureExpressionBag($queryRequirement)),
+            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($widgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $widgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($widgetNode->getVisibilityExpression()) :

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
+use Combyna\Component\Expression\AttributeExpression;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\ComparisonExpression;
@@ -26,6 +27,7 @@ use Combyna\Component\Expression\ListExpression;
 use Combyna\Component\Expression\MapExpression;
 use Combyna\Component\Expression\NothingExpression;
 use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StructureExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\TranslationExpression;
 use Combyna\Component\Expression\VariableExpression;
@@ -61,6 +63,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     private $modeContext;
 
     private static $typesToMethods = [
+        AttributeExpressionNode::TYPE => 'promoteAttributeExpression',
         BinaryArithmeticExpressionNode::TYPE => 'promoteBinaryArithmeticExpression',
         BooleanExpressionNode::TYPE => 'promoteBooleanExpression',
         ComparisonExpressionNode::TYPE => 'promoteComparisonExpression',
@@ -74,6 +77,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
         MapExpressionNode::TYPE => 'promoteMapExpression',
         NothingExpressionNode::TYPE => 'promoteNothingExpression',
         NumberExpressionNode::TYPE => 'promoteNumberExpression',
+        StructureExpressionNode::TYPE => 'promoteStructureExpression',
         TextExpressionNode::TYPE => 'promoteTextExpression',
         TranslationExpressionNode::TYPE => 'promoteTranslationExpression',
         VariableExpressionNode::TYPE => 'promoteVariableExpression'
@@ -108,6 +112,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     /**
      * {@inheritdoc}
      *
+     * @uses promoteAttributeExpression
      * @uses promoteBinaryArithmeticExpression
      * @uses promoteBooleanExpression
      * @uses promoteComparisonExpression
@@ -121,6 +126,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
      * @uses promoteMapExpression
      * @uses promoteNothingExpression
      * @uses promoteNumberExpression
+     * @uses promoteStructureExpression
      * @uses promoteTextExpression
      * @uses promoteTranslationExpression
      * @uses promoteVariableExpression
@@ -134,6 +140,21 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
         }
 
         return $this->{self::$typesToMethods[$expressionNode->getType()]}($expressionNode);
+    }
+
+    /**
+     * Promotes the specified node to an AttributeExpression
+     *
+     * @param AttributeExpressionNode $expressionNode
+     * @return AttributeExpression
+     * @used-by promote
+     */
+    private function promoteAttributeExpression(AttributeExpressionNode $expressionNode)
+    {
+        return $this->expressionFactory->createAttributeExpression(
+            $this->expressionNodePromoter->promote($expressionNode->getStructure()),
+            $expressionNode->getAttributeName()
+        );
     }
 
     /**
@@ -347,6 +368,22 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     private function promoteNumberExpression(NumberExpressionNode $expressionNode)
     {
         return $this->expressionFactory->createNumberExpression($expressionNode->toNative());
+    }
+
+    /**
+     * Promotes the specified node to an actual StructureExpression
+     *
+     * @param StructureExpressionNode $expressionNode
+     * @return StructureExpression
+     * @used-by promote
+     */
+    private function promoteStructureExpression(StructureExpressionNode $expressionNode)
+    {
+        $attributeBag = $this->bagNodePromoter->promoteExpressionBag(
+            $expressionNode->getExpressionBag()
+        );
+
+        return $this->expressionFactory->createStructureExpression($attributeBag);
     }
 
     /**

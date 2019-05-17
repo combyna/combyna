@@ -128,4 +128,19 @@ class StaticListExpression extends AbstractStaticExpression
     {
         return $this->staticList->toArray();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withElements(array $elementStatics)
+    {
+        $newStaticList = $this->staticList->withElements($elementStatics);
+
+        if ($newStaticList === $this->staticList) {
+            // List already contained all the statics - nothing to do
+            return $this;
+        }
+
+        return new StaticListExpression($this->expressionFactory, $newStaticList);
+    }
 }

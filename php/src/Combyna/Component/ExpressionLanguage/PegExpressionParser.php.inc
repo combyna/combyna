@@ -29,7 +29,7 @@ class PegExpressionParser extends Basic
     BooleanLiteral: value:/\b(true|false)\b/ >
     NumberLiteral: value:/\d+(\.\d+)?/ >
     StringLiteral: "\'" value:/[^']* / "\'" >
-    Variable: variableName:/[\w_]+/ > !/[.(:]/ >
+    Variable: variableName:/[\w_]+/ > !/[(:]/ >
     ElementList: Expression > ("," > Expression >)*
         function Expression(&$result, $sub)
         {
@@ -41,11 +41,32 @@ class PegExpressionParser extends Basic
         {
             $result['elements'] = isset($sub['ElementList']) ? $sub['ElementList']['elements'] : [];
         }
+    AttributeDeclaration: attributeName:/[\w_]+/ > ":" > Expression >
+        function attributeName(&$result, $sub)
+        {
+            $result['attributeName'] = $sub['text'];
+        }
+        function Expression(&$result, $sub)
+        {
+            $result['value'] = $sub['node'];
+        }
+    AttributeList: AttributeDeclaration > ("," > AttributeDeclaration >)*
+        function AttributeDeclaration(&$result, $sub)
+        {
+            // Called for each matched attribute
+            $result['attributes'][$sub['attributeName']] = $sub['value'];
+        }
+    Structure: "{" > attributes:(:AttributeList?) > "}" >
+        function attributes(&$result, $sub)
+        {
+            $result['attributes'] = isset($sub['AttributeList']) ? $sub['AttributeList']['attributes'] : [];
+        }
     Value:
             (
                 NumberLiteral |
                 BooleanLiteral |
                 List |
+                Structure |
                 StringLiteral |
                 Builtin |
                 Function |
@@ -70,6 +91,12 @@ class PegExpressionParser extends Basic
                 'elements' => $sub['elements']
             ];
         }
+        function Structure(&$result, $sub) {
+            $result['node'] = [
+                'type' => 'structure',
+                'attributes' => $sub['attributes']
+            ];
+        }
         function StringLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'text',
@@ -91,10 +118,21 @@ class PegExpressionParser extends Basic
         function Expression(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
-    Multiplication: '*' > operand:Value >
-    Division: '/' > operand:Value >
-    Product: Value > ( Multiplication | Division ) *
+    Attribute: '.' > (attributeName:/[\w_]+/) >
+    Dereference: Value > ( Attribute ) *
         function Value(&$result, $sub) {
+            $result['node'] = $sub['node'];
+        }
+        function Attribute(&$result, $sub) {
+            $result['node'] = $this->buildAttributeExpression(
+                $result['node'],
+                $sub['attributeName']['text']
+            );
+        }
+    Multiplication: '*' > operand:Dereference >
+    Division: '/' > operand:Dereference >
+    Product: Dereference > ( Multiplication | Division ) *
+        function Dereference(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
         function Multiplication(&$result, $sub) {
@@ -273,6 +311,20 @@ class PegExpressionParser extends Basic
 
     // "Conditional" just happens to currently be the expression with the lowest precedence,
     // which is why the top-level Expression references it
+
+    /**
+     * @param array $structure
+     * @param string $attributeName
+     * @return array
+     */
+    private function buildAttributeExpression(array $structure, $attributeName)
+    {
+        return [
+            'type' => 'attribute',
+            'structure' => $structure,
+            'attribute' => $attributeName
+        ];
+    }
 
     /**
      * @param array $left

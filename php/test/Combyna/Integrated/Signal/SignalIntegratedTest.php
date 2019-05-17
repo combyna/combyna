@@ -82,7 +82,7 @@ class SignalIntegratedTest extends TestCase
                 '(Nothing has been dispatched yet)' . // Current text display
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheImplicitNonBroadcasterButton()
@@ -110,7 +110,7 @@ class SignalIntegratedTest extends TestCase
                 'From the implicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheImplicitNonBroadcasterButton()
@@ -132,7 +132,7 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        $this->assertNull($lastEvent);
+        self::assertNull($lastEvent);
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheExplicitNonBroadcasterButton()
@@ -160,7 +160,7 @@ class SignalIntegratedTest extends TestCase
                 'From the explicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheExplicitNonBroadcasterButton()
@@ -182,7 +182,7 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        $this->assertNull($lastEvent);
+        self::assertNull($lastEvent);
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheBroadcasterButton()
@@ -210,7 +210,7 @@ class SignalIntegratedTest extends TestCase
                 'From the broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testDispatchEventEmitsASignalEventAfterClickingTheBroadcasterButton()
@@ -232,6 +232,6 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        $this->assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
+        self::assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
     }
 }

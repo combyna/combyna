@@ -35,6 +35,12 @@ services:
         tags:
             - {name: combyna.validation_constraint_validator}
 
+    combyna.expression.validation.structure_has_attribute_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\StructureHasAttributeConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
     combyna.expression.validation.valid_function_call_constraint_validator:
         class: Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraintValidator
         autowire: true

@@ -11,24 +11,30 @@
 
 namespace Combyna\Component\Store\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
-use Combyna\Component\Expression\Config\Act\DynamicUnknownExpressionNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
- * Class DynamicUnknownQueryNode
+ * Class UnknownQueryNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeInterface, QueryNodeInterface
+class UnknownQueryNode extends AbstractActNode implements DynamicActNodeInterface, QueryNodeInterface
 {
     const TYPE = 'unknown-store-query';
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -36,23 +42,15 @@ class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeI
     private $name;
 
     /**
-     * @var QueryRequirementInterface
-     */
-    private $queryRequirement;
-
-    /**
      * @param string $name
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct(
-        $name,
-        QueryRequirementInterface $queryRequirement
-    ) {
+    public function __construct($name, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
+    {
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->name = $name;
-        $this->queryRequirement = $queryRequirement;
 
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**
@@ -61,6 +59,8 @@ class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeI
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
         $specBuilder->addConstraint(new KnownFailureConstraint(sprintf('Unknown query node "%s"', $this->name)));
+
+        $specBuilder->addChildNode($this->dynamicContainerNode);
     }
 
     /**
@@ -68,9 +68,9 @@ class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeI
      */
     public function getExpression()
     {
-        return new DynamicUnknownExpressionNode(
+        return new UnknownExpressionNode(
             sprintf('Unknown query node "%s" expression', $this->name),
-            $this->queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
@@ -87,9 +87,9 @@ class DynamicUnknownQueryNode extends AbstractActNode implements DynamicActNodeI
      */
     public function getParameterBagModel()
     {
-        return new DynamicUnknownFixedStaticBagModelNode(
+        return new UnknownFixedStaticBagModelNode(
             sprintf('Unknown query node "%s" parameter bag model', $this->name),
-            $this->queryRequirement
+            $this->dynamicContainerNode
         );
     }
 

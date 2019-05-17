@@ -12,6 +12,8 @@
 namespace Combyna\Component\ExpressionLanguage;
 
 use Combyna\Component\Config\NodeVisitorInterface;
+use Combyna\Component\ExpressionLanguage\Config\Act\UnparsableExpressionNode;
+use InvalidArgumentException;
 
 /**
  * Class ExpressionNodeVisitor
@@ -49,8 +51,16 @@ class ExpressionNodeVisitor implements NodeVisitorInterface
             return $node;
         }
 
-        $expression = substr($node, 5);
+        $expression = trim(substr($node, 5));
 
-        return $this->expressionParser->parse($expression);
+        try {
+            return $this->expressionParser->parse($expression);
+        } catch (InvalidArgumentException $exception) {
+            // Return a special "unparsable expression" for validation to fail with
+            return [
+                'type' => UnparsableExpressionNode::TYPE,
+                'expression' => $expression
+            ];
+        }
     }
 }

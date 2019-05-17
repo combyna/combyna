@@ -86,7 +86,7 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'The capture is not a number, so it cannot be doubled' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterSettingTheNumberTextboxTo40()
@@ -120,7 +120,7 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'Double is: 80.' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterSettingTheNumberTextboxToADifferentNumber()
@@ -154,6 +154,6 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'The capture is not a number, so it cannot be doubled' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 }

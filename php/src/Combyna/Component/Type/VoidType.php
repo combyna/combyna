@@ -11,13 +11,20 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use LogicException;
 
 /**
  * Class VoidType
  *
- * Represents a type where no value will be provided (eg. the type of the elements in a list,
- * when that list is in fact empty)
+ * Represents a type where no value will be provided.
+ *
+ * For example, if you tried to assign an empty list to a type of list<number>,
+ * and an empty list was represented as list<any> (as we cannot derive a type
+ * for the elements of an empty list) it wouldn't be allowed, as the `any`
+ * element type could contain values other than numbers. To solve this, we create
+ * a `void` element type, as that represents that we have no defined type to use.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -88,6 +95,14 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        return false; // Void types only allow other void types
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         return false; // Void types only allow other void types
@@ -99,6 +114,14 @@ class VoidType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // This will probably never be used, as void cannot be used as an "accepting" type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        throw new LogicException('Tried to coerce a static for void type: ' . $this->contextDescription);
     }
 
     /**
@@ -125,6 +148,14 @@ class VoidType implements TypeInterface
     public function isAllowedByStaticListType(StaticListType $superType)
     {
         return $superType->allowsVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
+    {
+        return $otherType->allowsVoidType($this);
     }
 
     /**
@@ -189,6 +220,15 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        // No type was known before, so there is nothing to add to the StaticStructure type
+        return $otherType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         // No type was known before, so there is nothing to add to the Static type
@@ -235,6 +275,14 @@ class VoidType implements TypeInterface
     public function whenMergedWithStaticListType(StaticListType $otherType)
     {
         return $otherType->mergeWithVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithVoidType($this);
     }
 
     /**

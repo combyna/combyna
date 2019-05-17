@@ -14,7 +14,7 @@ namespace Combyna\Component\Event\Exception;
 use Exception;
 
 /**
- * Class EventDefinitionNotFoundException
+ * Class EventDefinitionNotReferencedException
  *
  * Thrown when an attempt is made to fetch an event definition from a collection of references
  * when that collection does not contain the specified definition.

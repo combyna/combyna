@@ -12,7 +12,9 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
@@ -23,7 +25,7 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownExpressionNode extends AbstractExpressionNode
+class UnknownExpressionNode extends AbstractExpressionNode implements DynamicActNodeInterface
 {
     const TYPE = 'unknown';
 
@@ -34,10 +36,13 @@ class UnknownExpressionNode extends AbstractExpressionNode
 
     /**
      * @param string $contextDescription
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($contextDescription)
+    public function __construct($contextDescription, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->contextDescription = $contextDescription;
+
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**

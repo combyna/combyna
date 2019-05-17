@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticBagModelInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Type\TypeInterface;
@@ -22,7 +23,7 @@ use Combyna\Component\Type\TypeInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface FixedStaticBagModelInterface
+interface FixedStaticBagModelInterface extends DeterminedFixedStaticBagModelInterface
 {
     /**
      * Checks that the static is defined and matches its type for this model
@@ -38,6 +39,33 @@ interface FixedStaticBagModelInterface
      * @param StaticBagInterface $staticBag
      */
     public function assertValidStaticBag(StaticBagInterface $staticBag);
+
+    /**
+     * Given a static value for a defined static of this model:
+     * - If a valid "complete" value for the static, the value is returned unmodified
+     * - If a valid but "incomplete" value for the static, eg. a structure missing some optional attributes,
+     *   the missing attributes will be added and a new, "complete" value returned
+     * - If null is provided rather than a static, the default value will be evaluated and returned
+     *
+     * @param string $name
+     * @param EvaluationContextInterface $evaluationContext
+     * @param StaticInterface|null $static
+     * @return StaticInterface
+     */
+    public function coerceStatic($name, EvaluationContextInterface $evaluationContext, StaticInterface $static = null);
+
+    /**
+     * Given a static bag for this model:
+     * - If the bag is "complete" (with all statics contained inside and each "complete" recursively),
+     *   the value is returned unmodified
+     * - If the bag is "incomplete" (with some or all statics missing or "incomplete"), the missing/incomplete statics
+     *   will be evaluated or coerced as per the statics' definitions.
+     *
+     * @param StaticBagInterface $staticBag
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticBagInterface
+     */
+    public function coerceStaticBag(StaticBagInterface $staticBag, EvaluationContextInterface $evaluationContext);
 
     /**
      * Creates a new StaticBag from a set of statics that is guaranteed to meet this fixed model.
@@ -73,14 +101,6 @@ interface FixedStaticBagModelInterface
     public function createDefaultStaticBag(EvaluationContextInterface $evaluationContext);
 
     /**
-     * Returns true if this model defines a static with the specified name, false otherwise
-     *
-     * @param string $name
-     * @return bool
-     */
-    public function definesStatic($name);
-
-    /**
      * Evaluates and returns the default expression for the specified static of the model
      *
      * @param string $name
@@ -92,6 +112,7 @@ interface FixedStaticBagModelInterface
     /**
      * Fetches the type of the specified static in the model
      *
+     * @param string $name
      * @return TypeInterface
      */
     public function getStaticType($name);

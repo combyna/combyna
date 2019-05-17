@@ -78,7 +78,7 @@ class ViewStoreState implements ViewStoreStateInterface
      */
     public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
     {
-        $newSlotStaticBag = $this->slotStaticBag->withSlotStatic($slotName, $newSlotStatic);
+        $newSlotStaticBag = $this->slotStaticBag->withStatic($slotName, $newSlotStatic);
 
         if ($this->slotStaticBag === $newSlotStaticBag) {
             // The slot already has the specified static value, no need to create a new store state

@@ -12,7 +12,7 @@
 namespace Combyna\Component\Event;
 
 /**
- * Interface EventDefinitionFetcherInterface
+ * Interface EventDefinitionRepositoryInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */

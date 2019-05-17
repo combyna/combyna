@@ -24,6 +24,12 @@ services:
         tags:
             - {name: combyna.builtin_expression_loader}
 
+    combyna.expression.loader.attribute:
+        class: Combyna\Component\Expression\Config\Loader\AttributeExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.binary_arithmetic:
         class: Combyna\Component\Expression\Config\Loader\BinaryArithmeticExpressionLoader
         autowire: true
@@ -103,6 +109,12 @@ services:
         tags:
             - {name: combyna.builtin_expression_loader}
 
+    combyna.expression.loader.structure:
+        class: Combyna\Component\Expression\Config\Loader\StructureExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.text_conversion:
         class: Combyna\Component\Expression\Config\Loader\TextConversionExpressionLoader
         autowire: true
@@ -120,6 +132,12 @@ services:
         autowire: true
         tags:
             - {name: combyna.builtin_expression_loader}
+
+    combyna.expression.loader.unparsable:
+        class: Combyna\Component\Expression\Config\Loader\UnparsableExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
 
     combyna.expression.loader.variable:
         class: Combyna\Component\Expression\Config\Loader\VariableExpressionLoader

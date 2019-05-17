@@ -15,10 +15,11 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use LogicException;
 
 /**
@@ -29,6 +30,11 @@ use LogicException;
 class UnknownWidgetDefinitionTypeNode extends AbstractActNode implements WidgetDefinitionNodeInterface
 {
     const TYPE = 'unknown-widget-definition-type';
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -52,6 +58,7 @@ class UnknownWidgetDefinitionTypeNode extends AbstractActNode implements WidgetD
      */
     public function __construct($libraryName, $widgetDefinitionName, $type)
     {
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->libraryName = $libraryName;
         $this->type = $type;
         $this->widgetDefinitionName = $widgetDefinitionName;
@@ -62,6 +69,8 @@ class UnknownWidgetDefinitionTypeNode extends AbstractActNode implements WidgetD
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
@@ -94,16 +103,17 @@ class UnknownWidgetDefinitionTypeNode extends AbstractActNode implements WidgetD
                 $this->widgetDefinitionName,
                 $this->libraryName,
                 $this->type
-            )
+            ),
+            $this->dynamicContainerNode
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement)
+    public function getChildDefinition($childName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
-        return new DynamicUnknownChildWidgetDefinitionNode($childName, $queryRequirement);
+        return new UnknownChildWidgetDefinitionNode($childName, $dynamicActNodeAdopter);
     }
 
     /**
@@ -128,7 +138,7 @@ class UnknownWidgetDefinitionTypeNode extends AbstractActNode implements WidgetD
     /**
      * {@inheritdoc}
      */
-    public function getValueType($valueName, QueryRequirementInterface $queryRequirement)
+    public function getValueType($valueName)
     {
         return new UnresolvedType(
             sprintf(

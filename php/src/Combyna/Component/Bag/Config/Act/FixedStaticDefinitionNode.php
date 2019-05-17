@@ -15,12 +15,13 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
+use Combyna\Component\Type\Config\Act\TypeNode;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
-use LogicException;
 
 /**
  * Class FixedStaticDefinitionNode
@@ -84,7 +85,7 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
             );
         }
 
-        // Make sure the static's type is a resolved, valid type
+        // Make sure the static's type is a resolvable, valid type
         $specBuilder->addConstraint(new ResolvableTypeConstraint($this->staticTypeDeterminer));
 
         // Resolve the static's type once all static values are known,
@@ -96,6 +97,21 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
                     $this->resolvedStaticType = $this->staticTypeDeterminer->determine($validationContext);
                 }
             )
+        );
+
+        // Make sure the static's type itself is validated as necessary
+        $specBuilder->addChildNode(new TypeNode($this->staticTypeDeterminer));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function determine(ValidationContextInterface $validationContext)
+    {
+        return new DeterminedFixedStaticDefinitionNode(
+            $this->name,
+            $this->staticTypeDeterminer->determine($validationContext),
+            $this->defaultExpressionNode
         );
     }
 
@@ -128,16 +144,11 @@ class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDe
      */
     public function getResolvedStaticType()
     {
-        if ($this->resolvedStaticType === null) {
-            throw new LogicException(
-                sprintf(
-                    'Bag static "%s" type was expected to be resolved but was not',
-                    $this->name
-                )
-            );
+        if ($this->resolvedStaticType !== null) {
+            return $this->resolvedStaticType;
         }
 
-        return $this->resolvedStaticType;
+        return $this->staticTypeDeterminer->determine(new NullValidationContext());
     }
 
     /**

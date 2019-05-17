@@ -84,7 +84,7 @@ class EditableListExampleAppIntegratedTest extends TestCase
     <div>Items: <hr>Add another: <input name="combyna-widget-item_viewer-root-contents-4" type="text" value="&lt;Enter some text&gt;"><button name="combyna-widget-item_viewer-root-contents-5">Add item</button></div>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterAddingTwoNewItemsViaTheUi()
@@ -127,6 +127,6 @@ HTML;
     <div>Items: <div>(1)First: (item_viewer-root-contents-4)</div><div>(2)Second: (item_viewer-root-contents-4)</div><hr>Add another: <input name="combyna-widget-item_viewer-root-contents-4" type="text" value="&lt;Enter some text&gt;"><button name="combyna-widget-item_viewer-root-contents-5">Add item</button></div>
 </div>
 HTML;
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 }

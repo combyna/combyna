@@ -23,7 +23,6 @@ use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\CompoundWidgetDefinitionHasChildConstraint;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -113,7 +112,7 @@ class ChildReferenceWidgetNode extends AbstractActNode implements CoreWidgetNode
     /**
      * {@inheritdoc}
      */
-    public function getCaptureExpressionBag(QueryRequirementInterface $queryRequirement)
+    public function getCaptureExpressionBag()
     {
         return $this->captureExpressionBagNode;
     }
@@ -121,7 +120,7 @@ class ChildReferenceWidgetNode extends AbstractActNode implements CoreWidgetNode
     /**
      * {@inheritdoc}
      */
-    public function getCaptureStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getCaptureStaticBagModel()
     {
         return $this->captureStaticBagModelNode;
     }

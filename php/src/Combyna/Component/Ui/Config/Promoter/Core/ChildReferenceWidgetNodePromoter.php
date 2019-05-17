@@ -19,7 +19,6 @@ use Combyna\Component\Ui\Config\Promoter\WidgetNodeTypePromoterInterface;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\ChildReferenceWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class ChildReferenceWidgetNodePromoter
@@ -83,16 +82,14 @@ class ChildReferenceWidgetNodePromoter implements WidgetNodeTypePromoterInterfac
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
-        $queryRequirement = new PromotionQueryRequirement($widgetNode);
-
         return $this->viewFactory->createChildReferenceWidget(
             $name,
             $widgetNode->getChildName(),
             $this->bagNodePromoter->promoteFixedStaticBagModel(
-                $widgetNode->getCaptureStaticBagModel($queryRequirement)
+                $widgetNode->getCaptureStaticBagModel()
             ),
             $this->bagNodePromoter->promoteExpressionBag(
-                $widgetNode->getCaptureExpressionBag($queryRequirement)
+                $widgetNode->getCaptureExpressionBag()
             ),
             $parentWidget,
             $widgetNode->getVisibilityExpression() ?

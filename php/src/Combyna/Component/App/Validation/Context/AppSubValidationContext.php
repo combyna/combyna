@@ -22,6 +22,7 @@ use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQ
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
 use Combyna\Component\Ui\Validation\Query\PageViewExistsQuery;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionExistsQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionHasValueQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionNodeQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionValueTypeQuery;
@@ -117,6 +118,7 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             SignalDefinitionExistsQuery::class => [$this, 'queryForSignalDefinitionExistence'],
             SignalDefinitionHasPayloadStaticQuery::class => [$this, 'queryForSignalPayloadStaticExistence'],
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
+            WidgetDefinitionExistsQuery::class => [$this, 'queryForWidgetDefinitionExistence'],
             WidgetDefinitionHasValueQuery::class => [$this, 'queryForWidgetValueExistence'],
             WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode'],
             WidgetDefinitionValueTypeQuery::class => [$this, 'queryForWidgetValueType']
@@ -220,7 +222,7 @@ class AppSubValidationContext implements AppSubValidationContextInterface
         );
 
         return $signalDefinitionNode
-            ->getPayloadStaticBagModel($queryRequirement)
+            ->getPayloadStaticBagModel()
             ->definesStatic($query->getPayloadStaticName());
     }
 
@@ -250,7 +252,32 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             $queryRequirement
         );
 
-        return $signalDefinitionNode->getPayloadStaticType($query->getPayloadStaticName(), $queryRequirement);
+        return $signalDefinitionNode->getPayloadStaticType($query->getPayloadStaticName());
+    }
+
+    /**
+     * Determines whether the specified widget definition exists
+     *
+     * @param WidgetDefinitionExistsQuery $query
+     * @return bool|null
+     */
+    public function queryForWidgetDefinitionExistence(WidgetDefinitionExistsQuery $query)
+    {
+        // Only handle widget definitions defined by the special "app" library for the current app
+        if ($query->getLibraryName() !== LibraryInterface::APP) {
+            // App doesn't define the specified widget definition - return null, so that we can bubble
+            // up to the parent node (the Environment) to look for the widget definition
+            return null;
+        }
+
+        if (array_key_exists($query->getWidgetDefinitionName(), $this->appNode->getWidgetDefinitions())) {
+            // We've discovered that the app _does_ define the requested widget definition
+            return true;
+        }
+
+        // The app doesn't define the requested widget definition - return null
+        // so that we can bubble up to an ancestor context that does define it
+        return null;
     }
 
     /**
@@ -304,7 +331,7 @@ class AppSubValidationContext implements AppSubValidationContextInterface
             $queryRequirement
         );
 
-        return $widgetDefinitionNode->getValueType($query->getValueName(), $queryRequirement);
+        return $widgetDefinitionNode->getValueType($query->getValueName());
     }
 
     /**

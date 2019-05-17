@@ -16,9 +16,9 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -28,7 +28,7 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownLibraryForFunctionNode extends AbstractActNode implements FunctionNodeInterface, DynamicActNodeInterface
+class UnknownLibraryForFunctionNode extends AbstractActNode implements DynamicActNodeInterface, FunctionNodeInterface
 {
     const TYPE = 'unknown-library-and-function';
 
@@ -45,15 +45,14 @@ class UnknownLibraryForFunctionNode extends AbstractActNode implements FunctionN
     /**
      * @param string $libraryName
      * @param string $functionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($libraryName, $functionName, QueryRequirementInterface $queryRequirement)
+    public function __construct($libraryName, $functionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
 
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**

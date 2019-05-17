@@ -37,6 +37,12 @@ services:
         tags:
             - {name: combyna.parameter_type_parser}
 
+    combyna.config.parameter.expression_bag_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\ExpressionBagParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
     combyna.config.parameter.expression_type_parser:
         class: Combyna\Component\Config\Parameter\Type\ExpressionParameterTypeParser
         autowire: true

@@ -12,10 +12,12 @@
 namespace Combyna\Component\Store\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Validation\Context\Specifier\ScopeContextSpecifier;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -38,18 +40,18 @@ class QueryNode extends AbstractActNode implements QueryNodeInterface
     private $name;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $parameterBagModelNode;
 
     /**
      * @param string $name
-     * @param FixedStaticBagModelNode $parameterBagModelNode
+     * @param FixedStaticBagModelNodeInterface $parameterBagModelNode
      * @param ExpressionNodeInterface $expressionNode
      */
     public function __construct(
         $name,
-        FixedStaticBagModelNode $parameterBagModelNode,
+        FixedStaticBagModelNodeInterface $parameterBagModelNode,
         ExpressionNodeInterface $expressionNode
     ) {
         $this->expressionNode = $expressionNode;
@@ -62,8 +64,19 @@ class QueryNode extends AbstractActNode implements QueryNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        $specBuilder->addChildNode($this->expressionNode);
         $specBuilder->addChildNode($this->parameterBagModelNode);
+
+        $specBuilder->addSubSpec(function (SubBehaviourSpecBuilderInterface $subSpecBuilder) {
+            $scopeContextSpecifier = new ScopeContextSpecifier();
+            // Expose the query parameters to the expression as variables
+            // (for some similar but special "parameters" such as signal payload statics, this is done differently -
+            // for payloads for example, statics must be fetched using the builtin `signal_payload(...)`)
+            $scopeContextSpecifier->defineBagStaticsAsVariables($this->parameterBagModelNode);
+
+            $subSpecBuilder->defineValidationContext($scopeContextSpecifier);
+
+            $subSpecBuilder->addChildNode($this->expressionNode);
+        });
     }
 
     /**
@@ -72,6 +85,14 @@ class QueryNode extends AbstractActNode implements QueryNodeInterface
     public function getExpression()
     {
         return $this->expressionNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->name;
     }
 
     /**

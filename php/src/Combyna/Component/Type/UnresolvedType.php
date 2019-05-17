@@ -11,7 +11,9 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use LogicException;
 
 /**
  * Class UnresolvedType
@@ -79,6 +81,14 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        return false; // Unresolved types cannot match any others
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         return false; // Unresolved types cannot match any others
@@ -90,6 +100,14 @@ class UnresolvedType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return false; // Unresolved types cannot match any others, including the special Void type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        throw new LogicException('Tried to coerce a static for unresolved type: ' . $this->contextDescription);
     }
 
     /**
@@ -115,6 +133,14 @@ class UnresolvedType implements TypeInterface
      * {@inheritdoc}
      */
     public function isAllowedByStaticListType(StaticListType $superType)
+    {
+        return false; // Unresolved types cannot match any others
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
     {
         return false; // Unresolved types cannot match any others
     }
@@ -182,6 +208,16 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        // There is nothing common to merge between a static structure type and an unresolved type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         // There is nothing common to merge between a static list type and an unresolved type,
@@ -231,6 +267,14 @@ class UnresolvedType implements TypeInterface
     public function whenMergedWithStaticListType(StaticListType $otherType)
     {
         return $otherType->mergeWithUnresolvedType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithUnresolvedType($this);
     }
 
     /**

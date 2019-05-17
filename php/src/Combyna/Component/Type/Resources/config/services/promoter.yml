@@ -1,0 +1,24 @@
+services:
+    combyna.type.promoter:
+        class: Combyna\Component\Type\Config\Act\DelegatingTypePromoter
+        autowire: true
+        # Ensure autowiring picks the DelegatingTypePromoter when typehinting for this interface
+        autowiring_types: Combyna\Component\Type\Config\Act\TypePromoterInterface
+
+    combyna.type.act.basic_type_promoter:
+        class: Combyna\Component\Type\Config\Act\BasicTypePromoter
+        autowire: true
+        tags:
+            - {name: combyna.type_promoter}
+
+    combyna.type.act.static_list_type_promoter:
+        class: Combyna\Component\Type\Config\Act\StaticListTypePromoter
+        autowire: true
+        tags:
+            - {name: combyna.type_promoter}
+
+    combyna.type.act.static_structure_type_promoter:
+        class: Combyna\Component\Type\Config\Act\StaticStructureTypePromoter
+        autowire: true
+        tags:
+            - {name: combyna.type_promoter}

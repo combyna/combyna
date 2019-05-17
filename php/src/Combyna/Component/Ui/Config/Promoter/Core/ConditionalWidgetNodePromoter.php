@@ -21,7 +21,6 @@ use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\ConditionalWidget;
 use Combyna\Component\Ui\Widget\ConditionalWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class ConditionalWidgetNodePromoter
@@ -93,16 +92,14 @@ class ConditionalWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
-        $queryRequirement = new PromotionQueryRequirement($widgetNode);
-
         $conditionalWidget = $this->viewFactory->createConditionalWidget(
             $name,
             $this->expressionNodePromoter->promote($widgetNode->getConditionExpression()),
             $this->bagNodePromoter->promoteFixedStaticBagModel(
-                $widgetNode->getCaptureStaticBagModel($queryRequirement)
+                $widgetNode->getCaptureStaticBagModel()
             ),
             $this->bagNodePromoter->promoteExpressionBag(
-                $widgetNode->getCaptureExpressionBag($queryRequirement)
+                $widgetNode->getCaptureExpressionBag()
             ),
             $parentWidget,
             $widgetNode->getTags()

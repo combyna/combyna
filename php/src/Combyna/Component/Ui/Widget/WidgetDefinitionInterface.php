@@ -15,6 +15,8 @@ use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
@@ -93,6 +95,20 @@ interface WidgetDefinitionInterface
         ExpressionBagInterface $attributeExpressionBag,
         ViewEvaluationContextInterface $evaluationContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
+
+    /**
+     * Fetches the value of the specified widget attribute, taking into account default values/coercion etc.
+     *
+     * @param string $name
+     * @param ExpressionBagInterface $attributeExpressionBag
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getAttribute(
+        $name,
+        ExpressionBagInterface $attributeExpressionBag,
+        EvaluationContextInterface $evaluationContext
     );
 
     /**

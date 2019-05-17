@@ -14,7 +14,7 @@ namespace Combyna\Component\Environment\Exception;
 use Exception;
 
 /**
- * Class WidgetDefinitionNotInstalledException
+ * Class WidgetDefinitionNotSupportedException
  *
  * Thrown when an attempt is made to fetch a widget definition from a library
  * when that library implements no such widget definition

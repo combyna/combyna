@@ -103,4 +103,13 @@ interface StaticListInterface extends Countable
      * @return array
      */
     public function toArray();
+
+    /**
+     * Either creates a new static list with the specified element statics
+     * or just returns the current one, if it already has the same element statics
+     *
+     * @param StaticInterface[] $newElementStatics
+     * @return StaticListInterface
+     */
+    public function withElements(array $newElementStatics);
 }

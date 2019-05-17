@@ -161,7 +161,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
     ) {
         $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
 
-        if (!$this->repeaterWidgetNode->getCaptureStaticBagModel($queryRequirement)
+        if (!$this->repeaterWidgetNode->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName())
         ) {
             // The repeater does not define the capture - nothing to do
@@ -169,7 +169,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         }
 
         return $this->repeaterWidgetNode
-            ->getCaptureStaticBagModel($queryRequirement)
+            ->getCaptureStaticBagModel()
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
                 $queryRequirement
@@ -180,17 +180,12 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
      * Determines whether the current widget's definition defines the specified capture
      *
      * @param CaptureIsDefinedQuery $query
-     * @param ValidationContextInterface $validationContext
      * @return bool|null
      */
-    public function queryForCaptureExistence(
-        CaptureIsDefinedQuery $query,
-        ValidationContextInterface $validationContext
-    ) {
+    public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
+    {
         return $this->repeaterWidgetNode
-            ->getCaptureStaticBagModel(
-                $validationContext->createBooleanQueryRequirement($query)
-            )
+            ->getCaptureStaticBagModel()
             ->definesStatic($query->getCaptureName()) ?: null;
     }
 
@@ -206,7 +201,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         ValidationContextInterface $validationContext
     ) {
         $queryRequirement = $validationContext->createTypeQueryRequirement($query);
-        $captureStaticBagModel = $this->repeaterWidgetNode->getCaptureStaticBagModel($queryRequirement);
+        $captureStaticBagModel = $this->repeaterWidgetNode->getCaptureStaticBagModel();
 
         if (!$captureStaticBagModel->definesStatic($query->getCaptureName())) {
             return null;
@@ -232,9 +227,8 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         ValidationContextInterface $validationContext
     ) {
         $queryWithRepeater = $query->withOptionalAncestor($this->repeaterWidgetNode);
-        $queryRequirement = $validationContext->createTypeQueryRequirement($query);
 
-        $captureStaticBagModel = $this->repeaterWidgetNode->getCaptureStaticBagModel($queryRequirement);
+        $captureStaticBagModel = $this->repeaterWidgetNode->getCaptureStaticBagModel();
 
         if ($captureStaticBagModel->definesStatic($query->getCaptureName())) {
             // This widget defines the capture - we can determine the correct type

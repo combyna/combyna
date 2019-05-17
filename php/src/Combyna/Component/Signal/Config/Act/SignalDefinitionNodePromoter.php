@@ -13,8 +13,8 @@ namespace Combyna\Component\Signal\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Signal\SignalDefinitionCollectionInterface;
+use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Signal\SignalFactoryInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class SignalDefinitionNodePromoter
@@ -44,6 +44,25 @@ class SignalDefinitionNodePromoter
     }
 
     /**
+     * Promotes a SignalDefinitionNode to a SignalDefinition
+     *
+     * @param string $libraryName
+     * @param SignalDefinitionNodeInterface $signalDefinitionNode
+     * @return SignalDefinitionInterface
+     */
+    public function promoteDefinition($libraryName, SignalDefinitionNodeInterface $signalDefinitionNode)
+    {
+        return $this->signalFactory->createSignalDefinition(
+            $libraryName,
+            $signalDefinitionNode->getSignalName(),
+            $this->bagNodePromoter->promoteFixedStaticBagModel(
+                $signalDefinitionNode->getPayloadStaticBagModel()
+            ),
+            $signalDefinitionNode->isBroadcast()
+        );
+    }
+
+    /**
      * Promotes a set of SignalDefinitionNodes to a SignalDefinitionCollection
      *
      * @param SignalDefinitionNode[] $signalDefinitionNodes
@@ -55,18 +74,7 @@ class SignalDefinitionNodePromoter
         $signalDefinitions = [];
 
         foreach ($signalDefinitionNodes as $signalDefinitionNode) {
-            $queryRequirement = new PromotionQueryRequirement($signalDefinitionNode);
-
-            $signalDefinitions[] = $this->signalFactory->createSignalDefinition(
-                $libraryName,
-                $signalDefinitionNode->getSignalName(),
-                $this->bagNodePromoter->promoteFixedStaticBagModel(
-                    $signalDefinitionNode->getPayloadStaticBagModel(
-                        $queryRequirement
-                    )
-                ),
-                $signalDefinitionNode->isBroadcast()
-            );
+            $signalDefinitions[] = $this->promoteDefinition($libraryName, $signalDefinitionNode);
         }
 
         return $this->signalFactory->createSignalDefinitionCollection($signalDefinitions, $libraryName);

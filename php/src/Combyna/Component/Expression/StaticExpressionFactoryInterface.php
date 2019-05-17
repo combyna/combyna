@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Bag\StaticListInterface;
 
 /**
@@ -77,6 +78,14 @@ interface StaticExpressionFactoryInterface
      * @return StaticListExpression
      */
     public function createStaticListExpression(StaticListInterface $elementStaticList);
+
+    /**
+     * Creates a StaticStructureExpression
+     *
+     * @param StaticBagInterface $attributeStaticBag
+     * @return StaticStructureExpression
+     */
+    public function createStaticStructureExpression(StaticBagInterface $attributeStaticBag);
 
     /**
      * Creates a TextExpression

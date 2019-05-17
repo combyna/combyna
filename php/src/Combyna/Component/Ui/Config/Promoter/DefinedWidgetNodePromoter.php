@@ -19,7 +19,6 @@ use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\View\ViewFactoryInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
-use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class DefinedWidgetNodePromoter
@@ -49,6 +48,11 @@ class DefinedWidgetNodePromoter implements WidgetNodeTypePromoterInterface
     private $viewFactory;
 
     /**
+     * @var WidgetDefinitionReferenceNodePromoterInterface
+     */
+    private $widgetDefinitionReferenceNodePromoter;
+
+    /**
      * @var WidgetNodePromoterInterface
      */
     private $widgetNodePromoter;
@@ -57,6 +61,7 @@ class DefinedWidgetNodePromoter implements WidgetNodeTypePromoterInterface
      * @param ViewFactoryInterface $viewFactory
      * @param BagNodePromoter $bagNodePromoter
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
+     * @param WidgetDefinitionReferenceNodePromoterInterface $widgetDefinitionReferenceNodePromoter
      * @param WidgetNodePromoterInterface $widgetNodePromoter
      * @param TriggerNodePromoter $triggerNodePromoter
      */
@@ -64,6 +69,7 @@ class DefinedWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         ViewFactoryInterface $viewFactory,
         BagNodePromoter $bagNodePromoter,
         DelegatingExpressionNodePromoter $expressionNodePromoter,
+        WidgetDefinitionReferenceNodePromoterInterface $widgetDefinitionReferenceNodePromoter,
         WidgetNodePromoterInterface $widgetNodePromoter,
         TriggerNodePromoter $triggerNodePromoter
     ) {
@@ -71,6 +77,7 @@ class DefinedWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         $this->expressionNodePromoter = $expressionNodePromoter;
         $this->triggerNodePromoter = $triggerNodePromoter;
         $this->viewFactory = $viewFactory;
+        $this->widgetDefinitionReferenceNodePromoter = $widgetDefinitionReferenceNodePromoter;
         $this->widgetNodePromoter = $widgetNodePromoter;
     }
 
@@ -99,25 +106,24 @@ class DefinedWidgetNodePromoter implements WidgetNodeTypePromoterInterface
         ResourceRepositoryInterface $resourceRepository,
         WidgetInterface $parentWidget = null
     ) {
-        $widgetDefinition = $resourceRepository->getWidgetDefinitionByName(
-            $widgetNode->getLibraryName(),
-            $widgetNode->getWidgetDefinitionName()
+        $widgetDefinitionReference = $this->widgetDefinitionReferenceNodePromoter->promote(
+            $widgetNode->getWidgetDefinitionReference(),
+            $resourceRepository
         );
         $triggerCollection = $this->triggerNodePromoter->promoteCollection(
             $widgetNode->getTriggers(),
             $resourceRepository
         );
-        $queryRequirement = new PromotionQueryRequirement($widgetNode);
 
         $widget = $this->viewFactory->createDefinedWidget(
             $name,
-            $widgetDefinition,
+            $widgetDefinitionReference,
             $this->bagNodePromoter->promoteExpressionBag(
                 $widgetNode->getAttributeExpressionBag()
             ),
             $triggerCollection,
-            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetNode->getCaptureStaticBagModel($queryRequirement)),
-            $this->bagNodePromoter->promoteExpressionBag($widgetNode->getCaptureExpressionBag($queryRequirement)),
+            $this->bagNodePromoter->promoteFixedStaticBagModel($widgetNode->getCaptureStaticBagModel()),
+            $this->bagNodePromoter->promoteExpressionBag($widgetNode->getCaptureExpressionBag()),
             $parentWidget,
             $widgetNode->getVisibilityExpression() ?
                 $this->expressionNodePromoter->promote($widgetNode->getVisibilityExpression()) :

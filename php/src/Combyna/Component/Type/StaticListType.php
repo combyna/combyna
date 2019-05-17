@@ -11,8 +11,10 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticListExpression;
+use InvalidArgumentException;
 
 /**
  * Class StaticListType
@@ -97,6 +99,14 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        return false; // We require a list, which a structure type can never be
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         return false; // We require a list, which a non-list static type can never be
@@ -108,6 +118,40 @@ class StaticListType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        if (!$static instanceof StaticListExpression) {
+            throw new InvalidArgumentException(sprintf(
+                'Expected a %s, got %s',
+                StaticListExpression::class,
+                get_class($static)
+            ));
+        }
+
+        $coercedElementStatics = [];
+        $coercionWasNeeded = true;
+
+        foreach ($static->getElementStatics() as $index => $elementStatic) {
+            $coercedElementStatic = $this->elementType->coerceStatic($elementStatic, $evaluationContext);
+
+            if ($coercedElementStatic === $elementStatic) {
+                $coercedElementStatics[] = $elementStatic;
+            } else {
+                $coercedElementStatics[] = $coercedElementStatic;
+                $coercionWasNeeded = true;
+            }
+        }
+
+        if (!$coercionWasNeeded) {
+            return $static; // Just return the original list if none of its elements needed coercion
+        }
+
+        return $static->withElements($coercedElementStatics);
     }
 
     /**
@@ -132,6 +176,14 @@ class StaticListType implements TypeInterface
     public function isAllowedByStaticListType(StaticListType $superType)
     {
         return $superType->allowsStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
+    {
+        return $otherType->allowsStaticListType($this, $this->elementType);
     }
 
     /**
@@ -209,6 +261,16 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        // There is nothing common to merge between a static list type and a static structure type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         // There is nothing common to merge between a static list type and a static type,
@@ -256,6 +318,14 @@ class StaticListType implements TypeInterface
     public function whenMergedWithStaticListType(StaticListType $otherType)
     {
         return $otherType->mergeWithStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithStaticListType($this, $this->elementType);
     }
 
     /**

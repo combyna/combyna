@@ -13,16 +13,17 @@ namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Event\Config\Act\EventDefinitionNodeInterface;
 use Combyna\Component\Event\Config\Act\UnknownEventDefinitionNode;
-use Combyna\Component\Signal\Config\Act\DynamicUnknownSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
+use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use LogicException;
 
 /**
@@ -38,6 +39,11 @@ class LibraryNode extends AbstractActNode
      * @var string
      */
     private $description;
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var EventDefinitionNodeInterface[]
@@ -88,6 +94,7 @@ class LibraryNode extends AbstractActNode
         array $widgetDefinitionNodes = []
     ) {
         $this->description = $description;
+        $this->dynamicContainerNode = new DynamicContainerNode();
 
         // Index functions by name to simplify lookups
         foreach ($functionNodes as $functionNode) {
@@ -118,6 +125,8 @@ class LibraryNode extends AbstractActNode
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         foreach ($this->eventDefinitionNodes as $eventDefinitionNode) {
             $specBuilder->addChildNode($eventDefinitionNode);
         }
@@ -149,13 +158,13 @@ class LibraryNode extends AbstractActNode
      * Fetches an event definition defined by this library
      *
      * @param string $eventName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return EventDefinitionNodeInterface
      */
-    public function getEventDefinition($eventName, QueryRequirementInterface $queryRequirement)
+    public function getEventDefinition($eventName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (!array_key_exists($eventName, $this->eventDefinitionNodes)) {
-            return new UnknownEventDefinitionNode($this->name, $eventName, $queryRequirement);
+            return new UnknownEventDefinitionNode($this->name, $eventName, $dynamicActNodeAdopter);
         }
 
         return $this->eventDefinitionNodes[$eventName];
@@ -183,18 +192,18 @@ class LibraryNode extends AbstractActNode
 
     /**
      * Fetches a function defined by this library. If the library
-     * does not define the specified function, then a DynamicUnknownFunctionNode will be returned.
+     * does not define the specified function, then an UnknownFunctionNode will be returned.
      * If the library does define the function but not of a generic type,
      * then an IncorrectTypeFunctionNode will be returned
      *
      * @param string $functionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return FunctionNodeInterface
      */
-    public function getGenericFunction($functionName, QueryRequirementInterface $queryRequirement)
+    public function getGenericFunction($functionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (!array_key_exists($functionName, $this->functionNodes)) {
-            return new DynamicUnknownFunctionNode($this->name, $functionName, $queryRequirement);
+            return new UnknownFunctionNode($this->name, $functionName, $dynamicActNodeAdopter);
         }
 
         // TODO: Check type of function and return IncorrectTypeFunctionNode if wrong
@@ -224,13 +233,13 @@ class LibraryNode extends AbstractActNode
      * Fetches a signal definition defined by this library
      *
      * @param string $signalName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return SignalDefinitionNodeInterface
      */
-    public function getSignalDefinition($signalName, QueryRequirementInterface $queryRequirement)
+    public function getSignalDefinition($signalName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (!array_key_exists($signalName, $this->signalDefinitionNodes)) {
-            return new DynamicUnknownSignalDefinitionNode($this->name, $signalName, $queryRequirement);
+            return new UnknownSignalDefinitionNode($this->name, $signalName, $dynamicActNodeAdopter);
         }
 
         return $this->signalDefinitionNodes[$signalName];
@@ -252,13 +261,13 @@ class LibraryNode extends AbstractActNode
      * then an UnknownWidgetDefinitionNode will be returned
      *
      * @param string $name
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return WidgetDefinitionNodeInterface
      */
-    public function getWidgetDefinition($name, QueryRequirementInterface $queryRequirement)
+    public function getWidgetDefinition($name, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         if (!array_key_exists($name, $this->widgetDefinitionNodes)) {
-            return new UnknownWidgetDefinitionNode($this->name, $name, $queryRequirement);
+            return new UnknownWidgetDefinitionNode($this->name, $name, $dynamicActNodeAdopter);
         }
 
         return $this->widgetDefinitionNodes[$name];

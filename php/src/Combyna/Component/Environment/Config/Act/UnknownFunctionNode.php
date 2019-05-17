@@ -14,22 +14,21 @@ namespace Combyna\Component\Environment\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
- * Class DynamicUnknownFunctionNode
+ * Class UnknownFunctionNode
  *
  * Indicates that a referenced library exists but does not define the specified function
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class DynamicUnknownFunctionNode extends AbstractActNode implements FunctionNodeInterface, DynamicActNodeInterface
+class UnknownFunctionNode extends AbstractActNode implements DynamicActNodeInterface, FunctionNodeInterface
 {
     const TYPE = 'unknown-function';
 
@@ -46,15 +45,14 @@ class DynamicUnknownFunctionNode extends AbstractActNode implements FunctionNode
     /**
      * @param string $libraryName
      * @param string $functionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($libraryName, $functionName, QueryRequirementInterface $queryRequirement)
+    public function __construct($libraryName, $functionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
 
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**
@@ -82,7 +80,7 @@ class DynamicUnknownFunctionNode extends AbstractActNode implements FunctionNode
     /**
      * {@inheritdoc}
      */
-    public function getReturnTypeDeterminer(ActNodeInterface $nodeQueriedFrom)
+    public function getReturnTypeDeterminer()
     {
         // We don't know what the function's return type could be as it is not defined
         return new PresolvedTypeDeterminer(new UnresolvedType('undefined function'));

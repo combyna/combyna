@@ -76,6 +76,6 @@ class SignalDefinitionLoader implements SignalDefinitionLoaderInterface
 
         $payloadStaticBagModelNode = $this->fixedStaticBagModelLoader->load($payloadStaticBagModelConfig);
 
-        return new SignalDefinitionNode($signalName, $payloadStaticBagModelNode, $isBroadcast);
+        return new SignalDefinitionNode($libraryName, $signalName, $payloadStaticBagModelNode, $isBroadcast);
     }
 }
