@@ -237,4 +237,34 @@ class StaticListTest extends TestCase
             $this->staticList->toArray()
         );
     }
+
+    public function testWithElementsReturnsTheSameListObjectWhenAllAndOnlySpecifiedStaticsAreAlreadyPresent()
+    {
+        $firstElement = new TextExpression('first element');
+        $secondElement = new TextExpression('second element');
+        $staticList = new StaticList(
+            $this->bagFactory,
+            $this->staticExpressionFactory,
+            [$firstElement, $secondElement]
+        );
+
+        self::assertSame($staticList, $staticList->withElements([$firstElement, $secondElement]));
+    }
+
+    public function testWithElementsReturnsANewListWhenAtLeastOneStaticIsNotAlreadyPresent()
+    {
+        $firstElement = new TextExpression('first element');
+        $secondElement = new TextExpression('second element');
+        $staticList = new StaticList(
+            $this->bagFactory,
+            $this->staticExpressionFactory,
+            [$firstElement, $secondElement]
+        );
+        $newElement = new TextExpression('new element');
+
+        $newStaticList = $staticList->withElements([$firstElement, $secondElement, $newElement]);
+
+        self::assertNotSame($staticList, $newStaticList);
+        self::assertSame($newElement, $newStaticList->getElementStatic(2));
+    }
 }
