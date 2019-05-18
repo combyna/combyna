@@ -37,7 +37,6 @@ class ScopeContextSpecifier implements SubValidationContextSpecifierInterface
     {
         foreach ($staticBagModelNode->getStaticDefinitions() as $name => $staticDefinition) {
             if (array_key_exists($name, $this->variableTypeDeterminers)) {
-                // TODO: Catch & raise validation failure for this?
                 throw new InvalidArgumentException('Scope already has a variable "' . $name . '"');
             }
 
