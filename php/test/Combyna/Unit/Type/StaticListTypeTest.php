@@ -11,13 +11,16 @@
 
 namespace Combyna\Unit\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticListExpression;
+use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Harness\TestCase;
+use InvalidArgumentException;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -142,7 +145,26 @@ class StaticListTypeTest extends TestCase
 
         $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isFalse;
     }
-    
+
+    public function testCoerceStaticThrowsWhenNonStaticListExpressionIsGiven()
+    {
+        $nonListStatic = $this->prophesize(TextExpression::class);
+        $evaluationContext = $this->prophesize(EvaluationContextInterface::class);
+
+        $this->setExpectedException(
+            InvalidArgumentException::class,
+            sprintf(
+                'Expected a %s, got %s',
+                StaticListExpression::class,
+                get_class($nonListStatic->reveal())
+            )
+        );
+
+        $this->type->coerceStatic($nonListStatic->reveal(), $evaluationContext->reveal());
+    }
+
+    // NB: See StaticListTypeIntegratedTest for further tests of StaticListType/coercion
+
     public function testGetSummaryReturnsTheCorrectRepresentation()
     {
         $this->elementType->getSummary()->willReturn('our-element-type');
