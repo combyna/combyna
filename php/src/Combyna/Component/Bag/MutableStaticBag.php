@@ -54,6 +54,14 @@ class MutableStaticBag implements MutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getStaticNames()
+    {
+        return array_keys($this->statics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasStatic($name)
     {
         return array_key_exists($name, $this->statics);

@@ -33,6 +33,13 @@ interface StaticBagInterface
     public function getStatic($name);
 
     /**
+     * Fetches the names of all statics in this bag
+     *
+     * @return string[]
+     */
+    public function getStaticNames();
+
+    /**
      * Determines whether this bag contains a static with the specified name
      *
      * @param string $name

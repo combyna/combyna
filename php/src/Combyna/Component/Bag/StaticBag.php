@@ -72,6 +72,14 @@ class StaticBag implements StaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getStaticNames()
+    {
+        return array_keys($this->statics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasStatic($name)
     {
         return array_key_exists($name, $this->statics);
