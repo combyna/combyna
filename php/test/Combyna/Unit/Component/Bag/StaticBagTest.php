@@ -66,6 +66,11 @@ class StaticBagTest extends TestCase
         $this->bag->getStatic('an-undefined-static');
     }
 
+    public function testGetStaticNamesReturnsTheNames()
+    {
+        self::assertEquals(['first-static', 'second-static'], $this->bag->getStaticNames());
+    }
+
     public function testHasStaticReturnsTrueWhenStaticIsDefinedInBag()
     {
         self::assertTrue($this->bag->hasStatic('first-static'));

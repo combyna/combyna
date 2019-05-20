@@ -58,6 +58,14 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getStaticNames()
+    {
+        return $this->looseBag->getStaticNames();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasStatic($name)
     {
         return $this->looseBag->hasStatic($name);
