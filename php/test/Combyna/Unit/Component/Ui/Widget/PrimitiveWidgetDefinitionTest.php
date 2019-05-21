@@ -18,6 +18,7 @@ use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
 use Combyna\Harness\TestCase;
@@ -46,6 +47,11 @@ class PrimitiveWidgetDefinitionTest extends TestCase
      * @var PrimitiveWidgetDefinition
      */
     private $definition;
+
+    /**
+     * @var ObjectProphecy|ViewEvaluationContextInterface
+     */
+    private $evaluationContext;
 
     /**
      * @var ObjectProphecy|EventDefinitionReferenceCollectionInterface
@@ -86,6 +92,7 @@ class PrimitiveWidgetDefinitionTest extends TestCase
     {
         $this->attributeBagModel = $this->prophesize(FixedStaticBagModelInterface::class);
         $this->coercedValueStatic = $this->prophesize(StaticInterface::class);
+        $this->evaluationContext = $this->prophesize(ViewEvaluationContextInterface::class);
         $this->eventDefinitionReferenceCollection = $this->prophesize(
             EventDefinitionReferenceCollectionInterface::class
         );
@@ -128,9 +135,11 @@ class PrimitiveWidgetDefinitionTest extends TestCase
     {
         $firstValueType = $this->prophesize(TypeInterface::class);
         $firstValueType->allowsStatic(Argument::is($this->firstValueStatic->reveal()))->willReturn(true);
+        $firstValueType->coerceStatic($this->firstValueStatic, $this->evaluationContext)
+            ->willReturn($this->firstValueStatic);
         $this->valueBagModel->getStaticType('first_value')->willReturn($firstValueType);
 
-        $this->assert($this->definition->getWidgetValue('first_value', ['path', 'to']))
+        $this->assert($this->definition->getWidgetValue('first_value', ['path', 'to'], $this->evaluationContext->reveal()))
             ->isTheSameAs($this->firstValueStatic->reveal());
     }
 
@@ -138,9 +147,23 @@ class PrimitiveWidgetDefinitionTest extends TestCase
     {
         $secondValueType = $this->prophesize(TypeInterface::class);
         $secondValueType->allowsStatic(Argument::is($this->coercedValueStatic->reveal()))->willReturn(true);
+        $secondValueType->coerceStatic($this->coercedValueStatic, $this->evaluationContext)
+            ->willReturn($this->coercedValueStatic);
         $this->valueBagModel->getStaticType('second_value')->willReturn($secondValueType);
 
-        $this->assert($this->definition->getWidgetValue('second_value', ['path', 'to']))
+        $this->assert($this->definition->getWidgetValue('second_value', ['path', 'to'], $this->evaluationContext->reveal()))
+            ->isTheSameAs($this->coercedValueStatic->reveal());
+    }
+
+    public function testGetWidgetValueCoercesTheStaticResultViaTheType()
+    {
+        $firstValueType = $this->prophesize(TypeInterface::class);
+        $firstValueType->allowsStatic(Argument::is($this->firstValueStatic->reveal()))->willReturn(true);
+        $firstValueType->coerceStatic($this->firstValueStatic, $this->evaluationContext)
+            ->willReturn($this->coercedValueStatic);
+        $this->valueBagModel->getStaticType('first_value')->willReturn($firstValueType);
+
+        $this->assert($this->definition->getWidgetValue('first_value', ['path', 'to'], $this->evaluationContext->reveal()))
             ->isTheSameAs($this->coercedValueStatic->reveal());
     }
 
@@ -148,6 +171,8 @@ class PrimitiveWidgetDefinitionTest extends TestCase
     {
         $firstValueType = $this->prophesize(TypeInterface::class);
         $firstValueType->allowsStatic(Argument::is($this->firstValueStatic->reveal()))->willReturn(false);
+        $firstValueType->coerceStatic($this->firstValueStatic, $this->evaluationContext)
+            ->willReturn($this->firstValueStatic);
         $firstValueType->getSummary()->willReturn('The wrong type');
         $this->valueBagModel->getStaticType('first_value')->willReturn($firstValueType);
 
@@ -156,13 +181,15 @@ class PrimitiveWidgetDefinitionTest extends TestCase
             'Provider for value "first_value" must return a [The wrong type]'
         );
 
-        $this->definition->getWidgetValue('first_value', ['path', 'to']);
+        $this->definition->getWidgetValue('first_value', ['path', 'to'], $this->evaluationContext->reveal());
     }
 
     public function testGetWidgetValueThrowsExceptionWhenProviderReturnsAStaticOfIncorrectType()
     {
         $firstValueType = $this->prophesize(TypeInterface::class);
         $firstValueType->allowsStatic(Argument::is($this->firstValueStatic->reveal()))->willReturn(false);
+        $firstValueType->coerceStatic($this->firstValueStatic, $this->evaluationContext)
+            ->willReturn($this->firstValueStatic);
         $firstValueType->getSummary()->willReturn('The wrong type');
         $this->valueBagModel->getStaticType('first_value')->willReturn($firstValueType);
 
@@ -171,6 +198,6 @@ class PrimitiveWidgetDefinitionTest extends TestCase
             'Provider for value "first_value" must return a [The wrong type]'
         );
 
-        $this->definition->getWidgetValue('first_value', ['path', 'to']);
+        $this->definition->getWidgetValue('first_value', ['path', 'to'], $this->evaluationContext->reveal());
     }
 }

@@ -14,6 +14,8 @@ namespace Combyna\Component\Type\Config\Loader;
 use Combyna\Component\Config\Exception\ArgumentParseException;
 use Combyna\Component\Config\Loader\ConfigParserInterface;
 use Combyna\Component\Config\Parameter\NamedParameter;
+use Combyna\Component\Config\Parameter\OptionalParameter;
+use Combyna\Component\Config\Parameter\Type\ExpressionParameterType;
 use Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterType;
 use Combyna\Component\Config\Parameter\Type\StringParameterType;
 use Combyna\Component\Type\UnresolvedType;
@@ -47,6 +49,9 @@ class StaticStructureTypeLoader implements TypeTypeLoaderInterface
     {
         try {
             $parsedArgumentBag = $this->configParser->parseArguments($config, [
+                new OptionalParameter(
+                    new NamedParameter('default', new ExpressionParameterType('default expression'))
+                ),
                 new NamedParameter('type', new StringParameterType('type')),
                 new NamedParameter('attributes', new FixedStaticBagModelParameterType('attributes model'))
             ]);

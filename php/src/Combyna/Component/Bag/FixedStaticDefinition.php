@@ -25,7 +25,7 @@ use LogicException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class FixedStaticDefinition implements DeterminedFixedStaticDefinitionInterface, FixedStaticDefinitionInterface
+class FixedStaticDefinition implements FixedStaticDefinitionInterface
 {
     /**
      * @var ExpressionInterface|null
@@ -55,6 +55,14 @@ class FixedStaticDefinition implements DeterminedFixedStaticDefinitionInterface,
         $this->defaultExpression = $defaultExpression;
         $this->name = $name;
         $this->staticType = $staticType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsStatic(StaticInterface $static)
+    {
+        return $this->staticType->allowsStatic($static);
     }
 
     /**

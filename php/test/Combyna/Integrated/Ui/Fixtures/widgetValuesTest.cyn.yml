@@ -31,7 +31,9 @@ page_views:
                               - type: signal
                                 signal: app.pokable_button_was_poked
                                 payload:
-                                    noise_made: !expr widget_value('noise')
+                                    # Fetch an attribute of the incomplete structure here,
+                                    # to test coercion
+                                    noise_made: !expr widget_value('noise') ~ widget_value('incomplete_structure').suffix
 
                 - type: text
                   text: !expr 'Value of the addable button: "' ~ view_query('get_the_sum') ~ '"'

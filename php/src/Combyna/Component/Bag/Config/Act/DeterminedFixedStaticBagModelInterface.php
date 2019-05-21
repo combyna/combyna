@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 
 /**
@@ -31,6 +32,15 @@ interface DeterminedFixedStaticBagModelInterface
      * @return bool
      */
     public function allowsOtherModel(DeterminedFixedStaticBagModelInterface $otherModel);
+
+    /**
+     * Determines whether the statics in this bag match the provided fixed static bag model,
+     * taking into account any static definitions that are optional
+     *
+     * @param StaticBagInterface $staticBag
+     * @return bool
+     */
+    public function allowsStaticBag(StaticBagInterface $staticBag);
 
     /**
      * Returns true if this model defines a static with the specified name, false otherwise
