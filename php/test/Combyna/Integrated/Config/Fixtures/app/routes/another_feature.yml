@@ -1,0 +1,3 @@
+another_feature_route:
+  pattern: '/'
+  page_view: another_feature_route

@@ -1,0 +1,3 @@
+name: Config directory loading test app
+home:
+  route: app.my_route
