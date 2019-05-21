@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use BadMethodCallException;
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
@@ -71,6 +73,14 @@ class DeterminedFixedStaticBagModelNode extends AbstractActNode implements Deter
         }
 
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsStaticBag(StaticBagInterface $staticBag)
+    {
+        throw new BadMethodCallException(__METHOD__ . ' :: Not implemented');
     }
 
     /**

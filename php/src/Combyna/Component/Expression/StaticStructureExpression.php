@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression;
 
+use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 
 /**
@@ -36,6 +37,18 @@ class StaticStructureExpression extends AbstractStaticExpression
     public function __construct(StaticBagInterface $staticBag)
     {
         $this->staticBag = $staticBag;
+    }
+
+    /**
+     * Determines whether the attributes in this structure match the provided fixed static bag model,
+     * taking into account any attributes that are optional
+     *
+     * @param DeterminedFixedStaticBagModelInterface $bagModel
+     * @return bool
+     */
+    public function attributesMatch(DeterminedFixedStaticBagModelInterface $bagModel)
+    {
+        return $bagModel->allowsStaticBag($this->staticBag);
     }
 
     /**

@@ -99,11 +99,16 @@ HTML;
             'poked'
         );
 
-        $expectedHtml = <<<HTML
-<div class="combyna-view" data-view-name="my_view">
-    Value of the pokable button: "Bang: (my_view-root-1-1)"<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "0"<button name="combyna-widget-my_view-root-3-root">Add me</button>
-</div>
-HTML;
+        $expectedHtml =
+            '<div class="combyna-view" data-view-name="my_view">' .
+            "\n" .
+            // Note that the suffix " (my suffix)" is fetched from the default value for an attribute of the structure type
+            '    Value of the pokable button: "Bang: (my_view-root-1-1) (my suffix)"' .
+                '<button name="combyna-widget-my_view-root-1">My pokable button</button>' .
+                'Value of the addable button: "0"' .
+                '<button name="combyna-widget-my_view-root-3-root">Add me</button>' .
+            "\n" .
+            '</div>';
         self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 

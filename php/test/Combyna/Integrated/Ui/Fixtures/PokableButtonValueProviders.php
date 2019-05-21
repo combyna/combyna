@@ -11,6 +11,7 @@
 
 namespace Combyna\Integrated\Ui\Fixtures;
 
+use Combyna\Component\Bag\StaticBag;
 use Combyna\Component\Environment\Library\WidgetValueProviderLocator;
 use Combyna\Component\Environment\Library\WidgetValueProviderProviderInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
@@ -50,6 +51,18 @@ class PokableButtonValueProviders implements WidgetValueProviderProviderInterfac
     }
 
     /**
+     * Returns an empty structure, to allow testing coercion behaviour
+     *
+     * @return StaticInterface
+     */
+    public function getIncompleteStructure()
+    {
+        return $this->staticExpressionFactory->createStaticStructureExpression(
+            new StaticBag([]) // Leave incomplete, will be filled in by the default for the attr
+        );
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getWidgetValueProviderLocators()
@@ -60,6 +73,12 @@ class PokableButtonValueProviders implements WidgetValueProviderProviderInterfac
                 'pokable_button',
                 'noise',
                 [$this, 'getNoise']
+            ),
+            new WidgetValueProviderLocator(
+                'widget_values',
+                'pokable_button',
+                'incomplete_structure',
+                [$this, 'getIncompleteStructure']
             )
         ];
     }

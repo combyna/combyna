@@ -14,6 +14,8 @@ namespace Combyna\Unit\Component\Bag;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\FixedStaticBagModel;
 use Combyna\Component\Bag\FixedStaticDefinition;
+use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Harness\TestCase;
 use LogicException;
@@ -236,6 +238,102 @@ class FixedStaticBagModelTest extends TestCase
         ]);
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
+    }
+
+    public function testAllowsStaticBagReturnsTrueWhenThereAreNoDefinitionsInTheModelNorTheBag()
+    {
+        $bagModel = new FixedStaticBagModel($this->bagFactory->reveal(), []);
+        $staticBag = $this->prophesize(StaticBagInterface::class);
+        $staticBag->hasStatic(Argument::any())
+            ->willReturn(false);
+        $staticBag->getStaticNames()
+            ->willReturn([]);
+
+        static::assertTrue($bagModel->allowsStaticBag($staticBag->reveal()));
+    }
+
+    public function testAllowsStaticBagReturnsTrueWhenAllRequiredStaticsInThisModelAreInTheBag()
+    {
+        $staticBag = $this->prophesize(StaticBagInterface::class);
+        $staticBag->hasStatic(Argument::any())
+            ->willReturn(false);
+        $staticBag->hasStatic('required-static')
+            ->willReturn(true);
+        $staticBag->getStaticNames()
+            ->willReturn(['required-static']);
+        $requiredStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('required-static')
+            ->willReturn($requiredStatic->reveal());
+        $this->staticDefinition2->allowsStatic($requiredStatic->reveal())
+            ->willReturn(true);
+
+        static::assertTrue($this->bagModel->allowsStaticBag($staticBag->reveal()));
+    }
+
+    public function testAllowsStaticBagReturnsFalseWhenARequiredStaticInThisModelIsNotInTheBag()
+    {
+        $staticBag = $this->prophesize(StaticBagInterface::class);
+        $staticBag->hasStatic(Argument::any())
+            ->willReturn(false);
+        $staticBag->hasStatic('optional-static')
+            ->willReturn(true);
+        $staticBag->getStaticNames()
+            ->willReturn(['optional-static']);
+        $optionalStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('optional-static')
+            ->willReturn($optionalStatic->reveal());
+
+        static::assertFalse($this->bagModel->allowsStaticBag($staticBag->reveal()));
+    }
+
+    public function testAllowsStaticBagReturnsFalseWhenTheBagContainsAnOptionalStaticNotAllowedByItsDefinitionInThisModel()
+    {
+        $staticBag = $this->prophesize(StaticBagInterface::class);
+        $staticBag->hasStatic(Argument::any())
+            ->willReturn(false);
+        $staticBag->hasStatic('optional-static')
+            ->willReturn(true);
+        $staticBag->hasStatic('required-static')
+            ->willReturn(true);
+        $staticBag->getStaticNames()
+            ->willReturn(['optional-static', 'required-static']);
+        $optionalStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('optional-static')
+            ->willReturn($optionalStatic->reveal());
+        $this->staticDefinition1->allowsStatic($optionalStatic->reveal())
+            ->willReturn(false); // Simulate the optional static not matching
+        $requiredStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('required-static')
+            ->willReturn($requiredStatic->reveal());
+        $this->staticDefinition2->allowsStatic($requiredStatic->reveal())
+            ->willReturn(true);
+
+        static::assertFalse($this->bagModel->allowsStaticBag($staticBag->reveal()));
+    }
+
+    public function testAllowsStaticBagReturnsFalseWhenTheBagContainsARequiredStaticNotAllowedByItsDefinitionInThisModel()
+    {
+        $staticBag = $this->prophesize(StaticBagInterface::class);
+        $staticBag->hasStatic(Argument::any())
+            ->willReturn(false);
+        $staticBag->hasStatic('optional-static')
+            ->willReturn(true);
+        $staticBag->hasStatic('required-static')
+            ->willReturn(true);
+        $staticBag->getStaticNames()
+            ->willReturn(['optional-static', 'required-static']);
+        $optionalStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('optional-static')
+            ->willReturn($optionalStatic->reveal());
+        $this->staticDefinition1->allowsStatic($optionalStatic->reveal())
+            ->willReturn(true);
+        $requiredStatic = $this->prophesize(StaticInterface::class);
+        $staticBag->getStatic('required-static')
+            ->willReturn($requiredStatic->reveal());
+        $this->staticDefinition2->allowsStatic($requiredStatic->reveal())
+            ->willReturn(false); // Simulate the required static not matching
+
+        static::assertFalse($this->bagModel->allowsStaticBag($staticBag->reveal()));
     }
 
     public function testGetStaticDefinitionByNameReturnsTheDefinitionWhenItExists()

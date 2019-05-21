@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticDefinitionInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use LogicException;
@@ -22,8 +23,16 @@ use LogicException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface FixedStaticDefinitionInterface
+interface FixedStaticDefinitionInterface extends DeterminedFixedStaticDefinitionInterface
 {
+    /**
+     * Determines whether the type for this definition allows the specified static
+     *
+     * @param StaticInterface $static
+     * @return bool
+     */
+    public function allowsStatic(StaticInterface $static);
+
     /**
      * Given a static value for this defined static:
      * - If a valid "complete" value for the static, the value is returned unmodified

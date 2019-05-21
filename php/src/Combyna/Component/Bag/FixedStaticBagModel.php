@@ -32,13 +32,13 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     private $bagFactory;
 
     /**
-     * @var FixedStaticDefinition[]
+     * @var FixedStaticDefinitionInterface[]
      */
     private $staticDefinitions = [];
 
     /**
      * @param BagFactoryInterface $bagFactory
-     * @param FixedStaticDefinition[] $staticDefinitions
+     * @param FixedStaticDefinitionInterface[] $staticDefinitions
      */
     public function __construct(BagFactoryInterface $bagFactory, array $staticDefinitions)
     {
@@ -77,6 +77,38 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
             $ourDefinition = $this->staticDefinitions[$theirDefinition->getName()];
 
             if (!$ourDefinition->allowsStaticDefinition($theirDefinition)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsStaticBag(StaticBagInterface $staticBag)
+    {
+        // Check there are no required statics in this model that are missing from the static bag
+        foreach ($this->staticDefinitions as $staticName => $definition) {
+            if (!$staticBag->hasStatic($staticName) && $definition->isRequired()) {
+                return false;
+            }
+        }
+
+        // Check there are no statics in the static bag that aren't part of this one
+        foreach ($staticBag->getStaticNames() as $staticName) {
+            if (!$this->definesStatic($staticName)) {
+                return false;
+            }
+        }
+
+        // Check all statics in the bag are allowed
+        // by their corresponding static definitions in this model
+        foreach ($staticBag->getStaticNames() as $staticName) {
+            $staticDefinition = $this->staticDefinitions[$staticName];
+
+            if (!$staticDefinition->allowsStatic($staticBag->getStatic($staticName))) {
                 return false;
             }
         }

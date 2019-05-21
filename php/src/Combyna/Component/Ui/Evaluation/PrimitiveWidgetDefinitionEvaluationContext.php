@@ -132,6 +132,6 @@ class PrimitiveWidgetDefinitionEvaluationContext extends AbstractEvaluationConte
             return $this->widgetDefinition->getDefaultWidgetValue($valueName, $this);
         }
 
-        return $this->widgetDefinition->getWidgetValue($valueName, $this->getPath());
+        return $this->widgetDefinition->getWidgetValue($valueName, $this->getPath(), $this);
     }
 }
