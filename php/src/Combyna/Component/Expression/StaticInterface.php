@@ -16,12 +16,6 @@ namespace Combyna\Component\Expression;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface StaticInterface extends ExpressionInterface
+interface StaticInterface extends ExpressionInterface, StaticValueInterface
 {
-    /**
-     * Fetches the native value of this static
-     *
-     * @return mixed
-     */
-    public function toNative();
 }

@@ -67,6 +67,12 @@ services:
         tags:
             - {name: combyna.parameter_type_parser}
 
+    combyna.config.parameter.type_type_parser:
+        class: Combyna\Component\Config\Parameter\Type\TypeParameterTypeParser
+        autowire: true
+        tags:
+            - {name: combyna.parameter_type_parser}
+
     combyna.config.parameter.widget_type_parser:
         class: Combyna\Component\Config\Parameter\Type\WidgetParameterTypeParser
         autowire: true

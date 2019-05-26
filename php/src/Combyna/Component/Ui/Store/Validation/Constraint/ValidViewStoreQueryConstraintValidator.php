@@ -15,7 +15,6 @@ use Combyna\Component\Store\Config\Act\QueryNodeInterface;
 use Combyna\Component\Ui\Store\Validation\Query\QueryNodeQuery;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use LogicException;
 
 /**
  * Class ValidViewStoreQueryConstraintValidator
@@ -63,7 +62,12 @@ class ValidViewStoreQueryConstraintValidator implements ConstraintValidatorInter
         );
 
         if (!$queryNode instanceof QueryNodeInterface) {
-            throw new LogicException(sprintf('Expected a query node, got "%s"', get_class($queryNode)));
+            $validationContext->addGenericViolation(sprintf(
+                'Expected a view store query node, got "%s"',
+                get_class($queryNode)
+            ));
+
+            return;
         }
 
         $queryNode->validateArgumentExpressionBag($validationContext, $constraint->getArgumentExpressionBag());

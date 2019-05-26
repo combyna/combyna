@@ -43,6 +43,14 @@ interface StaticListInterface extends Countable
     public function elementsMatch(TypeInterface $type);
 
     /**
+     * Determines whether this static list is equivalent to the given other static list
+     *
+     * @param StaticListInterface $otherStaticList
+     * @return bool
+     */
+    public function equals(StaticListInterface $otherStaticList);
+
+    /**
      * Fetches a static from the specified index in this list
      *
      * @param int $index

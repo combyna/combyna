@@ -148,6 +148,14 @@ class DeterminedFixedStaticDefinitionNode extends AbstractActNode implements Det
     /**
      * {@inheritdoc}
      */
+    public function getStaticTypeSummaryWithValue()
+    {
+        return $this->staticType->getSummaryWithValue();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStaticTypeDeterminer()
     {
         return new PresolvedTypeDeterminer($this->staticType);
@@ -159,6 +167,14 @@ class DeterminedFixedStaticDefinitionNode extends AbstractActNode implements Det
     public function isRequired()
     {
         return $this->defaultExpressionNode === null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function staticTypeHasValue()
+    {
+        return $this->staticType->hasValue();
     }
 
     /**

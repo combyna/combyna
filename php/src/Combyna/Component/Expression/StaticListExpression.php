@@ -69,6 +69,15 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof self &&
+            $otherValue->staticList->equals($this->staticList);
+    }
+
+    /**
      * Fetches all statics in this list
      *
      * @return StaticInterface[]
@@ -76,6 +85,31 @@ class StaticListExpression extends AbstractStaticExpression
     public function getElementStatics()
     {
         return $this->staticList->getElementStatics();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        $elementsWereTruncated = false;
+        $summaries = [];
+
+        foreach ($this->staticList->getElementStatics() as $index => $elementStatic) {
+            $summaries[] = $elementStatic->getSummary();
+
+            // Only capture a summary for the first few elements to keep it short-ish
+            if ($index > 3) {
+                $elementsWereTruncated = true;
+                break;
+            }
+        }
+
+        return sprintf(
+            '[%s]',
+            // Add an ellipsis to show that we had to truncate the element summaries when applicable
+            join(',', $summaries) . ($elementsWereTruncated ? ',...' : '')
+        );
     }
 
     /**

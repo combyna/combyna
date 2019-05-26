@@ -208,4 +208,28 @@ class NullValidationContext implements ValidationContextInterface
     {
         throw new RuntimeException(self::MESSAGE);
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateActNodeInIsolation(ActNodeInterface $actNode)
+    {
+        throw new RuntimeException(self::MESSAGE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedType(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        throw new RuntimeException(self::MESSAGE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedTypeIfPureExpression(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        throw new RuntimeException(self::MESSAGE);
+    }
 }

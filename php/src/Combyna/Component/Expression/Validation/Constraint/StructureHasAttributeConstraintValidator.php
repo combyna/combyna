@@ -12,6 +12,7 @@
 namespace Combyna\Component\Expression\Validation\Constraint;
 
 use Combyna\Component\Type\StaticStructureType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -52,6 +53,10 @@ class StructureHasAttributeConstraintValidator implements ConstraintValidatorInt
         ValidationContextInterface $validationContext
     ) {
         $structureType = $validationContext->getExpressionResultType($constraint->getStructureExpression());
+
+        if ($structureType instanceof ValuedType) {
+            $structureType = $structureType->getWrappedType();
+        }
 
         if ($structureType instanceof StaticStructureType) {
             if (!$structureType->hasAttribute($constraint->getAttributeName())) {

@@ -131,6 +131,14 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements Determ
     /**
      * {@inheritdoc}
      */
+    public function getStaticTypeSummaryWithValue()
+    {
+        return $this->getStaticType()->getSummaryWithValue();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStaticTypeDeterminer()
     {
         return new PresolvedTypeDeterminer($this->getStaticType());
@@ -142,6 +150,14 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements Determ
     public function isRequired()
     {
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function staticTypeHasValue()
+    {
+        return $this->getStaticType()->hasValue();
     }
 
     /**

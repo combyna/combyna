@@ -127,6 +127,16 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Discard the value of the valued type and just check whether
+        // this static type allows the value's wrapped type through
+        return $this->allows($candidateType->getWrappedType());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
@@ -192,6 +202,14 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsStaticType($this);
@@ -205,6 +223,22 @@ class StaticType implements TypeInterface
         $expressionClass = $this->staticClass;
 
         return $expressionClass::TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false; // No value information
     }
 
     /**
@@ -273,9 +307,19 @@ class StaticType implements TypeInterface
      */
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
     {
-        // There is nothing common to merge between a static list type and an unresolved type,
+        // There is nothing common to merge between a static type and an unresolved type,
         // so just return a MultipleType that allows both
         return new MultipleType([$this, $unresolvedType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // There is nothing common to merge between a static type and a valued type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType]);
     }
 
     /**
@@ -330,6 +374,14 @@ class StaticType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithStaticType($this);
     }

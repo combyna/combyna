@@ -65,6 +65,13 @@ interface EvaluationContextFactoryInterface
     );
 
     /**
+     * Creates a new NullRootEvaluationContext
+     *
+     * @return NullRootEvaluationContext
+     */
+    public function createNullRootContext();
+
+    /**
      * Creates a new RootEvaluationContext
      *
      * @param EnvironmentInterface $environment

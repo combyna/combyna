@@ -73,6 +73,14 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createNullRootContext()
+    {
+        return new NullRootEvaluationContext($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createRootContext(EnvironmentInterface $environment)
     {
         return new RootEvaluationContext($this, $environment);

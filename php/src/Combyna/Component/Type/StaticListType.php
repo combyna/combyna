@@ -115,6 +115,16 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Discard the value of the valued type and just check whether
+        // this list type allows the value's wrapped type through
+        return $this->allows($candidateType->getWrappedType());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
@@ -197,6 +207,14 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsStaticListType($this, $this->elementType);
@@ -218,6 +236,23 @@ class StaticListType implements TypeInterface
     public function getSummary()
     {
         return 'list<' . $this->elementType->getSummary() . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return 'list<' . $this->elementType->getSummaryWithValue() . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        // The list itself never stores any value information, but its element type may
+        return $this->elementType->hasValue();
     }
 
     /**
@@ -291,6 +326,17 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // There is nothing common to merge between a static list type and a valued type,
+        // so just return a MultipleType that allows both
+        // TODO: Consider merging this type with the valued type's wrapped type
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         return $this; // Void types cannot be passed, so only keep the static list type
@@ -340,6 +386,14 @@ class StaticListType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithStaticListType($this, $this->elementType);
     }

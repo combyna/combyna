@@ -81,7 +81,7 @@ class StructureExpressionIntegratedTest extends TestCase
             ' - Unparsable expression: my @ unparsable default expression. :: ' .
 
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[defined-widget:0]' .
-            ' - Capture "my_capture" is defined with type "structure<{my_attr_with_invalid_type: unknown<No loader is registered for types of type "my_invalid_attr_type">, my_attr_with_invalid_default: text, my_valid_attr: number}>", but is expected to be "structure<{my_attr_with_invalid_type: text, my_attr_with_invalid_default: number, my_valid_attr: text}>". :: ' .
+            ' - Capture "my_capture" would get [structure<{my_attr_with_invalid_type: text, my_attr_with_invalid_default: number, my_valid_attr: text}>], expects [structure<{my_attr_with_invalid_type: unknown<No loader is registered for types of type "my_invalid_attr_type">, my_attr_with_invalid_default: text, my_valid_attr: number}>]. :: ' .
 
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[text-widget].[concatenation]' .
             ' - operand list would get [list<text|unknown<Unknown fixed static "my_undefined_attr">>], expects [list<text|number>]. :: ' .

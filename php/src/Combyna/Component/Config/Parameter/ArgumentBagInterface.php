@@ -16,6 +16,7 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Exception\ExtraArgumentsNotCapturedException;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface ArgumentBagInterface
@@ -79,4 +80,12 @@ interface ArgumentBagInterface
      * @return WidgetNodeInterface
      */
     public function getNamedWidgetArgument($name);
+
+    /**
+     * Fetches a named type determiner argument by its parameter name
+     *
+     * @param string $name
+     * @return TypeDeterminerInterface
+     */
+    public function getNamedTypeArgument($name);
 }

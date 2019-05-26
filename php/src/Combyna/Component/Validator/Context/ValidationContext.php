@@ -304,4 +304,28 @@ class ValidationContext implements ValidationContextInterface
     {
         $this->rootValidationContext->throwIfViolated();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateActNodeInIsolation(ActNodeInterface $actNode)
+    {
+        return $this->rootValidationContext->validateActNodeInIsolation($actNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedType(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        return $this->rootValidationContext->wrapInValuedType($type, $expressionNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedTypeIfPureExpression(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        return $this->rootValidationContext->wrapInValuedTypeIfPureExpression($type, $expressionNode);
+    }
 }

@@ -21,9 +21,25 @@ namespace Combyna\Component\Expression;
  *        like have a guard expression for checking whether the attr is set before reading it
  *        (should only be required for nullable attrs to avoid complicating)
  */
-class NothingExpression extends AbstractStaticExpression
+class NothingExpression extends AbstractStaticExpression implements NothingValueInterface
 {
     const TYPE = 'nothing';
+
+    /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof NothingValueInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return '(none)';
+    }
 
     /**
      * {@inheritdoc}

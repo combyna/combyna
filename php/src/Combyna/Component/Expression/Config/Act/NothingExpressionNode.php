@@ -12,7 +12,10 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Expression\NothingExpression;
+use Combyna\Component\Expression\NothingValueInterface;
+use Combyna\Component\Expression\StaticValueInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
@@ -25,16 +28,37 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *        like have a guard expression for checking whether the attr is set before reading it
  *        (should only be required for nullable attrs to avoid complicating)
  */
-class NothingExpressionNode extends AbstractStaticExpressionNode
+class NothingExpressionNode extends AbstractStaticExpressionNode implements NothingValueInterface
 {
     const TYPE = NothingExpression::TYPE;
 
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof NothingValueInterface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(NothingExpression::class));
+        return new PresolvedTypeDeterminer(
+            new ValuedType(
+                new StaticType(NothingExpression::class),
+                $this
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return '(none)';
     }
 
     /**

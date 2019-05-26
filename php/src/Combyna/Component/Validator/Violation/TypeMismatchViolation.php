@@ -68,10 +68,22 @@ class TypeMismatchViolation implements ViolationInterface
      */
     public function getDescription()
     {
+        $actualType = $this->actualType;
+        $expectedType = $this->expectedType;
+
+        // Only display value information for both sides if the expected type has some available
+        if ($expectedType->hasValue()) {
+            $actualTypeSummary = $actualType->getSummaryWithValue();
+            $expectedTypeSummary = $expectedType->getSummaryWithValue();
+        } else {
+            $actualTypeSummary = $actualType->getSummary();
+            $expectedTypeSummary = $expectedType->getSummary();
+        }
+
         return $this->contextDescription . ' would get [' .
-            $this->actualType->getSummary() .
+            $actualTypeSummary .
             '], expects [' .
-            $this->expectedType->getSummary() .
+            $expectedTypeSummary .
             ']';
     }
 

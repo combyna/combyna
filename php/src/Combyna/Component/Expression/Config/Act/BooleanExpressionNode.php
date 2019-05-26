@@ -12,7 +12,10 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Expression\BooleanExpression;
+use Combyna\Component\Expression\BooleanValueInterface;
+use Combyna\Component\Expression\StaticValueInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use InvalidArgumentException;
 
@@ -23,7 +26,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class BooleanExpressionNode extends AbstractStaticExpressionNode
+class BooleanExpressionNode extends AbstractStaticExpressionNode implements BooleanValueInterface
 {
     const TYPE = BooleanExpression::TYPE;
 
@@ -49,9 +52,31 @@ class BooleanExpressionNode extends AbstractStaticExpressionNode
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof BooleanValueInterface &&
+            $otherValue->toNative() === $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class));
+        return new PresolvedTypeDeterminer(
+            new ValuedType(
+                new StaticType(BooleanExpression::class),
+                $this
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->value ? 'true' : 'false';
     }
 
     /**

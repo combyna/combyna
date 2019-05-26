@@ -111,6 +111,14 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        return false; // Void types only allow other void types
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // This will probably never be used, as void cannot be used as an "accepting" type
@@ -169,6 +177,14 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsVoidType($this);
@@ -180,6 +196,22 @@ class VoidType implements TypeInterface
     public function getSummary()
     {
         return 'void<' . $this->contextDescription . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false; // No value information
     }
 
     /**
@@ -247,6 +279,15 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // No type was known before, so there is nothing to add to the Valued type
+        return $otherType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         // Keep both void types, as each could have different context descriptions
@@ -297,6 +338,14 @@ class VoidType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithVoidType($this);
     }

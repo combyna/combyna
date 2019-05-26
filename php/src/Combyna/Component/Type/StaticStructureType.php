@@ -116,6 +116,16 @@ class StaticStructureType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Discard the value of the valued type and just check whether
+        // this structure type allows the value's wrapped type through
+        return $this->allows($candidateType->getWrappedType());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
@@ -235,6 +245,14 @@ class StaticStructureType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsStaticStructureType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsStaticStructureType($this);
@@ -246,6 +264,22 @@ class StaticStructureType implements TypeInterface
     public function getSummary()
     {
         return 'structure<' . $this->attributeBagModel->getSummary() . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return 'structure<' . $this->attributeBagModel->getSummaryWithValue() . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return $this->attributeBagModel->hasValue();
     }
 
     /**
@@ -317,6 +351,17 @@ class StaticStructureType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // There is nothing common to merge between a static structure type and a valued type,
+        // so just return a MultipleType that allows both
+        // TODO: Consider merging this type with the valued type's wrapped type
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         return $this; // Void types cannot be passed, so only keep the static structure type
@@ -366,6 +411,14 @@ class StaticStructureType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticStructureType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithStaticStructureType($this);
     }
