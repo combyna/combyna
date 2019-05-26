@@ -97,6 +97,14 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        return false; // Unresolved types cannot match any others
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return false; // Unresolved types cannot match any others, including the special Void type
@@ -156,6 +164,14 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return false; // Unresolved types cannot match any others
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return false; // Unresolved types cannot match any others
@@ -167,6 +183,22 @@ class UnresolvedType implements TypeInterface
     public function getSummary()
     {
         return 'unknown<' . $this->contextDescription . '>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false; // No value information
     }
 
     /**
@@ -238,6 +270,16 @@ class UnresolvedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // There is nothing common to merge between an unresolved and a valued type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         // Keep both the unresolved and void types, as each will probably have
@@ -289,6 +331,14 @@ class UnresolvedType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithUnresolvedType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithUnresolvedType($this);
     }

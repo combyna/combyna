@@ -311,4 +311,38 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
 
         return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        $staticDefinitionSummaries = [];
+
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            $staticDefinitionSummaries[] = sprintf(
+                '%s: %s',
+                $staticDefinition->getName(),
+                $staticDefinition->getStaticTypeSummaryWithValue() // As above, but including value info
+            );
+        }
+
+        return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            if ($staticDefinition->staticTypeHasValue()) {
+                // If the type of any definition in the model contains value information,
+                // treat the whole model as having it so it can be displayed if needed
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

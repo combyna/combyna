@@ -81,6 +81,14 @@ interface TypeInterface
     public function allowsStaticType(StaticType $candidateType);
 
     /**
+     * Returns true if this type would allow the specified ValuedType, false otherwise
+     *
+     * @param ValuedType $candidateType
+     * @return bool
+     */
+    public function allowsValuedType(ValuedType $candidateType);
+
+    /**
      * Returns true if this type would allow a VoidType (currently only another VoidType), false otherwise
      *
      * @param VoidType $candidateType
@@ -104,6 +112,21 @@ interface TypeInterface
      * @return string
      */
     public function getSummary();
+
+    /**
+     * Returns a summary of the type represented including any value
+     * eg. `list<number<21>>` or `text<Hello world!>`
+     *
+     * @return string
+     */
+    public function getSummaryWithValue();
+
+    /**
+     * Determines whether this type stores any value information
+     *
+     * @return bool
+     */
+    public function hasValue();
 
     /**
      * Returns true if this type is allowed by an AnyType (usually anything except an UnknownType),
@@ -148,6 +171,14 @@ interface TypeInterface
      * @return bool
      */
     public function isAllowedByStaticType(StaticType $otherType);
+
+    /**
+     * Returns true if this type (usually another ValuedType) would be allowed by the specified one
+     *
+     * @param ValuedType $otherType
+     * @return bool
+     */
+    public function isAllowedByValuedType(ValuedType $otherType);
 
     /**
      * Returns true if both types are void, false otherwise
@@ -222,6 +253,15 @@ interface TypeInterface
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType);
 
     /**
+     * Returns a new type that will match everything the current type does and also everything
+     * the provided valued type does
+     *
+     * @param ValuedType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithValuedType(ValuedType $otherType);
+
+    /**
      * For void types, this will just return whichever type is not void, unless both are void
      * in which case that will be returned
      *
@@ -283,6 +323,15 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided valued type does
+     *
+     * @param ValuedType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType);
 
     /**
      * For void types, this will just return whichever type is not void, unless both are void

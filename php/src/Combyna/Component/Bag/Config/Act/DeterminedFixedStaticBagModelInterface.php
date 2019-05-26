@@ -80,4 +80,19 @@ interface DeterminedFixedStaticBagModelInterface
      * @return string
      */
     public function getSummary();
+
+    /**
+     * Returns a summary of the static definitions represented including any value
+     * eg. `structure{name: text<Hello!>, age: number<21>}`
+     *
+     * @return string
+     */
+    public function getSummaryWithValue();
+
+    /**
+     * Determines whether the static definitions in this model store any value information
+     *
+     * @return bool
+     */
+    public function hasValue();
 }

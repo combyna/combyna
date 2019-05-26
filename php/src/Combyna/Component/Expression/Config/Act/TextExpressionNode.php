@@ -11,8 +11,11 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Expression\StaticValueInterface;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\TextValueInterface;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use InvalidArgumentException;
 
@@ -23,7 +26,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TextExpressionNode extends AbstractStaticExpressionNode
+class TextExpressionNode extends AbstractStaticExpressionNode implements TextValueInterface
 {
     const TYPE = TextExpression::TYPE;
 
@@ -49,9 +52,34 @@ class TextExpressionNode extends AbstractStaticExpressionNode
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof TextValueInterface &&
+            $otherValue->toNative() === $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
+        return new PresolvedTypeDeterminer(
+            new ValuedType(
+                new StaticType(TextExpression::class),
+                $this
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        // Add an ellipsis to show that we had to truncate the text when applicable
+        return strlen($this->text) > self::MAX_SUMMARY_LENGTH ?
+            substr($this->text, 0, self::MAX_SUMMARY_LENGTH) . '...' :
+            $this->text;
     }
 
     /**

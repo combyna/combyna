@@ -54,6 +54,25 @@ class StaticDayExpression extends AbstractStaticExpression
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof self &&
+            $otherValue->day === $this->day &&
+            $otherValue->month === $this->month &&
+            $otherValue->year === $this->year;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toNative()
     {
         return DateTime::createFromFormat('yyyy-mm-dd', implode('-', [$this->year, $this->month, $this->day]));

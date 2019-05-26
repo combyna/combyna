@@ -20,7 +20,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class BooleanExpression extends AbstractStaticExpression
+class BooleanExpression extends AbstractStaticExpression implements BooleanValueInterface
 {
     const TYPE = 'boolean';
 
@@ -41,6 +41,23 @@ class BooleanExpression extends AbstractStaticExpression
         }
 
         $this->value = $value;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof BooleanValueInterface &&
+            $otherValue->toNative() === $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->value ? 'true' : 'false';
     }
 
     /**

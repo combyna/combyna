@@ -19,8 +19,12 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Config\Act\UnknownNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Config\Act\ExpressionNodePromoterInterface;
+use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Type\ValuedType;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
 use Combyna\Component\Validator\Query\BooleanQueryInterface;
@@ -50,6 +54,16 @@ class RootValidationContext implements RootValidationContextInterface
     private $behaviourSpecValidator;
 
     /**
+     * @var EvaluationContextFactoryInterface
+     */
+    private $evaluationContextFactory;
+
+    /**
+     * @var ExpressionNodePromoterInterface
+     */
+    private $expressionNodePromoter;
+
+    /**
      * @var BehaviourSpecInterface
      */
     private $rootNodeBehaviourSpec;
@@ -75,16 +89,22 @@ class RootValidationContext implements RootValidationContextInterface
      * @param RootSubValidationContextInterface $rootSubValidationContext
      * @param BehaviourSpecInterface $rootNodeBehaviourSpec
      * @param BehaviourSpecValidatorInterface $behaviourSpecValidator
+     * @param EvaluationContextFactoryInterface $evaluationContextFactory
+     * @param ExpressionNodePromoterInterface $expressionNodePromoter
      */
     public function __construct(
         ValidationFactoryInterface $validationFactory,
         BehaviourFactoryInterface $behaviourFactory,
         RootSubValidationContextInterface $rootSubValidationContext,
         BehaviourSpecInterface $rootNodeBehaviourSpec,
-        BehaviourSpecValidatorInterface $behaviourSpecValidator
+        BehaviourSpecValidatorInterface $behaviourSpecValidator,
+        EvaluationContextFactoryInterface $evaluationContextFactory,
+        ExpressionNodePromoterInterface $expressionNodePromoter
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->behaviourSpecValidator = $behaviourSpecValidator;
+        $this->evaluationContextFactory = $evaluationContextFactory;
+        $this->expressionNodePromoter = $expressionNodePromoter;
         $this->rootNodeBehaviourSpec = $rootNodeBehaviourSpec;
         $this->rootSubValidationContext = $rootSubValidationContext;
         $this->validationFactory = $validationFactory;
@@ -199,6 +219,14 @@ class RootValidationContext implements RootValidationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function isViolated()
+    {
+        return !empty($this->violations);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function queryForActNode(
         ActNodeQueryInterface $actNodeQuery,
         ActNodeInterface $nodeToQueryFrom
@@ -223,7 +251,7 @@ class RootValidationContext implements RootValidationContextInterface
         );
 
         // Create and adopt the new unknown node into the ACT
-        $unknownNode = new UnknownNode($actNodeQuery->getDescription());
+        $unknownNode = new UnknownNode($actNodeQuery->getDescription(), new NullActNodeAdopter());
         $this->adoptDynamicActNode($unknownNode, $subValidationContext);
 
         return $unknownNode;
@@ -334,5 +362,66 @@ class RootValidationContext implements RootValidationContextInterface
 
             throw new ValidationFailureException($this, implode('. :: ', $descriptions));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateActNodeInIsolation(ActNodeInterface $actNode)
+    {
+        $behaviourSpecBuilder = $this->behaviourFactory->createBehaviourSpecBuilder($actNode);
+        $actNode->buildBehaviourSpec($behaviourSpecBuilder);
+        $behaviourSpec = $behaviourSpecBuilder->build();
+
+        $isolatedRootSubValidationContext = $this->validationFactory->createRootSubContext(
+            $this->rootSubValidationContext->getSubjectActNode(),
+            $behaviourSpec,
+            $actNode
+        );
+
+        $isolatedRootValidationContext = $this->validationFactory->createRootContext(
+            $isolatedRootSubValidationContext,
+            $behaviourSpec,
+            $this->behaviourSpecValidator
+        );
+
+        $this->behaviourSpecValidator->validateSpec(
+            $behaviourSpec,
+            $isolatedRootValidationContext,
+            $isolatedRootSubValidationContext
+        );
+
+        return $isolatedRootValidationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedType(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        $evaluationContext = $this->evaluationContextFactory->createNullRootContext();
+        $valueExpression = $this->expressionNodePromoter->promote($expressionNode);
+        $valueStatic = $valueExpression->toStatic($evaluationContext);
+
+        return new ValuedType($type, $valueStatic);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedTypeIfPureExpression(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        // Attempt to validate the expression (eg. a structure) as a "pure" one (with no function calls,
+        // widget attribute fetches etc.) - if it is then we can evaluate it to a static value
+        // statically (at validation time) and wrap it in a ValuedType to perform static analysis with it
+
+        // Check that the value expression is valid before trying to promote it
+        $expressionRootValidationContext = $this->validateActNodeInIsolation($expressionNode);
+
+        if (!$expressionRootValidationContext->isViolated()) {
+            return $this->wrapInValuedType($type, $expressionNode);
+        }
+
+        return $type;
     }
 }

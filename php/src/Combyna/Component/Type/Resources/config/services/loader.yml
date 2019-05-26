@@ -32,3 +32,9 @@ services:
         autowire: true
         tags:
             - {name: combyna.type_loader}
+
+    combyna.type.loader.valued:
+        class: Combyna\Component\Type\Config\Loader\ValuedTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}

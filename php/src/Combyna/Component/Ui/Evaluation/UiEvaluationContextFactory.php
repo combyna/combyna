@@ -190,6 +190,14 @@ class UiEvaluationContextFactory implements UiEvaluationContextFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createNullRootContext()
+    {
+        return $this->parentContextFactory->createNullRootContext();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createPrimitiveWidgetDefinitionEvaluationContext(
         PrimitiveWidgetEvaluationContextInterface $parentContext,
         PrimitiveWidgetDefinition $widgetDefinition,

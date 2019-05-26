@@ -50,9 +50,23 @@ interface DeterminedFixedStaticDefinitionInterface
     public function getStaticTypeSummary();
 
     /**
+     * Fetches the summary of the static type for this definition with value information if available
+     *
+     * @return string
+     */
+    public function getStaticTypeSummaryWithValue();
+
+    /**
      * Determines whether this static must be defined in the bag or not
      *
      * @return bool
      */
     public function isRequired();
+
+    /**
+     * Determines whether this definition's type stores any value information
+     *
+     * @return bool
+     */
+    public function staticTypeHasValue();
 }

@@ -100,6 +100,28 @@ class StaticList implements StaticListInterface
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticListInterface $otherStaticList)
+    {
+        if (count($otherStaticList->getElementStatics()) !== count($this->statics)) {
+            // If the lists have different lengths, they are guaranteed to differ
+            return false;
+        }
+
+        foreach ($otherStaticList->getElementStatics() as $index => $otherElementStatic) {
+            $ourElementStatic = $this->statics[$index];
+
+            if (!$otherElementStatic->equals($ourElementStatic)) {
+                // If any one element differs, the entire list differs
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getElementStatic($index)
     {
         if (!is_int($index)) {

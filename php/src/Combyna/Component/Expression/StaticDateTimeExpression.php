@@ -82,6 +82,29 @@ class StaticDateTimeExpression extends AbstractStaticExpression
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof self &&
+            $otherValue->day === $this->day &&
+            $otherValue->hour === $this->hour &&
+            $otherValue->millisecond === $this->millisecond &&
+            $otherValue->minute === $this->minute &&
+            $otherValue->month === $this->month &&
+            $otherValue->second === $this->second &&
+            $otherValue->year === $this->year;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toNative()
     {
         return DateTime::createFromFormat(

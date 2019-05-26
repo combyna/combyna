@@ -82,6 +82,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        return true; // Any valued type is allowed
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere, including to a special Any type
@@ -138,6 +146,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $superType)
+    {
+        return $superType->allowsAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsAnyType($this);
@@ -149,6 +165,22 @@ class AnyType implements TypeInterface
     public function getSummary()
     {
         return '*';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false;
     }
 
     /**
@@ -212,6 +244,14 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         return $this; // Void types cannot be passed, so only keep the Any type
@@ -261,6 +301,14 @@ class AnyType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithAnyType($this);
     }

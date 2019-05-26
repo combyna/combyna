@@ -133,8 +133,24 @@ class FixedStaticDefinition implements FixedStaticDefinitionInterface
     /**
      * {@inheritdoc}
      */
+    public function getStaticTypeSummaryWithValue()
+    {
+        return $this->staticType->getSummaryWithValue();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isRequired()
     {
         return $this->defaultExpression === null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function staticTypeHasValue()
+    {
+        return $this->staticType->hasValue();
     }
 }

@@ -39,6 +39,35 @@ class MutableStaticBag implements MutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticBagInterface $otherStaticBag)
+    {
+        if (count($otherStaticBag->getStaticNames()) !== count($this->statics)) {
+            // If the bags contain different numbers of statics, they are guaranteed to differ
+            return false;
+        }
+
+        foreach ($otherStaticBag->getStaticNames() as $staticName) {
+            $otherStatic = $otherStaticBag->getStatic($staticName);
+
+            if (!$this->hasStatic($staticName)) {
+                // If the other bag contains a static that this one doesn't, the entire bag differs
+                return false;
+            }
+
+            $ourStatic = $this->statics[$staticName];
+
+            if (!$otherStatic->equals($ourStatic)) {
+                // If any one static differs, the entire bag differs
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatic($name)
     {
         if (!$this->hasStatic($name)) {

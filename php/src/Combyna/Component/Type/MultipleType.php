@@ -148,6 +148,21 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Check that at least one of our sub-types allows the valued type
+        foreach ($this->subTypes as $ourSubType) {
+            if ($ourSubType->allows($candidateType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
@@ -214,6 +229,14 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsMultipleType($this, $this->subTypes);
@@ -231,6 +254,37 @@ class MultipleType implements TypeInterface
         }
 
         return implode('|', $parts);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        $parts = [];
+
+        foreach ($this->subTypes as $subType) {
+            $parts[] = $subType->getSummaryWithValue(); // Same as ->getSummary(), but with values
+        }
+
+        return implode('|', $parts);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        foreach ($this->subTypes as $subType) {
+            if ($subType->hasValue()) {
+                // If any sub-type (or descendant of one, like an attribute of a structure type)
+                // has a value, then treat the whole group as storing value information
+                // so that it may be displayed
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -306,6 +360,17 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        $combinedSubTypes = $this->subTypes;
+        $combinedSubTypes[] = $otherType;
+
+        return new MultipleType($combinedSubTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         return $this; // Void types cannot be passed, so only keep the Multiple type
@@ -355,6 +420,14 @@ class MultipleType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithMultipleType($this, $this->subTypes);
     }

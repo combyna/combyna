@@ -93,4 +93,12 @@ class ArgumentBag implements ArgumentBagInterface
     {
         return $this->arguments[$name];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamedTypeArgument($name)
+    {
+        return $this->arguments[$name];
+    }
 }

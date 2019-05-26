@@ -62,13 +62,10 @@ class CaptureHasCorrectTypeConstraintValidator implements ConstraintValidatorInt
         );
 
         if (!$definedCaptureType->allows($setterExpressionResultType)) {
-            $validationContext->addGenericViolation(
-                sprintf(
-                    'Capture "%s" is defined with type "%s", but is expected to be "%s"',
-                    $constraint->getCaptureName(),
-                    $definedCaptureType->getSummary(),
-                    $setterExpressionResultType->getSummary()
-                )
+            $validationContext->addTypeMismatchViolation(
+                $definedCaptureType,
+                $setterExpressionResultType,
+                sprintf('Capture "%s"', $constraint->getCaptureName())
             );
         }
     }
