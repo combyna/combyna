@@ -1,3 +1,0 @@
-my_feature:
-  pattern: '/feature'
-  page_view: my_feature_view

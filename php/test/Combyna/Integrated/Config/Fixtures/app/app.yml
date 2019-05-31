@@ -1,3 +1,16 @@
 name: Config directory loading test app
 home:
-  route: app.my_route
+  route: app.home
+
+routes:
+  home:
+    pattern: '/'
+    page_view: home_page
+
+page_views:
+  home_page:
+    title: !expr 'Welcome home'
+    description: The homepage of the web app
+    widget:
+      type: text
+      text: !expr 'Welcome!'

@@ -1,0 +1,13 @@
+login_page:
+  title: !expr 'Login'
+  description: This is the login page
+  widget:
+    type: text
+    text: !expr 'Click here to login'
+
+forgot_password_page:
+  title: !expr 'Reset your password'
+  description: The place to reset your password
+  widget:
+    type: text
+    text: !expr 'Enter your email'

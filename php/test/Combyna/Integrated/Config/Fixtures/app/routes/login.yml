@@ -1,0 +1,7 @@
+login:
+  pattern: '/login'
+  page_view: login_page
+
+forgot_password:
+  pattern: '/reset'
+  page_view: forgot_password_page

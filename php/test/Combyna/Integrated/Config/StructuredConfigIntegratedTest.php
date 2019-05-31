@@ -13,7 +13,7 @@ namespace Combyna\Integrated\Config;
 
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\Config\Loader\ConfigBuilder;
-use Combyna\Component\Config\Loader\ApplicatonLoader;
+use Combyna\Component\Config\FileSystem\ConfigLoader;
 use Combyna\Component\Config\Loader\YamlFileLoader;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
@@ -73,17 +73,12 @@ class StructuredConfigIntegratedTest extends TestCase
         $this->testGuiWidgetProviders = $this->container->get('combyna_test.gui_widget_providers');
         $yamlParser = $this->container->get('combyna.config.yaml_parser');
 
-        $config = new ConfigBuilder();
-        $locator = new FileLocator([__DIR__ . '/Fixtures']);
-        $appConfigLoader = new ApplicatonLoader($config, $locator);
-        $appConfigLoader->setResolver(new LoaderResolver([
-            new YamlFileLoader($config, $yamlParser, $locator),
-            $appConfigLoader
-        ]));
-         $appConfigLoader->load('app/');
+        $appConfigLoader = new ConfigLoader($yamlParser); // TODO remove YamlParser as a dep
+
+        $config = $appConfigLoader->load(__DIR__ . '/Fixtures/app');
 
         $this->environment = $this->combyna->createEnvironment();
-        $this->app = $this->combyna->createApp($config->getConfig(), $this->environment);
+        $this->app = $this->combyna->createApp($config->toArray(), $this->environment);
     }
 
     public function testRenderAppReturnsTheCorrectHtmlOnInitialLoad()
