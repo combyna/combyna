@@ -13,10 +13,9 @@ namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class UnknownExpressionNode
@@ -58,6 +57,6 @@ class UnknownExpressionNode extends AbstractExpressionNode implements DynamicAct
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new UnresolvedType($this->contextDescription));
+        return new UnresolvedTypeDeterminer($this->contextDescription);
     }
 }

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Program;
 
+use Combyna\Component\Router\RouteRepositoryInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionRepositoryInterface;
 
@@ -21,6 +22,13 @@ use Combyna\Component\Ui\Widget\WidgetDefinitionRepositoryInterface;
  */
 interface RootResourceRepositoryInterface extends ResourceRepositoryInterface
 {
+    /**
+     * Sets the route repository to use
+     *
+     * @param RouteRepositoryInterface $routeRepository
+     */
+    public function setRouteRepository(RouteRepositoryInterface $routeRepository);
+
     /**
      * Sets the signal definition repository to use
      *

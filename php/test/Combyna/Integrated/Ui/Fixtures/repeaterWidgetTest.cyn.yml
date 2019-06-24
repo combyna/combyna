@@ -1,0 +1,80 @@
+name: Repeater widgets test app
+translations:
+    en:
+        add_item_button_caption: Add item
+signals:
+    select_item:
+        payload:
+            item_text:
+                type: text
+home:
+    route: app.items
+routes:
+    items:
+        pattern: '/'
+        page_view: item_viewer
+
+page_views:
+    item_viewer:
+        title: !expr 'Repeater widgets test'
+        description: A test of the repeater widgets feature
+        widget:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'Selected item: ' ~ view_query('get_selected_item')
+
+                - type: gui.horizontal_rule
+
+                - type: text
+                  text: !expr 'Items: '
+                - type: repeater
+                  items: >
+                      !expr [
+                          'first',
+                          'second',
+                          'third'
+                      ]
+                  index_variable: this_item_index
+                  item_variable: this_item
+                  repeated:
+                      type: group
+                      children:
+                          - type: gui.button
+                            attributes:
+                                label: !expr 'Select item "' ~ this_item ~ '"'
+                            tags:
+                                - list_view.select_item_button
+                            triggers:
+                                gui.click:
+                                    instructions:
+                                        - type: signal
+                                          signal: app.select_item
+                                          payload:
+                                              item_text: !expr this_item
+
+        store:
+            slots:
+                selected_item:
+                    type: text|nothing
+                    default: !expr nothing
+            commands: ~
+            queries:
+                get_selected_item:
+                    parameters: ~
+                    expression: >
+                        !expr guard(
+                            name: 'my_non_nothing_selection',
+                            constraint: 'known-type-value',
+                            expression: slot('selected_item'),
+                            type: 'text',
+                            then: assured('my_non_nothing_selection'),
+                            else: '(No item selected)'
+                        )
+            signal_handlers:
+                app.select_item:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: selected_item
+                          value: !expr signal_payload('item_text')

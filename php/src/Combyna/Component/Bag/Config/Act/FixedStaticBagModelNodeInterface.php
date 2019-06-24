@@ -12,6 +12,7 @@
 namespace Combyna\Component\Bag\Config\Act;
 
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
@@ -61,6 +62,21 @@ interface FixedStaticBagModelNodeInterface extends ActNodeInterface
      * @return FixedStaticDefinitionNodeInterface[]
      */
     public function getStaticDefinitions();
+
+    /**
+     * Fetches the type of a definition
+     *
+     * @param string $definitionName
+     * @return TypeInterface
+     */
+    public function getStaticDefinitionType($definitionName);
+
+    /**
+     * Determines whether or not this model is empty (defines no statics)
+     *
+     * @return bool
+     */
+    public function isEmpty();
 
     /**
      * Checks that all expressions in the provided bag evaluate to statics that match

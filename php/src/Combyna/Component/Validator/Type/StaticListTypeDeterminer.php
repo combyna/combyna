@@ -44,7 +44,10 @@ class StaticListTypeDeterminer extends AbstractTypeDeterminer
      */
     public function determine(ValidationContextInterface $validationContext)
     {
-        return new StaticListType($this->elementTypeDeterminer->determine($validationContext));
+        return new StaticListType(
+            $this->elementTypeDeterminer->determine($validationContext),
+            $validationContext
+        );
     }
 
     /**

@@ -73,7 +73,7 @@ class CorrectCaptureTypeQuery implements ResultTypeQueryInterface
 
         foreach ($this->optionalAncestorWidgetNodesFound as $index => $optionalAncestorWidgetNode) {
             if ($optionalAncestorWidgetNode instanceof RepeaterWidgetNode) {
-                $type = new StaticListType($type);
+                $type = new StaticListType($type, $validationContext);
             } elseif ($optionalAncestorWidgetNode instanceof ConditionalWidgetNode) {
                 if ($index === count($this->optionalAncestorWidgetNodesFound) - 1) {
                     /*
@@ -85,7 +85,10 @@ class CorrectCaptureTypeQuery implements ResultTypeQueryInterface
                     break;
                 }
 
-                $type = new MultipleType([$type, new StaticType(NothingExpression::class)]);
+                $type = new MultipleType(
+                    [$type, new StaticType(NothingExpression::class, $validationContext)],
+                    $validationContext
+                );
             } else {
                 throw new LogicException('Unexpected widget node type');
             }

@@ -51,6 +51,14 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function buildRouteUrl($libraryName, $routeName, StaticBagInterface $argumentStaticBag)
+    {
+        return $this->parentContext->buildRouteUrl($libraryName, $routeName, $argumentStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function callFunction(
         $libraryName,
         $functionName,
@@ -127,6 +135,14 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCompoundWidgetDefinitionContext()
+    {
+        return $this->parentContext->getCompoundWidgetDefinitionContext();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
         return $this->parentContext->getEnvironment();
@@ -138,6 +154,38 @@ abstract class AbstractEvaluationContext implements EvaluationContextInterface
     public function getEventPayloadStatic($staticName)
     {
         return $this->parentContext->getEventPayloadStatic($staticName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentContext()
+    {
+        return $this->parentContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoute($libraryName, $routeName)
+    {
+        return $this->parentContext->getRoute($libraryName, $routeName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteArgument($parameterName)
+    {
+        return $this->parentContext->getRouteArgument($parameterName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSiblingBagStatic($staticName)
+    {
+        return $this->parentContext->getSiblingBagStatic($staticName);
     }
 
     /**

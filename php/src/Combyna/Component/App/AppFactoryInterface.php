@@ -14,6 +14,7 @@ namespace Combyna\Component\App;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Router\RouteInterface;
 use Combyna\Component\Router\RouterInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
@@ -35,6 +36,7 @@ interface AppFactoryInterface
      * @param PageViewCollectionInterface $pageViewCollection
      * @param OverlayViewCollectionInterface $overlayViewCollection
      * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      * @param ProgramInterface $program
      * @return AppInterface
      */
@@ -44,6 +46,7 @@ interface AppFactoryInterface
         PageViewCollectionInterface $pageViewCollection,
         OverlayViewCollectionInterface $overlayViewCollection,
         EnvironmentInterface $environment,
+        ResourceRepositoryInterface $resourceRepository,
         ProgramInterface $program
     );
 

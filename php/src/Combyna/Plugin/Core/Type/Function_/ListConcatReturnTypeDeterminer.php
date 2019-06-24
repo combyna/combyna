@@ -41,18 +41,21 @@ class ListConcatReturnTypeDeterminer extends AbstractTypeDeterminer
         $node = $validationContext->getSubjectActNode();
 
         if (!$node instanceof FunctionExpressionNode) {
-            return new StaticListType(new AnyType());
+            return new StaticListType(new AnyType($validationContext), $validationContext);
         }
 
         $listsArgExpression = $node->getArgumentExpressionBag()->getExpression('lists');
         $listsArgResultType = $listsArgExpression->getResultTypeDeterminer()->determine($validationContext);
 
         if (!$listsArgResultType instanceof StaticListType) {
-            return new UnresolvedType(sprintf(
-                'list.concat type - expected `lists` arg to resolve to a %s but got %s',
-                StaticListType::class,
-                get_class($listsArgResultType)
-            ));
+            return new UnresolvedType(
+                sprintf(
+                    'list.concat type - expected `lists` arg to resolve to a %s but got %s',
+                    StaticListType::class,
+                    get_class($listsArgResultType)
+                ),
+                $validationContext
+            );
         }
 
         $listTypes = $listsArgResultType->getElementType();

@@ -15,9 +15,8 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\ConditionalExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Type\AdditiveDeterminer;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class ConditionalExpressionNode
@@ -73,7 +72,7 @@ class ConditionalExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->conditionExpression,
-                new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                new StaticTypeDeterminer(BooleanExpression::class),
                 'condition'
             )
         );

@@ -20,6 +20,7 @@ use Combyna\Component\Ui\Store\Validation\Query\InsideViewStoreQuery;
 use Combyna\Component\Ui\Store\Validation\Query\ViewStoreHasSlotQuery;
 use Combyna\Component\Ui\Store\Validation\Query\ViewStoreSlotTypeQuery;
 use Combyna\Component\Validator\Context\SubValidationContextInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class ViewStoreSubValidationContext
@@ -151,14 +152,20 @@ class ViewStoreSubValidationContext implements ViewStoreSubValidationContextInte
      * Fetches the static type of a view store slot
      *
      * @param ViewStoreSlotTypeQuery $query
+     * @param ValidationContextInterface $validationContext
      * @return TypeInterface
      */
-    public function queryForViewStoreSlotType(ViewStoreSlotTypeQuery $query)
-    {
+    public function queryForViewStoreSlotType(
+        ViewStoreSlotTypeQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
         $staticType = $this->viewStoreNode->getSlotStaticType($query->getSlotName());
 
         if ($staticType === null) {
-            return new UnresolvedType('view store slot static type');
+            return new UnresolvedType(
+                'view store slot static type',
+                $validationContext
+            );
         }
 
         return $staticType;

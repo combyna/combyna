@@ -12,6 +12,7 @@
 namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Common\Delegator\DelegatorInterface;
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\HtmlNodeInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
@@ -45,9 +46,10 @@ class DelegatingWidgetRenderer implements DelegatorInterface
      * Renders the specified widget state to a HTML node
      *
      * @param WidgetStatePathInterface $widgetStatePath
+     * @param ProgramInterface $program
      * @return HtmlNodeInterface
      */
-    public function renderWidget(WidgetStatePathInterface $widgetStatePath)
+    public function renderWidget(WidgetStatePathInterface $widgetStatePath, ProgramInterface $program)
     {
         $eventualEndRenderableStatePath = $widgetStatePath->getEventualEndRenderableStatePath();
         /** @var WidgetStateInterface $widgetState */
@@ -71,7 +73,8 @@ class DelegatingWidgetRenderer implements DelegatorInterface
 
         return $this->widgetRenderers[$libraryName][$widgetDefinitionName]->renderWidget(
             $widgetState,
-            $eventualEndRenderableStatePath
+            $eventualEndRenderableStatePath,
+            $program
         );
     }
 }

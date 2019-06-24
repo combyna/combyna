@@ -12,11 +12,12 @@
 namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Ui\Exception\NotInsideCompoundWidgetDefinitionException;
 use LogicException;
 
 /**
@@ -27,25 +28,35 @@ use LogicException;
 class RootEvaluationContext implements EvaluationContextInterface
 {
     /**
-     * @var EnvironmentInterface
-     */
-    private $environment;
-
-    /**
      * @var EvaluationContextFactoryInterface
      */
     private $evaluationContextFactory;
 
     /**
+     * @var ResourceRepositoryInterface
+     */
+    private $resourceRepository;
+
+    /**
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
-     * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      */
     public function __construct(
         EvaluationContextFactoryInterface $evaluationContextFactory,
-        EnvironmentInterface $environment
+        ResourceRepositoryInterface $resourceRepository
     ) {
-        $this->environment = $environment;
         $this->evaluationContextFactory = $evaluationContextFactory;
+        $this->resourceRepository = $resourceRepository;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildRouteUrl($libraryName, $routeName, StaticBagInterface $argumentStaticBag)
+    {
+        $route = $this->resourceRepository->getRouteByName($libraryName, $routeName);
+
+        return $route->generateUrl($argumentStaticBag);
     }
 
     /**
@@ -57,7 +68,10 @@ class RootEvaluationContext implements EvaluationContextInterface
         StaticBagInterface $argumentStaticBag,
         TypeInterface $returnType
     ) {
-        $function = $this->environment->getGenericFunctionByName($libraryName, $functionName);
+        // TODO: Support app-defined (non-native) functions
+        $function = $this->resourceRepository
+            ->getEnvironment()
+            ->getGenericFunctionByName($libraryName, $functionName);
 
         return $function->call($argumentStaticBag, $returnType);
     }
@@ -129,9 +143,19 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCompoundWidgetDefinitionContext()
+    {
+        throw new NotInsideCompoundWidgetDefinitionException(
+            'Compound widget definition context cannot be fetched outside a widget'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
-        return $this->environment;
+        return $this->resourceRepository->getEnvironment();
     }
 
     /**
@@ -140,6 +164,43 @@ class RootEvaluationContext implements EvaluationContextInterface
     public function getEventPayloadStatic($staticName)
     {
         throw new LogicException('Event payload static "' . $staticName . '" cannot be fetched outside a trigger');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentContext()
+    {
+        return null; // Root context has no parent
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoute($libraryName, $routeName)
+    {
+        return $this->resourceRepository->getRouteByName($libraryName, $routeName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteArgument($parameterName)
+    {
+        throw new LogicException('Route argument "' . $parameterName . '" cannot be fetched outside a view');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSiblingBagStatic($staticName)
+    {
+        throw new LogicException(
+            sprintf(
+                'Sibling bag static "%s" cannot be fetched outside a bag',
+                $staticName
+            )
+        );
     }
 
     /**
@@ -202,6 +263,6 @@ class RootEvaluationContext implements EvaluationContextInterface
      */
     public function translate($translationKey, array $parameters = [])
     {
-        return $this->environment->translate($translationKey, $parameters);
+        return $this->resourceRepository->translate($translationKey, $parameters);
     }
 }

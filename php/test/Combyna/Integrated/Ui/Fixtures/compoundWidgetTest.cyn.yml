@@ -1,0 +1,62 @@
+name: Compound widgets test app
+translations:
+    en:
+        add_item_button_caption: Add item
+signals:
+    select_item:
+        payload:
+            item_text:
+                type: text
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+widgets:
+    inner_compound:
+        type: compound
+        attributes:
+            inner_text: text
+        children:
+            inner_child: ~
+        root:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'Inner text: ' ~ widget_attr('inner_text')
+                - type: child
+                  name: inner_child
+    outer_compound:
+        type: compound
+        attributes:
+            outer_text: text
+        children:
+            outer_child: ~
+        root:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'Outer text: ' ~ widget_attr('outer_text') ~ ' '
+                - type: app.inner_compound
+                  attributes:
+                      # fix me!
+                      inner_text: !expr 'Hi inner, from outer (' ~ widget_attr('outer_text') ~ ')! '
+                  children:
+                      inner_child:
+                          type: child
+                          name: outer_child
+
+page_views:
+    my_view:
+        title: !expr 'Compound widgets test'
+        description: A test of the compound widgets feature
+        widget:
+            type: app.outer_compound
+            attributes:
+                outer_text: !expr 'OUTER'
+            children:
+                outer_child:
+                    type: text
+                    text: !expr 'HI FROM OUTER'

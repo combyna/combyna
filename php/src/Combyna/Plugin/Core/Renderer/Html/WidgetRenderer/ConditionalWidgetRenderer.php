@@ -11,6 +11,7 @@
 
 namespace Combyna\Plugin\Core\Renderer\Html\WidgetRenderer;
 
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\DocumentFragment;
 use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
@@ -62,8 +63,11 @@ class ConditionalWidgetRenderer implements WidgetRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath)
-    {
+    public function renderWidget(
+        WidgetStateInterface $widgetState,
+        WidgetStatePathInterface $widgetStatePath,
+        ProgramInterface $program
+    ) {
         if (
             !$widgetState instanceof ConditionalWidgetStateInterface ||
             $widgetState->getWidgetDefinitionLibraryName() !== $this->getWidgetDefinitionLibraryName() ||
@@ -79,13 +83,13 @@ class ConditionalWidgetRenderer implements WidgetRendererInterface
                 $widgetState->getConsequentWidgetState()->getStateName()
             );
 
-            $childNodes[] = $this->delegatingWidgetRenderer->renderWidget($consequentWidgetStatePath);
+            $childNodes[] = $this->delegatingWidgetRenderer->renderWidget($consequentWidgetStatePath, $program);
         } elseif ($widgetState->getAlternateWidgetState() !== null) {
             $alternateWidgetStatePath = $widgetStatePath->getChildStatePath(
                 $widgetState->getAlternateWidgetState()->getStateName()
             );
 
-            $childNodes[] = $this->delegatingWidgetRenderer->renderWidget($alternateWidgetStatePath);
+            $childNodes[] = $this->delegatingWidgetRenderer->renderWidget($alternateWidgetStatePath, $program);
         }
 
         return new RenderedWidget(

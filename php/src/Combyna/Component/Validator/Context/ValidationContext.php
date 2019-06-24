@@ -171,6 +171,14 @@ class ValidationContext implements ValidationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createExoticTypeDeterminer($determinerName, array $config)
+    {
+        return $this->rootValidationContext->createExoticTypeDeterminer($determinerName, $config, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubContext(
         SubValidationContextSpecifierInterface $subContextSpecifier,
         StructuredNodeInterface $structuredNode,
@@ -191,6 +199,14 @@ class ValidationContext implements ValidationContextInterface
     public function createTypeQueryRequirement(ResultTypeQueryInterface $query)
     {
         return new TypeQueryRequirement($query, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode)
+    {
+        return $this->rootValidationContext->createValidationContextForActNode($structuredNode);
     }
 
     /**

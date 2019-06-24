@@ -81,7 +81,7 @@ class EventDefinitionNode extends AbstractActNode implements EventDefinitionNode
      */
     public function getPayloadStaticType($payloadStaticName)
     {
-        return $this->payloadStaticBagModelNode->getStaticType($payloadStaticName);
+        return $this->payloadStaticBagModelNode->getStaticDefinitionType($payloadStaticName);
     }
 
     /**

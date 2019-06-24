@@ -11,10 +11,14 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticListExpression;
-use InvalidArgumentException;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class StaticListType
@@ -31,11 +35,18 @@ class StaticListType implements TypeInterface
     private $elementType;
 
     /**
-     * @param TypeInterface $elementType Type allowed for elements of the list
+     * @var ValidationContextInterface
      */
-    public function __construct(TypeInterface $elementType)
+    private $validationContext;
+
+    /**
+     * @param TypeInterface $elementType Type allowed for elements of the list
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct(TypeInterface $elementType, ValidationContextInterface $validationContext)
     {
         $this->elementType = $elementType;
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -52,6 +63,17 @@ class StaticListType implements TypeInterface
     public function allowsAnyType(AnyType $candidateType)
     {
         return false; // A static list can only match specific other types, not "any" type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
+        return true;
     }
 
     /**
@@ -133,10 +155,63 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        if ($nativeValue instanceof StaticInterface) {
+            if (!$this->allowsStatic($nativeValue)) {
+                throw new IncompatibleNativeForCoercionException(
+                    sprintf(
+                        'Static of type "%s" was given, expected a native or matching static of type "%s"',
+                        $nativeValue->getType(),
+                        $this->getSummary()
+                    )
+                );
+            }
+
+            // Already a static, but we still need to perform static coercion
+            // so that any incomplete statics may be completed
+            return $this->coerceStatic($nativeValue, $evaluationContext);
+        }
+
+        if (!is_array($nativeValue)) {
+            throw new IncompatibleNativeForCoercionException(sprintf(
+                'Static list type expects an array, %s given',
+                gettype($nativeValue)
+            ));
+        }
+
+        return $staticExpressionFactory->createStaticListExpression(
+            $bagFactory->createStaticList(
+                array_map(
+                    function ($elementValue) use (
+                        $bagFactory,
+                        $evaluationContext,
+                        $staticExpressionFactory
+                    ) {
+                        return $this->elementType->coerceNative(
+                            $elementValue,
+                            $staticExpressionFactory,
+                            $bagFactory,
+                            $evaluationContext
+                        );
+                    },
+                    $nativeValue
+                )
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
     {
         if (!$static instanceof StaticListExpression) {
-            throw new InvalidArgumentException(sprintf(
+            throw new IncompatibleStaticForCoercionException(sprintf(
                 'Expected a %s, got %s',
                 StaticListExpression::class,
                 get_class($static)
@@ -167,9 +242,25 @@ class StaticListType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsStaticListType($this, $this->elementType);
     }
 
     /**
@@ -268,7 +359,15 @@ class StaticListType implements TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -278,7 +377,7 @@ class StaticListType implements TypeInterface
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -290,7 +389,7 @@ class StaticListType implements TypeInterface
         // whose element type encompasses this one's element type and the other type's element type
         $combinedElementType = $this->elementType->mergeWith($elementType);
 
-        return new StaticListType($combinedElementType);
+        return new StaticListType($combinedElementType, $this->validationContext);
     }
 
     /**
@@ -300,7 +399,7 @@ class StaticListType implements TypeInterface
     {
         // There is nothing common to merge between a static list type and a static structure type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -310,7 +409,7 @@ class StaticListType implements TypeInterface
     {
         // There is nothing common to merge between a static list type and a static type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -320,7 +419,7 @@ class StaticListType implements TypeInterface
     {
         // There is nothing common to merge between a static list type and an unresolved type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $unresolvedType]);
+        return new MultipleType([$this, $unresolvedType], $this->validationContext);
     }
 
     /**
@@ -331,7 +430,7 @@ class StaticListType implements TypeInterface
         // There is nothing common to merge between a static list type and a valued type,
         // so just return a MultipleType that allows both
         // TODO: Consider merging this type with the valued type's wrapped type
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -348,6 +447,14 @@ class StaticListType implements TypeInterface
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithStaticListType($this, $this->elementType);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
+    {
+        return $candidateType->mergeWithStaticListType($this, $this->elementType);
     }
 
     /**

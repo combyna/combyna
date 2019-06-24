@@ -15,11 +15,10 @@ use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class UnknownFunctionNode
@@ -83,7 +82,7 @@ class UnknownFunctionNode extends AbstractActNode implements DynamicActNodeInter
     public function getReturnTypeDeterminer()
     {
         // We don't know what the function's return type could be as it is not defined
-        return new PresolvedTypeDeterminer(new UnresolvedType('undefined function'));
+        return new UnresolvedTypeDeterminer('undefined function');
     }
 
     /**

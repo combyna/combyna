@@ -57,7 +57,7 @@ class ListElementTypeDeterminer extends AbstractTypeDeterminer
         }
 
         // Determiner does not resolve to a list, so we cannot fetch a type for its elements
-        return new UnresolvedType('list element type');
+        return new UnresolvedType('list element type', $validationContext);
     }
 
     /**

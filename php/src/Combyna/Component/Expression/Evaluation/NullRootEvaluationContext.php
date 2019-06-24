@@ -53,6 +53,20 @@ class NullRootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function buildRouteUrl($libraryName, $routeName, StaticBagInterface $argumentStaticBag)
+    {
+        throw new InvalidEvaluationContextException(
+            sprintf(
+                'Unable to build URL for route "%s" of library "%s" from null root evaluation context',
+                $routeName,
+                $libraryName
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function callFunction(
         $libraryName,
         $functionName,
@@ -135,6 +149,16 @@ class NullRootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCompoundWidgetDefinitionContext()
+    {
+        throw new InvalidEvaluationContextException(
+            'Unable to fetch a compound widget definition context from null root evaluation context'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
         throw new InvalidEvaluationContextException(
@@ -150,6 +174,54 @@ class NullRootEvaluationContext implements EvaluationContextInterface
         throw new InvalidEvaluationContextException(
             sprintf(
                 'Unable to fetch event payload static "%s" from null root evaluation context',
+                $staticName
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentContext()
+    {
+        return null; // Root context has no parent
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRoute($libraryName, $routeName)
+    {
+        throw new InvalidEvaluationContextException(
+            sprintf(
+                'Unable to fetch route "%s" for library "%s" from null root evaluation context',
+                $routeName,
+                $libraryName
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteArgument($parameterName)
+    {
+        throw new InvalidEvaluationContextException(
+            sprintf(
+                'Unable to fetch route argument "%s" from null root evaluation context',
+                $parameterName
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSiblingBagStatic($staticName)
+    {
+        throw new InvalidEvaluationContextException(
+            sprintf(
+                'Unable to fetch sibling bag static "%s" from null root evaluation context',
                 $staticName
             )
         );

@@ -13,6 +13,10 @@ namespace Combyna\Component\Ui\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Router\Validation\Query\CurrentViewRouteHasParameterQuery;
+use Combyna\Component\Router\Validation\Query\CurrentViewRouteParameterTypeQuery;
+use Combyna\Component\Router\Validation\Query\RouteParameterTypeQuery;
+use Combyna\Component\Router\Validation\Query\RoutesForViewDefineIdenticalParameterQuery;
 use Combyna\Component\Store\Config\Act\QueryNodeInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
@@ -114,6 +118,8 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     public function getQueryClassToQueryCallableMap()
     {
         return [
+            CurrentViewRouteHasParameterQuery::class => [$this, 'queryForCurrentViewRouteParameterExistence'],
+            CurrentViewRouteParameterTypeQuery::class => [$this, 'queryForCurrentViewRouteParameterType'],
             InsideViewQuery::class => [$this, 'queryForInsideView'],
             QueryNodeQuery::class => [$this, 'queryForQueryNode'],
             ViewStoreQueryResultTypeQuery::class => [$this, 'queryForViewStoreQueryResultType']
@@ -126,6 +132,47 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
     public function getSubjectActNode()
     {
         return $this->subjectNode;
+    }
+
+    /**
+     * Determines whether all of the routes that reference the current view define the specified parameter
+     * and with the same type
+     *
+     * @param CurrentViewRouteHasParameterQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool|null
+     */
+    public function queryForCurrentViewRouteParameterExistence(
+        CurrentViewRouteHasParameterQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        return $validationContext->queryForBoolean(
+            new RoutesForViewDefineIdenticalParameterQuery(
+                $this->viewNode->getName(),
+                $query->getParameterName()
+            ),
+            $validationContext->getCurrentActNode()
+        );
+    }
+
+    /**
+     * Fetches the type of a parameter for the route of the current view
+     *
+     * @param CurrentViewRouteParameterTypeQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return TypeInterface
+     */
+    public function queryForCurrentViewRouteParameterType(
+        CurrentViewRouteParameterTypeQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        return $validationContext->queryForResultType(
+            new RouteParameterTypeQuery(
+                $this->viewNode->getName(),
+                $query->getParameterName()
+            ),
+            $validationContext->getCurrentActNode()
+        );
     }
 
     /**
@@ -174,7 +221,10 @@ class ViewSubValidationContext implements ViewSubValidationContextInterface
         );
 
         if ($storeQuery === null) {
-            return new UnresolvedType('view store query result type');
+            return new UnresolvedType(
+                'view store query result type',
+                $validationContext
+            );
         }
 
         return $validationContext->getExpressionResultType($storeQuery->getExpression());

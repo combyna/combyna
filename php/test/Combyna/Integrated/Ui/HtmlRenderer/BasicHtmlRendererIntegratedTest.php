@@ -128,7 +128,7 @@ class BasicHtmlRendererIntegratedTest extends TestCase
         ], $this->environment);
 
         $appState = $this->app->createInitialState();
-        $renderedHtml = $this->htmlRenderer->renderApp($appState);
+        $renderedHtml = $this->htmlRenderer->renderApp($appState, $this->app);
 
         $expectedHtml = <<<HTML
 <div class="combyna-view" data-view-name="my_view">

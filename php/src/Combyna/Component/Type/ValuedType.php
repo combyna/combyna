@@ -11,9 +11,13 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticValueInterface;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use LogicException;
 
 /**
@@ -31,6 +35,11 @@ class ValuedType implements TypeInterface
     private $staticValue;
 
     /**
+     * @var ValidationContextInterface
+     */
+    private $validationContext;
+
+    /**
      * @var TypeInterface
      */
     private $wrappedType;
@@ -38,10 +47,15 @@ class ValuedType implements TypeInterface
     /**
      * @param TypeInterface $wrappedType
      * @param StaticValueInterface $staticValue
+     * @param ValidationContextInterface $validationContext
      */
-    public function __construct(TypeInterface $wrappedType, StaticValueInterface $staticValue)
-    {
+    public function __construct(
+        TypeInterface $wrappedType,
+        StaticValueInterface $staticValue,
+        ValidationContextInterface $validationContext
+    ) {
         $this->staticValue = $staticValue;
+        $this->validationContext = $validationContext;
         $this->wrappedType = $wrappedType;
 
         // TODO: Validate that the static value expression's result type
@@ -65,6 +79,17 @@ class ValuedType implements TypeInterface
     public function allowsAnyType(AnyType $candidateType)
     {
         return false; // A valued type can only match specific other types, not "any" type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
+        return true;
     }
 
     /**
@@ -141,10 +166,33 @@ class ValuedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        $coercedStatic = $this->wrappedType->coerceNative(
+            $nativeValue,
+            $staticExpressionFactory,
+            $bagFactory,
+            $evaluationContext
+        );
+
+        if (!$coercedStatic->equals($this->staticValue)) {
+            throw new LogicException('Valued type can only accept an exact matching value');
+        }
+
+        return $coercedStatic;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
     {
         if (!$static->equals($this->staticValue)) {
-            throw new LogicException('Valued type can only accept an exact matching value');
+            throw new IncompatibleStaticForCoercionException('Valued type can only accept an exact matching value');
         }
 
         // No coercion necessary
@@ -185,6 +233,14 @@ class ValuedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasValue()
     {
         return true; // Valued types always store a value
@@ -203,9 +259,17 @@ class ValuedType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsValuedType($this);
     }
 
     /**
@@ -269,7 +333,15 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -279,7 +351,7 @@ class ValuedType implements TypeInterface
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -287,7 +359,7 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithStaticListType(StaticListType $otherType, TypeInterface $elementType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -295,7 +367,7 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithStaticStructureType(StaticStructureType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -303,7 +375,7 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithStaticType(StaticType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -311,7 +383,7 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
     {
-        return new MultipleType([$this, $unresolvedType]);
+        return new MultipleType([$this, $unresolvedType], $this->validationContext);
     }
 
     /**
@@ -319,7 +391,7 @@ class ValuedType implements TypeInterface
      */
     public function mergeWithValuedType(ValuedType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -334,6 +406,14 @@ class ValuedType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithAnyType(AnyType $candidateType)
+    {
+        return $candidateType->mergeWithValuedType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
     {
         return $candidateType->mergeWithValuedType($this);
     }

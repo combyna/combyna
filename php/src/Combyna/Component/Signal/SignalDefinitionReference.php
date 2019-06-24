@@ -41,7 +41,7 @@ class SignalDefinitionReference implements SignalDefinitionReferenceInterface
     }
 
     /**
-     * @inheritdoc}
+     * {@inheritdoc}
      */
     public function getLibraryName()
     {

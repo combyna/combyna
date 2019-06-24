@@ -16,10 +16,9 @@ use Combyna\Component\Expression\ConcatenationExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\MultipleType;
-use Combyna\Component\Type\StaticListType;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\MultipleTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class ConcatenationExpressionNode
@@ -66,14 +65,12 @@ class ConcatenationExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->operandListExpression,
-                new PresolvedTypeDeterminer(
-                    new StaticListType(
-                        new MultipleType(
-                            [
-                                new StaticType(TextExpression::class),
-                                new StaticType(NumberExpression::class)
-                            ]
-                        )
+                new StaticListTypeDeterminer(
+                    new MultipleTypeDeterminer(
+                        [
+                            new StaticTypeDeterminer(TextExpression::class),
+                            new StaticTypeDeterminer(NumberExpression::class)
+                        ]
                     )
                 ),
                 'operand list'
@@ -106,6 +103,6 @@ class ConcatenationExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
+        return new StaticTypeDeterminer(TextExpression::class);
     }
 }

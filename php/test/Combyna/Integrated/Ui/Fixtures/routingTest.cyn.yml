@@ -1,0 +1,135 @@
+name: Routing test app
+signals:
+    navigation_detected:
+        payload:
+            which_route: text
+        broadcast: true
+    # A special signal for testing that route references can be provided from external sources,
+    # where they will be effectively validated at runtime as part of coercion
+    provide_some_route_data:
+        payload:
+            route:
+                type: exotic
+                name: route_name
+                arguments_static: arguments
+            arguments:
+                type: exotic
+                name: route_arguments
+                route_static: route
+                default: '!expr {}'
+home:
+    route: app.my_list_route
+routes:
+    my_list_route:
+        pattern: '/'
+        page_view: my_list_view
+    my_item_route:
+        pattern: '/item/{my_item_slug}'
+        page_view: my_item_view
+        parameters:
+            my_item_slug: text
+    my_about_route:
+        pattern: '/about'
+        page_view: my_about_view
+
+widgets:
+    my_fancier_route_link:
+        type: compound
+        attributes:
+            route:
+                type: exotic
+                name: route_name
+                arguments_static: arguments
+            arguments:
+                type: exotic
+                name: route_arguments
+                route_static: route
+                default: '!expr {}'
+        children:
+            contents: ~
+        root:
+            type: gui.route_link
+            attributes:
+                route: !expr widget_attr('route')
+                arguments: !expr widget_attr('arguments')
+            children:
+                contents:
+                    type: child
+                    name: contents
+
+page_views:
+    my_list_view:
+        title: !expr 'Routing test list view'
+        description: The list view of the routing test
+        widget:
+            type: group
+            children:
+                - type: gui.route_link
+                  attributes:
+                      route: !expr 'app.my_item_route'
+                      arguments: !expr {my_item_slug: 'item_1234'}
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'See the example item'
+                  tags:
+                      - list_view.view_item_button
+
+                - type: routing_test.navigable_thing
+                  attributes:
+                      label: !expr 'Navigate me'
+                  tags:
+                      - list_view.navigable_thing
+                  triggers:
+                      routing_test.somehow_navigated:
+                          instructions:
+                              - type: signal
+                                signal: app.navigation_detected
+                                payload:
+                                    which_route: !expr event_payload('route')
+
+    my_item_view:
+        title: !expr 'Routing test item view'
+        description: The item view of the routing test
+        widget:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'The item slug is: ' ~ route_arg('my_item_slug')
+                - type: gui.route_link
+                  attributes:
+                      route: !expr 'app.my_list_route'
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'Go back home'
+
+    my_about_view:
+        title: !expr 'About view'
+        description: The about view of the routing test
+        widget:
+            type: group
+            children:
+                - type: app.my_fancier_route_link
+                  attributes:
+                      route: !expr 'app.my_list_route'
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'Go back home'
+                - type: text
+                  text: !expr 'Provided URL: ' ~ view_query('get_provided_url')
+        store:
+            slots:
+                provided_url:
+                    type: text
+                    default: !expr '(None)'
+            queries:
+                get_provided_url:
+                    expression: !expr slot('provided_url')
+            signal_handlers:
+                app.provide_some_route_data:
+                    instructions:
+                        - type: set_slot
+                          slot: provided_url
+                          value: !expr route_url(route: signal_payload('route'), arguments: signal_payload('arguments'))

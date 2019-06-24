@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Ui\Widget\WidgetInterface;
+
 /**
  * Interface CompoundWidgetDefinitionEvaluationContextInterface
  *
@@ -18,4 +20,11 @@ namespace Combyna\Component\Ui\Evaluation;
  */
 interface CompoundWidgetDefinitionEvaluationContextInterface extends WidgetDefinitionEvaluationContextInterface
 {
+    /**
+     * Fetches the specified child of the current compound widget
+     *
+     * @param string $childName
+     * @return WidgetInterface
+     */
+    public function getChildWidget($childName);
 }

@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -93,7 +93,7 @@ class StructureExpressionIntegratedTest extends TestCase
             'Immediate attribute has this value: 21' .
             "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterChangingTheContentsOfTheTextbox()
@@ -131,6 +131,6 @@ class StructureExpressionIntegratedTest extends TestCase
             'Immediate attribute has this value: 21' .
             "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

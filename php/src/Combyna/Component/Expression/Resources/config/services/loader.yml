@@ -91,6 +91,12 @@ services:
         tags:
             - {name: combyna.expression_loader}
 
+    combyna.expression.loader.nothing:
+        class: Combyna\Component\Expression\Config\Loader\NothingExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.number_conversion:
         class: Combyna\Component\Expression\Config\Loader\NumberConversionExpressionLoader
         autowire: true

@@ -20,6 +20,7 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodePromoterInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Validation\Context\AssuredSubValidationContext;
 use Combyna\Component\Expression\Validation\Context\ScopeSubValidationContext;
+use Combyna\Component\Type\Exotic\ExoticTypeDeterminerFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ActNodeSubValidationContext;
 use Combyna\Component\Validator\Context\DetachedSubValidationContext;
@@ -54,6 +55,11 @@ class ValidationFactory implements ValidationFactoryInterface
     private $evaluationContextFactory;
 
     /**
+     * @var ExoticTypeDeterminerFactoryInterface
+     */
+    private $exoticTypeDeterminerFactory;
+
+    /**
      * @var ExpressionNodePromoterInterface
      */
     private $expressionNodePromoter;
@@ -68,15 +74,18 @@ class ValidationFactory implements ValidationFactoryInterface
      * @param BehaviourFactoryInterface $behaviourFactory
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
      * @param ExpressionNodePromoterInterface $expressionNodePromoter
+     * @param ExoticTypeDeterminerFactoryInterface $exoticTypeDeterminerFactory
      */
     public function __construct(
         DelegatingSubValidationContextFactoryInterface $subValidationContextFactory,
         BehaviourFactoryInterface $behaviourFactory,
         EvaluationContextFactoryInterface $evaluationContextFactory,
-        ExpressionNodePromoterInterface $expressionNodePromoter
+        ExpressionNodePromoterInterface $expressionNodePromoter,
+        ExoticTypeDeterminerFactoryInterface $exoticTypeDeterminerFactory
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->evaluationContextFactory = $evaluationContextFactory;
+        $this->exoticTypeDeterminerFactory = $exoticTypeDeterminerFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;
         $this->subValidationContextFactory = $subValidationContextFactory;
     }
@@ -157,7 +166,8 @@ class ValidationFactory implements ValidationFactoryInterface
             $rootNodeBehaviourSpec,
             $behaviourSpecValidator,
             $this->evaluationContextFactory,
-            $this->expressionNodePromoter
+            $this->expressionNodePromoter,
+            $this->exoticTypeDeterminerFactory
         );
     }
 

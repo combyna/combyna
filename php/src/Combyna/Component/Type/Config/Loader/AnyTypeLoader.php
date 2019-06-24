@@ -12,8 +12,7 @@
 namespace Combyna\Component\Type\Config\Loader;
 
 use Combyna\Component\Config\Loader\ConfigParser;
-use Combyna\Component\Type\AnyType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\AnyTypeDeterminer;
 
 /**
  * Class AnyTypeLoader
@@ -40,7 +39,7 @@ class AnyTypeLoader implements TypeTypeLoaderInterface
      */
     public function load(array $config)
     {
-        return new PresolvedTypeDeterminer(new AnyType());
+        return new AnyTypeDeterminer();
     }
 
     /**

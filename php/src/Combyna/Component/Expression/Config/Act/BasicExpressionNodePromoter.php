@@ -33,6 +33,7 @@ use Combyna\Component\Expression\TranslationExpression;
 use Combyna\Component\Expression\VariableExpression;
 use Combyna\Component\Framework\Context\ModeContext;
 use Combyna\Component\Type\AnyType;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use InvalidArgumentException;
 
 /**
@@ -310,7 +311,7 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
             // so we just allow any type
             $this->modeContext->getMode()->isDevelopment() ?
                 $expressionNode->getResolvedResultType() :
-                new AnyType()
+                new AnyType(new NullValidationContext())
         );
     }
 

@@ -52,14 +52,18 @@ class StructureExpressionTypeDeterminer extends AbstractTypeDeterminer
     public function determine(ValidationContextInterface $validationContext)
     {
         if ($this->determinedType === null) {
+            $structureExpressionNodeValidationContext = $validationContext->createValidationContextForActNode(
+                $this->structureExpressionNode
+            );
+
             // Fetch a type for the structure of the structure expression, excluding any value information
             $structureType = $this->structureExpressionNode->getImpureResultTypeDeterminer()
-                ->determine($validationContext);
+                ->determine($structureExpressionNodeValidationContext);
 
             // Attempt to validate the structure as a "pure" one (with no function calls,
             // widget attribute fetches etc.) - if it is then we can evaluate it to a static value
             // statically and wrap it in a ValuedType in order to perform static analysis with it
-            $structureType = $validationContext->wrapInValuedTypeIfPureExpression(
+            $structureType = $structureExpressionNodeValidationContext->wrapInValuedTypeIfPureExpression(
                 $structureType,
                 $this->structureExpressionNode
             );

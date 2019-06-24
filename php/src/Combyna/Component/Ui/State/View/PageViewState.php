@@ -13,6 +13,7 @@ namespace Combyna\Component\Ui\State\View;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Common\Exception\NotFoundException;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
@@ -29,6 +30,11 @@ class PageViewState implements PageViewStateInterface
      * @var WidgetStateInterface
      */
     private $rootWidgetState;
+
+    /**
+     * @var RouterStateInterface
+     */
+    private $routerState;
 
     /**
      * @var UiStateFactoryInterface
@@ -53,6 +59,7 @@ class PageViewState implements PageViewStateInterface
     /**
      * @param UiStateFactoryInterface $stateFactory
      * @param PageViewInterface $view
+     * @param RouterStateInterface $routerState
      * @param ViewStoreStateInterface $storeState
      * @param WidgetStateInterface $rootWidgetState
      * @param StaticBagInterface $viewAttributeStaticBag
@@ -60,11 +67,13 @@ class PageViewState implements PageViewStateInterface
     public function __construct(
         UiStateFactoryInterface $stateFactory,
         PageViewInterface $view,
+        RouterStateInterface $routerState,
         ViewStoreStateInterface $storeState,
         WidgetStateInterface $rootWidgetState,
         StaticBagInterface $viewAttributeStaticBag
     ) {
         $this->rootWidgetState = $rootWidgetState;
+        $this->routerState = $routerState;
         $this->stateFactory = $stateFactory;
         $this->storeState = $storeState;
 
@@ -88,6 +97,14 @@ class PageViewState implements PageViewStateInterface
     public function getRootWidgetState()
     {
         return $this->rootWidgetState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouterState()
+    {
+        return $this->routerState;
     }
 
     /**
@@ -160,6 +177,7 @@ class PageViewState implements PageViewStateInterface
         return new self(
             $this->stateFactory,
             $this->view,
+            $this->routerState,
             $this->storeState,
             $newRootWidgetState,
             $this->viewAttributeStaticBag
@@ -180,6 +198,7 @@ class PageViewState implements PageViewStateInterface
         return new self(
             $this->stateFactory,
             $this->view,
+            $this->routerState,
             $newStoreState,
             $newRootWidgetState,
             $this->viewAttributeStaticBag
@@ -200,6 +219,7 @@ class PageViewState implements PageViewStateInterface
         return new self(
             $this->stateFactory,
             $this->view,
+            $this->routerState,
             $newStoreState,
             $this->rootWidgetState,
             $this->viewAttributeStaticBag

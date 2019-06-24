@@ -20,6 +20,9 @@ use Combyna\Component\State\StatePathInterface;
  */
 interface WidgetStatePathInterface extends StatePathInterface
 {
+    const WIDGET_DEFINITION_PATH_TYPE = 'widget';
+    const VIEW_PATH_TYPE = 'view';
+
     /**
      * Creates a WidgetStatePath to the specified child state of the end state in this path
      *

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
@@ -43,6 +44,11 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * @var FixedStaticBagModelInterface
      */
     private $attributeBagModel;
+
+    /**
+     * @var BagFactoryInterface
+     */
+    private $bagFactory;
 
     /**
      * @var EventDefinitionReferenceCollectionInterface
@@ -90,6 +96,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     private $valueNameToProviderCallableMap;
 
     /**
+     * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory
      * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      * @param EventFactoryInterface $eventFactory
@@ -102,6 +109,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      * @param callable[] $valueNameToProviderCallableMap
      */
     public function __construct(
+        BagFactoryInterface $bagFactory,
         UiStateFactoryInterface $uiStateFactory,
         UiEvaluationContextFactoryInterface $uiEvaluationContextFactory,
         EventFactoryInterface $eventFactory,
@@ -114,6 +122,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         array $valueNameToProviderCallableMap
     ) {
         $this->attributeBagModel = $attributeBagModel;
+        $this->bagFactory = $bagFactory;
         $this->eventDefinitionReferenceCollection = $eventDefinitionReferenceCollection;
         $this->eventFactory = $eventFactory;
         $this->libraryName = $libraryName;
@@ -189,8 +198,12 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         try {
             $eventDefinition = $this->eventDefinitionReferenceCollection->getDefinitionByName($libraryName, $eventName);
         } catch (EventDefinitionNotReferencedException $exception) {
@@ -202,7 +215,11 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
             );
         }
 
-        return $this->eventFactory->createEvent($eventDefinition, $payloadStaticBag);
+        $payloadStaticBag = $eventDefinition
+            ->getPayloadStaticBagModel()
+            ->coerceNativeArrayToBag($payloadNatives, $evaluationContext);
+
+        return $this->eventFactory->createEvent($eventDefinition, $payloadStaticBag, $this);
     }
 
     /**
@@ -279,6 +296,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         return $this->attributeBagModel->coerceStatic(
             $name,
             $evaluationContext,
+            $attributeExpressionBag,
             $attributeExpressionBag->hasExpression($name) ?
                 $attributeExpressionBag->getExpression($name)->toStatic($evaluationContext) :
                 null
@@ -314,12 +332,7 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     }
 
     /**
-     * Fetches the specified widget value from its provider
-     *
-     * @param string $valueName
-     * @param string[]|int[] $widgetStatePath
-     * @param ViewEvaluationContextInterface $evaluationContext
-     * @return StaticInterface
+     * {@inheritdoc}
      */
     public function getWidgetValue(
         $valueName,
@@ -344,33 +357,13 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
         $result = $valueProvider($widgetStatePath);
 
         // Coerce the result to a static if needed, to allow it to return a non-static
-        $valueStatic = $this->staticExpressionFactory->coerce($result);
-
-        // Value providers must return a static as their result
-        if (!$valueStatic instanceof StaticInterface) {
-            throw new LogicException(
-                sprintf(
-                    'Provider for value "%s" must return a static, %s returned',
-                    $valueName,
-                    is_object($valueStatic) ? get_class($valueStatic) : gettype($valueStatic)
-                )
-            );
-        }
-
-        // Check that the provider returned a static of the type it declares that it returns
-        if (!$valueType->allowsStatic($valueStatic)) {
-            throw new LogicException(
-                sprintf(
-                    'Provider for value "%s" must return a [%s], %s returned',
-                    $valueName,
-                    $valueType->getSummary(),
-                    get_class($valueStatic)
-                )
-            );
-        }
-
-        // Coerce the static to match the type, so that any incomplete values are made complete
-        return $valueType->coerceStatic($valueStatic, $evaluationContext);
+        // and so that any incomplete values are made complete
+        return $valueType->coerceNative(
+            $result,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $evaluationContext
+        );
     }
 
     /**

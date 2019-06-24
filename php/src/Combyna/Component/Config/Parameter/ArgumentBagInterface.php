@@ -37,7 +37,7 @@ interface ArgumentBagInterface
      * Fetches a named, array-type argument by its parameter name
      *
      * @param string $name
-     * @return array
+     * @return array|null
      */
     public function getNamedArrayArgument($name);
 
@@ -45,7 +45,7 @@ interface ArgumentBagInterface
      * Fetches a named, expression-type argument by its parameter name
      *
      * @param string $name
-     * @return ExpressionNodeInterface
+     * @return ExpressionNodeInterface|null
      */
     public function getNamedExpressionArgument($name);
 
@@ -53,7 +53,7 @@ interface ArgumentBagInterface
      * Fetches a named, expression-bag-type argument by its parameter name
      *
      * @param string $name
-     * @return ExpressionBagNode
+     * @return ExpressionBagNode|null
      */
     public function getNamedExpressionBagArgument($name);
 
@@ -61,7 +61,7 @@ interface ArgumentBagInterface
      * Fetches a named, fixed-static-bag-model-type argument by its parameter name
      *
      * @param string $name
-     * @return FixedStaticBagModelNodeInterface
+     * @return FixedStaticBagModelNodeInterface|null
      */
     public function getNamedFixedStaticBagModelArgument($name);
 
@@ -69,7 +69,7 @@ interface ArgumentBagInterface
      * Fetches a named, string-type argument by its parameter name
      *
      * @param string $name
-     * @return string
+     * @return string|null
      */
     public function getNamedStringArgument($name);
 
@@ -77,7 +77,7 @@ interface ArgumentBagInterface
      * Fetches a named, widget-type argument by its parameter name
      *
      * @param string $name
-     * @return WidgetNodeInterface
+     * @return WidgetNodeInterface|null
      */
     public function getNamedWidgetArgument($name);
 
@@ -85,7 +85,7 @@ interface ArgumentBagInterface
      * Fetches a named type determiner argument by its parameter name
      *
      * @param string $name
-     * @return TypeDeterminerInterface
+     * @return TypeDeterminerInterface|null
      */
     public function getNamedTypeArgument($name);
 }

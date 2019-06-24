@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Validator\Context;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Exception\InvalidEvaluationContextException;
+use Combyna\Component\Type\Exotic\ExoticTypeDeterminerInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
@@ -82,6 +84,29 @@ interface RootValidationContextInterface
      * @param SubValidationContextInterface $subValidationContext
      */
     public function adoptDynamicActNode(DynamicActNodeInterface $actNode, SubValidationContextInterface $subValidationContext);
+
+    /**
+     * Creates an exotic type determiner for the given config and source validation context
+     *
+     * @param string $determinerName
+     * @param array $config
+     * @param ValidationContextInterface $sourceValidationContext
+     * @return ExoticTypeDeterminerInterface
+     */
+    public function createExoticTypeDeterminer(
+        $determinerName,
+        array $config,
+        ValidationContextInterface $sourceValidationContext
+    );
+
+    /**
+     * Creates a ValidationContext for the specified ACT node, anchored at the correct point
+     * in the ACT via its sub-validation context tree
+     *
+     * @param StructuredNodeInterface $structuredNode
+     * @return ValidationContextInterface
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode);
 
     /**
      * Fetches all descendant nodes of the specified behaviour spec that match the given query specifier

@@ -140,6 +140,14 @@ class DeterminedFixedStaticBagModelNode extends AbstractActNode implements Deter
     /**
      * {@inheritdoc}
      */
+    public function getStaticDefinitionType($definitionName)
+    {
+        return $this->staticDefinitionNodes[$definitionName]->getResolvedStaticType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSummary()
     {
         $staticDefinitionSummaries = [];
@@ -187,6 +195,14 @@ class DeterminedFixedStaticBagModelNode extends AbstractActNode implements Deter
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return empty($this->staticDefinitionNodes);
     }
 
     /**

@@ -21,6 +21,20 @@ use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 interface RepeaterWidgetInterface extends CoreWidgetInterface
 {
     /**
+     * Fetches the name to use for the variable that contains the index of the current item, if specified
+     *
+     * @return string|null
+     */
+    public function getIndexVariableName();
+
+    /**
+     * Fetches the name to use for the variable that contains the value of the current item
+     *
+     * @return string
+     */
+    public function getItemVariableName();
+
+    /**
      * Fetches the widget to be repeated by this repeater
      *
      * @return WidgetInterface

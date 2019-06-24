@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Router;
 
-use InvalidArgumentException;
+use Combyna\Component\Common\Exception\NotFoundException;
 
 /**
  * Class RouteCollection
@@ -41,7 +41,7 @@ class RouteCollection implements RouteCollectionInterface
     public function getByName($name)
     {
         if (!array_key_exists($name, $this->routeByName)) {
-            throw new InvalidArgumentException('Collection has no route with name "' . $name . '"');
+            throw new NotFoundException('Collection has no route with name "' . $name . '"');
         }
 
         return $this->routeByName[$name];

@@ -1,0 +1,4 @@
+services:
+    combyna.type.exotic.exotic_type_determiner_factory:
+        class: Combyna\Component\Type\Exotic\DelegatingExoticTypeDeterminerFactory
+        autowire: true

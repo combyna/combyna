@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -90,7 +90,7 @@ class StoreIntegratedTest extends TestCase
                 '<button name="combyna-widget-my_view-root-3">Save new age</button>' .
                 "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppShouldNotChangeItsOutputAfterChangingTheNewAgeTextboxButBeforeClickingSave()
@@ -125,7 +125,7 @@ class StoreIntegratedTest extends TestCase
                 '<button name="combyna-widget-my_view-root-3">Save new age</button>' .
                 "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppDoesChangeItsOutputAfterChangingTheNewAgeTextboxAndClickingSave()
@@ -149,7 +149,11 @@ class StoreIntegratedTest extends TestCase
             $appState,
             $appState->getWidgetStatePathByTag('my_app.save_new_age_button'),
             'gui',
-            'click'
+            'click',
+            [
+                'x' => 100,
+                'y' => 30
+            ]
         );
 
         $expectedHtml =
@@ -163,6 +167,6 @@ class StoreIntegratedTest extends TestCase
                 '<button name="combyna-widget-my_view-root-3">Save new age</button>' .
                 "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

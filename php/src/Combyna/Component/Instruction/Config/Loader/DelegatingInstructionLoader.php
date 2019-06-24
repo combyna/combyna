@@ -41,15 +41,21 @@ class DelegatingInstructionLoader implements InstructionLoaderInterface, Delegat
     {
         if (!array_key_exists('type', $instructionConfig)) {
             // Missing "type" element
-            return new UnknownInstructionNode(null);
+            return new UnknownInstructionNode('Instruction has no "type" specified');
         }
 
         $type = $instructionConfig['type'];
 
         if (!array_key_exists($type, $this->loaders)) {
-            // No loader is registered for instructions of this
-            return new UnknownInstructionNode($type);
+            // No loader is registered for instructions of this type
+            return new UnknownInstructionNode(sprintf(
+                'Instruction is of unknown type "%s"',
+                $type
+            ));
         }
+
+        // Remove the "type" element as the instruction type loader won't be expecting it
+        unset($instructionConfig['type']);
 
         return $this->loaders[$type]->load($instructionConfig);
     }

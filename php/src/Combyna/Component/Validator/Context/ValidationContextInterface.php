@@ -18,6 +18,7 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Exception\InvalidEvaluationContextException;
+use Combyna\Component\Type\Exotic\ExoticTypeDeterminerInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
@@ -100,6 +101,18 @@ interface ValidationContextInterface
     public function createBooleanQueryRequirement(BooleanQueryInterface $query);
 
     /**
+     * Creates an exotic type determiner for the given config and this validation context
+     *
+     * @param string $determinerName
+     * @param array $config
+     * @return ExoticTypeDeterminerInterface
+     */
+    public function createExoticTypeDeterminer(
+        $determinerName,
+        array $config
+    );
+
+    /**
      * Creates a child ValidationContext of the current one
      *
      * @param SubValidationContextSpecifierInterface $subContextSpecifier
@@ -120,6 +133,15 @@ interface ValidationContextInterface
      * @return TypeQueryRequirement
      */
     public function createTypeQueryRequirement(ResultTypeQueryInterface $query);
+
+    /**
+     * Creates a ValidationContext for the specified ACT node, anchored at the correct point
+     * in the ACT via its sub-validation context tree
+     *
+     * @param StructuredNodeInterface $structuredNode
+     * @return ValidationContextInterface
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode);
 
     /**
      * Fetches the ACT node that the current context represents.

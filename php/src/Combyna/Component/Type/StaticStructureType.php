@@ -11,13 +11,18 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticBagModelInterface;
-use Combyna\Component\Bag\FixedStaticDefinitionInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticStructureExpression;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
 use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
-use LogicException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
+use stdClass;
 
 /**
  * Class StaticStructureType
@@ -35,11 +40,20 @@ class StaticStructureType implements TypeInterface
     private $attributeBagModel;
 
     /**
-     * @param DeterminedFixedStaticBagModelInterface $attributeBagModel
+     * @var ValidationContextInterface
      */
-    public function __construct(DeterminedFixedStaticBagModelInterface $attributeBagModel)
-    {
+    private $validationContext;
+
+    /**
+     * @param DeterminedFixedStaticBagModelInterface $attributeBagModel
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct(
+        DeterminedFixedStaticBagModelInterface $attributeBagModel,
+        ValidationContextInterface $validationContext
+    ) {
         $this->attributeBagModel = $attributeBagModel;
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -56,6 +70,17 @@ class StaticStructureType implements TypeInterface
     public function allowsAnyType(AnyType $candidateType)
     {
         return false; // A static structure can only match specific other types, not "any" type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
+        return true;
     }
 
     /**
@@ -134,38 +159,77 @@ class StaticStructureType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        if ($nativeValue instanceof StaticInterface) {
+            if (!$this->allowsStatic($nativeValue)) {
+                throw new IncompatibleNativeForCoercionException(
+                    sprintf(
+                        'Static of type "%s" was given, expected a native or matching static of type "%s"',
+                        $nativeValue->getType(),
+                        $this->getSummary()
+                    )
+                );
+            }
+
+            // Already a static, but we still need to perform static coercion
+            // so that any incomplete statics may be completed
+            return $this->coerceStatic($nativeValue, $evaluationContext);
+        }
+
+        if (!is_array($nativeValue) && !is_object($nativeValue)) {
+            throw new IncompatibleNativeForCoercionException(sprintf(
+                'Static structure type expects an array or stdClass instance, %s given',
+                gettype($nativeValue)
+            ));
+        } elseif (is_object($nativeValue) && !$nativeValue instanceof stdClass) {
+            throw new IncompatibleNativeForCoercionException(sprintf(
+                'Static structure type expects an array or stdClass instance, instance of %s given',
+                get_class($nativeValue)
+            ));
+        }
+
+        /** @var FixedStaticBagModelInterface $attributeBagModel */
+        $attributeBagModel = $this->attributeBagModel;
+
+        return $staticExpressionFactory->createStaticStructureExpression(
+            $attributeBagModel->coerceNativeArrayToBag(
+                (array)$nativeValue,
+                $evaluationContext
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
     {
         if (!$static instanceof StaticStructureExpression) {
-            throw new LogicException(sprintf(
+            throw new IncompatibleStaticForCoercionException(sprintf(
                 'Expected %s, got %s',
                 StaticStructureExpression::class,
                 get_class($static)
             ));
         }
 
-        /** @var FixedStaticDefinitionInterface[] $staticDefinitions */
-        $staticDefinitions = $this->attributeBagModel->getStaticDefinitions();
-        $completeStatics = [];
-        $wasComplete = true;
+        /** @var FixedStaticBagModelInterface $attributeBagModel */
+        $attributeBagModel = $this->attributeBagModel;
 
-        foreach ($staticDefinitions as $name => $staticDefinition) {
-            if ($static->hasAttributeStatic($name)) {
-                $completeStatics[$name] = $staticDefinition->coerceStatic(
-                    $evaluationContext,
-                    $static->getAttributeStatic($name)
-                );
-            } else {
-                $completeStatics[$name] = $staticDefinition->getDefaultStatic($evaluationContext);
-                $wasComplete = false;
-            }
+        $coercedStructureAttributes = $attributeBagModel->coerceStaticBag(
+            $static->getAttributeStaticBag(),
+            $evaluationContext
+        );
+
+        if ($coercedStructureAttributes === $static->getAttributeStaticBag()) {
+            return $static; // No coercion necessary, structure is already complete
         }
 
-        if ($wasComplete) {
-            return $static; // Just return the original structure if it was complete
-        }
-
-        return $static->withStatics($completeStatics);
+        return new StaticStructureExpression($coercedStructureAttributes);
     }
 
     /**
@@ -192,6 +256,14 @@ class StaticStructureType implements TypeInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
      * Determines whether the structure defines an attribute with the given name
      *
      * @param string $attributeName
@@ -205,9 +277,17 @@ class StaticStructureType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsStaticStructureType($this);
     }
 
     /**
@@ -295,7 +375,15 @@ class StaticStructureType implements TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -305,7 +393,7 @@ class StaticStructureType implements TypeInterface
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -313,7 +401,7 @@ class StaticStructureType implements TypeInterface
      */
     public function mergeWithStaticListType(StaticListType $otherType, TypeInterface $elementType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -325,7 +413,7 @@ class StaticStructureType implements TypeInterface
         // We could in future attempt to match the two for similarity, and if within a certain %,
         // attempt to define a single new structure type where each attribute type is lenient enough
         // to cover the types from both of the source structures.
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -335,7 +423,7 @@ class StaticStructureType implements TypeInterface
     {
         // There is nothing common to merge between a static structure type and a static type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -345,7 +433,7 @@ class StaticStructureType implements TypeInterface
     {
         // There is nothing common to merge between a static structure type and an unresolved type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $unresolvedType]);
+        return new MultipleType([$this, $unresolvedType], $this->validationContext);
     }
 
     /**
@@ -356,7 +444,7 @@ class StaticStructureType implements TypeInterface
         // There is nothing common to merge between a static structure type and a valued type,
         // so just return a MultipleType that allows both
         // TODO: Consider merging this type with the valued type's wrapped type
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -371,6 +459,14 @@ class StaticStructureType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithAnyType(AnyType $candidateType)
+    {
+        return $candidateType->mergeWithStaticStructureType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
     {
         return $candidateType->mergeWithStaticStructureType($this);
     }

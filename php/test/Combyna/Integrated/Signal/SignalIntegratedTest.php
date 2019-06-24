@@ -82,7 +82,7 @@ class SignalIntegratedTest extends TestCase
                 '(Nothing has been dispatched yet)' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheImplicitNonBroadcasterButton()
@@ -110,7 +110,7 @@ class SignalIntegratedTest extends TestCase
                 'From the implicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheImplicitNonBroadcasterButton()
@@ -160,7 +160,7 @@ class SignalIntegratedTest extends TestCase
                 'From the explicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheExplicitNonBroadcasterButton()
@@ -210,7 +210,7 @@ class SignalIntegratedTest extends TestCase
                 'From the broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsASignalEventAfterClickingTheBroadcasterButton()

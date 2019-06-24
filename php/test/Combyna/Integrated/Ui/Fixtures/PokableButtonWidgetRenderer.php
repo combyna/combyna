@@ -11,6 +11,7 @@
 
 namespace Combyna\Integrated\Ui\Fixtures;
 
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\HtmlElement;
 use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\TextNode;
@@ -48,8 +49,11 @@ class PokableButtonWidgetRenderer implements WidgetRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath)
-    {
+    public function renderWidget(
+        WidgetStateInterface $widgetState,
+        WidgetStatePathInterface $widgetStatePath,
+        ProgramInterface $program
+    ) {
         if (
             !$widgetState instanceof DefinedWidgetStateInterface ||
             $widgetState->getWidgetDefinitionLibraryName() !== $this->getWidgetDefinitionLibraryName() ||

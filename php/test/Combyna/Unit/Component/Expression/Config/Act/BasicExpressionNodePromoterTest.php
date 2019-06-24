@@ -25,6 +25,7 @@ use Combyna\Component\Framework\Mode\DevelopmentMode;
 use Combyna\Component\Framework\Mode\ProductionMode;
 use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -79,7 +80,7 @@ class BasicExpressionNodePromoterTest extends TestCase
 
     public function testPromoteFunctionExpressionIsCorrectForDevelopmentMode()
     {
-        $resultType = new StaticType(TextExpression::class);
+        $resultType = new StaticType(TextExpression::class, new NullValidationContext());
         $argumentBagNode = $this->prophesize(ExpressionBagNode::class);
         /** @var ObjectProphecy|FunctionExpressionNode $node */
         $node = $this->prophesize(FunctionExpressionNode::class);

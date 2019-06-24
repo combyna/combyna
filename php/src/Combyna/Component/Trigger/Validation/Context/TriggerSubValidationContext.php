@@ -13,7 +13,9 @@ namespace Combyna\Component\Trigger\Validation\Context;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
+use Combyna\Component\Event\Validation\Query\CurrentEventHasPayloadStaticQuery;
 use Combyna\Component\Event\Validation\Query\CurrentEventPayloadStaticTypeQuery;
+use Combyna\Component\Event\Validation\Query\EventDefinitionHasPayloadStaticQuery;
 use Combyna\Component\Event\Validation\Query\EventDefinitionPayloadStaticTypeQuery;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Trigger\Validation\Query\InsideTriggerQuery;
@@ -116,6 +118,7 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
     public function getQueryClassToQueryCallableMap()
     {
         return [
+            CurrentEventHasPayloadStaticQuery::class => [$this, 'queryForCurrentEventPayloadStaticExistence'],
             CurrentEventPayloadStaticTypeQuery::class => [$this, 'queryForCurrentEventPayloadStaticType'],
             InsideTriggerQuery::class => [$this, 'queryForInsideTrigger']
         ];
@@ -127,6 +130,29 @@ class TriggerSubValidationContext implements TriggerSubValidationContextInterfac
     public function getSubjectActNode()
     {
         return $this->subjectNode;
+    }
+
+    /**
+     * Determines whether the event this trigger will fire for defines the specified payload static
+     *
+     * @param CurrentEventHasPayloadStaticQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool
+     */
+    public function queryForCurrentEventPayloadStaticExistence(
+        CurrentEventHasPayloadStaticQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        return $validationContext->queryForBoolean(
+            // Make another query for the existence of the actual event's payload static,
+            // adding the library and event name for the current trigger
+            new EventDefinitionHasPayloadStaticQuery(
+                $this->triggerNode->getEventDefinitionReference()->getLibraryName(),
+                $this->triggerNode->getEventDefinitionReference()->getEventName(),
+                $query->getPayloadStaticName()
+            ),
+            $this->triggerNode
+        );
     }
 
     /**

@@ -18,6 +18,7 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
@@ -120,12 +121,14 @@ class PageView implements PageViewInterface
     public function createEvaluationContext(
         EvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        RouterStateInterface $routerState,
         PageViewStateInterface $pageViewState = null
     ) {
         return $this->uiEvaluationContextFactory->createRootViewEvaluationContext(
             $this,
             $parentContext,
             $parentContext->getEnvironment(),
+            $routerState,
             $pageViewState
         );
     }
@@ -133,13 +136,16 @@ class PageView implements PageViewInterface
     /**
      * {@inheritdoc}
      */
-    public function createInitialState(EvaluationContextInterface $rootEvaluationContext)
-    {
+    public function createInitialState(
+        RouterStateInterface $routerState,
+        EvaluationContextInterface $rootEvaluationContext
+    ) {
         $storeState = $this->store->createInitialState($rootEvaluationContext);
         $viewAttributeStaticBag = new StaticBag([]); // FIXME
         $rootViewEvaluationContext = $this->createEvaluationContext(
             $rootEvaluationContext,
-            $this->uiEvaluationContextFactory
+            $this->uiEvaluationContextFactory,
+            $routerState
         );
 
         $rootWidgetState = $this->rootWidget->createInitialState(
@@ -150,6 +156,7 @@ class PageView implements PageViewInterface
 
         return $this->uiStateFactory->createPageViewState(
             $this,
+            $routerState,
             $storeState,
             $rootWidgetState,
             $viewAttributeStaticBag
@@ -213,6 +220,7 @@ class PageView implements PageViewInterface
         $evaluationContext = $this->createEvaluationContext(
             $program->getRootEvaluationContext(),
             $this->uiEvaluationContextFactory,
+            $pageViewState->getRouterState(),
             $pageViewState
         );
 
@@ -234,6 +242,7 @@ class PageView implements PageViewInterface
             $evaluationContext = $this->createEvaluationContext(
                 $program->getRootEvaluationContext(),
                 $this->uiEvaluationContextFactory,
+                $pageViewState->getRouterState(),
                 $pageViewState
             );
 
@@ -278,6 +287,7 @@ class PageView implements PageViewInterface
         $evaluationContext = $this->createEvaluationContext(
             $evaluationContext,
             $this->uiEvaluationContextFactory,
+            $oldState->getRouterState(),
             $oldState
         );
 

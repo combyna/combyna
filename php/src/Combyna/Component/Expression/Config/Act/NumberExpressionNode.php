@@ -14,9 +14,7 @@ namespace Combyna\Component\Expression\Config\Act;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\NumberValueInterface;
 use Combyna\Component\Expression\StaticValueInterface;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\ValuedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticValuedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -63,12 +61,7 @@ class NumberExpressionNode extends AbstractStaticExpressionNode implements Numbe
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(
-            new ValuedType(
-                new StaticType(NumberExpression::class),
-                $this
-            )
-        );
+        return new StaticValuedTypeDeterminer(NumberExpression::class, $this);
     }
 
     /**

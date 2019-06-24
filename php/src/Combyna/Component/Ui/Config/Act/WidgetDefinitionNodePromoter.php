@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter;
-use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Ui\Config\Promoter\WidgetNodePromoterInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionCollectionInterface;
@@ -39,11 +38,6 @@ class WidgetDefinitionNodePromoter
     private $eventDefinitionReferenceNodePromoter;
 
     /**
-     * @var StaticExpressionFactoryInterface
-     */
-    private $staticExpressionFactory;
-
-    /**
      * @var WidgetDefinitionFactoryInterface
      */
     private $widgetDefinitionFactory;
@@ -56,20 +50,17 @@ class WidgetDefinitionNodePromoter
     /**
      * @param BagNodePromoter $bagNodePromoter
      * @param EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter
-     * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
      * @param WidgetNodePromoterInterface $widgetNodePromoter
      */
     public function __construct(
         BagNodePromoter $bagNodePromoter,
         EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter,
-        StaticExpressionFactoryInterface $staticExpressionFactory,
         WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
         WidgetNodePromoterInterface $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->eventDefinitionReferenceNodePromoter = $eventDefinitionReferenceNodePromoter;
-        $this->staticExpressionFactory = $staticExpressionFactory;
         $this->widgetDefinitionFactory = $widgetDefinitionFactory;
         $this->widgetNodePromoter = $widgetNodePromoter;
     }
@@ -123,7 +114,6 @@ class WidgetDefinitionNodePromoter
                 $widgetDefinitionNode->getWidgetDefinitionName(),
                 $attributeBagModel,
                 $valueBagModel,
-                $this->staticExpressionFactory,
                 $widgetDefinitionNode->getValueNameToProviderCallableMap()
             );
         }

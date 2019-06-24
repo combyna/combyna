@@ -11,8 +11,12 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
+use InvalidArgumentException;
 
 /**
  * Class AnyType
@@ -24,11 +28,24 @@ use Combyna\Component\Expression\StaticInterface;
 class AnyType implements TypeInterface
 {
     /**
+     * @var ValidationContextInterface
+     */
+    private $validationContext;
+
+    /**
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct(ValidationContextInterface $validationContext)
+    {
+        $this->validationContext = $validationContext;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function allows(TypeInterface $candidateType)
     {
-        return $candidateType->isAllowedByAnyType();
+        return $candidateType->isAllowedByAnyType($this);
     }
 
     /**
@@ -36,6 +53,17 @@ class AnyType implements TypeInterface
      */
     public function allowsAnyType(AnyType $candidateType)
     {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
         return true;
     }
 
@@ -98,6 +126,91 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        // For an AnyType, the value could be anything, so we make a best guess based on its data
+
+        if ($nativeValue instanceof StaticInterface) {
+            // Already a static - nothing to do
+            return $nativeValue;
+        }
+
+        if (is_bool($nativeValue)) {
+            return $staticExpressionFactory->createBooleanExpression($nativeValue);
+        }
+
+        if (is_int($nativeValue) || is_float($nativeValue)) {
+            return $staticExpressionFactory->createNumberExpression($nativeValue);
+        }
+
+        if (is_string($nativeValue)) {
+            return $staticExpressionFactory->createTextExpression($nativeValue);
+        }
+
+        if ($nativeValue === null) {
+            return $staticExpressionFactory->createNothingExpression();
+        }
+
+        if (is_array($nativeValue)) {
+            $allNumeric = true;
+
+            foreach ($nativeValue as $key => $elementValue) {
+                if (!is_numeric($key)) {
+                    $allNumeric = false;
+                    break;
+                }
+            }
+
+            // If all keys are numeric, coerce to a list
+            if ($allNumeric) {
+                return $staticExpressionFactory->createStaticListExpression(
+                    $bagFactory->createStaticList(
+                        array_map(
+                            function ($elementValue) use (
+                                $bagFactory,
+                                $evaluationContext,
+                                $staticExpressionFactory
+                            ) {
+                                return $this->coerceNative(
+                                    $elementValue,
+                                    $staticExpressionFactory,
+                                    $bagFactory,
+                                    $evaluationContext
+                                );
+                            },
+                            $nativeValue
+                        )
+                    )
+                );
+            }
+
+            // Otherwise coerce to a structure
+            $coercedStatics = [];
+
+            foreach ($nativeValue as $name => $attributeValue) {
+                $coercedStatics[$name] = $this->coerceNative(
+                    $attributeValue,
+                    $staticExpressionFactory,
+                    $bagFactory,
+                    $evaluationContext
+                );
+            }
+
+            return $staticExpressionFactory->createStaticStructureExpression(
+                $bagFactory->createStaticBag($coercedStatics)
+            );
+        }
+
+        throw new InvalidArgumentException(sprintf('Cannot coerce native value of type "%s"', gettype($nativeValue)));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
     {
         return $static; // For an Any type, any value is possible
@@ -106,9 +219,25 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsAnyType($this);
     }
 
     /**
@@ -202,11 +331,19 @@ class AnyType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        return new MultipleType([$this, $otherType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithMultipleType(MultipleType $otherType, array $subSubTypes)
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -214,7 +351,7 @@ class AnyType implements TypeInterface
      */
     public function mergeWithStaticListType(StaticListType $otherType, TypeInterface $elementType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -222,7 +359,7 @@ class AnyType implements TypeInterface
      */
     public function mergeWithStaticStructureType(StaticStructureType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -230,7 +367,7 @@ class AnyType implements TypeInterface
      */
     public function mergeWithStaticType(StaticType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -238,7 +375,7 @@ class AnyType implements TypeInterface
      */
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
     {
-        return new MultipleType([$this, $unresolvedType]);
+        return new MultipleType([$this, $unresolvedType], $this->validationContext);
     }
 
     /**
@@ -246,7 +383,7 @@ class AnyType implements TypeInterface
      */
     public function mergeWithValuedType(ValuedType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -263,6 +400,14 @@ class AnyType implements TypeInterface
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithAnyType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
+    {
+        return $candidateType->mergeWithAnyType($this);
     }
 
     /**

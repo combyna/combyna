@@ -18,6 +18,7 @@ use Combyna\Component\Config\Parameter\ArgumentBagInterface;
 use Combyna\Component\Config\Parameter\ExtraParameter;
 use Combyna\Component\Config\Parameter\ParameterInterface;
 use Combyna\Component\Config\Parameter\ParameterParserInterface;
+use Combyna\Component\Config\Parameter\PositionalParameter;
 
 /**
  * Class ArgumentParser
@@ -51,7 +52,9 @@ class ArgumentParser implements ArgumentParserInterface
      */
     public function parseArguments(array $config, array $parameterList)
     {
-        $namedArguments = $config[ArgumentParser::NAMED_ARGUMENTS];
+        $namedArguments = array_key_exists(ArgumentParser::NAMED_ARGUMENTS, $config) ?
+            $config[ArgumentParser::NAMED_ARGUMENTS] :
+            [];
         $parameterNames = array_map(function (ParameterInterface $parameter) {
             return $parameter->getName();
         }, $parameterList);
@@ -65,8 +68,15 @@ class ArgumentParser implements ArgumentParserInterface
 
         $arguments = [];
         $argumentMismatches = [];
+        $nextPositionalParameterIndex = 0;
 
         foreach ($parameterList as $parameter) {
+            if ($parameter instanceof PositionalParameter) {
+                // Positional parameters need to be provided with their position index
+                // so that they can extract the correct argument from the list
+                $parameter->setPosition($nextPositionalParameterIndex++);
+            }
+
             try {
                 $arguments[$parameter->getName()] = $this->parameterParser->parseArgument(
                     $parameter,

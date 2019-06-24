@@ -12,6 +12,7 @@
 namespace Combyna\Integrated\Expression;
 
 use Combyna\Component\Bag\BagFactory;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactory;
 use Combyna\Component\Bag\FixedStaticBagModel;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Bag\StaticBagInterface;
@@ -31,6 +32,7 @@ use Combyna\Component\Expression\StaticExpressionFactory;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Signal\SignalDefinitionCollection;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Harness\TestCase;
 use Symfony\Component\Translation\Loader\ArrayLoader;
 use Symfony\Component\Translation\Translator;
@@ -64,12 +66,16 @@ class BasicExpressionIntegratedTest extends TestCase
 
     public function setUp()
     {
+        $this->evaluationContextFactory = new EvaluationContextFactory();
         $staticExpressionFactory = new StaticExpressionFactory();
+        $bagEvaluationContextFactory = new BagEvaluationContextFactory(
+            $this->evaluationContextFactory,
+            $staticExpressionFactory
+        );
         $translator = new Translator('en');
         $translator->addLoader('yaml', new ArrayLoader());
-        $this->bagFactory = new BagFactory($staticExpressionFactory);
+        $this->bagFactory = new BagFactory($staticExpressionFactory, $bagEvaluationContextFactory);
         $this->environment = new Environment($translator);
-        $this->evaluationContextFactory = new EvaluationContextFactory($this->bagFactory);
 
         $this->environment->installLibrary(
             new Library(
@@ -79,8 +85,13 @@ class BasicExpressionIntegratedTest extends TestCase
                         'length',
                         new FixedStaticBagModel(
                             $this->bagFactory,
+                            $staticExpressionFactory,
+                            $bagEvaluationContextFactory,
                             [
-                                new FixedStaticDefinition('textString', new StaticType(TextExpression::class))
+                                new FixedStaticDefinition(
+                                    'textString',
+                                    new StaticType(TextExpression::class, new NullValidationContext())
+                                )
                             ]
                         ),
                         function (StaticBagInterface $argumentBag) {
@@ -123,7 +134,7 @@ class BasicExpressionIntegratedTest extends TestCase
                         $this->bagFactory->createExpressionBag([
                             'textString' => $this->expressionFactory->createTextExpression('Fred')
                         ]),
-                        new StaticType(NumberExpression::class)
+                        new StaticType(NumberExpression::class, new NullValidationContext())
                     ),
                     ComparisonExpression::EQUAL,
                     $this->expressionFactory->createNumberExpression(21)

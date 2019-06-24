@@ -50,6 +50,14 @@ class Environment implements EnvironmentInterface
     /**
      * {@inheritdoc}
      */
+    public function getEnvironment()
+    {
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEventDefinitionByName($libraryName, $eventName)
     {
         if (!array_key_exists($libraryName, $this->libraries)) {

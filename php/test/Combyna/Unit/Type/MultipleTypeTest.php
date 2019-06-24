@@ -15,6 +15,7 @@ use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -41,15 +42,24 @@ class MultipleTypeTest extends TestCase
      */
     private $type;
 
+    /**
+     * @var ObjectProphecy|ValidationContextInterface
+     */
+    private $validationContext;
+
     public function setUp()
     {
         $this->ourSubType1 = $this->prophesize(TypeInterface::class);
         $this->ourSubType2 = $this->prophesize(TypeInterface::class);
+        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
-        $this->type = new MultipleType([
-            $this->ourSubType1->reveal(),
-            $this->ourSubType2->reveal()
-        ]);
+        $this->type = new MultipleType(
+            [
+                $this->ourSubType1->reveal(),
+                $this->ourSubType2->reveal()
+            ],
+            $this->validationContext->reveal()
+        );
     }
 
     public function testAllowsMultipleTypeReturnsTrueWhenFirstOfOurSubTypesAllowsAllTheirSubTypes()

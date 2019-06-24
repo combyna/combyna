@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use InvalidArgumentException;
 
@@ -86,6 +87,14 @@ class StaticBag implements StaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function evaluateStatic($staticName, EvaluationContextInterface $evaluationContext)
+    {
+        return $this->getStatic($staticName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatic($name)
     {
         if (!$this->hasStatic($name)) {
@@ -112,6 +121,14 @@ class StaticBag implements StaticBagInterface
     public function hasStatic($name)
     {
         return array_key_exists($name, $this->statics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function providesStatic($staticName)
+    {
+        return $this->hasStatic($staticName);
     }
 
     /**

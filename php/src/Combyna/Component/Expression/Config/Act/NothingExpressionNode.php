@@ -14,9 +14,7 @@ namespace Combyna\Component\Expression\Config\Act;
 use Combyna\Component\Expression\NothingExpression;
 use Combyna\Component\Expression\NothingValueInterface;
 use Combyna\Component\Expression\StaticValueInterface;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\ValuedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticValuedTypeDeterminer;
 
 /**
  * Class NothingExpressionNode
@@ -45,12 +43,7 @@ class NothingExpressionNode extends AbstractStaticExpressionNode implements Noth
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(
-            new ValuedType(
-                new StaticType(NothingExpression::class),
-                $this
-            )
-        );
+        return new StaticValuedTypeDeterminer(NothingExpression::class, $this);
     }
 
     /**

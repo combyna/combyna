@@ -18,9 +18,8 @@ use Combyna\Component\Config\Parameter\NamedParameter;
 use Combyna\Component\Config\Parameter\Type\ExpressionParameterType;
 use Combyna\Component\Config\Parameter\Type\StringParameterType;
 use Combyna\Component\Config\Parameter\Type\TypeParameterType;
-use Combyna\Component\Type\AnyType;
-use Combyna\Component\Type\UnresolvedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\AnyTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use Combyna\Component\Validator\Type\ValuedTypeDeterminer;
 
 /**
@@ -54,15 +53,13 @@ class ValuedTypeLoader implements TypeTypeLoaderInterface
                 new CallbackOptionalParameter(
                     new NamedParameter('wraps', new TypeParameterType('wrapped type')),
                     function () {
-                        return new AnyType();
+                        return new AnyTypeDeterminer();
                     }
                 ),
                 new NamedParameter('value', new ExpressionParameterType('value expression')),
             ]);
         } catch (ArgumentParseException $exception) {
-            return new PresolvedTypeDeterminer(
-                new UnresolvedType('Invalid valued type: ' . $exception->getMessage())
-            );
+            return new UnresolvedTypeDeterminer('Invalid valued type: ' . $exception->getMessage());
         }
 
         $wrappedTypeDeterminer = $parsedArgumentBag->getNamedTypeArgument('wraps');

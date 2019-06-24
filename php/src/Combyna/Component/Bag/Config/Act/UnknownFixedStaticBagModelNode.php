@@ -15,8 +15,10 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Config\Act\DynamicContainerNode;
+use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use LogicException;
 
@@ -104,6 +106,28 @@ class UnknownFixedStaticBagModelNode extends AbstractActNode implements FixedSta
     public function getStaticDefinitions()
     {
         return []; // Unknown static bag model cannot define any statics
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticDefinitionType($definitionName)
+    {
+        return new UnresolvedType(
+            sprintf(
+                'Cannot fetch static definition "%s" of unknown bag model',
+                $definitionName
+            ),
+            new NullValidationContext()
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return true; // Treat an unknown model as empty
     }
 
     /**

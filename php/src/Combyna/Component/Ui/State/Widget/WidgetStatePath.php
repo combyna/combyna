@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
+use Combyna\Component\Environment\Library\LibraryInterface;
+use Combyna\Component\State\Exception\AncestorStateUnavailableException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 use Combyna\Component\Ui\State\UiStateInterface;
 use LogicException;
@@ -91,6 +93,26 @@ class WidgetStatePath implements WidgetStatePathInterface
     /**
      * {@inheritdoc}
      */
+    public function getParentState()
+    {
+        if (count($this->states) <= 1) {
+            throw new AncestorStateUnavailableException('Parent state unavailable');
+        }
+
+        return $this->states[count($this->states) - 2];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentStateType()
+    {
+        return $this->getParentState()->getType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSubStatePaths()
     {
         $subStatePaths = [];
@@ -125,10 +147,58 @@ class WidgetStatePath implements WidgetStatePathInterface
      */
     public function getWidgetPath()
     {
-        $view = $this->states[0];
-        $widget = $this->getEndState();
+        // -2 so that we don't resolve via the definition when the end of the path
+        // points to a compound widget (rather than a descendant of one)
+        for ($i = count($this->states) - 2; $i >= 0; $i--) {
+            $state = $this->states[$i];
 
-        return array_merge([$view->getStateName()], $widget->getWidgetPath());
+            if ($state instanceof ChildReferenceWidgetStateInterface) {
+                // This state is for a child passed into a compound widget, so skip past its compound widget parent
+                if (!$this->states[$i - 1] instanceof DefinedCompoundWidgetStateInterface) {
+                    throw new LogicException(sprintf(
+                        'Expected parent to be a %s but it was a %s',
+                        DefinedCompoundWidgetStateInterface::class,
+                        get_class($this->states[$i - 1])
+                    ));
+                }
+
+                $i--;
+                continue;
+            }
+
+            if ($state instanceof DefinedCompoundWidgetStateInterface) {
+                // This state is for a widget of a compound widget definition,
+                // so the path needs to first point to the definition itself
+                // and then to the widget within its root tree
+                $path = [
+                    $state->getWidgetDefinitionLibraryName(),
+                    self::WIDGET_DEFINITION_PATH_TYPE,
+                    $state->getWidgetDefinitionName()
+                ];
+
+                $relativePath = $this->getEndState()->getWidgetPath();
+
+                for ($i++; $i < count($this->states) - count($relativePath); $i++) {
+                    $path[] = $this->states[$i]->getStateName();
+                }
+
+                $path = array_merge($path, $relativePath);
+
+                return $path;
+            }
+        }
+
+        $view = $this->states[0];
+        $widgetState = $this->getEndState();
+
+        return array_merge(
+            [
+                LibraryInterface::APP,
+                self::VIEW_PATH_TYPE,
+                $view->getStateName()
+            ],
+            $widgetState->getWidgetPath()
+        );
     }
 
     /**
@@ -151,5 +221,13 @@ class WidgetStatePath implements WidgetStatePathInterface
     public function getStates()
     {
         return $this->states;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasParent()
+    {
+        return count($this->states) > 1;
     }
 }

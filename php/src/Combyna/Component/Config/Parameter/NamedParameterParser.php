@@ -68,7 +68,9 @@ class NamedParameterParser implements ParameterTypeParserInterface
     ) {
         $this->validateArgument($parameter, $config);
 
-        $namedArguments = $config[ArgumentParser::NAMED_ARGUMENTS];
+        $namedArguments = array_key_exists(ArgumentParser::NAMED_ARGUMENTS, $config) ?
+            $config[ArgumentParser::NAMED_ARGUMENTS] :
+            [];
 
         return $this->typeParser->parseArgument(
             $parameter->getParameterType(),
@@ -86,7 +88,9 @@ class NamedParameterParser implements ParameterTypeParserInterface
      */
     public function validateArgument(NamedParameter $parameter, array $config)
     {
-        $namedArguments = $config[ArgumentParser::NAMED_ARGUMENTS];
+        $namedArguments = array_key_exists(ArgumentParser::NAMED_ARGUMENTS, $config) ?
+            $config[ArgumentParser::NAMED_ARGUMENTS] :
+            [];
 
         if (
             !array_key_exists($parameter->getName(), $namedArguments) ||

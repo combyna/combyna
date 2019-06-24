@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Program;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\RootEvaluationContext;
 use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Router\State\RouterStateInterface;
@@ -27,6 +28,16 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface ProgramInterface
 {
+    /**
+     * Builds a URL for the specified route given the provided arguments
+     *
+     * @param string $libraryName
+     * @param string $routeName
+     * @param StaticBagInterface $argumentStaticBag
+     * @return string
+     */
+    public function buildRouteUrl($libraryName, $routeName, StaticBagInterface $argumentStaticBag);
+
     /**
      * Creates an initial state for the program
      *
@@ -86,6 +97,22 @@ interface ProgramInterface
     public function handleSignal(
         ProgramStateInterface $programState,
         SignalInterface $signal
+    );
+
+    /**
+     * Navigates the app to a new location, using the specified route and its arguments
+     *
+     * @param ProgramStateInterface $programState
+     * @param string $libraryName
+     * @param string $routeName
+     * @param StaticBagInterface $routeArgumentBag
+     * @return ProgramStateInterface
+     */
+    public function navigateTo(
+        ProgramStateInterface $programState,
+        $libraryName,
+        $routeName,
+        StaticBagInterface $routeArgumentBag
     );
 
     /**

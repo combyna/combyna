@@ -175,9 +175,13 @@ class DefinedWidget implements DefinedWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
-        return $this->definition->createEvent($libraryName, $eventName, $payloadStaticBag);
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
+        return $this->definition->createEvent($libraryName, $eventName, $payloadNatives, $evaluationContext);
     }
 
     /**
@@ -238,22 +242,21 @@ class DefinedWidget implements DefinedWidgetInterface
         // Widget must be visible - if it was not, its state would have been an InvisibleWidgetState,
         // whose ->invokeTriggersForEvent() method will do nothing
 
-        if ($this->triggerCollection->isEmpty() && $this->parentWidget !== null) {
+        if ($this->triggerCollection->isEmpty()) {
             // Widget has no triggers defined directly on it, so it implicitly forwards
             // any and all events to its parent widget (bubbling)
-            return $this->parentWidget->dispatchEvent($programState, $program, $event, $widgetEvaluationContext);
+            return $widgetEvaluationContext->bubbleEventToParent(
+                $programState,
+                $program,
+                $event,
+                $widgetEvaluationContext->getWidget()
+            );
         }
 
         if ($this->triggerCollection->hasByEventName($event->getLibraryName(), $event->getName())) {
             $trigger = $this->triggerCollection->getByEventName($event->getLibraryName(), $event->getName());
 
-            $definitionSubEvaluationContext = $this->definition->createDefinitionEvaluationContextForWidget(
-                $widgetEvaluationContext,
-                $this,
-                $widgetEvaluationContext->getWidgetState()
-            );
-
-            $programState = $trigger->invoke($programState, $program, $event, $definitionSubEvaluationContext);
+            $programState = $trigger->invoke($programState, $program, $event, $widgetEvaluationContext);
         }
 
         return $programState;
@@ -306,6 +309,14 @@ class DefinedWidget implements DefinedWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getDefinition()
+    {
+        return $this->definition;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDefinitionLibraryName()
     {
         return $this->definition->getLibraryName();
@@ -340,6 +351,14 @@ class DefinedWidget implements DefinedWidgetInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentWidget()
+    {
+        return $this->parentWidget;
     }
 
     /**

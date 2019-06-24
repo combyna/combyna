@@ -41,9 +41,8 @@ use Combyna\Component\Expression\ConversionExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -90,9 +89,10 @@ class ExpressionValidationIntegratedTest extends TestCase
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
         $this->container = $combynaBootstrap->createContainer();
 
+        $bagEvaluationContextFactory = $this->container->get('combyna.bag.evaluation_context_factory');
         $staticExpressionFactory = $this->container->get('combyna.expression.static_factory');
         $this->validationFactory = $this->container->get('combyna.validator.factory');
-        $this->bagFactory = new BagFactory($staticExpressionFactory);
+        $this->bagFactory = new BagFactory($staticExpressionFactory, $bagEvaluationContextFactory);
         $this->environmentNode = new EnvironmentNode([
             new LibraryNode(
                 'text',
@@ -106,11 +106,11 @@ class ExpressionValidationIntegratedTest extends TestCase
                             [
                                 new FixedStaticDefinitionNode(
                                     'textString',
-                                    new PresolvedTypeDeterminer(new StaticType(TextExpression::class))
+                                    new StaticTypeDeterminer(TextExpression::class)
                                 )
                             ]
                         ),
-                        new PresolvedTypeDeterminer(new StaticType(NumberExpression::class))
+                        new StaticTypeDeterminer(NumberExpression::class)
                     )
                 ]
             )

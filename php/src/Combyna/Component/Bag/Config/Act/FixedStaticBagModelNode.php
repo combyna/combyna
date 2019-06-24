@@ -106,6 +106,22 @@ class FixedStaticBagModelNode extends AbstractActNode implements FixedStaticBagM
     /**
      * {@inheritdoc}
      */
+    public function getStaticDefinitionType($definitionName)
+    {
+        return $this->staticDefinitionNodes[$definitionName]->getResolvedStaticType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return empty($this->staticDefinitionNodes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function validateStaticExpressionBag(
         ValidationContextInterface $validationContext,
         ExpressionBagNode $expressionBagNode,

@@ -12,6 +12,7 @@
 namespace Combyna\Component\Validator\Context;
 
 use Combyna\Component\Behaviour\BehaviourFactoryInterface;
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
@@ -21,6 +22,7 @@ use Combyna\Component\Config\Act\UnknownNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodePromoterInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
+use Combyna\Component\Type\Exotic\ExoticTypeDeterminerFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Type\ValuedType;
@@ -59,6 +61,11 @@ class RootValidationContext implements RootValidationContextInterface
     private $evaluationContextFactory;
 
     /**
+     * @var ExoticTypeDeterminerFactoryInterface
+     */
+    private $exoticTypeDeterminerFactory;
+
+    /**
      * @var ExpressionNodePromoterInterface
      */
     private $expressionNodePromoter;
@@ -91,6 +98,7 @@ class RootValidationContext implements RootValidationContextInterface
      * @param BehaviourSpecValidatorInterface $behaviourSpecValidator
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
      * @param ExpressionNodePromoterInterface $expressionNodePromoter
+     * @param ExoticTypeDeterminerFactoryInterface $exoticTypeDeterminerFactory
      */
     public function __construct(
         ValidationFactoryInterface $validationFactory,
@@ -99,11 +107,13 @@ class RootValidationContext implements RootValidationContextInterface
         BehaviourSpecInterface $rootNodeBehaviourSpec,
         BehaviourSpecValidatorInterface $behaviourSpecValidator,
         EvaluationContextFactoryInterface $evaluationContextFactory,
-        ExpressionNodePromoterInterface $expressionNodePromoter
+        ExpressionNodePromoterInterface $expressionNodePromoter,
+        ExoticTypeDeterminerFactoryInterface $exoticTypeDeterminerFactory
     ) {
         $this->behaviourFactory = $behaviourFactory;
         $this->behaviourSpecValidator = $behaviourSpecValidator;
         $this->evaluationContextFactory = $evaluationContextFactory;
+        $this->exoticTypeDeterminerFactory = $exoticTypeDeterminerFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;
         $this->rootNodeBehaviourSpec = $rootNodeBehaviourSpec;
         $this->rootSubValidationContext = $rootSubValidationContext;
@@ -171,6 +181,40 @@ class RootValidationContext implements RootValidationContextInterface
             $behaviourSpec,
             $this,
             $subValidationContext
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createExoticTypeDeterminer($determinerName, array $config, ValidationContextInterface $sourceValidationContext)
+    {
+        return $this->exoticTypeDeterminerFactory->createDeterminer(
+            $determinerName,
+            $config,
+            $sourceValidationContext
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode)
+    {
+        $subValidationContext = $this->rootNodeBehaviourSpec
+            ->getSubValidationContextForDescendant(
+                $structuredNode,
+                $this->rootSubValidationContext
+            );
+
+        if (!$subValidationContext) {
+            throw new LogicException('Could not find the structured node in the behaviour spec trees');
+        }
+
+        return $this->validationFactory->createContext(
+            $this,
+            $subValidationContext,
+            $this->behaviourSpecValidator
         );
     }
 
@@ -302,7 +346,10 @@ class RootValidationContext implements RootValidationContextInterface
             $subValidationContext
         );
 
-        return new UnresolvedType($resultTypeQuery->getDescription());
+        return new UnresolvedType(
+            $resultTypeQuery->getDescription(),
+            $this->createValidationContextForActNode($nodeToQueryFrom)
+        );
     }
 
     /**
@@ -403,7 +450,11 @@ class RootValidationContext implements RootValidationContextInterface
         $valueExpression = $this->expressionNodePromoter->promote($expressionNode);
         $valueStatic = $valueExpression->toStatic($evaluationContext);
 
-        return new ValuedType($type, $valueStatic);
+        return new ValuedType(
+            $type,
+            $valueStatic,
+            $type->getValidationContext()
+        );
     }
 
     /**

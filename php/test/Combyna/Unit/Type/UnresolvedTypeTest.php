@@ -16,6 +16,7 @@ use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
 
@@ -31,9 +32,16 @@ class UnresolvedTypeTest extends TestCase
      */
     private $type;
 
+    /**
+     * @var ObjectProphecy|ValidationContextInterface
+     */
+    private $validationContext;
+
     public function setUp()
     {
-        $this->type = new UnresolvedType('my context');
+        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
+
+        $this->type = new UnresolvedType('my context', $this->validationContext->reveal());
     }
 
     public function testAllowsMultipleTypeReturnsFalse()

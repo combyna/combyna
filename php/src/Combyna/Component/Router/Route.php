@@ -100,6 +100,14 @@ class Route implements RouteInterface
     /**
      * {@inheritdoc}
      */
+    public function getParameterBagModel()
+    {
+        return $this->parameterBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getUrlPattern()
     {
         return $this->urlPattern;

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\GenericNode;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
@@ -83,8 +84,11 @@ class GenericWidgetRenderer implements WidgetRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath)
-    {
+    public function renderWidget(
+        WidgetStateInterface $widgetState,
+        WidgetStatePathInterface $widgetStatePath,
+        ProgramInterface $program
+    ) {
         if (
             !$widgetState instanceof DefinedWidgetStateInterface ||
             $widgetState->getWidgetDefinitionLibraryName() !== $this->getWidgetDefinitionLibraryName() ||
@@ -101,7 +105,8 @@ class GenericWidgetRenderer implements WidgetRendererInterface
         $attributes = $widgetState->getAttributeStaticBag()->toNativeArray();
         $rootChildNode = $this->rootChildName !== null ?
             $this->delegatingWidgetRenderer->renderWidget(
-                $widgetStatePath->getChildStatePath($this->rootChildName)
+                $widgetStatePath->getChildStatePath($this->rootChildName),
+                $program
             ) :
             null;
 

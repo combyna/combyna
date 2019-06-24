@@ -12,11 +12,11 @@
 namespace Combyna\Component\Bag;
 
 use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticDefinitionInterface;
+use Combyna\Component\Bag\Exception\StaticIsRequiredException;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Type\TypeInterface;
-use LogicException;
 
 /**
  * Class FixedStaticDefinition
@@ -89,16 +89,12 @@ class FixedStaticDefinition implements FixedStaticDefinitionInterface
     }
 
     /**
-     * Fetches the default value for this static, if configured
-     *
-     * @param EvaluationContextInterface $evaluationContext
-     * @return StaticInterface
-     * @throws LogicException when no default static has been configured
+     * {@inheritdoc}
      */
     public function getDefaultStatic(EvaluationContextInterface $evaluationContext)
     {
         if (!$this->defaultExpression) {
-            throw new LogicException(
+            throw new StaticIsRequiredException(
                 'No default expression has been configured for parameter "' . $this->name . '"'
             );
         }

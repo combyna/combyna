@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
@@ -23,10 +24,17 @@ use Combyna\Component\Ui\State\UiStateFactoryInterface;
 /**
  * Class WidgetDefinitionFactory
  *
+ * TODO: Rename to just WidgetFactory to match SignalFactory
+ *
  * @author Dan Phillimore <dan@ovms.co>
  */
 class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
 {
+    /**
+     * @var BagFactoryInterface
+     */
+    private $bagFactory;
+
     /**
      * @var EventFactoryInterface
      */
@@ -38,22 +46,33 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
     private $renderedWidgetFactory;
 
     /**
+     * @var StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
+    /**
      * @var UiEvaluationContextFactoryInterface
      */
     private $uiEvaluationContextFactory;
 
     /**
+     * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $renderedWidgetFactory
      * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      * @param EventFactoryInterface $eventFactory
+     * @param StaticExpressionFactoryInterface $staticExpressionFactory
      */
     public function __construct(
+        BagFactoryInterface $bagFactory,
         UiStateFactoryInterface $renderedWidgetFactory,
         UiEvaluationContextFactoryInterface $uiEvaluationContextFactory,
-        EventFactoryInterface $eventFactory
+        EventFactoryInterface $eventFactory,
+        StaticExpressionFactoryInterface $staticExpressionFactory
     ) {
+        $this->bagFactory = $bagFactory;
         $this->eventFactory = $eventFactory;
         $this->renderedWidgetFactory = $renderedWidgetFactory;
+        $this->staticExpressionFactory = $staticExpressionFactory;
         $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
     }
 
@@ -90,10 +109,10 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
         FixedStaticBagModelInterface $valueBagModel,
-        StaticExpressionFactoryInterface $staticExpressionFactory,
         array $valueNameToProviderCallableMap
     ) {
         return new PrimitiveWidgetDefinition(
+            $this->bagFactory,
             $this->renderedWidgetFactory,
             $this->uiEvaluationContextFactory,
             $this->eventFactory,
@@ -102,7 +121,7 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
             $name,
             $attributeBagModel,
             $valueBagModel,
-            $staticExpressionFactory,
+            $this->staticExpressionFactory,
             $valueNameToProviderCallableMap
         );
     }

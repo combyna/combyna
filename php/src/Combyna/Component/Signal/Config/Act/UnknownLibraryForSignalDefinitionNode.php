@@ -19,6 +19,7 @@ use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Context\NullValidationContext;
 
 /**
  * Class UnknownLibraryForSignalDefinitionNode
@@ -111,7 +112,8 @@ class UnknownLibraryForSignalDefinitionNode extends AbstractActNode implements S
                 $staticName,
                 $this->signalName,
                 $this->libraryName
-            )
+            ),
+            new NullValidationContext()
         );
     }
 

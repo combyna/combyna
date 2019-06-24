@@ -50,4 +50,11 @@ interface DefinedWidgetInterface extends WidgetInterface
      * @return WidgetInterface[]
      */
     public function getChildWidgets();
+
+    /**
+     * Fetches the widget's definition
+     *
+     * @return WidgetDefinitionInterface
+     */
+    public function getDefinition();
 }

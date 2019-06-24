@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Environment;
 
-use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Environment\Exception\FunctionNotSupportedException;
 use Combyna\Component\Environment\Exception\IncorrectFunctionTypeException;
 use Combyna\Component\Environment\Exception\LibraryAlreadyInstalledException;
@@ -20,7 +19,6 @@ use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedExceptio
 use Combyna\Component\Environment\Library\FunctionInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Program\ResourceRepositoryInterface;
-use Combyna\Component\Router\RouteInterface;
 use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
@@ -44,18 +42,6 @@ interface EnvironmentInterface extends ResourceRepositoryInterface
      * @throws IncorrectFunctionTypeException
      */
     public function getGenericFunctionByName($libraryName, $functionName);
-
-    /**
-     * Fetches a route from a library installed into this environment.
-     * Throws a LibraryNotInstalled or WidgetDefinitionNotSupported exception on failure
-     *
-     * @param string $libraryName
-     * @param string $routeName
-     * @return RouteInterface
-     * @throws LibraryNotInstalledException
-     * @throws NotFoundException
-     */
-    public function getRouteByName($libraryName, $routeName);
 
     /**
      * Fetches a signal definition from a library installed into this environment.
@@ -88,13 +74,4 @@ interface EnvironmentInterface extends ResourceRepositoryInterface
      * @throws LibraryAlreadyInstalledException
      */
     public function installLibrary(LibraryInterface $library);
-
-    /**
-     * Translates a key for the current locale
-     *
-     * @param string $key
-     * @param array $arguments
-     * @return string
-     */
-    public function translate($key, array $arguments = []);
 }

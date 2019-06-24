@@ -19,6 +19,7 @@ use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
 use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
@@ -144,7 +145,7 @@ class FunctionExpressionNode extends AbstractExpressionNode
             return $this->resolvedResultType;
         }
 
-        return new AnyType();
+        return new AnyType(new NullValidationContext());
     }
 
     /**

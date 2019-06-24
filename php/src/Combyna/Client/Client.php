@@ -123,6 +123,6 @@ class Client
      */
     public function renderVisibleViews(AppStateInterface $appState)
     {
-        return $this->arrayRenderer->renderViews($appState);
+        return $this->arrayRenderer->renderViews($appState, $this->app->getProgram());
     }
 }

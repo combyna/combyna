@@ -72,6 +72,16 @@ class StaticStructureExpression extends AbstractStaticExpression
     }
 
     /**
+     * Fetches the static bag of attributes in this structure
+     *
+     * @return StaticBagInterface
+     */
+    public function getAttributeStaticBag()
+    {
+        return $this->staticBag;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getSummary()

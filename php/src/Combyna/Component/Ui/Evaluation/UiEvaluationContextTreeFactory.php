@@ -55,9 +55,26 @@ class UiEvaluationContextTreeFactory implements UiEvaluationContextTreeFactoryIn
         EnvironmentInterface $environment,
         EvaluationContextInterface $parentContext = null
     ) {
-        $map = $this->evaluationContextFactory->getStateTypeToContextFactoryMap();
+        // First, wrap the parent context in a child-specific wrapper one if needed
+        $parentFactoryMap = $this->evaluationContextFactory->getParentStateTypeToContextFactoryMap();
 
-        if (!array_key_exists($statePath->getEndStateType(), $map)) {
+        if ($parentContext !== null &&
+            $statePath->hasParent() &&
+            array_key_exists($statePath->getParentStateType(), $parentFactoryMap)
+        ) {
+            $parentContext = $parentFactoryMap[$statePath->getParentStateType()](
+                $parentContext,
+                $statePath->getParentState(),
+                $statePath,
+                $statePath->getEndState(),
+                $program
+            );
+        }
+
+        // Now create the child's actual context
+        $childFactoryMap = $this->evaluationContextFactory->getStateTypeToContextFactoryMap();
+
+        if (!array_key_exists($statePath->getEndStateType(), $childFactoryMap)) {
             throw new InvalidArgumentException(
                 sprintf(
                     'No context factory for state type "%s"',
@@ -66,7 +83,7 @@ class UiEvaluationContextTreeFactory implements UiEvaluationContextTreeFactoryIn
             );
         }
 
-        return $map[$statePath->getEndStateType()](
+        return $childFactoryMap[$statePath->getEndStateType()](
             $parentContext,
             $statePath,
             $statePath->getEndState(),

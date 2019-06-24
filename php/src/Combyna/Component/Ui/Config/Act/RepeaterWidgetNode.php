@@ -21,15 +21,14 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Expression\Validation\Context\Specifier\ScopeContextSpecifier;
-use Combyna\Component\Type\AnyType;
-use Combyna\Component\Type\StaticListType;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
 use Combyna\Component\Ui\Validation\Context\Specifier\RepeaterWidgetContextSpecifier;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Type\AnyTypeDeterminer;
 use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class RepeaterWidgetNode
@@ -131,7 +130,7 @@ class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterf
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->itemListExpressionNode,
-                new PresolvedTypeDeterminer(new StaticListType(new AnyType())),
+                new StaticListTypeDeterminer(new AnyTypeDeterminer()),
                 'item list'
             )
         );
@@ -164,7 +163,7 @@ class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterf
             if ($this->indexVariableName !== null) {
                 $scopeContextSpecifier->defineVariable(
                     $this->indexVariableName,
-                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class))
+                    new StaticTypeDeterminer(NumberExpression::class)
                 );
             }
 

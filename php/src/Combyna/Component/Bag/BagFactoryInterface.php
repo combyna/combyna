@@ -25,14 +25,6 @@ use Combyna\Component\Type\TypeInterface;
 interface BagFactoryInterface
 {
     /**
-     * Coerces an associative array of native values and their names to a StaticBag
-     *
-     * @param array $natives
-     * @return StaticBagInterface
-     */
-    public function coerceStaticBag(array $natives);
-
-    /**
      * Creates an ExpressionBag
      *
      * @param ExpressionInterface[] $expressions

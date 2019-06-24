@@ -93,9 +93,13 @@ class WidgetDefinitionReference implements WidgetDefinitionReferenceInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
-        return $this->getDefinition()->createEvent($libraryName, $eventName, $payloadStaticBag);
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
+        return $this->getDefinition()->createEvent($libraryName, $eventName, $payloadNatives, $evaluationContext);
     }
 
     /**
@@ -160,6 +164,17 @@ class WidgetDefinitionReference implements WidgetDefinitionReferenceInterface
     public function getName()
     {
         return $this->widgetDefinitionName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWidgetValue(
+        $valueName,
+        array $widgetStatePath,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
+        return $this->getDefinition()->getWidgetValue($valueName, $widgetStatePath, $evaluationContext);
     }
 
     /**

@@ -52,14 +52,18 @@ class ListExpressionTypeDeterminer extends AbstractTypeDeterminer
     public function determine(ValidationContextInterface $validationContext)
     {
         if ($this->determinedType === null) {
+            $listExpressionNodeValidationContext = $validationContext->createValidationContextForActNode(
+                $this->listExpressionNode
+            );
+
             // Fetch a type for the structure of the list expression, excluding any value information
             $listType = $this->listExpressionNode->getImpureResultTypeDeterminer()
-                ->determine($validationContext);
+                ->determine($listExpressionNodeValidationContext);
 
             // Attempt to validate the list as a "pure" one (with no function calls,
             // widget attribute fetches etc.) - if it is then we can evaluate it to a static value
             // statically and wrap it in a ValuedType in order to perform static analysis with it
-            $listType = $validationContext->wrapInValuedTypeIfPureExpression(
+            $listType = $listExpressionNodeValidationContext->wrapInValuedTypeIfPureExpression(
                 $listType,
                 $this->listExpressionNode
             );

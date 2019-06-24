@@ -14,9 +14,7 @@ namespace Combyna\Component\Expression\Config\Act;
 use Combyna\Component\Expression\StaticValueInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\TextValueInterface;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\ValuedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticValuedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -63,12 +61,7 @@ class TextExpressionNode extends AbstractStaticExpressionNode implements TextVal
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(
-            new ValuedType(
-                new StaticType(TextExpression::class),
-                $this
-            )
-        );
+        return new StaticValuedTypeDeterminer(TextExpression::class, $this);
     }
 
     /**

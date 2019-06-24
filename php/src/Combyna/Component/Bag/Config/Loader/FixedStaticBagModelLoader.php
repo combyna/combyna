@@ -53,13 +53,17 @@ class FixedStaticBagModelLoader implements FixedStaticBagModelLoaderInterface
         $staticDefinitionNodes = [];
 
         foreach ($modelConfig as $name => $definitionConfig) {
-            $staticTypeDeterminer = $this->typeLoader->load($definitionConfig);
-
             // Allow the static to specify a default value
-            $defaultExpressionNode =
-                (is_array($definitionConfig) && isset($definitionConfig['default'])) ?
-                $this->expressionLoader->load($definitionConfig['default']) :
-                null;
+            if (is_array($definitionConfig) && isset($definitionConfig['default'])) {
+                $defaultExpressionNode = $this->expressionLoader->load($definitionConfig['default']);
+
+                // Remove the "default" element as the type loader won't be expecting it
+                unset($definitionConfig['default']);
+            } else {
+                $defaultExpressionNode = null;
+            }
+
+            $staticTypeDeterminer = $this->typeLoader->load($definitionConfig);
 
             $staticDefinitionNodes[] = new FixedStaticDefinitionNode(
                 $name,

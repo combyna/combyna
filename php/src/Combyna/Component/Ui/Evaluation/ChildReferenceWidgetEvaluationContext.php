@@ -69,8 +69,28 @@ class ChildReferenceWidgetEvaluationContext extends AbstractCoreWidgetEvaluation
             return $this->widget->getCaptureExpressionBag()->getExpression($captureName)->toStatic($this);
         }
 
-        // Child reference widgets cannot have any descendants (despite their name),
-        // so none could set the capture
+        $childWidget = $this->getCompoundWidgetDefinitionContext()
+            ->getChildWidget($this->widget->getChildName());
+
+        // Fetch the child widget state if it has been created already, otherwise use none
+        $childWidgetState = $this->widgetState ?
+            $this->widgetState->getChildState($this->widget->getChildName()) :
+            null;
+
+        $childWidgetEvaluationContext = $childWidget
+            ->createEvaluationContext(
+                $this,
+                $this->evaluationContextFactory,
+                $childWidgetState
+            );
+
+        $captureStatic = $childWidgetEvaluationContext->getCaptureLeafwise($captureName);
+
+        if ($captureStatic !== null) {
+            return $captureStatic;
+        }
+
+        // No descendants set the capture
         return null;
     }
 }

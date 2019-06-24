@@ -60,7 +60,10 @@ class ValuedTypeDeterminer extends AbstractTypeDeterminer
         $expressionRootValidationContext = $validationContext->validateActNodeInIsolation($this->valueExpressionNode);
 
         if ($expressionRootValidationContext->isViolated()) {
-            return new UnresolvedType('Impure value expression given for valued type');
+            return new UnresolvedType(
+                'Impure value expression given for valued type',
+                $validationContext
+            );
         }
 
         return $validationContext->wrapInValuedType($wrappedType, $this->valueExpressionNode);

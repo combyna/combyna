@@ -20,6 +20,7 @@ use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use LogicException;
@@ -117,7 +118,10 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements Determ
      */
     public function getStaticType()
     {
-        return new UnresolvedType('Unknown fixed static "' . $this->name . '"');
+        return new UnresolvedType(
+            'Unknown fixed static "' . $this->name . '"',
+            new NullValidationContext()
+        );
     }
 
     /**

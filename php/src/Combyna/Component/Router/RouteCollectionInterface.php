@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Router;
 
+use Combyna\Component\Common\Exception\NotFoundException;
+
 /**
  * Interface RouteCollectionInterface
  *
@@ -23,6 +25,7 @@ interface RouteCollectionInterface
      *
      * @param string $name
      * @return RouteInterface
+     * @throws NotFoundException
      */
     public function getByName($name);
 }

@@ -1,4 +1,16 @@
 services:
+    combyna.router.validation.route_exists_constraint_validator:
+        class: Combyna\Component\Router\Validation\Constraint\RouteExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.router.validation.route_parameter_exists_constraint_validator:
+        class: Combyna\Component\Router\Validation\Constraint\RouteParameterExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
     combyna.router.validation.valid_parameter_bag_for_url_pattern_constraint_validator:
         class: Combyna\Component\Router\Validation\Constraint\ValidParameterBagForUrlPatternConstraintValidator
         autowire: true

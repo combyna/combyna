@@ -21,7 +21,7 @@ use Combyna\Component\Expression\ExpressionInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface ExpressionBagInterface
+interface ExpressionBagInterface extends StaticProviderBagInterface
 {
     /**
      * Fetches the specified expression from this bag

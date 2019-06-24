@@ -23,16 +23,16 @@ use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 class UnknownInstructionNode extends AbstractActNode implements InstructionNodeInterface
 {
     /**
-     * @var string|null
+     * @var string
      */
-    private $type;
+    private $contextDescription;
 
     /**
-     * @param string|null $type
+     * @param string $contextDescription
      */
-    public function __construct($type = null)
+    public function __construct($contextDescription)
     {
-        $this->type = $type;
+        $this->contextDescription = $contextDescription;
     }
 
     /**
@@ -40,12 +40,7 @@ class UnknownInstructionNode extends AbstractActNode implements InstructionNodeI
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        $type = $this->type !== null ? $this->type : '[missing]';
-
         // Make sure validation fails, as this node is invalid
-        $specBuilder->addConstraint(new KnownFailureConstraint(sprintf(
-            'Instruction is of unknown type "%s"',
-            $type
-        )));
+        $specBuilder->addConstraint(new KnownFailureConstraint($this->contextDescription));
     }
 }

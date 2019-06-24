@@ -12,16 +12,20 @@
 namespace Combyna\Integrated\Component\Type;
 
 use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface;
 use Combyna\Component\Bag\FixedStaticBagModel;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Environment\EnvironmentFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticStructureType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\NullValidationContext;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -32,6 +36,11 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  */
 class StaticListTypeIntegratedTest extends TestCase
 {
+    /**
+     * @var BagEvaluationContextFactoryInterface
+     */
+    private $bagEvaluationContextFactory;
+
     /**
      * @var BagFactoryInterface
      */
@@ -57,34 +66,54 @@ class StaticListTypeIntegratedTest extends TestCase
      */
     private $expressionFactory;
 
+    /**
+     * @var StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
+    /**
+     * @var ValidationContextInterface
+     */
+    private $validationContext;
+
     public function setUp()
     {
         global $combynaBootstrap;
         $this->container = $combynaBootstrap->createContainer();
 
+        $this->bagEvaluationContextFactory = $this->container->get('combyna.bag.evaluation_context_factory');
         $this->bagFactory = $this->container->get('combyna.bag.factory');
         $this->environmentFactory = $this->container->get('combyna.environment.factory');
         $this->evaluationContextFactory = $this->container->get('combyna.expression.evaluation_context_factory');
         $this->expressionFactory = $this->container->get('combyna.expression.factory');
+        $this->staticExpressionFactory = $this->container->get('combyna.expression.static_factory');
+        $this->validationContext = new NullValidationContext();
     }
 
     public function testListWithOneCompleteAndOneIncompleteStructureElementIsCoercedCorrectly()
     {
         $listType = new StaticListType(
             new StaticStructureType(
-                new FixedStaticBagModel($this->bagFactory, [
-                    new FixedStaticDefinition(
-                        'first-attr',
-                        new StaticType(TextExpression::class),
-                        new TextExpression('default for first-attr')
-                    ),
-                    new FixedStaticDefinition(
-                        'second-attr',
-                        new StaticType(TextExpression::class),
-                        new TextExpression('default for second-attr')
-                    )
-                ])
-            )
+                new FixedStaticBagModel(
+                    $this->bagFactory,
+                    $this->staticExpressionFactory,
+                    $this->bagEvaluationContextFactory,
+                    [
+                        new FixedStaticDefinition(
+                            'first-attr',
+                            new StaticType(TextExpression::class, $this->validationContext),
+                            new TextExpression('default for first-attr')
+                        ),
+                        new FixedStaticDefinition(
+                            'second-attr',
+                            new StaticType(TextExpression::class, $this->validationContext),
+                            new TextExpression('default for second-attr')
+                        )
+                    ]
+                ),
+                $this->validationContext
+            ),
+            $this->validationContext
         );
         $listExpression = $this->expressionFactory->createListExpression(
             $this->bagFactory->createExpressionList([

@@ -125,6 +125,8 @@ class AppNode extends AbstractActNode implements RootNodeInterface
          */
         $specBuilder->defineValidationContext(new AppContextSpecifier($this->environmentNode));
 
+        $specBuilder->addChildNode($this->homeNode);
+
         foreach ($this->overlayViewNodes as $overlayViewNode) {
             $specBuilder->addChildNode($overlayViewNode);
         }

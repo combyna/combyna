@@ -18,6 +18,7 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\AnyType;
+use Combyna\Component\Type\Exotic\NullExoticTypeDeterminer;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
@@ -99,6 +100,14 @@ class NullValidationContext implements ValidationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createExoticTypeDeterminer($determinerName, array $config)
+    {
+        return new NullExoticTypeDeterminer($this, $determinerName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubContext(
         SubValidationContextSpecifierInterface $subContextSpecifier,
         StructuredNodeInterface $structuredNode,
@@ -111,6 +120,14 @@ class NullValidationContext implements ValidationContextInterface
      * {@inheritdoc}
      */
     public function createTypeQueryRequirement(ResultTypeQueryInterface $query)
+    {
+        throw new RuntimeException(self::MESSAGE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode)
     {
         throw new RuntimeException(self::MESSAGE);
     }
@@ -198,7 +215,7 @@ class NullValidationContext implements ValidationContextInterface
         ResultTypeQueryInterface $resultTypeQuery,
         ActNodeInterface $nodeToQueryFrom
     ) {
-        return new AnyType();
+        return new AnyType($this);
     }
 
     /**

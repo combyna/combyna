@@ -208,15 +208,16 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
                 return $stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]));
             }
 
-            foreach ($this->childWidgetStates as $childWidgetState) {
-                try {
-                    return $childWidgetState->getWidgetStatePathByPath(
-                        $path,
-                        array_merge($parentStates, [$this]),
-                        $stateFactory
-                    );
-                } catch (NotFoundException $exception) {
-                }
+            // Recurse into the root widget state only - the child states should all
+            // exist somewhere within the root widget state structure, as validation
+            // should have ensured that all child widgets are embedded somewhere in the root one
+            try {
+                return $this->rootWidgetState->getWidgetStatePathByPath(
+                    $path,
+                    array_merge($parentStates, [$this]),
+                    $stateFactory
+                );
+            } catch (NotFoundException $exception) {
             }
         }
 
@@ -230,20 +231,19 @@ class DefinedCompoundWidgetState implements DefinedCompoundWidgetStateInterface
      */
     public function getWidgetStatePathsByTag($tag, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
+        $parentStatesForChild = array_merge($parentStates, [$this]);
         $widgetStatePaths = $this->widget->hasTag($tag) ?
-            [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
+            [$stateFactory->createWidgetStatePath($parentStatesForChild)] :
             [];
 
-        foreach ($this->childWidgetStates as $childWidgetState) {
-            $widgetStatePaths = array_merge(
-                $widgetStatePaths,
-                $childWidgetState->getWidgetStatePathsByTag(
-                    $tag,
-                    array_merge($parentStates, [$this]),
-                    $stateFactory
-                )
-            );
-        }
+        $widgetStatePaths = array_merge(
+            $widgetStatePaths,
+            $this->rootWidgetState->getWidgetStatePathsByTag(
+                $tag,
+                $parentStatesForChild,
+                $stateFactory
+            )
+        );
 
         return $widgetStatePaths;
     }

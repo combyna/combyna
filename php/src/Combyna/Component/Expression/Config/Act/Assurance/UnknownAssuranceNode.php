@@ -14,10 +14,9 @@ namespace Combyna\Component\Expression\Config\Act\Assurance;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class UnknownAssuranceNode
@@ -91,10 +90,10 @@ class UnknownAssuranceNode extends AbstractActNode implements AssuranceNodeInter
     {
         $constraintName = $this->constraintName !== null ? $this->constraintName : '[missing]';
 
-        return new PresolvedTypeDeterminer(new UnresolvedType(sprintf(
+        return new UnresolvedTypeDeterminer(sprintf(
             'Unknown assurance constraint "%s"',
             $constraintName
-        )));
+        ));
     }
 
     /**

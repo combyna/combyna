@@ -18,7 +18,6 @@ use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
 use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Ui\Evaluation\CompoundWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
@@ -180,8 +179,12 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         try {
             $eventDefinition = $this->eventDefinitionReferenceCollection->getDefinitionByName($libraryName, $eventName);
         } catch (EventDefinitionNotReferencedException $exception) {
@@ -193,7 +196,11 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
             );
         }
 
-        return $this->eventFactory->createEvent($eventDefinition, $payloadStaticBag);
+        $payloadStaticBag = $eventDefinition
+            ->getPayloadStaticBagModel()
+            ->coerceNativeArrayToBag($payloadNatives, $evaluationContext);
+
+        return $this->eventFactory->createEvent($eventDefinition, $payloadStaticBag, $this);
     }
 
     /**
@@ -278,6 +285,7 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
         return $this->attributeBagModel->coerceStatic(
             $name,
             $evaluationContext,
+            $attributeExpressionBag,
             $attributeExpressionBag->hasExpression($name) ?
                 $attributeExpressionBag->getExpression($name)->toStatic($evaluationContext) :
                 null
@@ -311,14 +319,13 @@ class CompoundWidgetDefinition implements WidgetDefinitionInterface
     }
 
     /**
-     * Evaluates and then returns the value of the specified widget value
-     *
-     * @param string $valueName
-     * @param ViewEvaluationContextInterface $evaluationContext
-     * @return StaticInterface
+     * {@inheritdoc}
      */
-    public function getWidgetValue($valueName, ViewEvaluationContextInterface $evaluationContext)
-    {
+    public function getWidgetValue(
+        $valueName,
+        array $widgetStatePath,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         return $this->valueExpressionBag->getExpression($valueName)->toStatic($evaluationContext);
     }
 

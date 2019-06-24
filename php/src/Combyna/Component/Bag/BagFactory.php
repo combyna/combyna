@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Type\TypeInterface;
@@ -25,30 +26,25 @@ use Combyna\Component\Type\TypeInterface;
 class BagFactory implements BagFactoryInterface
 {
     /**
+     * @var BagEvaluationContextFactoryInterface
+     */
+    private $bagEvaluationContextFactory;
+
+    /**
      * @var StaticExpressionFactoryInterface
      */
     private $staticExpressionFactory;
 
     /**
      * @param StaticExpressionFactoryInterface $staticExpressionFactory
+     * @param BagEvaluationContextFactoryInterface $bagEvaluationContextFactory
      */
-    public function __construct(StaticExpressionFactoryInterface $staticExpressionFactory)
-    {
+    public function __construct(
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagEvaluationContextFactoryInterface $bagEvaluationContextFactory
+    ) {
+        $this->bagEvaluationContextFactory = $bagEvaluationContextFactory;
         $this->staticExpressionFactory = $staticExpressionFactory;
-    }
-
-    /**
-     * @inheritdoc}
-     */
-    public function coerceStaticBag(array $natives)
-    {
-        $statics = [];
-
-        foreach ($natives as $name => $value) {
-            $statics[$name] = $this->staticExpressionFactory->coerce($value);
-        }
-
-        return $this->createStaticBag($statics);
     }
 
     /**
@@ -72,7 +68,12 @@ class BagFactory implements BagFactoryInterface
      */
     public function createFixedStaticBagModel(array $staticDefinitions)
     {
-        return new FixedStaticBagModel($this, $staticDefinitions);
+        return new FixedStaticBagModel(
+            $this,
+            $this->staticExpressionFactory,
+            $this->bagEvaluationContextFactory,
+            $staticDefinitions
+        );
     }
 
     /**

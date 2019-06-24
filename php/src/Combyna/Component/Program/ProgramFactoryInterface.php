@@ -13,6 +13,7 @@ namespace Combyna\Component\Program;
 
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Router\RouterInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
@@ -27,6 +28,7 @@ interface ProgramFactoryInterface
      * Creates a new Program
      *
      * @param EnvironmentInterface $environment
+     * @param RouterInterface $router
      * @param ResourceRepositoryInterface $resourceRepository
      * @param PageViewCollectionInterface $pageViewCollection
      * @param OverlayViewCollectionInterface $overlayViewCollection
@@ -35,6 +37,7 @@ interface ProgramFactoryInterface
      */
     public function createProgram(
         EnvironmentInterface $environment,
+        RouterInterface $router,
         ResourceRepositoryInterface $resourceRepository,
         PageViewCollectionInterface $pageViewCollection,
         OverlayViewCollectionInterface $overlayViewCollection,

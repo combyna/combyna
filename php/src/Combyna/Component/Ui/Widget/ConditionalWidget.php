@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
@@ -137,8 +136,12 @@ class ConditionalWidget implements ConditionalWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         throw new \Exception('Not implemented');
     }
 
@@ -348,6 +351,14 @@ class ConditionalWidget implements ConditionalWidgetInterface
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentWidget()
+    {
+        return $this->parentWidget;
     }
 
     /**

@@ -14,9 +14,7 @@ namespace Combyna\Component\Expression\Config\Act;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\BooleanValueInterface;
 use Combyna\Component\Expression\StaticValueInterface;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\ValuedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticValuedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -63,11 +61,9 @@ class BooleanExpressionNode extends AbstractStaticExpressionNode implements Bool
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(
-            new ValuedType(
-                new StaticType(BooleanExpression::class),
-                $this
-            )
+        return new StaticValuedTypeDeterminer(
+            BooleanExpression::class,
+            $this
         );
     }
 

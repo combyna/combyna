@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
@@ -157,9 +156,29 @@ class RepeaterWidget implements RepeaterWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         throw new \Exception('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIndexVariableName()
+    {
+        return $this->indexVariableName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getItemVariableName()
+    {
+        return $this->itemVariableName;
     }
 
     /**
@@ -179,13 +198,17 @@ class RepeaterWidget implements RepeaterWidgetInterface
         // that this widget or any child widget makes available to its other child widgets
         $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
 
+        $itemStatics = [];
+
         // Create one instance of the repeated widget's state for each item in the list
         $repeatedWidgetStates = $this->mapItemStaticList(
             function (
                 ViewEvaluationContextInterface $itemEvaluationContext,
                 StaticInterface $static,
                 $index
-            ) use ($evaluationContextFactory) {
+            ) use ($evaluationContextFactory, &$itemStatics) {
+                $itemStatics[$index] = $static;
+
                 // Use the index of each repeated instance as its name
                 return $this->repeatedWidget->createInitialState(
                     $index,
@@ -199,6 +222,7 @@ class RepeaterWidget implements RepeaterWidgetInterface
         return $this->uiStateFactory->createRepeaterWidgetState(
             $name,
             $this,
+            $itemStatics,
             $repeatedWidgetStates
         );
     }
@@ -341,6 +365,14 @@ class RepeaterWidget implements RepeaterWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getParentWidget()
+    {
+        return $this->parentWidget;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPath()
     {
         $prefix = ($this->parentWidget !== null) ?
@@ -420,13 +452,17 @@ class RepeaterWidget implements RepeaterWidgetInterface
             $oldState
         );
 
+        $itemStatics = [];
+
         // Create one instance of the repeated widget's state for each item in the list
         $repeatedWidgetStates = $this->mapItemStaticList(
             function (
                 ViewEvaluationContextInterface $itemEvaluationContext,
                 StaticInterface $static,
                 $index
-            ) use ($evaluationContextFactory, $oldState) {
+            ) use ($evaluationContextFactory, &$itemStatics, $oldState) {
+                $itemStatics[$index] = $static;
+
                 if (!$oldState->hasChildState($index)) {
                     // This repeated item did not exist before (ie. the number of items repeated
                     // has changed) - so we need to create a new initial state for the newly added item(s)
@@ -447,7 +483,7 @@ class RepeaterWidget implements RepeaterWidgetInterface
             $subEvaluationContext
         );
 
-        return $oldState->with($repeatedWidgetStates);
+        return $oldState->with($itemStatics, $repeatedWidgetStates);
     }
 
     /**

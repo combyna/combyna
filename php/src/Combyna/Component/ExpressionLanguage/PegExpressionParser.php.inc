@@ -29,6 +29,7 @@ class PegExpressionParser extends Basic
     BooleanLiteral: value:/\b(true|false)\b/ >
     NumberLiteral: value:/\d+(\.\d+)?/ >
     StringLiteral: "\'" value:/[^']* / "\'" >
+    NothingLiteral: "nothing" >
     Variable: variableName:/[\w_]+/ > !/[(:]/ >
     ElementList: Expression > ("," > Expression >)*
         function Expression(&$result, $sub)
@@ -65,6 +66,7 @@ class PegExpressionParser extends Basic
             (
                 NumberLiteral |
                 BooleanLiteral |
+                NothingLiteral |
                 List |
                 Structure |
                 StringLiteral |
@@ -83,6 +85,11 @@ class PegExpressionParser extends Basic
             $result['node'] = [
                 'type' => 'boolean',
                 'boolean' => ($sub['value']['text'] === 'true')
+            ];
+        }
+        function NothingLiteral(&$result, $sub) {
+            $result['node'] = [
+                'type' => 'nothing'
             ];
         }
         function List(&$result, $sub) {

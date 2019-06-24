@@ -11,14 +11,20 @@
 
 namespace Combyna\Unit\Type;
 
+use Combyna\Component\Bag\BagFactory;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactory;
+use Combyna\Component\Expression\Evaluation\EvaluationContextFactory;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StaticExpressionFactory;
 use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Prophecy\Argument;
@@ -32,20 +38,65 @@ use Prophecy\Prophecy\ObjectProphecy;
 class StaticListTypeTest extends TestCase
 {
     /**
+     * @var BagEvaluationContextFactory
+     */
+    private $bagEvaluationContextFactory;
+
+    /**
+     * @var BagFactory
+     */
+    private $bagFactory;
+
+    /**
      * @var ObjectProphecy|TypeInterface
      */
     private $elementType;
+
+    /**
+     * @var ObjectProphecy|EvaluationContextInterface
+     */
+    private $evaluationContext;
+
+    /**
+     * @var EvaluationContextFactory
+     */
+    private $evaluationContextFactory;
+
+    /**
+     * @var StaticExpressionFactory
+     */
+    private $staticExpressionFactory;
 
     /**
      * @var StaticListType
      */
     private $type;
 
+    /**
+     * @var ObjectProphecy|ValidationContextInterface
+     */
+    private $validationContext;
+
     public function setUp()
     {
+        $this->evaluationContextFactory = new EvaluationContextFactory();
+        $this->staticExpressionFactory = new StaticExpressionFactory();
+        $this->bagEvaluationContextFactory = new BagEvaluationContextFactory(
+            $this->evaluationContextFactory,
+            $this->staticExpressionFactory
+        );
+        $this->bagFactory = new BagFactory(
+            $this->staticExpressionFactory,
+            $this->bagEvaluationContextFactory
+        );
         $this->elementType = $this->prophesize(TypeInterface::class);
+        $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
+        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
 
-        $this->type = new StaticListType($this->elementType->reveal());
+        $this->type = new StaticListType(
+            $this->elementType->reveal(),
+            $this->validationContext->reveal()
+        );
     }
 
     public function testAllowsMultipleTypeReturnsTrueIfAllItsSubTypesAreAllowedByUs()
@@ -93,7 +144,7 @@ class StaticListTypeTest extends TestCase
 
         $this->assert($this->type->allowsStatic($candidateType->reveal()))->isFalse;
     }
-    
+
     public function testAllowsStaticReturnsTrueWhenStaticListExpressionGivenAndElementTypesMatch()
     {
         /** @var ObjectProphecy|StaticListExpression $candidateType */
@@ -144,6 +195,96 @@ class StaticListTypeTest extends TestCase
         $candidateType = $this->prophesize(StaticType::class);
 
         $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isFalse;
+    }
+
+    public function testCoerceNativeCoercesAndReturnsAnExistingAllowedListStatic()
+    {
+        $element1 = new TextExpression('first element');
+        $element2 = new TextExpression('second element');
+        $staticListExpression = new StaticListExpression(
+            $this->staticExpressionFactory,
+            $this->bagFactory->createStaticList([
+                $element1,
+                $element2
+            ])
+        );
+        $this->elementType->allowsStatic($element1)
+            ->willReturn(true);
+        $this->elementType->coerceStatic($element1, $this->evaluationContext)
+            ->willReturn($element1);
+        $this->elementType->allowsStatic($element2)
+            ->willReturn(true);
+        $this->elementType->coerceStatic($element2, $this->evaluationContext)
+            ->willReturn($element2);
+
+        $this->assert(
+            $this->type->coerceNative(
+                $staticListExpression,
+                $this->staticExpressionFactory,
+                $this->bagFactory,
+                $this->evaluationContext->reveal()
+            )
+        )->exactlyEquals($staticListExpression);
+    }
+
+    public function testCoerceNativeThrowsForAnIncompatibleExistingStatic()
+    {
+        $element = new TextExpression('my element');
+        $staticListExpression = new StaticListExpression(
+            $this->staticExpressionFactory,
+            $this->bagFactory->createStaticList([$element])
+        );
+        $this->elementType->allowsStatic($element)
+            ->willReturn(false);
+        $this->elementType->coerceStatic($element, $this->evaluationContext)
+            ->willReturn($element);
+        $this->elementType->getSummary()
+            ->willReturn('my type summary');
+
+        $this->setExpectedException(
+            IncompatibleNativeForCoercionException::class,
+            'Static of type "static-list" was given, expected a native or matching static of type "list<my type summary>"'
+        );
+
+        $this->type->coerceNative(
+            $staticListExpression,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+    }
+
+    public function testCoerceNativeCoercesAnIndexedArrayWithTwoNumbersToAListExpressionWithTwoNumbers()
+    {
+        $coercedElement1 = new NumberExpression(21);
+        $this->elementType->coerceNative(
+            21,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext
+        )
+            ->willReturn($coercedElement1);
+        $coercedElement2 = new NumberExpression(1004);
+        $this->elementType->coerceNative(
+            1004,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext
+        )
+            ->willReturn($coercedElement2);
+
+        $static = $this->type->coerceNative(
+            [21, 1004],
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        /** @var StaticListExpression $static */
+        $this->assert($static)->isAnInstanceOf(StaticListExpression::class);
+        $statics = $static->getElementStatics();
+        $this->assert($statics[0])->exactlyEquals($coercedElement1);
+        $this->assert($statics[1])->exactlyEquals($coercedElement2);
     }
 
     public function testCoerceStaticThrowsWhenNonStaticListExpressionIsGiven()

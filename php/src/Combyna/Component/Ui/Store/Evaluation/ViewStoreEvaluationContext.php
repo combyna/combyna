@@ -11,10 +11,14 @@
 
 namespace Combyna\Component\Ui\Store\Evaluation;
 
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 use LogicException;
 
 /**
@@ -57,10 +61,23 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     /**
      * {@inheritdoc}
      */
-    public function getChildOfCurrentCompoundWidget($childName)
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        // There are no more widgets in the tree to bubble to, so there's nothing to do
+        return $programState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompoundWidgetDefinitionContext()
     {
         // TODO: Restructure interfaces so that this method stub is not needed here
-        throw new LogicException('View stores cannot define child widgets');
+        throw new LogicException('View stores cannot access compound widget definitions');
     }
 
     /**

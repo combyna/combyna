@@ -14,6 +14,7 @@ namespace Combyna\Component\Trigger\Config\Act;
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Signal\DispatcherInterface;
+use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
 use Combyna\Component\Trigger\Instruction\SignalInstruction;
 
 /**
@@ -61,6 +62,7 @@ class SignalInstructionNodePromoter implements InstructionNodeTypePromoterInterf
      * @param SignalInstructionNode $instructionNode
      * @param ResourceRepositoryInterface $resourceRepository
      * @return SignalInstruction
+     * @throws SignalDefinitionNotFoundException
      */
     public function promote(SignalInstructionNode $instructionNode, ResourceRepositoryInterface $resourceRepository)
     {

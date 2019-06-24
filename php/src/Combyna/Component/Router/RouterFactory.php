@@ -12,7 +12,6 @@
 namespace Combyna\Component\Router;
 
 use Combyna\Component\App\HomeInterface;
-use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Signal\DispatcherInterface;
@@ -26,24 +25,15 @@ use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 class RouterFactory implements RouterFactoryInterface
 {
     /**
-     * @var BagFactoryInterface
-     */
-    private $bagFactory;
-
-    /**
      * @var DispatcherInterface
      */
     private $dispatcher;
 
     /**
-     * @param BagFactoryInterface $bagFactory
      * @param DispatcherInterface $dispatcher
      */
-    public function __construct(
-        BagFactoryInterface $bagFactory,
-        DispatcherInterface $dispatcher
-    ) {
-        $this->bagFactory = $bagFactory;
+    public function __construct(DispatcherInterface $dispatcher)
+    {
         $this->dispatcher = $dispatcher;
     }
 
@@ -75,8 +65,7 @@ class RouterFactory implements RouterFactoryInterface
             $this->dispatcher,
             $routeRepository,
             $home,
-            $signalDefinitionRepository,
-            $this->bagFactory
+            $signalDefinitionRepository
         );
     }
 

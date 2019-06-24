@@ -14,10 +14,9 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Type\VoidType;
 use Combyna\Component\Validator\Type\AdditiveDeterminer;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
+use Combyna\Component\Validator\Type\VoidTypeDeterminer;
 
 /**
  * Class ExpressionListNode
@@ -65,7 +64,7 @@ class ExpressionListNode extends AbstractActNode
         if (count($this->expressionNodes) === 0) {
             // We cannot determine the type of the elements in an empty expression list,
             // as there are no elements to look at the types of
-            return new PresolvedTypeDeterminer(new VoidType('expression list element type'));
+            return new VoidTypeDeterminer('expression list element type');
         }
 
         /*

@@ -16,9 +16,8 @@ use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\TranslationExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class TranslationExpressionNode
@@ -66,7 +65,7 @@ class TranslationExpressionNode extends AbstractExpressionNode
                 $specBuilder->addConstraint(
                     new ResultTypeConstraint(
                         $argumentExpressionNode,
-                        new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                        new StaticTypeDeterminer(TextExpression::class),
                         'parameter "' . $parameterName . '"'
                     )
                 );
@@ -91,7 +90,7 @@ class TranslationExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
+        return new StaticTypeDeterminer(TextExpression::class);
     }
 
     /**

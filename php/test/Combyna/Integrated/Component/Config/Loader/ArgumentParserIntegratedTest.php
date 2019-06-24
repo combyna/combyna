@@ -17,6 +17,7 @@ use Combyna\Component\Config\Parameter\ArgumentBag;
 use Combyna\Component\Config\Parameter\ExtraParameter;
 use Combyna\Component\Config\Parameter\NamedParameter;
 use Combyna\Component\Config\Parameter\OptionalParameter;
+use Combyna\Component\Config\Parameter\PositionalParameter;
 use Combyna\Component\Config\Parameter\Type\ExpressionParameterType;
 use Combyna\Component\Config\Parameter\Type\TextParameterType;
 use Combyna\Harness\TestCase;
@@ -57,6 +58,24 @@ class ArgumentParserIntegratedTest extends TestCase
         ], [
             new NamedParameter('my_first_param', new TextParameterType('first param')),
             new NamedParameter('my_second_param', new TextParameterType('second param'))
+        ]);
+
+        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
+        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
+        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
+        $this->assert($argumentBag->getExtraArguments())->equals([]);
+    }
+
+    public function testParseArgumentsReturnsCorrectArgumentBagWhenOnlyExplicitPositionalTextArguments()
+    {
+        $argumentBag = $this->parser->parseArguments([
+            ArgumentParser::POSITIONAL_ARGUMENTS => [
+                ['type' => 'text', 'text' => 'first value'],
+                ['type' => 'text', 'text' => 'second value']
+            ]
+        ], [
+            new PositionalParameter('my_first_param', new TextParameterType('first param')),
+            new PositionalParameter('my_second_param', new TextParameterType('second param'))
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
@@ -174,7 +193,7 @@ class ArgumentParserIntegratedTest extends TestCase
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 
-    public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForTextParameter()
+    public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForNamedTextParameter()
     {
         $this->setExpectedException(
             ArgumentParseException::class,
@@ -187,6 +206,20 @@ class ArgumentParserIntegratedTest extends TestCase
             ]
         ], [
             new NamedParameter('my_param', new TextParameterType('a param'))
+        ]);
+    }
+
+    public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForPositionalTextParameter()
+    {
+        $this->setExpectedException(
+            ArgumentParseException::class,
+            'Wrong type of value given for argument "my_param (#0)": expected text for a param, got integer(21111)'
+        );
+
+        $this->parser->parseArguments([
+            ArgumentParser::POSITIONAL_ARGUMENTS => [21111]
+        ], [
+            new PositionalParameter('my_param', new TextParameterType('a param'))
         ]);
     }
 

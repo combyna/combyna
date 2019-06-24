@@ -12,14 +12,18 @@
 namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Router\RouteInterface;
 use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Ui\Evaluation\CompoundWidgetDefinitionEvaluationContextInterface;
+use Combyna\Component\Ui\Exception\NotInsideCompoundWidgetDefinitionException;
 use InvalidArgumentException;
 
 /**
@@ -29,6 +33,16 @@ use InvalidArgumentException;
  */
 interface EvaluationContextInterface
 {
+    /**
+     * Builds a URL for the specified route given the provided arguments
+     *
+     * @param string $libraryName
+     * @param string $routeName
+     * @param StaticBagInterface $argumentStaticBag
+     * @return string
+     */
+    public function buildRouteUrl($libraryName, $routeName, StaticBagInterface $argumentStaticBag);
+
     /**
      * Calls a function and returns its static result. The return type must be passed in
      * as it can be different depending on the types of the arguments provided
@@ -119,6 +133,14 @@ interface EvaluationContextInterface
     public function getCaptureRootwise($captureName);
 
     /**
+     * Fetches the evaluation context for the current compound widget definition, if we are inside one
+     *
+     * @return CompoundWidgetDefinitionEvaluationContextInterface
+     * @throws NotInsideCompoundWidgetDefinitionException
+     */
+    public function getCompoundWidgetDefinitionContext();
+
+    /**
      * Fetches the environment
      *
      * @return EnvironmentInterface
@@ -132,6 +154,40 @@ interface EvaluationContextInterface
      * @return StaticInterface
      */
     public function getEventPayloadStatic($staticName);
+
+    /**
+     * Fetches the parent context, if any
+     *
+     * @return EvaluationContextInterface|null
+     */
+    public function getParentContext();
+
+    /**
+     * Fetches a route by its name, if it exists
+     *
+     * @param string $libraryName
+     * @param string $routeName
+     * @return RouteInterface
+     * @throws NotFoundException
+     */
+    public function getRoute($libraryName, $routeName);
+
+    /**
+     * Fetches the argument for a parameter of the current route
+     *
+     * @param string $parameterName
+     * @return StaticInterface
+     */
+    public function getRouteArgument($parameterName);
+
+    /**
+     * Fetches the specified static from the current bag in the context, if defined
+     *
+     * @param string $staticName
+     * @return StaticInterface
+     * @throws NotFoundException
+     */
+    public function getSiblingBagStatic($staticName);
 
     /**
      * Fetches the specified static from the current signal's payload

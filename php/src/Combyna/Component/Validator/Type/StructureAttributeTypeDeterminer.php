@@ -65,7 +65,10 @@ class StructureAttributeTypeDeterminer extends AbstractTypeDeterminer
         }
 
         // Determiner does not resolve to a structure, so we cannot fetch a type for one of its attributes
-        return new UnresolvedType(sprintf('structure attribute "%s" type', $this->attributeName));
+        return new UnresolvedType(
+            sprintf('structure attribute "%s" type', $this->attributeName),
+            $validationContext
+        );
     }
 
     /**
