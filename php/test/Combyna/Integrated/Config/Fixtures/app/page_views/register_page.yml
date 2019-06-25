@@ -2,5 +2,7 @@ registration_page:
   title: !expr 'Register your account'
   description: This is where you give us your details
   widget:
-    type: text
-    text: !expr 'Please fill in the registration form'
+    type: group
+    children:
+      - type: text
+        text: !expr 'Please fill in the registration form'

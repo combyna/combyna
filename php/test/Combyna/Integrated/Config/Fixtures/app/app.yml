@@ -12,5 +12,7 @@ page_views:
     title: !expr 'Welcome home'
     description: The homepage of the web app
     widget:
-      type: text
-      text: !expr 'Welcome!'
+      type: group
+      children:
+        - type: text
+          text: !expr 'Welcome!'
