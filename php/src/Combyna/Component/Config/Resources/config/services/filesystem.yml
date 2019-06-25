@@ -1,0 +1,24 @@
+services:
+  combyna.config.loader.filesystem.config_loader:
+    class: Combyna\Component\Config\FileSystem\ConfigLoader
+    autowire: true
+
+  combyna.config.loader.filesystem.directory_loader:
+    class: Combyna\Component\Config\FileSystem\DirectoryLoader
+    autowire: true
+    calls:
+      - [setResolver, ['@combyna.config.loader.filesystem.loader_resolver']]
+
+  combyna.config.loader.filesystem.yaml_file_loader:
+    class: Combyna\Component\Config\FileSystem\YamlFileLoader
+    autowire: true
+
+  combyna.config.loader.filesystem.file_locator:
+    class: Symfony\Component\Config\FileLocator
+
+  combyna.config.loader.filesystem.loader_resolver:
+    class: Symfony\Component\Config\Loader\LoaderResolver
+    arguments:
+      -
+        - '@combyna.config.loader.filesystem.directory_loader'
+        - '@combyna.config.loader.filesystem.yaml_file_loader'

@@ -12,16 +12,11 @@
 namespace Combyna\Integrated\Config;
 
 use Combyna\Component\App\AppInterface;
-use Combyna\Component\Config\Loader\ConfigBuilder;
-use Combyna\Component\Config\FileSystem\ConfigLoader;
-use Combyna\Component\Config\Loader\YamlFileLoader;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderResolver;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -71,9 +66,8 @@ class StructuredConfigIntegratedTest extends TestCase
         $this->combyna = $this->container->get('combyna');
         $this->htmlRenderer = $this->container->get('combyna.renderer.html');
         $this->testGuiWidgetProviders = $this->container->get('combyna_test.gui_widget_providers');
-        $yamlParser = $this->container->get('combyna.config.yaml_parser');
 
-        $appConfigLoader = new ConfigLoader($yamlParser); // TODO remove YamlParser as a dep
+        $appConfigLoader = $this->container->get('combyna.config.loader.filesystem.config_loader');
 
         $config = $appConfigLoader->load(__DIR__ . '/Fixtures/app');
 
@@ -85,5 +79,4 @@ class StructuredConfigIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
     }
-
 }

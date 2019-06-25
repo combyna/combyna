@@ -1,10 +1,22 @@
 <?php
 
+/**
+ * Combyna
+ * Copyright (c) the Combyna project and contributors
+ * https://github.com/combyna/combyna
+ *
+ * Released under the MIT license
+ * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
+ */
+
 namespace Combyna\Component\Config\FileSystem;
 
 /**
  * Class ConfigCollection
- * @package Combyna\Component\Config\Loader\FileSystem
+ *
+ * A collection of Config objects
+ *
+ * @author Robin Cawser <robin.cawser@gmail.com>
  */
 class ConfigCollection implements ConfigInterface
 {

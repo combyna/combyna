@@ -1,45 +1,45 @@
 <?php
 
+/**
+ * Combyna
+ * Copyright (c) the Combyna project and contributors
+ * https://github.com/combyna/combyna
+ *
+ * Released under the MIT license
+ * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
+ */
+
 namespace Combyna\Component\Config\FileSystem;
 
-use Combyna\Component\Config\YamlParser;
-use Symfony\Component\Config\FileLocator;
-use Symfony\Component\Config\Loader\LoaderResolver;
-
 /**
- * Class ApplicatonLoader
- * @package Combyna\Component\Config\Loader
+ * Class ConfigLoader
+ *
+ * Loads configuration for a given path
+ *
+ * @author Robin Cawser <robin.cawser@gmail.com>
  */
 class ConfigLoader
 {
     /**
-     * @var YamlParser
+     * @var DirectoryLoader
      */
-    private $yamlParser;
+    private $directoryLoader;
 
     /**
-     * ConfigLoader constructor.
-     * @param YamlParser $yamlParser
+     * @param DirectoryLoader $directoryLoader
      */
-    public function __construct(YamlParser $yamlParser)
+    public function __construct(DirectoryLoader $directoryLoader)
     {
-        $this->yamlParser = $yamlParser;
+        $this->directoryLoader = $directoryLoader;
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $path
+     * @return ConfigInterface
      */
     public function load($path)
     {
-        $locator = new FileLocator();
-        $directoryLoader = new DirectoryLoader($locator);
-        $loaderResolver = new LoaderResolver(array(
-            new YamlFileLoader($locator, $this->yamlParser),
-            $directoryLoader,
-        ));
-        $directoryLoader->setResolver($loaderResolver);
-
-        $config = $directoryLoader->load($path, 'directory');
+        $config = $this->directoryLoader->load($path, 'directory');
 
         return $config;
     }

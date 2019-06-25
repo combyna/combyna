@@ -1,7 +1,23 @@
 <?php
 
+/**
+ * Combyna
+ * Copyright (c) the Combyna project and contributors
+ * https://github.com/combyna/combyna
+ *
+ * Released under the MIT license
+ * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
+ */
+
 namespace Combyna\Component\Config\FileSystem;
 
+/**
+ * Class Config
+ *
+ * Encapsulates configuration loaded from a file
+ *
+ * @author Robin Cawser <robin.cawser@gmail.com>
+ */
 class Config implements ConfigInterface
 {
     /**
@@ -10,7 +26,6 @@ class Config implements ConfigInterface
     private $config;
 
     /**
-     * Config constructor.
      * @param array $config
      */
     public function __construct(array $config)
@@ -18,6 +33,9 @@ class Config implements ConfigInterface
         $this->config = $config;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function toArray()
     {
         return $this->config;
