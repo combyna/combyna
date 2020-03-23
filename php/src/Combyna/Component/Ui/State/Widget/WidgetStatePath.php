@@ -154,16 +154,16 @@ class WidgetStatePath implements WidgetStatePathInterface
 
             if ($state instanceof ChildReferenceWidgetStateInterface) {
                 // This state is for a child passed into a compound widget, so skip past its compound widget parent
-                if (!$this->states[$i - 1] instanceof DefinedCompoundWidgetStateInterface) {
-                    throw new LogicException(sprintf(
-                        'Expected parent to be a %s but it was a %s',
-                        DefinedCompoundWidgetStateInterface::class,
-                        get_class($this->states[$i - 1])
-                    ));
+                for (; $i >= 0; $i--) {
+                    if ($this->states[$i] instanceof DefinedCompoundWidgetStateInterface) {
+                        continue 2;
+                    }
                 }
 
-                $i--;
-                continue;
+                throw new LogicException(sprintf(
+                    'Expected an ancestor to be a %s but none was',
+                    DefinedCompoundWidgetStateInterface::class
+                ));
             }
 
             if ($state instanceof DefinedCompoundWidgetStateInterface) {
