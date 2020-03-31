@@ -13,6 +13,7 @@ namespace Combyna\Component\Renderer\Html\WidgetRenderer;
 
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\GenericNode;
+use Combyna\Component\Renderer\Html\UiRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
@@ -28,11 +29,6 @@ use InvalidArgumentException;
 class GenericWidgetRenderer implements WidgetRendererInterface
 {
     /**
-     * @var DelegatingWidgetRenderer
-     */
-    private $delegatingWidgetRenderer;
-
-    /**
      * @var string
      */
     private $libraryName;
@@ -43,25 +39,30 @@ class GenericWidgetRenderer implements WidgetRendererInterface
     private $rootChildName;
 
     /**
+     * @var UiRendererInterface
+     */
+    private $uiRenderer;
+
+    /**
      * @var string
      */
     private $widgetDefinitionName;
 
     /**
-     * @param DelegatingWidgetRenderer $delegatingWidgetRenderer
+     * @param UiRendererInterface $uiRenderer
      * @param string $libraryName
      * @param string $widgetDefinitionName
      * @param string|null $rootChildName
      */
     public function __construct(
-        DelegatingWidgetRenderer $delegatingWidgetRenderer,
+        UiRendererInterface $uiRenderer,
         $libraryName,
         $widgetDefinitionName,
         $rootChildName = null
     ) {
-        $this->delegatingWidgetRenderer = $delegatingWidgetRenderer;
         $this->libraryName = $libraryName;
         $this->rootChildName = $rootChildName;
+        $this->uiRenderer = $uiRenderer;
         $this->widgetDefinitionName = $widgetDefinitionName;
     }
 
@@ -98,18 +99,25 @@ class GenericWidgetRenderer implements WidgetRendererInterface
                 'Renderer must receive a ' .
                 $this->libraryName . '.' .
                 $this->widgetDefinitionName .
-                ' widget'
+                ' widget state'
             );
         }
 
         $attributes = $widgetState->getAttributeStaticBag()->toNativeArray();
+        $triggers = $this->uiRenderer->renderTriggers($widgetStatePath, $program);
         $rootChildNode = $this->rootChildName !== null ?
-            $this->delegatingWidgetRenderer->renderWidget(
+            $this->uiRenderer->renderWidget(
                 $widgetStatePath->getChildStatePath($this->rootChildName),
                 $program
             ) :
             null;
 
-        return new GenericNode($widgetState, $widgetStatePath->getWidgetStatePath(), $attributes, $rootChildNode);
+        return new GenericNode(
+            $widgetState,
+            $widgetStatePath->getWidgetStatePath(),
+            $attributes,
+            $triggers,
+            $rootChildNode
+        );
     }
 }

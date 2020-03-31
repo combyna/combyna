@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Trigger;
 
+use Combyna\Component\Trigger\Exception\TriggerNotFoundException;
+
 /**
  * Class TriggerCollection
  *
@@ -34,6 +36,14 @@ class TriggerCollection implements TriggerCollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getAll()
+    {
+        return $this->triggers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getByEventName($libraryName, $eventName)
     {
         foreach ($this->triggers as $trigger) {
@@ -42,7 +52,7 @@ class TriggerCollection implements TriggerCollectionInterface
             }
         }
 
-        throw new TriggerNotFoundException();
+        throw new TriggerNotFoundException($libraryName, $eventName);
     }
 
     /**

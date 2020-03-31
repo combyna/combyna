@@ -376,6 +376,14 @@ class DefinedWidget implements DefinedWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getTriggers()
+    {
+        return $this->triggerCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasTag($tag)
     {
         return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
