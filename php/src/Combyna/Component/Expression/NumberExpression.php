@@ -20,7 +20,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NumberExpression extends AbstractStaticExpression
+class NumberExpression extends AbstractStaticExpression implements NumberValueInterface
 {
     const TYPE = 'number';
 
@@ -41,6 +41,23 @@ class NumberExpression extends AbstractStaticExpression
         }
 
         $this->number = $number;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof NumberValueInterface &&
+            $otherValue->toNative() === $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->number;
     }
 
     /**

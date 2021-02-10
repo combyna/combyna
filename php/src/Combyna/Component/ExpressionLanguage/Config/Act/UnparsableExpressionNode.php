@@ -13,9 +13,8 @@ namespace Combyna\Component\ExpressionLanguage\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class UnparsableExpressionNode
@@ -54,6 +53,6 @@ class UnparsableExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new UnresolvedType($this->contextDescription));
+        return new UnresolvedTypeDeterminer($this->contextDescription);
     }
 }

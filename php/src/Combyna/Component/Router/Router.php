@@ -12,7 +12,6 @@
 namespace Combyna\Component\Router;
 
 use Combyna\Component\App\HomeInterface;
-use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
@@ -30,11 +29,6 @@ use Combyna\Component\Ui\View\PageViewCollectionInterface;
  */
 class Router implements RouterInterface
 {
-    /**
-     * @var BagFactoryInterface
-     */
-    private $bagFactory;
-
     /**
      * @var DispatcherInterface
      */
@@ -60,16 +54,13 @@ class Router implements RouterInterface
      * @param RouteRepositoryInterface $routeRepository
      * @param HomeInterface $home
      * @param SignalDefinitionRepositoryInterface $signalDefinitionRepository
-     * @param BagFactoryInterface $bagFactory
      */
     public function __construct(
         DispatcherInterface $dispatcher,
         RouteRepositoryInterface $routeRepository,
         HomeInterface $home,
-        SignalDefinitionRepositoryInterface $signalDefinitionRepository,
-        BagFactoryInterface $bagFactory
+        SignalDefinitionRepositoryInterface $signalDefinitionRepository
     ) {
-        $this->bagFactory = $bagFactory;
         $this->dispatcher = $dispatcher;
         $this->home = $home;
         $this->routeRepository = $routeRepository;
@@ -121,15 +112,20 @@ class Router implements RouterInterface
             LibraryInterface::CORE,
             'navigated'
         );
+        $payloadStaticBag = $navigatedSignalDefinition->getPayloadStaticBagModel()
+            ->coerceNativeArrayToBag(
+                [
+                    'library' => $libraryName,
+                    'route' => $routeName
+                ],
+                $evaluationContext
+            );
 
         return $this->dispatcher->dispatchSignal(
             $program,
             $newAppState,
             $navigatedSignalDefinition,
-            $this->bagFactory->coerceStaticBag([
-                'library' => $libraryName,
-                'route' => $routeName
-            ])
+            $payloadStaticBag
         );
     }
 }

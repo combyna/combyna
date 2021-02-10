@@ -50,6 +50,14 @@ class ExpressionBag implements ExpressionBagInterface
     /**
      * {@inheritdoc}
      */
+    public function evaluateStatic($staticName, EvaluationContextInterface $evaluationContext)
+    {
+        return $this->getExpression($staticName)->toStatic($evaluationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExpression($name)
     {
         if (!$this->hasExpression($name)) {
@@ -76,6 +84,14 @@ class ExpressionBag implements ExpressionBagInterface
     public function hasExpression($name)
     {
         return array_key_exists($name, $this->expressions);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function providesStatic($staticName)
+    {
+        return $this->hasExpression($staticName);
     }
 
     /**

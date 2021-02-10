@@ -14,6 +14,7 @@ namespace Combyna\Component\Validator\Type;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -47,12 +48,16 @@ class ListElementTypeDeterminer extends AbstractTypeDeterminer
     {
         $listType = $this->listTypeDeterminer->determine($validationContext);
 
+        if ($listType instanceof ValuedType) {
+            $listType = $listType->getWrappedType();
+        }
+
         if ($listType instanceof StaticListType) {
             return $listType->getElementType();
         }
 
         // Determiner does not resolve to a list, so we cannot fetch a type for its elements
-        return new UnresolvedType('list element type');
+        return new UnresolvedType('list element type', $validationContext);
     }
 
     /**

@@ -16,8 +16,7 @@ use Combyna\Component\Expression\DateTimeExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDateTimeExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class DateTimeExpressionNode
@@ -111,42 +110,42 @@ class DateTimeExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->yearExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'year'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->monthExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'month'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->dayExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'day'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->hourExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'hour'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->minuteExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'minute'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->secondExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'second'
             )
         );
@@ -155,7 +154,7 @@ class DateTimeExpressionNode extends AbstractExpressionNode
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->millisecondExpression,
-                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                    new StaticTypeDeterminer(NumberExpression::class),
                     'millisecond'
                 )
             );
@@ -217,7 +216,7 @@ class DateTimeExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(StaticDateTimeExpression::class));
+        return new StaticTypeDeterminer(StaticDateTimeExpression::class);
     }
 
     /**

@@ -13,11 +13,15 @@ namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Widget\CoreWidgetStateInterface;
 use Combyna\Component\Ui\Widget\CoreWidgetInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class AbstractCoreWidgetEvaluationContext
@@ -83,6 +87,34 @@ abstract class AbstractCoreWidgetEvaluationContext extends AbstractEvaluationCon
     /**
      * {@inheritdoc}
      */
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        if ($this->widget === $initialWidget) {
+            // We've gone no further up the tree yet - bubble again, as evaluation contexts
+            // can span between a compound widget's root widget and the compound defined widget
+            return $this->parentContext->bubbleEventToParent(
+                $programState,
+                $program,
+                $event,
+                $initialWidget
+            );
+        }
+
+        return $this->widget->dispatchEvent(
+            $programState,
+            $program,
+            $event,
+            $this
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubScopeContext(StaticBagInterface $variableStaticBag)
     {
         return $this->evaluationContextFactory->createViewEvaluationContext($this, $variableStaticBag);
@@ -110,15 +142,12 @@ abstract class AbstractCoreWidgetEvaluationContext extends AbstractEvaluationCon
         // (if not defined, an exception will be thrown, as validation should have ensured
         // that a capture that is able to not be set always has a default expression defined)
         return $this->widget->getCaptureStaticBagModel()
-            ->coerceStatic($captureName, $this, $this->getCaptureLeafwise($captureName));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChildOfCurrentCompoundWidget($childName)
-    {
-        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
+            ->coerceStatic(
+                $captureName,
+                $this,
+                $this->widget->getCaptureExpressionBag(),
+                $this->getCaptureLeafwise($captureName)
+            );
     }
 
     /**

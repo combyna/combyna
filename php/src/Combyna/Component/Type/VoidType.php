@@ -11,9 +11,13 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
-use LogicException;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class VoidType
@@ -36,11 +40,18 @@ class VoidType implements TypeInterface
     private $contextDescription;
 
     /**
-     * @param string $contextDescription
+     * @var ValidationContextInterface
      */
-    public function __construct($contextDescription)
+    private $validationContext;
+
+    /**
+     * @param string $contextDescription
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct($contextDescription, ValidationContextInterface $validationContext)
     {
         $this->contextDescription = $contextDescription;
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -55,6 +66,14 @@ class VoidType implements TypeInterface
      * {@inheritdoc}
      */
     public function allowsAnyType(AnyType $candidateType)
+    {
+        return false; // Void types only allow other void types
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
     {
         return false; // Void types only allow other void types
     }
@@ -111,6 +130,14 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        return false; // Void types only allow other void types
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // This will probably never be used, as void cannot be used as an "accepting" type
@@ -119,19 +146,43 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
-    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
-    {
-        throw new LogicException('Tried to coerce a static for void type: ' . $this->contextDescription);
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        throw new IncompatibleNativeForCoercionException(
+            'Unable to coerce a native for void type: ' . $this->contextDescription
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        throw new IncompatibleStaticForCoercionException(
+            'Tried to coerce a static for void type: ' . $this->contextDescription
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByAnyType(AnyType $superType)
     {
         // Void types cannot provide a value, so they cannot be allowed to be passed where a value is required,
         // even "any" type of value
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsVoidType($this);
     }
 
     /**
@@ -169,6 +220,14 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsVoidType($this);
@@ -185,6 +244,30 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false; // No value information
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWith(TypeInterface $otherType)
     {
         return $otherType->whenMergedWithVoidType($this);
@@ -196,6 +279,15 @@ class VoidType implements TypeInterface
     public function mergeWithAnyType(AnyType $otherType)
     {
         // No type was known before, so there is nothing to add to the Any type
+        return $otherType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        // No type was known before, so there is nothing to add to the Exotic type
         return $otherType;
     }
 
@@ -247,10 +339,19 @@ class VoidType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // No type was known before, so there is nothing to add to the Valued type
+        return $otherType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithVoidType(VoidType $otherType)
     {
         // Keep both void types, as each could have different context descriptions
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -259,6 +360,14 @@ class VoidType implements TypeInterface
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
+    {
+        return $candidateType->mergeWithVoidType($this);
     }
 
     /**
@@ -297,6 +406,14 @@ class VoidType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithVoidType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithVoidType($this);
     }

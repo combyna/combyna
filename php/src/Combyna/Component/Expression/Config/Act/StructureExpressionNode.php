@@ -17,6 +17,7 @@ use Combyna\Component\Bag\Config\Act\FixedStaticDefinitionNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\StructureExpression;
 use Combyna\Component\Validator\Type\StaticStructureTypeDeterminer;
+use Combyna\Component\Validator\Type\StructureExpressionTypeDeterminer;
 
 /**
  * Class StructureExpressionNode
@@ -61,9 +62,11 @@ class StructureExpressionNode extends AbstractExpressionNode
     }
 
     /**
-     * {@inheritdoc}
+     * Fetches a type determiner for this structure, excluding any value information
+     *
+     * @return StaticStructureTypeDeterminer
      */
-    public function getResultTypeDeterminer()
+    public function getImpureResultTypeDeterminer()
     {
         $staticDefinitionNodes = [];
 
@@ -77,5 +80,13 @@ class StructureExpressionNode extends AbstractExpressionNode
         $attributeBagModelNode = new FixedStaticBagModelNode($staticDefinitionNodes);
 
         return new StaticStructureTypeDeterminer($attributeBagModelNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResultTypeDeterminer()
+    {
+        return new StructureExpressionTypeDeterminer($this);
     }
 }

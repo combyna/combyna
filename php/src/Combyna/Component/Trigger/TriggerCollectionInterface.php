@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Trigger;
 
+use Combyna\Component\Trigger\Exception\TriggerNotFoundException;
+
 /**
  * Interface TriggerCollectionInterface
  *
@@ -18,6 +20,13 @@ namespace Combyna\Component\Trigger;
  */
 interface TriggerCollectionInterface
 {
+    /**
+     * Fetches all triggers in this collection
+     *
+     * @return TriggerInterface[]
+     */
+    public function getAll();
+
     /**
      * Fetches a trigger from this collection by the name of the event it fires on
      *

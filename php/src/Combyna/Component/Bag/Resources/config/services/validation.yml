@@ -1,0 +1,6 @@
+services:
+    combyna.bag.validation.bag_sub_validation_context_factory:
+        class: Combyna\Component\Bag\Validation\Context\Factory\BagContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}

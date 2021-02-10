@@ -17,6 +17,7 @@ use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\VoidType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -33,9 +34,16 @@ class VoidTypeTest extends TestCase
      */
     private $type;
 
+    /**
+     * @var ObjectProphecy|ValidationContextInterface
+     */
+    private $validationContext;
+
     public function setUp()
     {
-        $this->type = new VoidType('my context');
+        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
+
+        $this->type = new VoidType('my context', $this->validationContext->reveal());
     }
 
     public function testAllowsMultipleTypeReturnsTrueIfAllItsSubTypesAreAllowedByUs()
@@ -98,7 +106,7 @@ class VoidTypeTest extends TestCase
 
     public function testAllowsStaticTypeAlwaysReturnsFalse()
     {
-        $candidateType = new StaticType(StaticInterface::class);
+        $candidateType = new StaticType(StaticInterface::class, $this->validationContext->reveal());
 
         $this->assert($this->type->allowsStaticType($candidateType))->isFalse;
     }
@@ -139,7 +147,7 @@ class VoidTypeTest extends TestCase
 
     public function testMergeWithStaticTypeJustReturnsTheStaticType()
     {
-        $staticType = new StaticType(StaticInterface::class);
+        $staticType = new StaticType(StaticInterface::class, $this->validationContext->reveal());
 
         $result = $this->type->mergeWithStaticType($staticType);
 

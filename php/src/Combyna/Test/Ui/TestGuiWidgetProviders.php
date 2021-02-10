@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Integrated\Fixtures;
+namespace Combyna\Test\Ui;
 
 use Combyna\Component\Environment\Library\WidgetValueProviderLocator;
 use Combyna\Component\Environment\Library\WidgetValueProviderProviderInterface;

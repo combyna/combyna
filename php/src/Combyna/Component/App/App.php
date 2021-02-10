@@ -11,17 +11,22 @@
 
 namespace Combyna\Component\App;
 
+use Combyna\Component\App\Exception\EventDispatchFailedException;
+use Combyna\Component\App\Exception\SignalDispatchFailedException;
 use Combyna\Component\App\State\AppState;
 use Combyna\Component\App\State\AppStateInterface;
-use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Event\EventDispatcherInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Router\RouterInterface;
 use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextTreeFactoryInterface;
+use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
@@ -33,11 +38,6 @@ use Combyna\Component\Ui\View\PageViewCollectionInterface;
  */
 class App implements AppInterface
 {
-    /**
-     * @var BagFactoryInterface
-     */
-    private $bagFactory;
-
     /**
      * @var DispatcherInterface
      */
@@ -74,6 +74,11 @@ class App implements AppInterface
     private $program;
 
     /**
+     * @var ResourceRepositoryInterface
+     */
+    private $resourceRepository;
+
+    /**
      * @var RouterInterface
      */
     private $router;
@@ -89,7 +94,6 @@ class App implements AppInterface
     private $uiEvaluationContextTreeFactory;
 
     /**
-     * @param BagFactoryInterface $bagFactory
      * @param ExpressionFactoryInterface $expressionFactory
      * @param DispatcherInterface $dispatcher
      * @param EventDispatcherInterface $eventDispatcher
@@ -99,10 +103,10 @@ class App implements AppInterface
      * @param OverlayViewCollectionInterface $overlayViewCollection
      * @param UiEvaluationContextTreeFactoryInterface $uiEvaluationContextTreeFactory
      * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      * @param ProgramInterface $program
      */
     public function __construct(
-        BagFactoryInterface $bagFactory,
         ExpressionFactoryInterface $expressionFactory,
         DispatcherInterface $dispatcher,
         EventDispatcherInterface $eventDispatcher,
@@ -112,9 +116,9 @@ class App implements AppInterface
         OverlayViewCollectionInterface $overlayViewCollection,
         UiEvaluationContextTreeFactoryInterface $uiEvaluationContextTreeFactory,
         EnvironmentInterface $environment,
+        ResourceRepositoryInterface $resourceRepository,
         ProgramInterface $program
     ) {
-        $this->bagFactory = $bagFactory;
         $this->dispatcher = $dispatcher;
         $this->environment = $environment;
         $this->eventDispatcher = $eventDispatcher;
@@ -122,6 +126,7 @@ class App implements AppInterface
         $this->overlayViewCollection = $overlayViewCollection;
         $this->pageViewCollection = $pageViewCollection;
         $this->program = $program;
+        $this->resourceRepository = $resourceRepository;
         $this->router = $router;
         $this->signalDefinitionRepository = $signalDefinitionRepository;
         $this->uiEvaluationContextTreeFactory = $uiEvaluationContextTreeFactory;
@@ -147,17 +152,28 @@ class App implements AppInterface
         $eventName,
         array $payloadNatives = []
     ) {
+        $widgetEndRenderableStatePath = $widgetStatePath->getEventualEndRenderableStatePath();
         $widgetEvaluationContext = $this->uiEvaluationContextTreeFactory->createWidgetEvaluationContextTree(
-            $widgetStatePath,
+            $widgetEndRenderableStatePath,
             $this->program,
             $this->environment
         );
         $widget = $widgetEvaluationContext->getWidget();
-        $event = $widget->createEvent(
-            $libraryName,
-            $eventName,
-            $this->bagFactory->coerceStaticBag($payloadNatives)
-        );
+
+        try {
+            $event = $widget->createEvent(
+                $libraryName,
+                $eventName,
+                $payloadNatives,
+                $widgetEvaluationContext
+            );
+        } catch (EventDefinitionNotReferencedByWidgetException $exception) {
+            throw new EventDispatchFailedException($exception->getMessage());
+        } catch (IncompatibleNativeForCoercionException $exception) {
+            throw new EventDispatchFailedException($exception->getMessage());
+        } catch (LibraryNotInstalledException $exception) {
+            throw new EventDispatchFailedException($exception->getMessage());
+        }
 
         $newProgramState = $this->eventDispatcher->dispatchEvent(
             $appState->getProgramState(),
@@ -176,7 +192,17 @@ class App implements AppInterface
     public function dispatchSignal(AppStateInterface $appState, $libraryName, $signalName, array $payloadNatives)
     {
         $signalDefinition = $this->signalDefinitionRepository->getByName($libraryName, $signalName);
-        $payloadStaticBag = $this->bagFactory->coerceStaticBag($payloadNatives);
+
+        try {
+            $payloadStaticBag = $signalDefinition
+                ->getPayloadStaticBagModel()
+                ->coerceNativeArrayToBag(
+                    $payloadNatives,
+                    $this->program->getRootEvaluationContext()
+                );
+        } catch (IncompatibleNativeForCoercionException $exception) {
+            throw new SignalDispatchFailedException($exception->getMessage());
+        }
 
         $newProgramState = $this->dispatcher->dispatchSignal(
             $this->program,
@@ -194,6 +220,14 @@ class App implements AppInterface
     public function getPageViewByName($name)
     {
         return $this->program->getPageViewByName($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProgram()
+    {
+        return $this->program;
     }
 
     /**
@@ -217,17 +251,21 @@ class App implements AppInterface
      */
     public function navigateTo(AppStateInterface $appState, $libraryName, $routeName, array $routeArguments = [])
     {
-        $newProgramState = $this->router->navigateTo(
-            $appState->getProgramState(),
-            $this->program,
-            $libraryName,
-            $routeName,
-            $this->bagFactory->coerceStaticBag($routeArguments),
-            $this->pageViewCollection,
-            $this->program->getRootEvaluationContext()
-        );
+        $route = $this->resourceRepository->getRouteByName($libraryName, $routeName);
+        $routeArgumentStaticBag = $route->getParameterBagModel()
+            ->coerceNativeArrayToBag(
+                $routeArguments,
+                $this->program->getRootEvaluationContext()
+            );
 
-        return $appState->withProgramState($newProgramState);
+        return $appState->withProgramState(
+            $this->program->navigateTo(
+                $appState->getProgramState(),
+                $libraryName,
+                $routeName,
+                $routeArgumentStaticBag
+            )
+        );
     }
 
     /**

@@ -151,9 +151,17 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
      */
     public function getWidgetStatePathsByTag($tag, array $parentStates, UiStateFactoryInterface $stateFactory)
     {
-        return $this->childReferenceWidget->hasTag($tag) ?
-            [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
+        $parentStatesForChild = array_merge($parentStates, [$this]);
+        $widgetStatePaths = $this->childReferenceWidget->hasTag($tag) ?
+            [$stateFactory->createWidgetStatePath($parentStatesForChild)] :
             [];
+
+        $widgetStatePaths = array_merge(
+            $widgetStatePaths,
+            $this->referencedChildWidgetState->getWidgetStatePathsByTag($tag, $parentStatesForChild, $stateFactory)
+        );
+
+        return $widgetStatePaths;
     }
 
     /**
@@ -177,6 +185,6 @@ class ChildReferenceWidgetState implements ChildReferenceWidgetStateInterface
         }
 
         // At least one sub-component of the state has changed, so we need to create a new one
-        return new self($this->name, $this->childReferenceWidget, $this->referencedChildWidgetState);
+        return new self($this->name, $this->childReferenceWidget, $referencedWidgetState);
     }
 }

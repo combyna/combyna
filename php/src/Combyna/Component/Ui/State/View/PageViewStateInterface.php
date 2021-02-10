@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\State\View;
 
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
@@ -23,6 +24,13 @@ use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 interface PageViewStateInterface extends ViewStateInterface
 {
     const TYPE = PageViewNode::TYPE;
+
+    /**
+     * Fetches the router state
+     *
+     * @return RouterStateInterface
+     */
+    public function getRouterState();
 
     /**
      * Either creates a new page view state with the specified root widget state

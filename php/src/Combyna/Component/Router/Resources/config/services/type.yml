@@ -1,0 +1,6 @@
+services:
+    combyna.router.type.exotic_type_determiner_factory:
+        class: Combyna\Component\Router\Type\Exotic\RouterExoticTypeDeterminerFactory
+        autowire: true
+        tags:
+            - {name: combyna.exotic_type_determiner_factory}

@@ -11,11 +11,15 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
-use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class CompoundWidgetDefinitionEvaluationContext
@@ -30,7 +34,7 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
     protected $evaluationContextFactory;
 
     /**
-     * @var CompoundWidgetEvaluationContextInterface
+     * @var ViewEvaluationContextInterface
      */
     protected $parentContext;
 
@@ -40,7 +44,7 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
     private $widget;
 
     /**
-     * @var CompoundWidgetDefinition
+     * @var WidgetDefinitionInterface
      */
     private $widgetDefinition;
 
@@ -51,15 +55,15 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
 
     /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
-     * @param CompoundWidgetEvaluationContextInterface $parentContext
-     * @param CompoundWidgetDefinition $widgetDefinition
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param WidgetDefinitionInterface $widgetDefinition
      * @param DefinedWidgetInterface $widget
      * @param DefinedCompoundWidgetStateInterface|null $widgetState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        CompoundWidgetEvaluationContextInterface $parentContext,
-        CompoundWidgetDefinition $widgetDefinition,
+        ViewEvaluationContextInterface $parentContext,
+        WidgetDefinitionInterface $widgetDefinition,
         DefinedWidgetInterface $widget,
         DefinedCompoundWidgetStateInterface $widgetState = null
     ) {
@@ -73,6 +77,34 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
     /**
      * {@inheritdoc}
      */
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        if ($this->widget === $initialWidget) {
+            // We've gone no further up the tree yet - bubble again, as evaluation contexts
+            // can span between a compound widget's root widget and the compound defined widget
+            return $this->parentContext->bubbleEventToParent(
+                $programState,
+                $program,
+                $event,
+                $initialWidget
+            );
+        }
+
+        return $this->widget->dispatchEvent(
+            $programState,
+            $program,
+            $event,
+            $this
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubStoreContext(UiStoreStateInterface $storeState)
     {
         throw new \BadMethodCallException('Not implemented');
@@ -81,9 +113,17 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
     /**
      * {@inheritdoc}
      */
-    public function getChildOfCurrentCompoundWidget($childName)
+    public function getChildWidget($childName)
     {
         return $this->widget->getChildWidget($childName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCompoundWidgetDefinitionContext()
+    {
+        return $this;
     }
 
     /**
@@ -109,7 +149,7 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
      */
     public function getWidgetAttribute($attributeName)
     {
-        return $this->widget->getAttribute($attributeName, $this);
+        return $this->widget->getAttribute($attributeName, $this->parentContext);
     }
 
     /**
@@ -125,6 +165,6 @@ class CompoundWidgetDefinitionEvaluationContext extends AbstractEvaluationContex
      */
     public function getWidgetValue($valueName)
     {
-        return $this->widgetDefinition->getWidgetValue($valueName, $this);
+        return $this->widgetDefinition->getWidgetValue($valueName, $this->getPath(), $this);
     }
 }

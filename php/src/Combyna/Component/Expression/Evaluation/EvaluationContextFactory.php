@@ -11,12 +11,11 @@
 
 namespace Combyna\Component\Expression\Evaluation;
 
-use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
 use Combyna\Component\Signal\SignalInterface;
 
@@ -27,19 +26,6 @@ use Combyna\Component\Signal\SignalInterface;
  */
 class EvaluationContextFactory implements EvaluationContextFactoryInterface
 {
-    /**
-     * @var BagFactoryInterface
-     */
-    private $bagFactory;
-
-    /**
-     * @param BagFactoryInterface $bagFactory
-     */
-    public function __construct(BagFactoryInterface $bagFactory)
-    {
-        $this->bagFactory = $bagFactory;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -73,9 +59,17 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createRootContext(EnvironmentInterface $environment)
+    public function createNullRootContext()
     {
-        return new RootEvaluationContext($this, $environment);
+        return new NullRootEvaluationContext($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createRootContext(ResourceRepositoryInterface $resourceRepository)
+    {
+        return new RootEvaluationContext($this, $resourceRepository);
     }
 
     /**
@@ -96,6 +90,14 @@ class EvaluationContextFactory implements EvaluationContextFactoryInterface
         SignalInterface $signal
     ) {
         return new SignalEvaluationContext($this, $parentContext, $signal);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getParentStateTypeToContextFactoryMap()
+    {
+        return [];
     }
 
     /**

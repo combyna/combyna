@@ -82,6 +82,14 @@ class RouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function getIdentifier()
+    {
+        return $this->getType() . ':' . $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return $this->name;

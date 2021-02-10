@@ -63,11 +63,19 @@ class AssuredConstraintValidator implements ConstraintValidatorInterface
             return;
         }
 
-        /** @var AssuranceNodeInterface $assuranceNode */
         $assuranceNode = $validationContext->queryForActNode(
             new AssuranceNodeQuery($expressionNode->getAssuredStaticName()),
             $validationContext->getCurrentActNode()
         );
+
+        if (!$assuranceNode instanceof AssuranceNodeInterface) {
+            $validationContext->addGenericViolation(sprintf(
+                'Expected an assurance node, got "%s"',
+                get_class($assuranceNode)
+            ));
+
+            return;
+        }
 
         $expectedAssuranceConstraint = $constraint->getConstraint();
         $actualAssuranceConstraint = $assuranceNode->getConstraint();

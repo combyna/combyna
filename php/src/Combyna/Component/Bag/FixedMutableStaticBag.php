@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 
 /**
@@ -50,6 +51,22 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticBagInterface $otherStaticBag)
+    {
+        return $this->looseBag->equals($otherStaticBag);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluateStatic($staticName, EvaluationContextInterface $evaluationContext)
+    {
+        return $this->looseBag->evaluateStatic($staticName, $evaluationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStatic($name)
     {
         return $this->looseBag->hasStatic($name);
@@ -69,6 +86,14 @@ class FixedMutableStaticBag implements FixedMutableStaticBagInterface
     public function hasStatic($name)
     {
         return $this->looseBag->hasStatic($name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function providesStatic($staticName)
+    {
+        return $this->hasStatic($staticName);
     }
 
     /**

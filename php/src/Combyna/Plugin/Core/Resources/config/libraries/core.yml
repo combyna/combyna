@@ -4,5 +4,7 @@ events: ~
 signals:
     # This signal is dispatched when a new route is navigated to within the app
     navigated:
-        payload: ~
+        payload:
+            library: text
+            route: text
 widgets: ~

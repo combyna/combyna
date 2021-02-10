@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-use Combyna\Harness\TestCombynaBootstrap;
+use Combyna\Test\Harness\TestCombynaBootstrap;
 use Symfony\Component\Filesystem\Filesystem;
 
 // Load Composer's autoloader

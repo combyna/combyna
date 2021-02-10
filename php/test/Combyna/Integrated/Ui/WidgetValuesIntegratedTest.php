@@ -85,7 +85,7 @@ class WidgetValuesIntegratedTest extends TestCase
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "0"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterPokingThePokableButton()
@@ -109,7 +109,7 @@ HTML;
                 '<button name="combyna-widget-my_view-root-3-root">Add me</button>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheAddableButton()
@@ -120,7 +120,11 @@ HTML;
             $appState,
             $appState->getWidgetStatePathByTag('the_addable_button'),
             'gui',
-            'click'
+            'click',
+            [
+                'x' => 100,
+                'y' => 30
+            ]
         );
 
         // Note the `Value of the addable button: "61"`
@@ -129,6 +133,6 @@ HTML;
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "61"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

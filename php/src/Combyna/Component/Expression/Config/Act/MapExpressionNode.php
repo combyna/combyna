@@ -16,12 +16,10 @@ use Combyna\Component\Expression\MapExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Expression\Validation\Context\Specifier\ScopeContextSpecifier;
-use Combyna\Component\Type\AnyType;
-use Combyna\Component\Type\StaticListType;
-use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\AnyTypeDeterminer;
 use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class MapExpressionNode
@@ -91,7 +89,7 @@ class MapExpressionNode extends AbstractExpressionNode
             if ($this->indexVariableName !== null) {
                 $scopeContextSpecifier->defineVariable(
                     $this->indexVariableName,
-                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class))
+                    new StaticTypeDeterminer(NumberExpression::class)
                 );
             }
 
@@ -104,7 +102,7 @@ class MapExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->listExpression,
-                new PresolvedTypeDeterminer(new StaticListType(new AnyType())),
+                new StaticListTypeDeterminer(new AnyTypeDeterminer()),
                 'list operand'
             )
         );

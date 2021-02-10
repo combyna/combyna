@@ -12,9 +12,8 @@
 namespace Combyna\Component\Type\Config\Loader;
 
 use Combyna\Component\Config\Loader\ConfigParser;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Type\MultipleTypeDeterminer;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -57,7 +56,7 @@ class MultipleTypeLoader implements TypeTypeLoaderInterface
                 ['array']
             );
         } catch (InvalidArgumentException $exception) {
-            return new PresolvedTypeDeterminer(new UnresolvedType($exception->getMessage()));
+            return new UnresolvedTypeDeterminer($exception->getMessage());
         }
 
         $subTypeDeterminers = array_map(function ($subTypeConfig) {

@@ -12,9 +12,11 @@
 namespace Combyna\Unit\Component\Bag;
 
 use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface;
 use Combyna\Component\Bag\FixedStaticBagModel;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Harness\TestCase;
@@ -29,6 +31,11 @@ use Prophecy\Prophecy\ObjectProphecy;
  */
 class FixedStaticBagModelTest extends TestCase
 {
+    /**
+     * @var ObjectProphecy|BagEvaluationContextFactoryInterface
+     */
+    private $bagEvaluationContextFactory;
+
     /**
      * @var FixedStaticBagModel
      */
@@ -49,11 +56,18 @@ class FixedStaticBagModelTest extends TestCase
      */
     private $staticDefinition2;
 
+    /**
+     * @var ObjectProphecy|StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
     public function setUp()
     {
+        $this->bagEvaluationContextFactory = $this->prophesize(BagEvaluationContextFactoryInterface::class);
         $this->bagFactory = $this->prophesize(BagFactoryInterface::class);
         $this->staticDefinition1 = $this->prophesize(FixedStaticDefinition::class);
         $this->staticDefinition2 = $this->prophesize(FixedStaticDefinition::class);
+        $this->staticExpressionFactory = $this->prophesize(StaticExpressionFactoryInterface::class);
 
         $this->staticDefinition1->getName()
             ->willReturn('optional-static');
@@ -72,16 +86,31 @@ class FixedStaticBagModelTest extends TestCase
         $this->staticDefinition2->allowsStaticDefinition(Argument::any())
             ->willReturn(false);
 
-        $this->bagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            'optional-static' => $this->staticDefinition1->reveal(),
-            'required-static' => $this->staticDefinition2->reveal()
-        ]);
+        $this->bagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                'optional-static' => $this->staticDefinition1->reveal(),
+                'required-static' => $this->staticDefinition2->reveal()
+            ]
+        );
     }
 
     public function testAllowsOtherModelReturnsTrueWhenThereAreNoDefinitionsInEitherModel()
     {
-        $bagModel = new FixedStaticBagModel($this->bagFactory->reveal(), []);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), []);
+        $bagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            []
+        );
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            []
+        );
 
         static::assertTrue($bagModel->allowsOtherModel($otherBagModel));
     }
@@ -98,9 +127,14 @@ class FixedStaticBagModelTest extends TestCase
         $this->staticDefinition2
             ->allowsStaticDefinition($otherStaticDefinition)
             ->willReturn(true);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherStaticDefinition->reveal()
+            ]
+        );
 
         static::assertTrue($this->bagModel->allowsOtherModel($otherBagModel));
     }
@@ -117,9 +151,14 @@ class FixedStaticBagModelTest extends TestCase
         $this->staticDefinition1
             ->allowsStaticDefinition($otherStaticDefinition)
             ->willReturn(true);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherStaticDefinition->reveal()
+            ]
+        );
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
     }
@@ -144,10 +183,15 @@ class FixedStaticBagModelTest extends TestCase
             ->willReturn('number');
         $anotherStaticDefinition->isRequired()
             ->willReturn(true);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherRequiredStaticDefinition->reveal(),
-            $anotherStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherRequiredStaticDefinition->reveal(),
+                $anotherStaticDefinition->reveal()
+            ]
+        );
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
     }
@@ -172,10 +216,15 @@ class FixedStaticBagModelTest extends TestCase
             ->willReturn('number');
         $anotherStaticDefinition->isRequired()
             ->willReturn(false);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherRequiredStaticDefinition->reveal(),
-            $anotherStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherRequiredStaticDefinition->reveal(),
+                $anotherStaticDefinition->reveal()
+            ]
+        );
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
     }
@@ -202,10 +251,15 @@ class FixedStaticBagModelTest extends TestCase
         $this->staticDefinition2
             ->allowsStaticDefinition($otherRequiredStaticDefinition)
             ->willReturn(true);
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherOptionalStaticDefinition->reveal(),
-            $otherRequiredStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherOptionalStaticDefinition->reveal(),
+                $otherRequiredStaticDefinition->reveal()
+            ]
+        );
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
     }
@@ -232,17 +286,27 @@ class FixedStaticBagModelTest extends TestCase
         $this->staticDefinition2
             ->allowsStaticDefinition($otherRequiredStaticDefinition)
             ->willReturn(false); // Don't allow `required-static` to be accepted by this one (wrong type)
-        $otherBagModel = new FixedStaticBagModel($this->bagFactory->reveal(), [
-            $otherOptionalStaticDefinition->reveal(),
-            $otherRequiredStaticDefinition->reveal()
-        ]);
+        $otherBagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            [
+                $otherOptionalStaticDefinition->reveal(),
+                $otherRequiredStaticDefinition->reveal()
+            ]
+        );
 
         static::assertFalse($this->bagModel->allowsOtherModel($otherBagModel));
     }
 
     public function testAllowsStaticBagReturnsTrueWhenThereAreNoDefinitionsInTheModelNorTheBag()
     {
-        $bagModel = new FixedStaticBagModel($this->bagFactory->reveal(), []);
+        $bagModel = new FixedStaticBagModel(
+            $this->bagFactory->reveal(),
+            $this->staticExpressionFactory->reveal(),
+            $this->bagEvaluationContextFactory->reveal(),
+            []
+        );
         $staticBag = $this->prophesize(StaticBagInterface::class);
         $staticBag->hasStatic(Argument::any())
             ->willReturn(false);

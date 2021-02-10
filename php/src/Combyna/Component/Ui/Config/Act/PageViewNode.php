@@ -19,10 +19,9 @@ use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
 use Combyna\Component\Ui\Validation\Context\Specifier\ViewContextSpecifier;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class PageViewNode
@@ -117,7 +116,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
             $subSpecBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->titleExpressionNode,
-                    new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                    new StaticTypeDeterminer(TextExpression::class),
                     'title'
                 )
             );
@@ -129,7 +128,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
                 $subSpecBuilder->addConstraint(
                     new ResultTypeConstraint(
                         $this->visibilityExpressionNode,
-                        new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                        new StaticTypeDeterminer(BooleanExpression::class),
                         'visibility'
                     )
                 );

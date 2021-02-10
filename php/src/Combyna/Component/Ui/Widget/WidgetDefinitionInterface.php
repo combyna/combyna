@@ -72,12 +72,18 @@ interface WidgetDefinitionInterface
      *
      * @param string $libraryName
      * @param string $eventName
-     * @param StaticBagInterface $payloadStaticBag
+     * @param array $payloadNatives
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @return EventInterface
      * @throws EventDefinitionNotReferencedByWidgetException
      * @throws LibraryNotInstalledException
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag);
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    );
 
     /**
      * Creates a DefinedCompoundWidgetState or DefinedPrimitiveWidgetState
@@ -124,6 +130,20 @@ interface WidgetDefinitionInterface
      * @return string
      */
     public function getName();
+
+    /**
+     * Evaluates and then returns the value of the specified widget value from its provider
+     *
+     * @param string $valueName
+     * @param string[]|int[] $widgetStatePath
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getWidgetValue(
+        $valueName,
+        array $widgetStatePath,
+        ViewEvaluationContextInterface $evaluationContext
+    );
 
     /**
      * Renderable widgets may be rendered directly, without needing to be "resolved" further.

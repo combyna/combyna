@@ -11,14 +11,23 @@
 
 namespace Combyna\Unit\Type;
 
+use Combyna\Component\Bag\BagFactory;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactory;
+use Combyna\Component\Expression\BooleanExpression;
+use Combyna\Component\Expression\Evaluation\EvaluationContextFactory;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Expression\NothingExpression;
 use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StaticExpressionFactory;
 use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Prophecy\Argument;
@@ -32,9 +41,55 @@ use Prophecy\Prophecy\ObjectProphecy;
 class StaticTypeTest extends TestCase
 {
     /**
+     * @var BagEvaluationContextFactory
+     */
+    private $bagEvaluationContextFactory;
+
+    /**
+     * @var BagFactory
+     */
+    private $bagFactory;
+
+    /**
+     * @var ObjectProphecy|EvaluationContextInterface
+     */
+    private $evaluationContext;
+
+    /**
+     * @var EvaluationContextFactory
+     */
+    private $evaluationContextFactory;
+
+    /**
+     * @var StaticExpressionFactory
+     */
+    private $staticExpressionFactory;
+
+    /**
      * @var StaticType
      */
     private $type;
+
+    /**
+     * @var ObjectProphecy|ValidationContextInterface
+     */
+    private $validationContext;
+
+    public function setUp()
+    {
+        $this->evaluationContextFactory = new EvaluationContextFactory();
+        $this->staticExpressionFactory = new StaticExpressionFactory();
+        $this->bagEvaluationContextFactory = new BagEvaluationContextFactory(
+            $this->evaluationContextFactory,
+            $this->staticExpressionFactory
+        );
+        $this->bagFactory = new BagFactory(
+            $this->staticExpressionFactory,
+            $this->bagEvaluationContextFactory
+        );
+        $this->evaluationContext = $this->prophesize(EvaluationContextInterface::class);
+        $this->validationContext = $this->prophesize(ValidationContextInterface::class);
+    }
 
     public function testCannotBeUsedToMatchAStaticListExpression()
     {
@@ -130,7 +185,7 @@ class StaticTypeTest extends TestCase
     public function testAllowsStaticTypeReturnsTrueWhenBothMatchTheSameStaticClass()
     {
         $this->createType(TextExpression::class);
-        $candidateType = new StaticType(TextExpression::class);
+        $candidateType = new StaticType(TextExpression::class, $this->validationContext->reveal());
 
         $this->assert($this->type->allowsStaticType($candidateType))->isTrue;
     }
@@ -138,9 +193,175 @@ class StaticTypeTest extends TestCase
     public function testAllowsStaticTypeReturnsFalseWhenCandidateTypeMatchesADifferentStaticClass()
     {
         $this->createType(TextExpression::class);
-        $candidateType = new StaticType(NumberExpression::class);
+        $candidateType = new StaticType(NumberExpression::class, $this->validationContext->reveal());
 
         $this->assert($this->type->allowsStaticType($candidateType))->isFalse;
+    }
+
+    public function testCoerceNativeJustReturnsAnExistingCompatibleStatic()
+    {
+        $this->createType(TextExpression::class);
+        $static = $this->prophesize(TextExpression::class);
+
+        $this->assert(
+            $this->type->coerceNative(
+                $static->reveal(),
+                $this->staticExpressionFactory,
+                $this->bagFactory,
+                $this->evaluationContext->reveal()
+            )
+        )->exactlyEquals($static->reveal());
+    }
+
+    public function testCoerceNativeCoercesABooleanToABooleanExpression()
+    {
+        $this->createType(BooleanExpression::class);
+        $static = $this->type->coerceNative(
+            true,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($static->toNative())->isTrue;
+    }
+
+    public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForBoolean()
+    {
+        $this->createType(BooleanExpression::class);
+
+        $this->setExpectedException(
+            IncompatibleNativeForCoercionException::class,
+            'Expected boolean, got integer'
+        );
+
+        $this->type->coerceNative(
+            987, // Boolean expects true or false, but we give a number
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+    }
+
+    public function testCoerceNativeCoercesNullToANothingExpression()
+    {
+        $this->createType(NothingExpression::class);
+        $static = $this->type->coerceNative(
+            null,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(NothingExpression::class);
+    }
+
+    public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForNothing()
+    {
+        $this->createType(NothingExpression::class);
+
+        $this->setExpectedException(
+            IncompatibleNativeForCoercionException::class,
+            'Expected null, got string'
+        );
+
+        $this->type->coerceNative(
+            'my non-null value', // Nothing expects null, but we give a string
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+    }
+
+    public function testCoerceNativeCoercesAnIntegerToANumberExpression()
+    {
+        $this->createType(NumberExpression::class);
+        $static = $this->type->coerceNative(
+            21,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
+        $this->assert($static->toNative())->exactlyEquals(21);
+    }
+
+    public function testCoerceNativeCoercesAFloatToANumberExpression()
+    {
+        $this->createType(NumberExpression::class);
+        $static = $this->type->coerceNative(
+            1001.4,
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
+        $this->assert($static->toNative())->exactlyEquals(1001.4);
+    }
+
+    public function testCoerceNativeCoercesANumericStringToANumberExpression()
+    {
+        $this->createType(NumberExpression::class);
+        $static = $this->type->coerceNative(
+            '1001.4',
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
+        $this->assert($static->toNative())->exactlyEquals(1001.4);
+    }
+
+    public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForNumber()
+    {
+        $this->createType(NumberExpression::class);
+
+        $this->setExpectedException(
+            IncompatibleNativeForCoercionException::class,
+            'Expected int, float or numeric string, got string'
+        );
+
+        $this->type->coerceNative(
+            'my non-numeric string', // Text expects a number, but we give a string
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+    }
+
+    public function testCoerceNativeCoercesAStringToATextExpression()
+    {
+        $this->createType(TextExpression::class);
+        $static = $this->type->coerceNative(
+            'hello world!',
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
+
+        $this->assert($static)->isAnInstanceOf(TextExpression::class);
+        $this->assert($static->toNative())->exactlyEquals('hello world!');
+    }
+
+    public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForText()
+    {
+        $this->createType(TextExpression::class);
+
+        $this->setExpectedException(
+            IncompatibleNativeForCoercionException::class,
+            'Expected string, got integer'
+        );
+
+        $this->type->coerceNative(
+            1001, // Text expects a string, but we give a number
+            $this->staticExpressionFactory,
+            $this->bagFactory,
+            $this->evaluationContext->reveal()
+        );
     }
 
     /**
@@ -191,7 +412,9 @@ class StaticTypeTest extends TestCase
     {
         $this->createType(TextExpression::class);
 
-        $result = $this->type->mergeWithStaticType(new StaticType(TextExpression::class));
+        $result = $this->type->mergeWithStaticType(
+            new StaticType(TextExpression::class, $this->validationContext->reveal())
+        );
 
         $this->assert($result)->exactlyEquals($this->type);
     }
@@ -199,7 +422,7 @@ class StaticTypeTest extends TestCase
     public function testMergeWithStaticTypeReturnsANewMultipleTypeWithBothStatics()
     {
         $this->createType(TextExpression::class);
-        $otherType = new StaticType(NumberExpression::class);
+        $otherType = new StaticType(NumberExpression::class, $this->validationContext->reveal());
 
         $result = $this->type->mergeWithStaticType($otherType);
 
@@ -223,6 +446,6 @@ class StaticTypeTest extends TestCase
      */
     private function createType($staticClass)
     {
-        $this->type = new StaticType($staticClass);
+        $this->type = new StaticType($staticClass, $this->validationContext->reveal());
     }
 }

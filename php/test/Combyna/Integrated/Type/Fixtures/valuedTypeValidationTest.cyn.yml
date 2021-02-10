@@ -1,0 +1,193 @@
+name: Valued type validation test app
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Valued type validation test'
+        description: A test of the validation for valued types
+        widget:
+            type: group
+            captures:
+                define:
+                    # For testing that if only a single valued type is given,
+                    # and that exact static is given, validation passes
+                    a_single_valued_type_that_matches_type_and_value:
+                        type: valued
+                        wraps: text
+                        value: !expr 'I must be given exactly'
+                    # As above, but the exact static is not given
+                    a_single_valued_type_that_matches_type_but_not_value:
+                        type: valued
+                        wraps: text
+                        value: !expr 'I must be given exactly'
+                    # As above, but the exact static is not given
+                    a_single_valued_type_that_matches_neither_type_nor_value:
+                        type: valued
+                        wraps: text
+                        value: !expr 'I must be given exactly'
+                    # For testing that the value must be allowed by the wrapped type
+                    a_single_valued_type_whose_value_doesnt_match_wrapped_type:
+                        type: valued
+                        wraps: number
+                        value: !expr 'I am not a valid value for the wrapped type'
+                    # For testing that the expected value expression itself is validated
+                    a_single_valued_type_with_invalid_value_expression:
+                        type: valued
+                        wraps: number
+                        value: !expr I am definitely @ not (!) a valid expression
+
+                    # For testing that multiple scalar value options may be given via a multiple type
+                    a_multiple_scalar_valued_type_that_matches_type_and_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps: text
+                              value: !expr 'First option'
+                            - type: valued
+                              wraps: text
+                              value: !expr 'Second option'
+                    # As above, but none of the scalar statics are exactly given
+                    a_multiple_scalar_valued_type_that_matches_type_but_not_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps: text
+                              value: !expr 'First option'
+                            - type: valued
+                              wraps: text
+                              value: !expr 'Second option'
+
+                    # For testing that multiple structure value options may be given via a multiple type
+                    a_multiple_structure_valued_type_that_matches_type_and_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps:
+                                  type: structure
+                                  attributes:
+                                      my_attr: text
+                              value: !expr {my_attr: 'First option'}
+                            - type: valued
+                              wraps:
+                                  type: structure
+                                  attributes:
+                                      my_attr: text
+                              value: !expr {my_attr: 'Second option'}
+                    # As above, but none of the structure statics are exactly given
+                    a_multiple_structure_valued_type_that_matches_type_but_not_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps:
+                                  type: structure
+                                  attributes:
+                                      my_attr: text
+                              value: !expr {my_attr: 'First option'}
+                            - type: valued
+                              wraps:
+                                  type: structure
+                                  attributes:
+                                      my_attr: text
+                              value: !expr {my_attr: 'Second option'}
+
+                    # For testing that multiple list value options may be given via a multiple type
+                    a_multiple_list_valued_type_that_matches_type_and_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps:
+                                  type: list
+                                  element: text|number
+                              value: !expr ['First option, part 1', 1001]
+                            - type: valued
+                              wraps:
+                                  type: list
+                                  element: text|number
+                              value: !expr ['Second option, part 1', 2002]
+                    # As above, but none of the list statics are exactly given
+                    a_multiple_list_valued_type_that_matches_type_but_not_value:
+                        type: multiple
+                        types:
+                            - type: valued
+                              wraps:
+                                  type: list
+                                  element: text|number
+                              value: !expr ['First option, part 1', 3003]
+                            - type: valued
+                              wraps:
+                                  type: list
+                                  element: text|number
+                              value: !expr ['Second option, part 1', 4004]
+            children:
+                # Test using a valued type in isolation
+                - type: text
+                  text: !expr 'I set the a_single_valued_type_that_matches_type_and_value capture'
+                  captures:
+                      set:
+                          a_single_valued_type_that_matches_type_and_value: !expr 'I must be given exactly'
+                - type: text
+                  text: !expr 'I set the a_single_valued_type_that_matches_type_but_not_value capture'
+                  captures:
+                      set:
+                          a_single_valued_type_that_matches_type_but_not_value: !expr 'I do not match the expectation'
+                - type: text
+                  text: !expr 'I set the a_single_valued_type_that_matches_neither_type_nor_value capture'
+                  captures:
+                      set:
+                          # Must be text, but a number is given
+                          a_single_valued_type_that_matches_neither_type_nor_value: !expr 21
+                - type: text
+                  text: !expr 'I set the a_single_valued_type_that_matches_neither_type_nor_value capture'
+                  captures:
+                      set:
+                          # Correct value is given, but the capture's valued type itself was invalid
+                          # because its expected value doesn't match the wrapped type (number)
+                          a_single_valued_type_whose_value_doesnt_match_wrapped_type: !expr 'I am not a valid value for the wrapped type'
+                - type: text
+                  text: !expr 'I set the a_single_valued_type_with_invalid_value_expression capture'
+                  captures:
+                      set:
+                          # Correct value type is given, but the capture's valued type itself was invalid
+                          # because its expected value expression is invalid
+                          a_single_valued_type_with_invalid_value_expression: !expr 1001
+
+                # Test using a scalar-valued type as part of a multiple-type
+                - type: text
+                  text: !expr 'I set the a_multiple_scalar_valued_type_that_matches_type_and_value capture'
+                  captures:
+                      set:
+                          a_multiple_scalar_valued_type_that_matches_type_and_value: !expr 'First option'
+                - type: text
+                  text: !expr 'I set the a_multiple_scalar_valued_type_that_matches_type_but_not_value capture'
+                  captures:
+                      set:
+                          a_multiple_scalar_valued_type_that_matches_type_but_not_value: !expr 'Not an option'
+
+                # Test using a structure-valued type as part of a multiple-type
+                - type: text
+                  text: !expr 'I set the a_multiple_structure_valued_type_that_matches_type_and_value capture'
+                  captures:
+                      set:
+                          a_multiple_structure_valued_type_that_matches_type_and_value: !expr {my_attr: 'First option'}
+                - type: text
+                  text: !expr 'I set the a_multiple_structure_valued_type_that_matches_type_but_not_value capture'
+                  captures:
+                      set:
+                          a_multiple_structure_valued_type_that_matches_type_but_not_value: !expr {my_attr: 'Not an option'}
+
+                # Test using a list-valued type as part of a multiple-type
+                - type: text
+                  text: !expr 'I set the a_multiple_list_valued_type_that_matches_type_and_value capture'
+                  captures:
+                      set:
+                          a_multiple_list_valued_type_that_matches_type_and_value: !expr ['First option, part 1', 1001]
+                - type: text
+                  text: !expr 'I set the a_multiple_list_valued_type_that_matches_type_but_not_value capture'
+                  captures:
+                      set:
+                          a_multiple_list_valued_type_that_matches_type_but_not_value: !expr ['Not an option', 9009]

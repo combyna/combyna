@@ -11,6 +11,7 @@
 
 namespace Combyna\Plugin\Core\Renderer\Html\WidgetRenderer;
 
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
@@ -58,8 +59,11 @@ class ChildReferenceWidgetRenderer implements WidgetRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath)
-    {
+    public function renderWidget(
+        WidgetStateInterface $widgetState,
+        WidgetStatePathInterface $widgetStatePath,
+        ProgramInterface $program
+    ) {
         if (
             !$widgetState instanceof ChildReferenceWidgetStateInterface ||
             $widgetStatePath->getWidgetDefinitionLibraryName() !== $this->getWidgetDefinitionLibraryName() ||
@@ -68,6 +72,9 @@ class ChildReferenceWidgetRenderer implements WidgetRendererInterface
             throw new InvalidArgumentException('Child reference widget renderer must receive a core.child widget');
         }
 
-        return $this->delegatingWidgetRenderer->renderWidget($widgetStatePath->getChildStatePath('child'));
+        return $this->delegatingWidgetRenderer->renderWidget(
+            $widgetStatePath->getChildStatePath('child'),
+            $program
+        );
     }
 }

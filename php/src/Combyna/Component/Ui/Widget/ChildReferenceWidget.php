@@ -14,7 +14,6 @@ namespace Combyna\Component\Ui\Widget;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
@@ -62,7 +61,7 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     private $name;
 
     /**
-     * @var WidgetInterface
+     * @var WidgetInterface|null
      */
     private $parentWidget;
 
@@ -82,7 +81,7 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     private $visibilityExpression;
 
     /**
-     * @param WidgetInterface $parentWidget
+     * @param WidgetInterface|null $parentWidget
      * @param string|int $name
      * @param string $childName
      * @param BagFactoryInterface $bagFactory
@@ -93,7 +92,7 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
      * @param array $tags
      */
     public function __construct(
-        WidgetInterface $parentWidget,
+        WidgetInterface $parentWidget = null,
         $name,
         $childName,
         BagFactoryInterface $bagFactory,
@@ -142,8 +141,12 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag)
-    {
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         throw new LogicException('ChildReferenceWidgets cannot handle events');
     }
 
@@ -155,16 +158,22 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
         ViewEvaluationContextInterface $evaluationContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
-        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
+        $compoundWidgetDefinitionContext = $evaluationContext->getCompoundWidgetDefinitionContext();
 
-        $childWidget = $evaluationContext->getChildOfCurrentCompoundWidget($this->childName);
+        $childWidget = $compoundWidgetDefinitionContext->getChildWidget($this->childName);
 
         return $this->uiStateFactory->createChildReferenceWidgetState(
             $name,
             $this,
             // Each embedded instance of a compound widget's child will get a separate state. This allows
             // eg. a self-incrementing button to maintain a separate counter for each place it is embedded.
-            $childWidget->createInitialState($name, $subEvaluationContext, $evaluationContextFactory)
+            $childWidget->createInitialState(
+                $name,
+                // To avoid infinite recursion, go above the compound widget context
+                // so that we don't attempt to fetch the referenced child widget from the same one again
+                $compoundWidgetDefinitionContext->getParentContext(),
+                $evaluationContextFactory
+            )
         );
     }
 
@@ -258,9 +267,19 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
     /**
      * {@inheritdoc}
      */
+    public function getParentWidget()
+    {
+        return $this->parentWidget;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getPath()
     {
-        return array_merge($this->parentWidget->getPath(), [$this->name]);
+        return $this->parentWidget !== null ?
+            array_merge($this->parentWidget->getPath(), [$this->name]) :
+            [$this->name];
     }
 
     /**
@@ -297,18 +316,16 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
             );
         }
 
-        $subEvaluationContext = $this->createEvaluationContext(
-            $evaluationContext,
-            $evaluationContextFactory,
-            $oldState
-        );
+        $compoundWidgetDefinitionContext = $evaluationContext->getCompoundWidgetDefinitionContext();
 
-        $childWidget = $evaluationContext->getChildOfCurrentCompoundWidget($this->childName);
+        $childWidget = $compoundWidgetDefinitionContext->getChildWidget($this->childName);
 
         return $oldState->with(
             $childWidget->reevaluateState(
                 $oldState->getChildState('child'),
-                $subEvaluationContext,
+                // To avoid infinite recursion, go above the compound widget context
+                // so that we don't attempt to fetch the referenced child widget from the same one again
+                $compoundWidgetDefinitionContext->getParentContext(),
                 $evaluationContextFactory
             )
         );

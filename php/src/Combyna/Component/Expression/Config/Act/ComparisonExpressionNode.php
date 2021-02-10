@@ -19,7 +19,8 @@ use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\PossibleMatchingResultTypesConstraint;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Context\NullValidationContext;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class ComparisonExpressionNode
@@ -71,6 +72,8 @@ class ComparisonExpressionNode extends AbstractExpressionNode
         $specBuilder->addChildNode($this->leftOperandExpression);
         $specBuilder->addChildNode($this->rightOperandExpression);
 
+        $validationContext = new NullValidationContext();
+
         switch ($this->operator) {
             case ComparisonExpression::EQUAL:
                 // For text expressions, this will be a case-sensitive comparison
@@ -81,9 +84,9 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(BooleanExpression::class),
-                            new StaticType(NumberExpression::class),
-                            new StaticType(TextExpression::class)
+                            new StaticType(BooleanExpression::class, $validationContext),
+                            new StaticType(NumberExpression::class, $validationContext),
+                            new StaticType(TextExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -98,7 +101,7 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(TextExpression::class)
+                            new StaticType(TextExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -111,7 +114,7 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(NumberExpression::class)
+                            new StaticType(NumberExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -124,7 +127,7 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(NumberExpression::class)
+                            new StaticType(NumberExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -138,9 +141,9 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(BooleanExpression::class),
-                            new StaticType(NumberExpression::class),
-                            new StaticType(TextExpression::class)
+                            new StaticType(BooleanExpression::class, $validationContext),
+                            new StaticType(NumberExpression::class, $validationContext),
+                            new StaticType(TextExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -155,7 +158,7 @@ class ComparisonExpressionNode extends AbstractExpressionNode
                         $this->rightOperandExpression,
                         'right operand',
                         [
-                            new StaticType(TextExpression::class)
+                            new StaticType(TextExpression::class, $validationContext)
                         ]
                     )
                 );
@@ -197,7 +200,7 @@ class ComparisonExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class));
+        return new StaticTypeDeterminer(BooleanExpression::class);
     }
 
     /**

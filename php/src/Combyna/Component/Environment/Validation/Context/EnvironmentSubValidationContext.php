@@ -16,9 +16,11 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
 use Combyna\Component\Event\Validation\Query\EventDefinitionExistsQuery;
+use Combyna\Component\Event\Validation\Query\EventDefinitionHasPayloadStaticQuery;
 use Combyna\Component\Event\Validation\Query\EventDefinitionPayloadStaticTypeQuery;
 use Combyna\Component\Expression\Validation\Query\FunctionNodeQuery;
 use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
+use Combyna\Component\Router\Validation\Query\RouteExistsQuery;
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionExistsQuery;
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionHasPayloadStaticQuery;
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQuery;
@@ -115,9 +117,11 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
     {
         return [
             EventDefinitionExistsQuery::class => [$this, 'queryForEventDefinitionExistence'],
+            EventDefinitionHasPayloadStaticQuery::class => [$this, 'queryForEventPayloadStaticExistence'],
             EventDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForEventPayloadStaticType'],
             FunctionNodeQuery::class => [$this, 'queryForFunctionActNode'],
             FunctionReturnTypeQuery::class => [$this, 'queryForFunctionReturnType'],
+            RouteExistsQuery::class => [$this, 'queryForRouteExistence'],
             SignalDefinitionExistsQuery::class => [$this, 'queryForSignalDefinitionExistence'],
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
             WidgetDefinitionExistsQuery::class => [$this, 'queryForWidgetDefinitionExistence'],
@@ -160,6 +164,28 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
         // The library doesn't define the requested event definition - return null
         // so that we can bubble up to an ancestor context that does define it
         return null;
+    }
+
+    /**
+     * Determines whether the specified event defines the specified payload,
+     * where the event is defined by a library
+     *
+     * @param EventDefinitionHasPayloadStaticQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool
+     */
+    public function queryForEventPayloadStaticExistence(
+        EventDefinitionHasPayloadStaticQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        $eventDefinitionNode = $this->environmentNode->getEventDefinition(
+            $query->getLibraryName(),
+            $query->getEventName(),
+            $validationContext->createBooleanQueryRequirement($query)
+        );
+
+        return $eventDefinitionNode->getPayloadStaticBagModel()
+            ->definesStatic($query->getPayloadStaticName());
     }
 
     /**
@@ -221,6 +247,21 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             )
             ->getReturnTypeDeterminer()
             ->determine($validationContext);
+    }
+
+    /**
+     * Determines whether the specified route exists
+     *
+     * @param RouteExistsQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool|null
+     */
+    public function queryForRouteExistence(
+        RouteExistsQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        // TODO: Libraries cannot yet define routes
+        return null;
     }
 
     /**

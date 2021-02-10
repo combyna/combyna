@@ -91,7 +91,7 @@ class Client
      * @param array $routeArguments
      * @return AppStateInterface
      */
-    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName, $routeArguments = [])
+    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName, array $routeArguments = [])
     {
         return $this->app->navigateTo($appState, $libraryName, $routeName, $routeArguments);
     }
@@ -123,6 +123,6 @@ class Client
      */
     public function renderVisibleViews(AppStateInterface $appState)
     {
-        return $this->arrayRenderer->renderViews($appState);
+        return $this->arrayRenderer->renderViews($appState, $this->app->getProgram());
     }
 }

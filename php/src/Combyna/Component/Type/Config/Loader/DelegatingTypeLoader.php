@@ -13,8 +13,7 @@ namespace Combyna\Component\Type\Config\Loader;
 
 use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
-use Combyna\Component\Type\UnresolvedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -63,31 +62,31 @@ class DelegatingTypeLoader implements TypeLoaderInterface, DelegatorInterface
             try {
                 $typeName = $this->configParser->getElement($config, 'type', 'type name');
             } catch (InvalidArgumentException $exception) {
-                return new PresolvedTypeDeterminer(new UnresolvedType($exception->getMessage()));
+                return new UnresolvedTypeDeterminer($exception->getMessage());
             }
-        } elseif (strpos($config, '|') !== false) {
+        } else {
+            // Type is just a string, the name of the type to load
+            $typeName = $config;
+            $config = [
+                'type' => $typeName
+            ];
+        }
+
+        if (strpos($typeName, '|') !== false) {
             // Type is the pipe shorthand for multiple
-            $subTypeNames = explode('|', $config);
+            $subTypeNames = explode('|', $typeName);
             $typeName = 'multiple';
             $config = [
                 'type' => $typeName,
                 'types' => $subTypeNames
             ];
-        } else {
-            // Type is just a string, the name of the type to load
-            $typeName = $config;
-            $config = [
-                'type' => $config
-            ];
         }
 
         if (!array_key_exists($typeName, $this->loaders)) {
-            return new PresolvedTypeDeterminer(
-                new UnresolvedType(sprintf(
-                    'No loader is registered for types of type "%s"',
-                    $typeName
-                ))
-            );
+            return new UnresolvedTypeDeterminer(sprintf(
+                'No loader is registered for types of type "%s"',
+                $typeName
+            ));
         }
 
         return $this->loaders[$typeName]->load($config);

@@ -16,6 +16,7 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
 use Combyna\Component\Ui\State\Widget\ChildReferenceWidgetStateInterface;
@@ -34,6 +35,7 @@ use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
 use Combyna\Component\Ui\Widget\RepeaterWidgetInterface;
 use Combyna\Component\Ui\Widget\TextWidgetInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
@@ -60,15 +62,15 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     /**
      * Creates a CompoundWidgetDefinitionEvaluationContext
      *
-     * @param CompoundWidgetEvaluationContextInterface $parentContext
-     * @param CompoundWidgetDefinition $widgetDefinition
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param WidgetDefinitionInterface $widgetDefinition
      * @param DefinedWidgetInterface $widget
      * @param DefinedCompoundWidgetStateInterface|null $widgetState
      * @return CompoundWidgetDefinitionEvaluationContextInterface
      */
     public function createCompoundWidgetDefinitionEvaluationContext(
-        CompoundWidgetEvaluationContextInterface $parentContext,
-        CompoundWidgetDefinition $widgetDefinition,
+        ViewEvaluationContextInterface $parentContext,
+        WidgetDefinitionInterface $widgetDefinition,
         DefinedWidgetInterface $widget,
         DefinedCompoundWidgetStateInterface $widgetState = null
     );
@@ -171,6 +173,7 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
      * @param ViewInterface $view
      * @param EvaluationContextInterface $parentContext
      * @param EnvironmentInterface $environment
+     * @param RouterStateInterface $routerState
      * @param PageViewStateInterface|null $pageViewState
      * @return RootViewEvaluationContext
      */
@@ -178,6 +181,7 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
         ViewInterface $view,
         EvaluationContextInterface $parentContext,
         EnvironmentInterface $environment,
+        RouterStateInterface $routerState,
         PageViewStateInterface $pageViewState = null
     );
 

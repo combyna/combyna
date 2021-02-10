@@ -147,7 +147,7 @@ class AppNodePromoter
         $environment = $this->environmentNodePromoter->promoteEnvironment($environmentNode);
         $resourceRepository = $this->programFactory->createResourceRepository($environment);
 
-        $rootEvaluationContext = $this->evaluationContextFactory->createRootContext($environment);
+        $rootEvaluationContext = $this->evaluationContextFactory->createRootContext($resourceRepository);
 
         $appRouteCollection = $this->routeNodePromoter->promoteCollection($appNode->getRoutes());
         $routeRepository = $this->routerFactory->createRouteRepository($environment, $appRouteCollection);
@@ -180,6 +180,7 @@ class AppNodePromoter
         // These need to be set late, to solve the catch-22 of the promoter calls above
         // needing the root repository to be provided in order to create the sub-repositories
         // _but_ the root repository also needing the sub-repositories itself
+        $resourceRepository->setRouteRepository($routeRepository);
         $resourceRepository->setSignalDefinitionRepository($signalDefinitionRepository);
         $resourceRepository->setWidgetDefinitionRepository($widgetDefinitionRepository);
 
@@ -193,6 +194,7 @@ class AppNodePromoter
         );
         $program = $this->programFactory->createProgram(
             $environment,
+            $router,
             $resourceRepository,
             $pageViewCollection,
             $overlayViewCollection,
@@ -205,6 +207,7 @@ class AppNodePromoter
             $pageViewCollection,
             $overlayViewCollection,
             $environment,
+            $resourceRepository,
             $program
         );
     }

@@ -52,6 +52,15 @@ class StaticStructureExpression extends AbstractStaticExpression
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof self &&
+            $otherValue->staticBag->equals($this->staticBag);
+    }
+
+    /**
      * Fetches an attribute's static from the structure
      *
      * @param string $staticName
@@ -60,6 +69,41 @@ class StaticStructureExpression extends AbstractStaticExpression
     public function getAttributeStatic($staticName)
     {
         return $this->staticBag->getStatic($staticName);
+    }
+
+    /**
+     * Fetches the static bag of attributes in this structure
+     *
+     * @return StaticBagInterface
+     */
+    public function getAttributeStaticBag()
+    {
+        return $this->staticBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        $staticsWereTruncated = false;
+        $summaries = [];
+
+        foreach ($this->staticBag->getStaticNames() as $index => $staticName) {
+            $summaries[] = $staticName . ':' . $this->staticBag->getStatic($staticName)->getSummary();
+
+            // Only capture a summary for the first few statics to keep it short-ish
+            if ($index > 3) {
+                $staticsWereTruncated = true;
+                break;
+            }
+        }
+
+        return sprintf(
+            '{%s}',
+            // Add an ellipsis to show that we had to truncate the static summaries when applicable
+            join(',', $summaries) . ($staticsWereTruncated ? ',...' : '')
+        );
     }
 
     /**

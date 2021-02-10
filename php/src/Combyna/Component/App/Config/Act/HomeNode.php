@@ -14,9 +14,12 @@ namespace Combyna\Component\App\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Router\Validation\Constraint\RouteExistsConstraint;
 
 /**
  * Class HomeNode
+ *
+ * Represents the location the app should load at
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -56,8 +59,7 @@ class HomeNode extends AbstractActNode
     {
         $specBuilder->addChildNode($this->attributeExpressionBagNode);
 
-        $specBuilder->addConstraint(new LibraryExistsConstraint($this->routeLibraryName));
-        $specBuilder->addConstraint(new LibraryDefinesRouteConstraint($this->routeLibraryName, $this->routeName));
+        $specBuilder->addConstraint(new RouteExistsConstraint($this->routeLibraryName, $this->routeName));
     }
 
     /**

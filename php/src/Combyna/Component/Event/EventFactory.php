@@ -15,6 +15,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Program\ResourceRepositoryInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 
 /**
  * Class EventFactory
@@ -26,9 +27,12 @@ class EventFactory implements EventFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createEvent(EventDefinitionInterface $eventDefinition, StaticBagInterface $payloadStaticBag)
-    {
-        return new Event($eventDefinition, $payloadStaticBag);
+    public function createEvent(
+        EventDefinitionInterface $eventDefinition,
+        StaticBagInterface $payloadStaticBag,
+        WidgetDefinitionInterface $widgetDefinition
+    ) {
+        return new Event($eventDefinition, $payloadStaticBag, $widgetDefinition);
     }
 
     /**

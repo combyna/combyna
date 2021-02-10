@@ -24,7 +24,6 @@ use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
@@ -32,7 +31,7 @@ use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -74,9 +73,10 @@ class AppValidationIntegratedTest extends TestCase
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
         $this->container = $combynaBootstrap->createContainer();
 
+        $bagEvaluationContextFactory = $this->container->get('combyna.bag.evaluation_context_factory');
         $staticExpressionFactory = $this->container->get('combyna.expression.static_factory');
         $this->validationFactory = $this->container->get('combyna.validator.factory');
-        $this->bagFactory = new BagFactory($staticExpressionFactory);
+        $this->bagFactory = new BagFactory($staticExpressionFactory, $bagEvaluationContextFactory);
         $this->environmentNode = new EnvironmentNode([
             new LibraryNode(
                 'text',
@@ -102,7 +102,7 @@ class AppValidationIntegratedTest extends TestCase
                     new FixedStaticBagModelNode([
                         new FixedStaticDefinitionNode(
                             'invalid-attr',
-                            new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                            new StaticTypeDeterminer(TextExpression::class),
                             new UnknownExpressionTypeNode('invalid-type-for-page-attr')
                         )
                     ]),

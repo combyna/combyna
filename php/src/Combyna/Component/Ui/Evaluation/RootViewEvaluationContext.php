@@ -13,11 +13,16 @@ namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
-use Combyna\Component\Ui\State\View\ViewStateInterface;
+use Combyna\Component\Ui\State\View\PageViewStateInterface;
 use Combyna\Component\Ui\View\ViewInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 use LogicException;
 
 /**
@@ -38,12 +43,17 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     protected $evaluationContextFactory;
 
     /**
+     * @var RouterStateInterface
+     */
+    private $routerState;
+
+    /**
      * @var ViewInterface
      */
     private $view;
 
     /**
-     * @var ViewStateInterface|null
+     * @var PageViewStateInterface|null
      */
     private $viewState;
 
@@ -52,20 +62,36 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
      * @param ViewInterface $view
      * @param EvaluationContextInterface $parentContext
      * @param EnvironmentInterface $environment
-     * @param ViewStateInterface|null $viewState
+     * @param RouterStateInterface $routerState
+     * @param PageViewStateInterface|null $viewState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewInterface $view,
         EvaluationContextInterface $parentContext,
         EnvironmentInterface $environment,
-        ViewStateInterface $viewState = null
+        RouterStateInterface $routerState,
+        PageViewStateInterface $viewState = null
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
         $this->environment = $environment;
+        $this->routerState = $routerState;
         $this->view = $view;
         $this->viewState = $viewState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        // There are no more widgets in the tree to bubble to, so there's nothing to do
+        return $programState;
     }
 
     /**
@@ -90,12 +116,9 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     /**
      * {@inheritdoc}
      */
-    public function getChildOfCurrentCompoundWidget($childName)
+    public function getCompoundWidgetDefinitionContext()
     {
-        throw new LogicException(sprintf(
-            'Cannot fetch child "%s" from outside a compound widget',
-            $childName
-        ));
+        throw new LogicException('Cannot fetch compound widget definition context outside a compound widget');
     }
 
     /**
@@ -104,6 +127,16 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     public function getPath()
     {
         return [$this->view->getName()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteArgument($parameterName)
+    {
+        return $this->routerState
+            ->getRouteArgumentBag()
+            ->getStatic($parameterName);
     }
 
     /**

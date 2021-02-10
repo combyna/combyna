@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -92,7 +92,7 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The quotient is: 20.' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEditingTheDividendTextbox()
@@ -132,7 +132,7 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The quotient is: 4.' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEditingTheDivisorTextboxToBeZero()
@@ -172,6 +172,6 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The divisor is zero, so the quotient cannot be determined' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

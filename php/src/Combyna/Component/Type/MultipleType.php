@@ -11,9 +11,13 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
-use LogicException;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class MultipleType
@@ -30,11 +34,18 @@ class MultipleType implements TypeInterface
     private $subTypes;
 
     /**
-     * @param TypeInterface[] $subTypes
+     * @var ValidationContextInterface
      */
-    public function __construct(array $subTypes)
+    private $validationContext;
+
+    /**
+     * @param TypeInterface[] $subTypes
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct(array $subTypes, ValidationContextInterface $validationContext)
     {
         $this->subTypes = $subTypes;
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -58,6 +69,17 @@ class MultipleType implements TypeInterface
         }
 
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
+        return true;
     }
 
     /**
@@ -148,9 +170,66 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Check that at least one of our sub-types allows the valued type
+        foreach ($this->subTypes as $ourSubType) {
+            if ($ourSubType->allows($candidateType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        if ($nativeValue instanceof StaticInterface) {
+            if (!$this->allowsStatic($nativeValue)) {
+                throw new IncompatibleNativeForCoercionException(
+                    sprintf(
+                        'Static of type "%s" was given, expected a native or static of type "%s"',
+                        $nativeValue->getType(),
+                        $this->getSummary()
+                    )
+                );
+            }
+
+            // Already a static, but we still need to perform static coercion
+            // so that any incomplete statics may be completed
+            return $this->coerceStatic($nativeValue, $evaluationContext);
+        }
+
+        foreach ($this->subTypes as $subType) {
+            try {
+                return $subType->coerceNative(
+                    $nativeValue,
+                    $staticExpressionFactory,
+                    $bagFactory,
+                    $evaluationContext
+                );
+            } catch (IncompatibleNativeForCoercionException $exception) {
+                // Ignore the exception, try the next sub-type to see if it can coerce
+            }
+        }
+
+        // None of the sub-types could coerce
+        throw new IncompatibleNativeForCoercionException('No sub-types were able to coerce the value');
     }
 
     /**
@@ -160,23 +239,43 @@ class MultipleType implements TypeInterface
     {
         // Coerce to the first sub-type that allows the static in its current, potentially "incomplete" form
         foreach ($this->subTypes as $subType) {
-            if ($subType->allowsStatic($static)) {
+            try {
                 return $subType->coerceStatic($static, $evaluationContext);
+            } catch (IncompatibleStaticForCoercionException $exception) {
+                // Ignore and try the next sub-type
             }
         }
 
-        throw new LogicException(sprintf(
+        throw new IncompatibleStaticForCoercionException(sprintf(
             'No sub-type allows the given static of type "%s"',
             $static->getType()
         ));
     }
 
     /**
+     * Fetches all sub-types of this multiple one
+     *
+     * @return TypeInterface[]
+     */
+    public function getSubTypes()
+    {
+        return $this->subTypes;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true; // Special "any" type allows any other type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsMultipleType($this, $this->subTypes);
     }
 
     /**
@@ -214,6 +313,14 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsMultipleType($this, $this->subTypes);
@@ -236,6 +343,45 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getSummaryWithValue()
+    {
+        $parts = [];
+
+        foreach ($this->subTypes as $subType) {
+            $parts[] = $subType->getSummaryWithValue(); // Same as ->getSummary(), but with values
+        }
+
+        return implode('|', $parts);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationContext()
+    {
+        return $this->validationContext;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        foreach ($this->subTypes as $subType) {
+            if ($subType->hasValue()) {
+                // If any sub-type (or descendant of one, like an attribute of a structure type)
+                // has a value, then treat the whole group as storing value information
+                // so that it may be displayed
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWith(TypeInterface $otherType)
     {
         return $otherType->whenMergedWithMultipleType($this);
@@ -246,7 +392,18 @@ class MultipleType implements TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType)
     {
-        return new MultipleType(array_merge($this->subTypes, [$otherType]));
+        return new MultipleType(array_merge($this->subTypes, [$otherType]), $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        $combinedSubTypes = $this->subTypes;
+        $combinedSubTypes[] = $otherType;
+
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -256,7 +413,7 @@ class MultipleType implements TypeInterface
     {
         $combinedSubTypes = array_merge($this->subTypes, $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -267,7 +424,7 @@ class MultipleType implements TypeInterface
         $combinedSubTypes = $this->subTypes;
         $combinedSubTypes[] = $otherType;
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -278,7 +435,7 @@ class MultipleType implements TypeInterface
         $combinedSubTypes = $this->subTypes;
         $combinedSubTypes[] = $otherType;
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -289,7 +446,7 @@ class MultipleType implements TypeInterface
         $combinedSubTypes = $this->subTypes;
         $combinedSubTypes[] = $otherType;
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -300,7 +457,18 @@ class MultipleType implements TypeInterface
         $combinedSubTypes = $this->subTypes;
         $combinedSubTypes[] = $unresolvedType;
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        $combinedSubTypes = $this->subTypes;
+        $combinedSubTypes[] = $otherType;
+
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -317,6 +485,14 @@ class MultipleType implements TypeInterface
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
     }
 
     /**
@@ -355,6 +531,14 @@ class MultipleType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithMultipleType($this, $this->subTypes);
     }

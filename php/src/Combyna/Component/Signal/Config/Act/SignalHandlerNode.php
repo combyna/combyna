@@ -18,8 +18,7 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Instruction\Config\Act\InstructionNodeInterface;
 use Combyna\Component\Signal\Validation\Context\Specifier\SignalHandlerContextSpecifier;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class SignalHandlerNode
@@ -78,7 +77,7 @@ class SignalHandlerNode extends AbstractActNode
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->guardExpressionNode,
-                    new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                    new StaticTypeDeterminer(BooleanExpression::class),
                     'guard'
                 )
             );

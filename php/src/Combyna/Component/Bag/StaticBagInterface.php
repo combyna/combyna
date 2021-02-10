@@ -21,8 +21,16 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface StaticBagInterface
+interface StaticBagInterface extends StaticProviderBagInterface
 {
+    /**
+     * Determines whether this static bag is equivalent to the given other static bag
+     *
+     * @param StaticBagInterface $otherStaticBag
+     * @return bool
+     */
+    public function equals(StaticBagInterface $otherStaticBag);
+
     /**
      * Fetches the specified static from this bag
      *

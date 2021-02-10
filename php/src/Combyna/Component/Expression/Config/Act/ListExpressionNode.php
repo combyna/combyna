@@ -14,6 +14,7 @@ namespace Combyna\Component\Expression\Config\Act;
 use Combyna\Component\Bag\Config\Act\ExpressionListNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\ListExpression;
+use Combyna\Component\Validator\Type\ListExpressionTypeDeterminer;
 use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
 
 /**
@@ -59,10 +60,20 @@ class ListExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * Fetches a type determiner for this list, excluding any value information
+     *
+     * @return StaticListTypeDeterminer
+     */
+    public function getImpureResultTypeDeterminer()
+    {
+        return new StaticListTypeDeterminer($this->expressionList->getElementResultTypeDeterminer());
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getResultTypeDeterminer()
     {
-        return new StaticListTypeDeterminer($this->expressionList->getElementResultTypeDeterminer());
+        return new ListExpressionTypeDeterminer($this);
     }
 }

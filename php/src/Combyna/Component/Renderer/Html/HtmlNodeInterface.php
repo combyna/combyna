@@ -33,7 +33,9 @@ interface HtmlNodeInterface
     public function toHtml();
 
     /**
-     * Returns an array
+     * Returns an array representation of this node's root-level element(s).
+     * If this node only contains one child then it should still be wrapped in a one-element array,
+     * eg. `[['type' => 'some-type']]`
      *
      * @return array
      */

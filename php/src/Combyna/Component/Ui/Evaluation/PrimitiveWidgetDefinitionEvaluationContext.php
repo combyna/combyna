@@ -11,11 +11,15 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class PrimitiveWidgetDefinitionEvaluationContext
@@ -73,17 +77,37 @@ class PrimitiveWidgetDefinitionEvaluationContext extends AbstractEvaluationConte
     /**
      * {@inheritdoc}
      */
-    public function createSubStoreContext(UiStoreStateInterface $storeState)
-    {
-        throw new \BadMethodCallException('Not implemented');
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        if ($this->widget === $initialWidget) {
+            // We've gone no further up the tree yet - bubble again, as evaluation contexts
+            // can span between a compound widget's root widget and the compound defined widget
+            return $this->parentContext->bubbleEventToParent(
+                $programState,
+                $program,
+                $event,
+                $initialWidget
+            );
+        }
+
+        return $this->widget->dispatchEvent(
+            $programState,
+            $program,
+            $event,
+            $this
+        );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getChildOfCurrentCompoundWidget($childName)
+    public function createSubStoreContext(UiStoreStateInterface $storeState)
     {
-        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
+        throw new \BadMethodCallException('Not implemented');
     }
 
     /**
@@ -109,7 +133,7 @@ class PrimitiveWidgetDefinitionEvaluationContext extends AbstractEvaluationConte
      */
     public function getWidgetAttribute($attributeName)
     {
-        return $this->widget->getAttribute($attributeName, $this);
+        return $this->widget->getAttribute($attributeName, $this->parentContext);
     }
 
     /**

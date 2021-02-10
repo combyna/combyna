@@ -16,8 +16,7 @@ use Combyna\Component\Expression\DayExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDayExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class DayExpressionNode
@@ -72,21 +71,21 @@ class DayExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->yearExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'year'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->monthExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'month'
             )
         );
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->dayExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'day'
             )
         );
@@ -127,6 +126,6 @@ class DayExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(StaticDayExpression::class));
+        return new StaticTypeDeterminer(StaticDayExpression::class);
     }
 }

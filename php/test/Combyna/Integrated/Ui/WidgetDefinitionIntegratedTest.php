@@ -14,8 +14,8 @@ namespace Combyna\Integrated\Ui;
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\HtmlElement;
-use Combyna\Component\Renderer\Html\HtmlNodeInterface;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\TextNode;
@@ -24,7 +24,7 @@ use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -91,7 +91,7 @@ class WidgetDefinitionIntegratedTest extends TestCase
                 }
 
                 /**
-                 * @return string
+                 * {@inheritdoc}
                  */
                 public function getWidgetDefinitionLibraryName()
                 {
@@ -99,7 +99,7 @@ class WidgetDefinitionIntegratedTest extends TestCase
                 }
 
                 /**
-                 * @return string
+                 * {@inheritdoc}
                  */
                 public function getWidgetDefinitionName()
                 {
@@ -107,12 +107,13 @@ class WidgetDefinitionIntegratedTest extends TestCase
                 }
 
                 /**
-                 * @param WidgetStateInterface $widgetState
-                 * @param WidgetStatePathInterface $widgetStatePath
-                 * @return HtmlNodeInterface
+                 * {@inheritdoc}
                  */
-                public function renderWidget(WidgetStateInterface $widgetState, WidgetStatePathInterface $widgetStatePath)
-                {
+                public function renderWidget(
+                    WidgetStateInterface $widgetState,
+                    WidgetStatePathInterface $widgetStatePath,
+                    ProgramInterface $program
+                ) {
                     if (!$widgetState instanceof DefinedWidgetStateInterface) {
                         throw new InvalidArgumentException('Wrong type of widget state');
                     }
@@ -120,7 +121,8 @@ class WidgetDefinitionIntegratedTest extends TestCase
                     $childNodes = [
                         new TextNode('Label :: ' . $widgetState->getAttribute('primitives_label')->toNative()),
                         $this->delegatingWidgetRenderer->renderWidget(
-                            $widgetStatePath->getChildStatePath('primitives_child')
+                            $widgetStatePath->getChildStatePath('primitives_child'),
+                            $program
                         )
                     ];
                     $htmlAttributes = [];
@@ -160,6 +162,6 @@ class WidgetDefinitionIntegratedTest extends TestCase
                 '</section>' .
             "\n" .
             '</div>';
-        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

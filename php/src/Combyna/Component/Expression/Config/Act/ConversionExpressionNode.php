@@ -16,9 +16,8 @@ use Combyna\Component\Expression\ConversionExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\UnresolvedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -79,7 +78,7 @@ class ConversionExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->expressionNode,
-                new PresolvedTypeDeterminer(new StaticType($allowedInputType)),
+                new StaticTypeDeterminer($allowedInputType),
                 'expression'
             )
         );
@@ -112,16 +111,14 @@ class ConversionExpressionNode extends AbstractExpressionNode
     {
         switch ($this->conversion) {
             case ConversionExpression::NUMBER_TO_TEXT:
-                return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
+                return new StaticTypeDeterminer(TextExpression::class);
             case ConversionExpression::TEXT_TO_NUMBER:
-                return new PresolvedTypeDeterminer(new StaticType(NumberExpression::class));
+                return new StaticTypeDeterminer(NumberExpression::class);
             default:
-                return new PresolvedTypeDeterminer(
-                    new UnresolvedType(
-                        sprintf(
-                            'Invalid conversion "%s" provided',
-                            $this->conversion
-                        )
+                return new UnresolvedTypeDeterminer(
+                    sprintf(
+                        'Invalid conversion "%s" provided',
+                        $this->conversion
                     )
                 );
         }

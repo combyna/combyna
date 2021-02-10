@@ -9,31 +9,67 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Harness;
+namespace Combyna\Test\Harness;
 
 use Combyna\CombynaBootstrap;
 use Combyna\CombynaBootstrapInterface;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Component\Framework\Bootstrap\BootstrapConfigInterface;
+use Combyna\Component\Plugin\PluginInterface;
 use Combyna\Plugin\Gui\GuiPlugin;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 
 /**
  * Class TestCombynaBootstrap
+ *
+ * Bootstraps a test framework with the provided plugins
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
 class TestCombynaBootstrap implements CombynaBootstrapInterface
 {
     /**
-     * @var CombynaBootstrap
+     * @var CombynaBootstrapInterface
      */
     private $combynaBootstrap;
 
-    public function __construct()
+    /**
+     * @param PluginInterface[] $plugins
+     */
+    public function __construct(array $plugins = [])
     {
-        $this->combynaBootstrap = new CombynaBootstrap([
-            // Install the basic GUI plugin for integrated tests to use
-            new GuiPlugin()
-        ]);
+        $hasGuiPlugin = false;
+
+        foreach ($plugins as $plugin) {
+            if ($plugin instanceof GuiPlugin) {
+                $hasGuiPlugin = true;
+            }
+        }
+
+        if (!$hasGuiPlugin) {
+            // Install the basic GUI plugin for integrated tests to use if not present
+            $plugins[] = new GuiPlugin();
+        }
+
+        $this->combynaBootstrap = new CombynaBootstrap($plugins);
+    }
+
+    /**
+     * Creates a new TestCombynaBootstrap from the provided BootstrapConfig
+     *
+     * @param BootstrapConfigInterface $bootstrapConfig
+     * @param PluginInterface[] $additionalPlugins
+     * @return self
+     */
+    public static function fromBootstrapConfig(
+        BootstrapConfigInterface $bootstrapConfig,
+        array $additionalPlugins = []
+    ) {
+        return new self(
+            array_merge(
+                $bootstrapConfig->getPlugins(),
+                $additionalPlugins
+            )
+        );
     }
 
     /**

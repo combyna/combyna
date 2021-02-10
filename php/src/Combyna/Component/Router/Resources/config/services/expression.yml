@@ -1,0 +1,4 @@
+services:
+    combyna.router.expression.factory:
+        class: Combyna\Component\Router\Expression\RouterExpressionFactory
+        autowire: true

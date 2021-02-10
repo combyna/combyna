@@ -140,6 +140,14 @@ class DeterminedFixedStaticBagModelNode extends AbstractActNode implements Deter
     /**
      * {@inheritdoc}
      */
+    public function getStaticDefinitionType($definitionName)
+    {
+        return $this->staticDefinitionNodes[$definitionName]->getResolvedStaticType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSummary()
     {
         $staticDefinitionSummaries = [];
@@ -153,6 +161,48 @@ class DeterminedFixedStaticBagModelNode extends AbstractActNode implements Deter
         }
 
         return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        $staticDefinitionSummaries = [];
+
+        foreach ($this->staticDefinitionNodes as $staticDefinitionNode) {
+            $staticDefinitionSummaries[] = sprintf(
+                '%s: %s',
+                $staticDefinitionNode->getName(),
+                $staticDefinitionNode->getStaticTypeSummaryWithValue() // As above, but including value info
+            );
+        }
+
+        return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        foreach ($this->staticDefinitionNodes as $staticDefinitionNode) {
+            if ($staticDefinitionNode->staticTypeHasValue()) {
+                // If the type of any definition in the model contains value information,
+                // treat the whole model as having it so it can be displayed if needed
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        return empty($this->staticDefinitionNodes);
     }
 
     /**

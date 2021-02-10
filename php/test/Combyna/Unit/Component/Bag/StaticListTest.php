@@ -12,6 +12,7 @@
 namespace Combyna\Unit\Component\Bag;
 
 use Combyna\Component\Bag\BagFactory;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Bag\StaticList;
 use Combyna\Component\Expression\BooleanExpression;
@@ -25,6 +26,7 @@ use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use OutOfBoundsException;
@@ -56,7 +58,8 @@ class StaticListTest extends TestCase
     public function setUp()
     {
         $this->staticExpressionFactory = new StaticExpressionFactory();
-        $this->bagFactory = new BagFactory($this->staticExpressionFactory);
+        $bagEvaluationContextFactory = $this->prophesize(BagEvaluationContextFactoryInterface::class);
+        $this->bagFactory = new BagFactory($this->staticExpressionFactory, $bagEvaluationContextFactory->reveal());
 
         $this->staticList = new StaticList(
             $this->bagFactory,
@@ -81,27 +84,36 @@ class StaticListTest extends TestCase
 
     public function testElementsMatchReturnsTrueForATypeThatMatchesAllTheElements()
     {
-        $type = new MultipleType([
-            new StaticType(TextExpression::class),
-            new StaticType(NumberExpression::class)
-        ]);
+        $validationContext = $this->prophesize(ValidationContextInterface::class);
+        $type = new MultipleType(
+            [
+                new StaticType(TextExpression::class, $validationContext->reveal()),
+                new StaticType(NumberExpression::class, $validationContext->reveal())
+            ],
+            $validationContext->reveal()
+        );
 
         self::assertTrue($this->staticList->elementsMatch($type));
     }
 
     public function testElementsMatchReturnsFalseForATypeThatMatchesNoneOfTheElements()
     {
-        $type = new StaticType(BooleanExpression::class);
+        $validationContext = $this->prophesize(ValidationContextInterface::class);
+        $type = new StaticType(BooleanExpression::class, $validationContext->reveal());
 
         self::assertFalse($this->staticList->elementsMatch($type));
     }
 
     public function testElementsMatchReturnsFalseForATypeThatMatchesOnlySomeOfTheElements()
     {
-        $type = new MultipleType([
-            new StaticType(TextExpression::class),
-            new StaticType(BooleanExpression::class)
-        ]);
+        $validationContext = $this->prophesize(ValidationContextInterface::class);
+        $type = new MultipleType(
+            [
+                new StaticType(TextExpression::class, $validationContext->reveal()),
+                new StaticType(BooleanExpression::class, $validationContext->reveal())
+            ],
+            $validationContext->reveal()
+        );
 
         self::assertFalse($this->staticList->elementsMatch($type));
     }

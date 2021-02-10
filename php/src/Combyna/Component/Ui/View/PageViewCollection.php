@@ -53,7 +53,7 @@ class PageViewCollection implements PageViewCollectionInterface
     {
         $pageViewName = $routerState->getRoutePageViewName();
 
-        return $this->views[$pageViewName]->createInitialState($evaluationContext);
+        return $this->views[$pageViewName]->createInitialState($routerState, $evaluationContext);
     }
 
     /**

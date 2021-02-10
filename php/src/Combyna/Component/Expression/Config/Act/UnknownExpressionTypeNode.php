@@ -12,9 +12,8 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class UnknownExpressionTypeNode
@@ -57,6 +56,6 @@ class UnknownExpressionTypeNode extends AbstractExpressionNode
     {
         $type = $this->type !== null ? $this->type : '[missing]';
 
-        return new PresolvedTypeDeterminer(new UnresolvedType('Expression type "' . $type . '"'));
+        return new UnresolvedTypeDeterminer('Expression type "' . $type . '"');
     }
 }

@@ -15,7 +15,6 @@ use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
-use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 
 /**
  * Interface WidgetDefinitionFactoryInterface
@@ -52,7 +51,6 @@ interface WidgetDefinitionFactoryInterface
      * @param string $name
      * @param FixedStaticBagModelInterface $attributeBagModel
      * @param FixedStaticBagModelInterface $valueBagModel
-     * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param array $valueNameToProviderCallableMap
      * @return PrimitiveWidgetDefinition
      */
@@ -62,7 +60,6 @@ interface WidgetDefinitionFactoryInterface
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
         FixedStaticBagModelInterface $valueBagModel,
-        StaticExpressionFactoryInterface $staticExpressionFactory,
         array $valueNameToProviderCallableMap
     );
 

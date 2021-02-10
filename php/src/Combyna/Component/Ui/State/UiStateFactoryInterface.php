@@ -12,6 +12,8 @@
 namespace Combyna\Component\Ui\State;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\State\Store\NullViewStoreStateInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\ViewStateInterface;
@@ -119,6 +121,7 @@ interface UiStateFactoryInterface
      * Creates a PageViewState
      *
      * @param PageViewInterface $view
+     * @param RouterStateInterface $routerState
      * @param ViewStoreStateInterface $storeState
      * @param WidgetStateInterface $renderedRootWidget
      * @param StaticBagInterface $viewAttributeStaticBag
@@ -126,6 +129,7 @@ interface UiStateFactoryInterface
      */
     public function createPageViewState(
         PageViewInterface $view,
+        RouterStateInterface $routerState,
         ViewStoreStateInterface $storeState,
         WidgetStateInterface $renderedRootWidget,
         StaticBagInterface $viewAttributeStaticBag
@@ -136,12 +140,14 @@ interface UiStateFactoryInterface
      *
      * @param string|int $name
      * @param RepeaterWidgetInterface $repeaterWidget
+     * @param StaticInterface[] $itemStatics
      * @param array $repeatedWidgetStates
      * @return RepeaterWidgetStateInterface
      */
     public function createRepeaterWidgetState(
         $name,
         RepeaterWidgetInterface $repeaterWidget,
+        array $itemStatics,
         array $repeatedWidgetStates
     );
 

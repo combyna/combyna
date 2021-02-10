@@ -13,7 +13,7 @@ namespace Combyna\Component\Type\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Type\AnyType;
-use Combyna\Component\Type\MultipleType;
+use Combyna\Component\Type\ExoticType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Type\UnresolvedType;
@@ -46,7 +46,7 @@ class BasicTypePromoter implements TypeTypePromoterInterface
     {
         return [
             AnyType::class => [$this, 'promoteType'],
-            MultipleType::class => [$this, 'promoteType'],
+            ExoticType::class => [$this, 'promoteType'],
             StaticType::class => [$this, 'promoteType'],
             UnresolvedType::class => [$this, 'promoteType'],
             VoidType::class => [$this, 'promoteType']

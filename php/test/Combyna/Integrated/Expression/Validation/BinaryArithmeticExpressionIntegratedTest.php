@@ -14,6 +14,7 @@ namespace Combyna\Integrated\Expression\Validation;
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\App\Config\Act\HomeNode;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
@@ -21,7 +22,10 @@ use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\Config\Act\TextExpressionNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionTypeNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
+use Combyna\Component\Router\Config\Act\RouteNode;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Ui\Config\Act\PageViewNode;
+use Combyna\Component\Ui\Config\Act\WidgetGroupNode;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -63,9 +67,29 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             $this->environmentNode,
             [],
             [],
-            [],
+            [
+                new RouteNode(
+                    'home',
+                    '/',
+                    new FixedStaticBagModelNode([]),
+                    'home_view'
+                )
+            ],
             new HomeNode('app', 'home', new ExpressionBagNode([])),
-            [],
+            [
+                new PageViewNode(
+                    'home_view',
+                    new TextExpressionNode('My home view'),
+                    'My home view',
+                    new FixedStaticBagModelNode([]),
+                    new WidgetGroupNode(
+                        [],
+                        new FixedStaticBagModelNode([]),
+                        new ExpressionBagNode([]),
+                        'root'
+                    )
+                )
+            ],
             []
         );
         $this->nodeValidator = $this->container->get('combyna.program.node_validator');

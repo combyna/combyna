@@ -12,10 +12,10 @@
 namespace Combyna\Component\Expression\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
 use Combyna\Component\Signal\SignalInterface;
 
@@ -65,12 +65,19 @@ interface EvaluationContextFactoryInterface
     );
 
     /**
+     * Creates a new NullRootEvaluationContext
+     *
+     * @return NullRootEvaluationContext
+     */
+    public function createNullRootContext();
+
+    /**
      * Creates a new RootEvaluationContext
      *
-     * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      * @return RootEvaluationContext
      */
-    public function createRootContext(EnvironmentInterface $environment);
+    public function createRootContext(ResourceRepositoryInterface $resourceRepository);
 
     /**
      * Creates a new ScopeEvaluationContext
@@ -97,6 +104,13 @@ interface EvaluationContextFactoryInterface
         EvaluationContextInterface $parentContext,
         SignalInterface $signal
     );
+
+    /**
+     * Fetches a map from state type (eg. "assured") to its factory method, for a state that acts as a parent
+     *
+     * @return callable[]
+     */
+    public function getParentStateTypeToContextFactoryMap();
 
     /**
      * Fetches a map from state type (eg. "assured") to its factory method

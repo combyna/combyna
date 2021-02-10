@@ -15,6 +15,7 @@ use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Type\StaticStructureType;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Type\ValuedType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
@@ -55,12 +56,19 @@ class StructureAttributeTypeDeterminer extends AbstractTypeDeterminer
     {
         $structureType = $validationContext->getExpressionResultType($this->structureExpressionNode);
 
+        if ($structureType instanceof ValuedType) {
+            $structureType = $structureType->getWrappedType();
+        }
+
         if ($structureType instanceof StaticStructureType) {
             return $structureType->getAttributeType($this->attributeName);
         }
 
         // Determiner does not resolve to a structure, so we cannot fetch a type for one of its attributes
-        return new UnresolvedType(sprintf('structure attribute "%s" type', $this->attributeName));
+        return new UnresolvedType(
+            sprintf('structure attribute "%s" type', $this->attributeName),
+            $validationContext
+        );
     }
 
     /**

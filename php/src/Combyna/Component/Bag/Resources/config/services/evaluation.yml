@@ -1,0 +1,7 @@
+services:
+    combyna.bag.evaluation_context_factory:
+        class: Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactory
+        autowire: true
+        # Ensure autowiring picks the BagEvaluationContextFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface

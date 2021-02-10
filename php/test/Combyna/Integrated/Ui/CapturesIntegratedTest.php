@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -101,7 +101,7 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEnteringSomeTextInThePhoneNumberTextbox()
@@ -147,7 +147,7 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEnteringSomeTextInTheSecondRepeatedMultiplierTextbox()
@@ -195,6 +195,6 @@ class CapturesIntegratedTest extends TestCase
                 'I am always present, so will set the capture' . // Present capture setter widget
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

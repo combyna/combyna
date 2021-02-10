@@ -12,6 +12,7 @@
 namespace Combyna\Component\Renderer\Html;
 
 use Combyna\Component\App\State\AppStateInterface;
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
@@ -46,9 +47,10 @@ class ArrayRenderer
      * Renders the specified app state's visible views to an array structure
      *
      * @param AppStateInterface $appState
+     * @param ProgramInterface $program
      * @return array
      */
-    public function renderViews(AppStateInterface $appState)
+    public function renderViews(AppStateInterface $appState, ProgramInterface $program)
     {
         $viewsData = [];
 
@@ -59,7 +61,7 @@ class ArrayRenderer
                 $viewState,
                 $viewState->getRootWidgetState()
             ]);
-            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath);
+            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath, $program);
 
             $viewsData[] = [
                 'type' => $viewState->getType(),

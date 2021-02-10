@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Router;
 
+use Combyna\Component\Common\Exception\NotFoundException;
+
 /**
  * Interface RouteRepositoryInterface
  *
@@ -24,6 +26,7 @@ interface RouteRepositoryInterface
      * @param string $libraryName
      * @param string $routeName
      * @return RouteInterface
+     * @throws NotFoundException
      */
     public function getByName($libraryName, $routeName);
 }

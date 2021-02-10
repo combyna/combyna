@@ -48,7 +48,7 @@ class MultipleTypeDeterminer extends AbstractTypeDeterminer
             return $subTypeDeterminer->determine($validationContext);
         }, $this->subTypeDeterminers);
 
-        return new MultipleType($subTypes);
+        return new MultipleType($subTypes, $validationContext);
     }
 
     /**

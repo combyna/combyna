@@ -15,7 +15,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Combyna\Integrated\Fixtures\TestGuiWidgetProviders;
+use Combyna\Test\Ui\TestGuiWidgetProviders;
 use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -114,7 +114,7 @@ class CaptureValidationIntegratedTest extends TestCase
             // Test that the type of a capture defined outside but set inside a conditional or repeater
             // must allow a `list<...>` type for a repeater and `...|nothing` for a (nested) conditional
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[repeater:8].[scope].[conditional:repeated].[text-widget]' .
-            ' - Capture "a_capture_that_is_set_inside_repeater_then_conditional_but_wrong_type" is defined with type "number", but is expected to be "list<text|nothing>"'
+            ' - Capture "a_capture_that_is_set_inside_repeater_then_conditional_but_wrong_type" would get [list<text|nothing>], expects [number]'
         );
 
         $this->combyna->createApp($this->appConfig, $this->environment);

@@ -12,8 +12,13 @@
 namespace Combyna\Component\Bag;
 
 use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticBagModelInterface;
+use Combyna\Component\Bag\Exception\StaticIsRequiredException;
+use Combyna\Component\Bag\Expression\Evaluation\BagEvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
 use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use LogicException;
 
@@ -27,6 +32,11 @@ use LogicException;
 class FixedStaticBagModel implements FixedStaticBagModelInterface
 {
     /**
+     * @var BagEvaluationContextFactoryInterface
+     */
+    private $bagEvaluationContextFactory;
+
+    /**
      * @var BagFactoryInterface
      */
     private $bagFactory;
@@ -37,17 +47,30 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     private $staticDefinitions = [];
 
     /**
+     * @var StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
+    /**
      * @param BagFactoryInterface $bagFactory
+     * @param StaticExpressionFactoryInterface $staticExpressionFactory
+     * @param BagEvaluationContextFactoryInterface $bagEvaluationContextFactory
      * @param FixedStaticDefinitionInterface[] $staticDefinitions
      */
-    public function __construct(BagFactoryInterface $bagFactory, array $staticDefinitions)
-    {
+    public function __construct(
+        BagFactoryInterface $bagFactory,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagEvaluationContextFactoryInterface $bagEvaluationContextFactory,
+        array $staticDefinitions
+    ) {
         // Index definitions by name to simplify lookups
         foreach ($staticDefinitions as $staticDefinition) {
             $this->staticDefinitions[$staticDefinition->getName()] = $staticDefinition;
         }
 
+        $this->bagEvaluationContextFactory = $bagEvaluationContextFactory;
         $this->bagFactory = $bagFactory;
+        $this->staticExpressionFactory = $staticExpressionFactory;
     }
 
     /**
@@ -135,13 +158,63 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
     /**
      * {@inheritdoc}
      */
-    public function coerceStatic($name, EvaluationContextInterface $evaluationContext, StaticInterface $static = null)
-    {
+    public function coerceNativeArrayToBag(
+        array $nativeValues,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        $coercionEvaluationContext = $this->bagEvaluationContextFactory->createNativeBagCoercionEvaluationContext(
+            $this->bagFactory,
+            $evaluationContext,
+            $this,
+            $nativeValues
+        );
+        $coercedStatics = [];
+
+        foreach ($this->staticDefinitions as $name => $staticDefinition) {
+            if (array_key_exists($name, $nativeValues)) {
+                $coercedStatics[$name] = $staticDefinition->getStaticType()->coerceNative(
+                    $nativeValues[$name],
+                    $this->staticExpressionFactory,
+                    $this->bagFactory,
+                    $coercionEvaluationContext
+                );
+            } else {
+                try {
+                    $coercedStatics[$name] = $staticDefinition->getDefaultStatic($coercionEvaluationContext);
+                } catch (StaticIsRequiredException $exception) {
+                    throw new IncompatibleNativeForCoercionException(sprintf(
+                        'Native value for required static "%s" is missing from array',
+                        $name
+                    ));
+                }
+            }
+        }
+
+        return $this->bagFactory->createStaticBag($coercedStatics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(
+        $name,
+        EvaluationContextInterface $evaluationContext,
+        StaticProviderBagInterface $sourceStaticProviderBag,
+        StaticInterface $static = null
+    ) {
         if (!$this->definesStatic($name)) {
             throw new LogicException(sprintf('Bag model does not define static %s', $name));
         }
 
-        return $this->staticDefinitions[$name]->coerceStatic($evaluationContext, $static);
+        $coercionEvaluationContext = $this->bagEvaluationContextFactory->createStaticCoercionEvaluationContext(
+            $this->bagFactory,
+            $evaluationContext,
+            $this,
+            $sourceStaticProviderBag,
+            $static
+        );
+
+        return $this->staticDefinitions[$name]->coerceStatic($coercionEvaluationContext, $static);
     }
 
     /**
@@ -149,12 +222,30 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
      */
     public function coerceStaticBag(StaticBagInterface $staticBag, EvaluationContextInterface $evaluationContext)
     {
+        $coercionEvaluationContext = $this->bagEvaluationContextFactory->createStaticBagCoercionEvaluationContext(
+            $this->bagFactory,
+            $evaluationContext,
+            $this,
+            $staticBag
+        );
         $coercedStatics = [];
 
         foreach ($this->staticDefinitions as $name => $staticDefinition) {
-            $coercedStatics[$name] = $staticBag->hasStatic($name) ?
-                $staticDefinition->coerceStatic($evaluationContext, $staticBag->getStatic($name)) :
-                $staticDefinition->getDefaultStatic($evaluationContext);
+            if ($staticBag->hasStatic($name)) {
+                $coercedStatics[$name] = $staticDefinition->coerceStatic(
+                    $coercionEvaluationContext,
+                    $staticBag->getStatic($name)
+                );
+            } else {
+                try {
+                    $coercedStatics[$name] = $staticDefinition->getDefaultStatic($coercionEvaluationContext);
+                } catch (StaticIsRequiredException $exception) {
+                    throw new IncompatibleStaticForCoercionException(sprintf(
+                        'Required static "%s" is missing from bag',
+                        $name
+                    ));
+                }
+            }
         }
 
         return $staticBag->withStatics($coercedStatics);
@@ -174,6 +265,7 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
             $statics[$staticDefinition->getName()] = $this->coerceStatic(
                 $staticDefinition->getName(),
                 $defaultsEvaluationContext,
+                $expressionBag,
                 $expressionBag->hasExpression($staticDefinition->getName()) ?
                     $expressionBag->getExpression($staticDefinition->getName())->toStatic($explicitEvaluationContext) :
                     null
@@ -310,5 +402,39 @@ class FixedStaticBagModel implements FixedStaticBagModelInterface
         }
 
         return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummaryWithValue()
+    {
+        $staticDefinitionSummaries = [];
+
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            $staticDefinitionSummaries[] = sprintf(
+                '%s: %s',
+                $staticDefinition->getName(),
+                $staticDefinition->getStaticTypeSummaryWithValue() // As above, but including value info
+            );
+        }
+
+        return sprintf('{%s}', implode(', ', $staticDefinitionSummaries));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        foreach ($this->staticDefinitions as $staticDefinition) {
+            if ($staticDefinition->staticTypeHasValue()) {
+                // If the type of any definition in the model contains value information,
+                // treat the whole model as having it so it can be displayed if needed
+                return true;
+            }
+        }
+
+        return false;
     }
 }

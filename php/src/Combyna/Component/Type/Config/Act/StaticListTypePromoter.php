@@ -12,6 +12,7 @@
 namespace Combyna\Component\Type\Config\Act;
 
 use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Validator\Context\NullValidationContext;
 
 /**
  * Class StaticListTypePromoter
@@ -57,7 +58,7 @@ class StaticListTypePromoter implements TypeTypePromoterInterface
         // Create a new list type with the promoted element type if it needed to be promoted,
         // otherwise just return the original one unchanged
         return $promotedElementType !== $elementType ?
-            new StaticListType($promotedElementType) :
+            new StaticListType($promotedElementType, new NullValidationContext()) :
             $type;
     }
 }

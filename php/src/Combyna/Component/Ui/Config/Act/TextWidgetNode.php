@@ -20,10 +20,9 @@ use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureDefinitionsSpecModifier;
 use Combyna\Component\Ui\Validation\Constraint\ValidCaptureSetsSpecModifier;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class TextWidgetNode
@@ -155,7 +154,7 @@ class TextWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->textExpressionNode,
-                new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                new StaticTypeDeterminer(TextExpression::class),
                 'text'
             )
         );
@@ -167,7 +166,7 @@ class TextWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
             $specBuilder->addConstraint(
                 new ResultTypeConstraint(
                     $this->visibilityExpressionNode,
-                    new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                    new StaticTypeDeterminer(BooleanExpression::class),
                     'visibility'
                 )
             );

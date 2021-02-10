@@ -27,7 +27,6 @@ use Combyna\Component\Instruction\Config\Act\UnknownInstructionNode;
 use Combyna\Component\Program\Validation\Validator\NodeValidator;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNode;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
-use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Ui\Config\Act\ChildWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
@@ -35,7 +34,7 @@ use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -72,9 +71,10 @@ class EnvironmentValidationIntegratedTest extends TestCase
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
         $this->container = $combynaBootstrap->createContainer();
 
+        $bagEvaluationContextFactory = $this->container->get('combyna.bag.evaluation_context_factory');
         $staticExpressionFactory = $this->container->get('combyna.expression.static_factory');
         $this->validationFactory = $this->container->get('combyna.validator.factory');
-        $this->bagFactory = new BagFactory($staticExpressionFactory);
+        $this->bagFactory = new BagFactory($staticExpressionFactory, $bagEvaluationContextFactory);
         $this->nodeValidator = $this->container->get('combyna.program.node_validator');
     }
 
@@ -92,19 +92,20 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-param',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid func param type'))
+                                new UnresolvedTypeDeterminer('invalid func param type')
                             )
                         ]),
-                        new PresolvedTypeDeterminer(new UnresolvedType('invalid func return type'))
+                        new UnresolvedTypeDeterminer('invalid func return type')
                     )
                 ],
                 [
                     new EventDefinitionNode(
+                        // TODO: Add library name as prop here
                         'my_event',
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-payload-static',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid event payload static type'))
+                                new UnresolvedTypeDeterminer('invalid event payload static type')
                             )
                         ])
                     )
@@ -116,7 +117,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-payload-static',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid signal payload static type'))
+                                new UnresolvedTypeDeterminer('invalid signal payload static type')
                             )
                         ])
                     )
@@ -128,13 +129,13 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-widget-attr',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
+                                new UnresolvedTypeDeterminer('invalid widget attr type')
                             )
                         ]),
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-widget-value',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget value type'))
+                                new UnresolvedTypeDeterminer('invalid widget value type')
                             )
                         ]),
                         [
@@ -153,7 +154,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
                                 'my-invalid-widget-attr',
-                                new PresolvedTypeDeterminer(new UnresolvedType('invalid widget attr type'))
+                                new UnresolvedTypeDeterminer('invalid widget attr type')
                             )
                         ]),
                         new ExpressionBagNode([
@@ -190,7 +191,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                                         'some_event'
                                     ),
                                     [
-                                        new UnknownInstructionNode('some_unknown_instruction')
+                                        new UnknownInstructionNode('Instruction is of unknown type "some_unknown_instruction"')
                                     ]
                                 )
                             ]

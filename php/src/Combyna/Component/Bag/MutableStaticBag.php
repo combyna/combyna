@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use InvalidArgumentException;
 
@@ -34,6 +35,43 @@ class MutableStaticBag implements MutableStaticBagInterface
     public function __construct(array $statics)
     {
         $this->statics = $statics;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function equals(StaticBagInterface $otherStaticBag)
+    {
+        if (count($otherStaticBag->getStaticNames()) !== count($this->statics)) {
+            // If the bags contain different numbers of statics, they are guaranteed to differ
+            return false;
+        }
+
+        foreach ($otherStaticBag->getStaticNames() as $staticName) {
+            $otherStatic = $otherStaticBag->getStatic($staticName);
+
+            if (!$this->hasStatic($staticName)) {
+                // If the other bag contains a static that this one doesn't, the entire bag differs
+                return false;
+            }
+
+            $ourStatic = $this->statics[$staticName];
+
+            if (!$otherStatic->equals($ourStatic)) {
+                // If any one static differs, the entire bag differs
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function evaluateStatic($staticName, EvaluationContextInterface $evaluationContext)
+    {
+        return $this->getStatic($staticName);
     }
 
     /**
@@ -65,6 +103,14 @@ class MutableStaticBag implements MutableStaticBagInterface
     public function hasStatic($name)
     {
         return array_key_exists($name, $this->statics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function providesStatic($staticName)
+    {
+        return $this->hasStatic($staticName);
     }
 
     /**

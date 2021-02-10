@@ -12,8 +12,9 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Expression\NumberValueInterface;
+use Combyna\Component\Expression\StaticValueInterface;
+use Combyna\Component\Validator\Type\StaticValuedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -23,7 +24,7 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NumberExpressionNode extends AbstractStaticExpressionNode
+class NumberExpressionNode extends AbstractStaticExpressionNode implements NumberValueInterface
 {
     const TYPE = NumberExpression::TYPE;
 
@@ -49,9 +50,26 @@ class NumberExpressionNode extends AbstractStaticExpressionNode
     /**
      * {@inheritdoc}
      */
+    public function equals(StaticValueInterface $otherValue)
+    {
+        return $otherValue instanceof NumberValueInterface &&
+            $otherValue->toNative() === $this->toNative();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(NumberExpression::class));
+        return new StaticValuedTypeDeterminer(NumberExpression::class, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSummary()
+    {
+        return $this->number;
     }
 
     /**

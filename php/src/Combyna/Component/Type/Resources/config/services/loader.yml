@@ -9,6 +9,12 @@ services:
         tags:
             - {name: combyna.type_loader}
 
+    combyna.type.loader.exotic:
+        class: Combyna\Component\Type\Config\Loader\ExoticTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}
+
     combyna.type.loader.multiple:
         class: Combyna\Component\Type\Config\Loader\MultipleTypeLoader
         autowire: true
@@ -29,6 +35,12 @@ services:
 
     combyna.type.loader.static:
         class: Combyna\Component\Type\Config\Loader\StaticTypeLoader
+        autowire: true
+        tags:
+            - {name: combyna.type_loader}
+
+    combyna.type.loader.valued:
+        class: Combyna\Component\Type\Config\Loader\ValuedTypeLoader
         autowire: true
         tags:
             - {name: combyna.type_loader}

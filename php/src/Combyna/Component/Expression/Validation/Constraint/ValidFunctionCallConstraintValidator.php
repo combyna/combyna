@@ -15,7 +15,6 @@ use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
 use Combyna\Component\Expression\Validation\Query\FunctionNodeQuery;
 use Combyna\Component\Validator\Constraint\ConstraintValidatorInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use LogicException;
 
 /**
  * Class ValidFunctionCallConstraintValidator
@@ -64,7 +63,14 @@ class ValidFunctionCallConstraintValidator implements ConstraintValidatorInterfa
         );
 
         if (!$functionNode instanceof FunctionNodeInterface) {
-            throw new LogicException(sprintf('Expected a function node, got "%s"', get_class($functionNode)));
+            $validationContext->addGenericViolation(
+                sprintf(
+                    'Expected a function node, got "%s"',
+                    get_class($functionNode)
+                )
+            );
+
+            return;
         }
 
         $functionNode->validateArgumentExpressionBag($validationContext, $constraint->getArgumentExpressionBag());

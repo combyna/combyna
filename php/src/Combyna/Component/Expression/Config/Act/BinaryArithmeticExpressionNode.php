@@ -17,11 +17,10 @@ use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\Validation\Constraint\AssuredConstraint;
 use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
 
 /**
  * Class BinaryArithmeticExpressionNode
@@ -76,7 +75,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->leftOperandExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'left operand'
             )
         );
@@ -133,7 +132,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
         $specBuilder->addConstraint(
             new ResultTypeConstraint(
                 $this->rightOperandExpression,
-                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                new StaticTypeDeterminer(NumberExpression::class),
                 'right operand'
             )
         );
@@ -164,7 +163,7 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
      */
     public function getResultTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(new StaticType(NumberExpression::class));
+        return new StaticTypeDeterminer(NumberExpression::class);
     }
 
     /**

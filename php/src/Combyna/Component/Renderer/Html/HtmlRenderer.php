@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Renderer\Html;
 
+use Combyna\Component\App\AppInterface;
 use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
@@ -46,9 +47,10 @@ class HtmlRenderer
      * Renders the specified rendered app to HTML
      *
      * @param AppStateInterface $appState
+     * @param AppInterface $app
      * @return string
      */
-    public function renderApp(AppStateInterface $appState)
+    public function renderApp(AppStateInterface $appState, AppInterface $app)
     {
         $viewsHtml = '';
 
@@ -60,7 +62,7 @@ class HtmlRenderer
                 $viewState,
                 $viewState->getRootWidgetState()
             ]);
-            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath);
+            $renderedRootWidget = $this->widgetRenderer->renderWidget($rootWidgetStatePath, $app->getProgram());
             $rootWidgetHtml = $renderedRootWidget->toHtml();
 
             $viewsHtml .= <<<HTML

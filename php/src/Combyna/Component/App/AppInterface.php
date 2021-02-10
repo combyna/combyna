@@ -11,8 +11,11 @@
 
 namespace Combyna\Component\App;
 
+use Combyna\Component\App\Exception\EventDispatchFailedException;
+use Combyna\Component\App\Exception\SignalDispatchFailedException;
 use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Expression\Evaluation\RootEvaluationContext;
+use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
@@ -49,7 +52,7 @@ interface AppInterface
      * @param string $eventName
      * @param array $payloadNatives
      * @return AppStateInterface
-     * @throws AppStateMismatchException
+     * @throws EventDispatchFailedException
      */
     public function dispatchEvent(
         AppStateInterface $appState,
@@ -71,6 +74,7 @@ interface AppInterface
      * @param string $signalName
      * @param array $payloadNatives
      * @return AppStateInterface
+     * @throws SignalDispatchFailedException
      */
     public function dispatchSignal(AppStateInterface $appState, $libraryName, $signalName, array $payloadNatives);
 
@@ -81,6 +85,13 @@ interface AppInterface
      * @return PageViewInterface
      */
     public function getPageViewByName($name);
+
+    /**
+     * Fetches the internal representation of the app
+     *
+     * @return ProgramInterface
+     */
+    public function getProgram();
 
     /**
      * Fetches the root evaluation context for the app

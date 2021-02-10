@@ -11,15 +11,20 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Interface TypeInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface TypeInterface
+interface TypeInterface extends CandidateTypeInterface
 {
     /**
      * Returns true if this type is equivalent to or is a supertype of the specified type, false otherwise
@@ -36,6 +41,14 @@ interface TypeInterface
      * @return bool
      */
     public function allowsAnyType(AnyType $candidateType);
+
+    /**
+     * Returns true if this type would allow the specified ExoticType, false otherwise
+     *
+     * @param ExoticType $candidateType
+     * @return bool
+     */
+    public function allowsExoticType(ExoticType $candidateType);
 
     /**
      * Returns true if this type allows all sub-types of the specified multiple type, false otherwise
@@ -81,6 +94,14 @@ interface TypeInterface
     public function allowsStaticType(StaticType $candidateType);
 
     /**
+     * Returns true if this type would allow the specified ValuedType, false otherwise
+     *
+     * @param ValuedType $candidateType
+     * @return bool
+     */
+    public function allowsValuedType(ValuedType $candidateType);
+
+    /**
      * Returns true if this type would allow a VoidType (currently only another VoidType), false otherwise
      *
      * @param VoidType $candidateType
@@ -89,11 +110,30 @@ interface TypeInterface
     public function allowsVoidType(VoidType $candidateType);
 
     /**
-     * Coerces the given, potentially "incomplete" static to a "complete" one for this type
+     * Coerces a native value for this type to a static, if possible
+     *
+     * @param mixed $nativeValue
+     * @param StaticExpressionFactoryInterface $staticExpressionFactory
+     * @param BagFactoryInterface $bagFactory
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     * @throws IncompatibleNativeForCoercionException When a native is passed in that cannot be coerced
+     * @throws IncompatibleStaticForCoercionException When a static is passed in that cannot be coerced
+     */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    );
+
+    /**
+     * Coerces the given, potentially "incomplete" static to a "complete" one for this type, if possible
      *
      * @param StaticInterface $static
      * @param EvaluationContextInterface $evaluationContext
      * @return StaticInterface
+     * @throws IncompatibleStaticForCoercionException
      */
     public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext);
 
@@ -106,56 +146,26 @@ interface TypeInterface
     public function getSummary();
 
     /**
-     * Returns true if this type is allowed by an AnyType (usually anything except an UnknownType),
-     * false otherwise
+     * Returns a summary of the type represented including any value
+     * eg. `list<number<21>>` or `text<Hello world!>`
      *
-     * @return bool
+     * @return string
      */
-    public function isAllowedByAnyType();
+    public function getSummaryWithValue();
 
     /**
-     * Returns true if this type is equivalent to the specified multiple type, false otherwise
+     * Fetches the validation context the type was created in
      *
-     * @param MultipleType $otherType
-     * @return bool
+     * @return ValidationContextInterface
      */
-    public function isAllowedByMultipleType(MultipleType $otherType);
+    public function getValidationContext();
 
     /**
-     * Returns true if this type is equivalent to the specified static list type, false otherwise
+     * Determines whether this type stores any value information
      *
-     * @param StaticListType $otherType
      * @return bool
      */
-    public function isAllowedByStaticListType(StaticListType $otherType);
-
-    /**
-     * Determines whether the required attributes of the structure type
-     * all exist in this structure (assuming this is a structure), and that there are no extras provided.
-     *
-     * If there are any optional attributes in the structure type, this structure
-     * does not need to specify them as they can use their default values.
-     *
-     * @param StaticStructureType $otherType
-     * @return bool
-     */
-    public function isAllowedByStaticStructureType(StaticStructureType $otherType);
-
-    /**
-     * Returns true if this type is equivalent to the specified static type, false otherwise
-     *
-     * @param StaticType $otherType
-     * @return bool
-     */
-    public function isAllowedByStaticType(StaticType $otherType);
-
-    /**
-     * Returns true if both types are void, false otherwise
-     *
-     * @param VoidType $otherType
-     * @return bool
-     */
-    public function isAllowedByVoidType(VoidType $otherType);
+    public function hasValue();
 
     /**
      * Returns a new type that will match everything the current type does and also everything
@@ -173,6 +183,15 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType);
+
+    /**
+     * Returns a new type that will match everything the current type does and also everything
+     * the provided exotic type does
+     *
+     * @param ExoticType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithExoticType(ExoticType $otherType);
 
     /**
      * Returns a new type that will match everything the current type does and also everything
@@ -222,6 +241,15 @@ interface TypeInterface
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType);
 
     /**
+     * Returns a new type that will match everything the current type does and also everything
+     * the provided valued type does
+     *
+     * @param ValuedType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithValuedType(ValuedType $otherType);
+
+    /**
      * For void types, this will just return whichever type is not void, unless both are void
      * in which case that will be returned
      *
@@ -238,6 +266,15 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithAnyType(AnyType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided exotic type does
+     *
+     * @param ExoticType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType);
 
     /**
      * Returns a new type that matches everything the current type does,
@@ -283,6 +320,15 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided valued type does
+     *
+     * @param ValuedType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType);
 
     /**
      * For void types, this will just return whichever type is not void, unless both are void

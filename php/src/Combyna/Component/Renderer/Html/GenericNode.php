@@ -40,6 +40,11 @@ class GenericNode implements HtmlNodeInterface
     private $rootChildNode;
 
     /**
+     * @var array
+     */
+    private $triggers;
+
+    /**
      * @var WidgetStateInterface
      */
     private $widgetState;
@@ -48,17 +53,20 @@ class GenericNode implements HtmlNodeInterface
      * @param WidgetStateInterface $widgetState
      * @param string[]|int[] $path
      * @param array $attributes
+     * @param array $triggers
      * @param HtmlNodeInterface|null $rootChildNode
      */
     public function __construct(
         WidgetStateInterface $widgetState,
         array $path,
         array $attributes,
+        array $triggers,
         HtmlNodeInterface $rootChildNode = null
     ) {
         $this->attributes = $attributes;
         $this->path = $path;
         $this->rootChildNode = $rootChildNode;
+        $this->triggers = $triggers;
         $this->widgetState = $widgetState;
     }
 
@@ -73,7 +81,8 @@ class GenericNode implements HtmlNodeInterface
             'widget' => $this->widgetState->getWidgetDefinitionName(),
             'path' => $this->path,
             'attributes' => $this->attributes,
-            'children' => $this->rootChildNode !== null ? $this->rootChildNode->toGenericArray() : []
+            'children' => $this->rootChildNode !== null ? $this->rootChildNode->toGenericArray() : [],
+            'triggers' => $this->triggers
         ];
     }
 

@@ -2,3 +2,21 @@ services:
     combyna.router.loader.environment:
         class: Combyna\Component\Router\Config\Loader\RouteCollectionLoader
         autowire: true
+
+    combyna.router.loader.navigate_instruction:
+        class: Combyna\Component\Router\Config\Loader\Instruction\NavigateInstructionLoader
+        autowire: true
+        tags:
+            - {name: combyna.instruction_loader}
+
+    combyna.router.loader.route_argument_expression:
+        class: Combyna\Component\Router\Config\Loader\Expression\RouteArgumentExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.router.loader.route_url_expression:
+        class: Combyna\Component\Router\Config\Loader\Expression\RouteUrlExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}

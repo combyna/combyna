@@ -13,7 +13,7 @@ namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
-use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Program\ProgramInterface;
@@ -21,6 +21,7 @@ use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
 /**
@@ -49,10 +50,18 @@ interface WidgetInterface
      *
      * @param string $libraryName
      * @param string $eventName
-     * @param StaticBagInterface $payloadStaticBag
+     * @param array $payloadNatives
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @return EventInterface
+     * @throws EventDefinitionNotReferencedByWidgetException
+     * @throws LibraryNotInstalledException
      */
-    public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag);
+    public function createEvent(
+        $libraryName,
+        $eventName,
+        array $payloadNatives,
+        ViewEvaluationContextInterface $evaluationContext
+    );
 
     /**
      * Creates an initial state for the widget
@@ -143,6 +152,13 @@ interface WidgetInterface
      * @return string|int
      */
     public function getName();
+
+    /**
+     * Fetches this widget's parent, if any
+     *
+     * @return WidgetInterface|null
+     */
+    public function getParentWidget();
 
     /**
      * Fetches the path to this widget, with its view name and all ancestor names

@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Expression\StaticValueInterface;
+
 /**
  * Interface StaticNodeInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface StaticNodeInterface extends ExpressionNodeInterface
+interface StaticNodeInterface extends ExpressionNodeInterface, StaticValueInterface
 {
     /**
      * Fetches the native value of this static

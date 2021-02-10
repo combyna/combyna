@@ -13,7 +13,6 @@ namespace Combyna\Component\Expression;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Bag\StaticListInterface;
-use InvalidArgumentException;
 
 /**
  * Interface StaticExpressionFactoryInterface
@@ -27,30 +26,17 @@ class StaticExpressionFactory implements StaticExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function coerce($value)
+    public function createBooleanExpression($value)
     {
-        if ($value instanceof StaticInterface) {
-            // Already a static - nothing to do
-            return $value;
-        }
-
-        if (is_string($value)) {
-            return $this->createTextExpression($value);
-        }
-
-        if (is_int($value) || is_float($value)) {
-            return $this->createNumberExpression($value);
-        }
-
-        throw new InvalidArgumentException(sprintf('Cannot coerce native value of type "%s"', gettype($value)));
+        return new BooleanExpression($value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createBooleanExpression($value)
+    public function createNothingExpression()
     {
-        return new BooleanExpression($value);
+        return new NothingExpression();
     }
 
     /**

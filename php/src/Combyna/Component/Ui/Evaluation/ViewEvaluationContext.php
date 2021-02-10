@@ -12,8 +12,12 @@
 namespace Combyna\Component\Ui\Evaluation;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
+use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
  * Class ViewEvaluationContext
@@ -55,6 +59,19 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
     /**
      * {@inheritdoc}
      */
+    public function bubbleEventToParent(
+        ProgramStateInterface $programState,
+        ProgramInterface $program,
+        EventInterface $event,
+        WidgetInterface $initialWidget
+    ) {
+        // There are no more widgets in the tree to bubble to, so there's nothing to do
+        return $programState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubScopeContext(StaticBagInterface $variableStaticBag)
     {
         return $this->evaluationContextFactory->createViewEvaluationContext($this, $variableStaticBag);
@@ -66,14 +83,6 @@ class ViewEvaluationContext extends AbstractEvaluationContext implements ViewEva
     public function createSubStoreContext(UiStoreStateInterface $storeState)
     {
         return $this->evaluationContextFactory->createViewStoreEvaluationContext($this, $storeState);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChildOfCurrentCompoundWidget($childName)
-    {
-        return $this->parentContext->getChildOfCurrentCompoundWidget($childName);
     }
 
     /**

@@ -11,6 +11,12 @@ services:
         tags:
             - {name: combyna.type_promoter}
 
+    combyna.type.act.multiple_type_promoter:
+        class: Combyna\Component\Type\Config\Act\MultipleTypePromoter
+        autowire: true
+        tags:
+            - {name: combyna.type_promoter}
+
     combyna.type.act.static_list_type_promoter:
         class: Combyna\Component\Type\Config\Act\StaticListTypePromoter
         autowire: true

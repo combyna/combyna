@@ -74,7 +74,7 @@ class DelegatorInitialiser implements DelegatorInitialiserInterface
 
         /**
          * WARNING - This logic monkey-patches the behaviour of Symfony\Component\DependencyInjection\Container
-         *           by modifying some a protected property. This makes it coupled to implementation details
+         *           by modifying a protected property. This makes it coupled to implementation details
          *           of the Symfony framework and gives it the potential to break when used with future versions
          *           of Symfony. We should investigate replacing this with a cleaner hook-based approach,
          *           which may involve changes to Symfony internals.

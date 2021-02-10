@@ -11,11 +11,19 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Expression\NothingExpression;
+use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticListExpression;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
+use Combyna\Component\Type\Exception\IncompatibleStaticForCoercionException;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
 use InvalidArgumentException;
-use LogicException;
 
 /**
  * Class StaticType
@@ -33,9 +41,15 @@ class StaticType implements TypeInterface
     private $staticClass;
 
     /**
-     * @param string $staticClass
+     * @var ValidationContextInterface
      */
-    public function __construct($staticClass)
+    private $validationContext;
+
+    /**
+     * @param string $staticClass
+     * @param ValidationContextInterface $validationContext
+     */
+    public function __construct($staticClass, ValidationContextInterface $validationContext)
     {
         $this->staticClass = $staticClass;
 
@@ -54,6 +68,8 @@ class StaticType implements TypeInterface
                 'StaticListExpression must be matched with a StaticListType, not a StaticType'
             );
         }
+
+        $this->validationContext = $validationContext;
     }
 
     /**
@@ -72,6 +88,17 @@ class StaticType implements TypeInterface
         // Static type cannot allow all other types, only other static types
         // of the correct class (and not static lists, for example)
         return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowsExoticType(ExoticType $candidateType)
+    {
+        // We cannot determine whether an exotic type should be allowed,
+        // so instead we rely on the exotic determiner adding a violation
+        // to fail validation if there is an issue
+        return true;
     }
 
     /**
@@ -127,9 +154,98 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsValuedType(ValuedType $candidateType)
+    {
+        // Discard the value of the valued type and just check whether
+        // this static type allows the value's wrapped type through
+        return $this->allows($candidateType->getWrappedType());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceNative(
+        $nativeValue,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        BagFactoryInterface $bagFactory,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        if ($nativeValue instanceof StaticInterface) {
+            if (!$this->allowsStatic($nativeValue)) {
+                throw new IncompatibleNativeForCoercionException(
+                    sprintf(
+                        'Static of type "%s" was given, expected a native or matching static of type "%s"',
+                        $nativeValue->getType(),
+                        $this->getSummary()
+                    )
+                );
+            }
+
+            // Already a static - nothing to do
+            return $nativeValue;
+        }
+
+        switch ($this->staticClass) {
+            case BooleanExpression::class:
+                if (!is_bool($nativeValue)) {
+                    throw new IncompatibleNativeForCoercionException(
+                        sprintf(
+                            'Expected boolean, got %s',
+                            gettype($nativeValue)
+                        )
+                    );
+                }
+
+                return $staticExpressionFactory->createBooleanExpression($nativeValue);
+            case NothingExpression::class:
+                if ($nativeValue !== null) {
+                    throw new IncompatibleNativeForCoercionException(
+                        sprintf(
+                            'Expected null, got %s',
+                            gettype($nativeValue)
+                        )
+                    );
+                }
+
+                return $staticExpressionFactory->createNothingExpression();
+            case NumberExpression::class:
+                if (!is_numeric($nativeValue)) {
+                    throw new IncompatibleNativeForCoercionException(
+                        sprintf(
+                            'Expected int, float or numeric string, got %s',
+                            gettype($nativeValue)
+                        )
+                    );
+                }
+
+                return $staticExpressionFactory->createNumberExpression($nativeValue * 1); // Cast to number
+            case TextExpression::class:
+                if (!is_string($nativeValue)) {
+                    throw new IncompatibleNativeForCoercionException(
+                        sprintf(
+                            'Expected string, got %s',
+                            gettype($nativeValue)
+                        )
+                    );
+                }
+
+                return $staticExpressionFactory->createTextExpression($nativeValue);
+            default:
+                throw new IncompatibleNativeForCoercionException(
+                    sprintf(
+                        'Unsupported static class for coercion: %s',
+                        $this->staticClass
+                    )
+                );
+        }
     }
 
     /**
@@ -139,7 +255,7 @@ class StaticType implements TypeInterface
     {
         // Just check that the static is valid for this type
         if (!$this->allowsStatic($static)) {
-            throw new LogicException(sprintf(
+            throw new IncompatibleStaticForCoercionException(sprintf(
                 'Expected a %s, got a %s',
                 $this->staticClass,
                 get_class($static)
@@ -150,11 +266,29 @@ class StaticType implements TypeInterface
     }
 
     /**
+     * Fetches the class of static expression
+     *
+     * @return string
+     */
+    public function getStaticClass()
+    {
+        return $this->staticClass;
+    }
+
+    /**
      * {@inheritdoc}
      */
-    public function isAllowedByAnyType()
+    public function isAllowedByAnyType(AnyType $superType)
     {
         return true; // "Any" type allows any other type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByExoticType(ExoticType $otherType)
+    {
+        return $otherType->allowsStaticType($this);
     }
 
     /**
@@ -192,9 +326,25 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function isAllowedByValuedType(ValuedType $otherType)
+    {
+        return $otherType->allowsStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByVoidType(VoidType $otherType)
     {
         return $otherType->allowsStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationContext()
+    {
+        return $this->validationContext;
     }
 
     /**
@@ -210,6 +360,22 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getSummaryWithValue()
+    {
+        return $this->getSummary(); // No value information to add
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasValue()
+    {
+        return false; // No value information
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWith(TypeInterface $otherType)
     {
         return $otherType->whenMergedWithStaticType($this);
@@ -220,7 +386,15 @@ class StaticType implements TypeInterface
      */
     public function mergeWithAnyType(AnyType $otherType)
     {
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithExoticType(ExoticType $otherType)
+    {
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -230,7 +404,7 @@ class StaticType implements TypeInterface
     {
         $combinedSubTypes = array_merge([$this], $subSubTypes);
 
-        return new MultipleType($combinedSubTypes);
+        return new MultipleType($combinedSubTypes, $this->validationContext);
     }
 
     /**
@@ -240,7 +414,7 @@ class StaticType implements TypeInterface
     {
         // There is nothing common to merge between a static list type and a static type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -250,7 +424,7 @@ class StaticType implements TypeInterface
     {
         // There is nothing common to merge between a static structure type and a static type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -265,7 +439,7 @@ class StaticType implements TypeInterface
 
         // Otherwise return a MultipleType that will match everything this type does
         // and everything the other type does
-        return new MultipleType([$this, $otherType]);
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -273,9 +447,19 @@ class StaticType implements TypeInterface
      */
     public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
     {
-        // There is nothing common to merge between a static list type and an unresolved type,
+        // There is nothing common to merge between a static type and an unresolved type,
         // so just return a MultipleType that allows both
-        return new MultipleType([$this, $unresolvedType]);
+        return new MultipleType([$this, $unresolvedType], $this->validationContext);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithValuedType(ValuedType $otherType)
+    {
+        // There is nothing common to merge between a static type and a valued type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType], $this->validationContext);
     }
 
     /**
@@ -292,6 +476,14 @@ class StaticType implements TypeInterface
     public function whenMergedWithAnyType(AnyType $otherType)
     {
         return $otherType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithExoticType(ExoticType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
     }
 
     /**
@@ -330,6 +522,14 @@ class StaticType implements TypeInterface
      * {@inheritdoc}
      */
     public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithValuedType(ValuedType $candidateType)
     {
         return $candidateType->mergeWithStaticType($this);
     }

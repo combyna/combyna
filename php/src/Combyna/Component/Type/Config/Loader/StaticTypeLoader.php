@@ -18,9 +18,8 @@ use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDateTimeExpression;
 use Combyna\Component\Expression\StaticDayExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Type\StaticType;
-use Combyna\Component\Type\UnresolvedType;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticTypeDeterminer;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
 /**
  * Class StaticTypeLoader
@@ -62,15 +61,13 @@ class StaticTypeLoader implements TypeTypeLoaderInterface
         $type = $this->configParser->getElement($config, 'type', 'type name');
 
         if (!array_key_exists($type, self::$typesToClasses)) {
-            return new PresolvedTypeDeterminer(
-                new UnresolvedType(
-                    'Invalid static type "' . $type . '" given - valid types are "' .
-                    implode('", "', array_keys(self::$typesToClasses)) . '"'
-                )
+            return new UnresolvedTypeDeterminer(
+                'Invalid static type "' . $type . '" given - valid types are "' .
+                implode('", "', array_keys(self::$typesToClasses)) . '"'
             );
         }
 
-        return new PresolvedTypeDeterminer(new StaticType(self::$typesToClasses[$type]));
+        return new StaticTypeDeterminer(self::$typesToClasses[$type]);
     }
 
     /**

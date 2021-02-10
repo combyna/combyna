@@ -1,0 +1,18 @@
+services:
+    combyna.router.promoter.navigate_instruction_node:
+        class: Combyna\Component\Router\Config\Act\Instruction\NavigateInstructionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.trigger_instruction_promoter}
+
+    combyna.router.promoter.route_argument_expression_node:
+        class: Combyna\Component\Router\Config\Act\Expression\RouteArgumentExpressionPromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
+    combyna.router.promoter.route_url_expression_node:
+        class: Combyna\Component\Router\Config\Act\Expression\RouteUrlExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

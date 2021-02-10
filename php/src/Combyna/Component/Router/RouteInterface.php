@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Router;
 
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 
 /**
@@ -48,6 +49,13 @@ interface RouteInterface
      * @return string
      */
     public function getPageViewName();
+
+    /**
+     * Fetches the model for the parameter argument static bag this route expects to be extracted from its route segments
+     *
+     * @return FixedStaticBagModelInterface
+     */
+    public function getParameterBagModel();
 
     /**
      * Fetches the URL pattern for this route

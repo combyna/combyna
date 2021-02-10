@@ -11,11 +11,14 @@
 
 namespace Combyna\Component\Validator\Context;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Exception\InvalidEvaluationContextException;
+use Combyna\Component\Type\Exotic\ExoticTypeDeterminerInterface;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Component\Validator\Query\ActNodeQueryInterface;
@@ -83,6 +86,29 @@ interface RootValidationContextInterface
     public function adoptDynamicActNode(DynamicActNodeInterface $actNode, SubValidationContextInterface $subValidationContext);
 
     /**
+     * Creates an exotic type determiner for the given config and source validation context
+     *
+     * @param string $determinerName
+     * @param array $config
+     * @param ValidationContextInterface $sourceValidationContext
+     * @return ExoticTypeDeterminerInterface
+     */
+    public function createExoticTypeDeterminer(
+        $determinerName,
+        array $config,
+        ValidationContextInterface $sourceValidationContext
+    );
+
+    /**
+     * Creates a ValidationContext for the specified ACT node, anchored at the correct point
+     * in the ACT via its sub-validation context tree
+     *
+     * @param StructuredNodeInterface $structuredNode
+     * @return ValidationContextInterface
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode);
+
+    /**
      * Fetches all descendant nodes of the specified behaviour spec that match the given query specifier
      *
      * @param QuerySpecifierInterface $querySpecifier
@@ -109,6 +135,13 @@ interface RootValidationContextInterface
      * @return RootSubValidationContextInterface
      */
     public function getRootSubValidationContext();
+
+    /**
+     * Returns true if any violations have been raised and added, false otherwise
+     *
+     * @return bool
+     */
+    public function isViolated();
 
     /**
      * Performs a query that will result in an ACT node
@@ -152,4 +185,42 @@ interface RootValidationContextInterface
      * @throws ValidationFailureException
      */
     public function throwIfViolated();
+
+    /**
+     * Validates an ACT node in its own isolated root validation context,
+     * to avoid its violations being added to the main one. Useful for testing
+     * an expression to identify whether it is "pure", that is, that none of its terms
+     * look up a widget attribute or make a function call etc.
+     *
+     * @param ActNodeInterface $actNode
+     * @return RootValidationContextInterface Returns the new isolated root validation context
+     */
+    public function validateActNodeInIsolation(ActNodeInterface $actNode);
+
+    /**
+     * Evaluates the given expression to a static value statically (at validation time)
+     * and wraps it in a ValuedType to perform static analysis with it.
+     *
+     * If the expression is impure, then an InvalidEvaluationContextException will be thrown
+     * at some point during evaluation where an impure expression term is evaluated.
+     *
+     * @param TypeInterface $type
+     * @param ExpressionNodeInterface $expressionNode
+     * @return TypeInterface
+     * @throws InvalidEvaluationContextException When the expression is impure
+     */
+    public function wrapInValuedType(TypeInterface $type, ExpressionNodeInterface $expressionNode);
+
+    /**
+     * Attempts to validate the expression (eg. a structure) as a "pure" one (with no function calls,
+     * widget attribute fetches etc.) - if it is then we can evaluate it to a static value
+     * statically (at validation time) and wrap it in a ValuedType to perform static analysis with it.
+     *
+     * If the expression is impure, then the provided type will be returned unwrapped.
+     *
+     * @param TypeInterface $type
+     * @param ExpressionNodeInterface $expressionNode
+     * @return TypeInterface
+     */
+    public function wrapInValuedTypeIfPureExpression(TypeInterface $type, ExpressionNodeInterface $expressionNode);
 }

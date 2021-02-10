@@ -171,6 +171,14 @@ class ValidationContext implements ValidationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createExoticTypeDeterminer($determinerName, array $config)
+    {
+        return $this->rootValidationContext->createExoticTypeDeterminer($determinerName, $config, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createSubContext(
         SubValidationContextSpecifierInterface $subContextSpecifier,
         StructuredNodeInterface $structuredNode,
@@ -191,6 +199,14 @@ class ValidationContext implements ValidationContextInterface
     public function createTypeQueryRequirement(ResultTypeQueryInterface $query)
     {
         return new TypeQueryRequirement($query, $this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createValidationContextForActNode(StructuredNodeInterface $structuredNode)
+    {
+        return $this->rootValidationContext->createValidationContextForActNode($structuredNode);
     }
 
     /**
@@ -303,5 +319,29 @@ class ValidationContext implements ValidationContextInterface
     public function throwIfViolated()
     {
         $this->rootValidationContext->throwIfViolated();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateActNodeInIsolation(ActNodeInterface $actNode)
+    {
+        return $this->rootValidationContext->validateActNodeInIsolation($actNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedType(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        return $this->rootValidationContext->wrapInValuedType($type, $expressionNode);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function wrapInValuedTypeIfPureExpression(TypeInterface $type, ExpressionNodeInterface $expressionNode)
+    {
+        return $this->rootValidationContext->wrapInValuedTypeIfPureExpression($type, $expressionNode);
     }
 }

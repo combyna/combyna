@@ -24,20 +24,19 @@ use Combyna\Component\Bag\StaticListInterface;
 interface StaticExpressionFactoryInterface
 {
     /**
-     * Coerces a native value to a static
-     *
-     * @param mixed $value
-     * @return StaticInterface
-     */
-    public function coerce($value);
-
-    /**
      * Creates a BooleanExpression
      *
      * @param bool $value
      * @return BooleanExpression
      */
     public function createBooleanExpression($value);
+
+    /**
+     * Creates a NothingExpression
+     *
+     * @return NothingExpression
+     */
+    public function createNothingExpression();
 
     /**
      * Creates a NumberExpression

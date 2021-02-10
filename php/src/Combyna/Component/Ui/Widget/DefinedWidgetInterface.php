@@ -12,6 +12,7 @@
 namespace Combyna\Component\Ui\Widget;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Trigger\TriggerCollectionInterface;
 
 /**
  * Interface DefinedWidgetInterface
@@ -50,4 +51,18 @@ interface DefinedWidgetInterface extends WidgetInterface
      * @return WidgetInterface[]
      */
     public function getChildWidgets();
+
+    /**
+     * Fetches the widget's definition
+     *
+     * @return WidgetDefinitionInterface
+     */
+    public function getDefinition();
+
+    /**
+     * Fetches the widget's collection of triggers
+     *
+     * @return TriggerCollectionInterface
+     */
+    public function getTriggers();
 }

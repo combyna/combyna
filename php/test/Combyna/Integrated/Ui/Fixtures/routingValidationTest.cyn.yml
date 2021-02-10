@@ -1,0 +1,175 @@
+name: Routing validation test app
+home:
+    route: app.my_list_route
+routes:
+    my_list_route:
+        pattern: '/'
+        page_view: my_list_view
+    my_item_route:
+        pattern: '/item/{my_item_slug}'
+        page_view: my_item_view
+        parameters:
+            my_item_slug: text
+    my_invalid_route:
+        pattern: '/item/{my_slug_with_invalid_type}/{my_slug_with_missing_type}'
+        page_view: my_item_view
+        parameters:
+            my_slug_with_invalid_type: myinvalidtype
+            # NB: We're deliberately not specifying a type for my_slug_with_missing_type
+
+    # A route that is invalid as it uses the same view as my_item_route does but with different parameters
+    my_route_with_non_matching_params:
+        pattern: '/some/other/path/with/{some_other_arg}'
+        page_view: my_item_view
+        parameters:
+            some_other_arg: number
+
+    my_url_generation_test_route:
+        pattern: '/my/url/gen/test'
+        page_view: my_url_generation_test_view
+
+widgets:
+    my_fancier_route_link:
+        type: compound
+        attributes:
+            route:
+                type: exotic
+                name: route_name
+                arguments_static: arguments
+            arguments:
+                type: exotic
+                name: route_arguments
+                route_static: route
+                default: '!expr {}'
+        children:
+            contents: ~
+        root:
+            type: gui.route_link
+            attributes:
+                route: !expr widget_attr('route')
+                arguments: !expr widget_attr('arguments')
+            children:
+                contents:
+                    type: child
+                    name: contents
+
+page_views:
+    my_list_view:
+        title: !expr 'Routing test list view'
+        description: The list view of the routing validation test
+        widget:
+            type: group
+            children:
+                # A valid link
+                - type: gui.route_link
+                  attributes:
+                      route: !expr 'app.my_item_route'
+                      arguments: !expr {my_item_slug: 'item_1234'}
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'See the example item'
+
+                - type: text
+                  # Test that route arguments' parameter names are validated
+                  text: !expr 'The item slug is: ' ~ route_arg('not_a_valid_parameter_name')
+
+                - type: gui.route_link
+                  attributes:
+                      # Test that route names are validated
+                      route: !expr 'app.my_invalid_route_name'
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'Go back home'
+
+                - type: app.my_fancier_route_link
+                  attributes:
+                      # Test that route names are validated when we go via another "layer" of widget definition
+                      route: !expr 'app.your_invalid_route_name'
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'Go back home'
+
+                - type: routing_test.my_even_fancier_route_link
+                  attributes:
+                      # Test that routes are validated in the context they are specified, because
+                      # a library's validation context won't have access to the app to check its routes
+                      route: !expr 'app.my_item_route'
+                      arguments: !expr {my_item_slug: 'item_9876'}
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'View the item'
+
+                - type: app.my_fancier_route_link
+                  attributes:
+                      # Test that route arguments are validated, including
+                      # when we go via another "layer" of widget definition
+                      route: !expr 'app.my_item_route'
+                      arguments: !expr {not_a_valid_parameter: 1001} # Invalid
+                  children:
+                      contents:
+                          type: text
+                          text: !expr 'View an invalid item (I should never be seen)'
+
+    my_item_view:
+        title: !expr 'Routing test item view'
+        description: The item view of the routing test
+        widget:
+            type: text
+            # The setup is invalid as multiple routes use this view _but_ define different parameters
+            text: !expr 'The non-matching slug arg is: ' ~ route_arg('my_item_slug')
+
+    my_url_generation_test_view:
+        title: !expr 'URL generation test view'
+        description: For testing URL generation
+        widget:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'Providing invalid route name statically: ' ~ route_url(route: 'invalid_lib.invalid_route')
+
+                - type: text
+                  # Provide the arguments structure explicitly to ensure the arguments validation is invoked
+                  # (even though the route name is invalid/not fully qualified)
+                  text: !expr 'Providing route name with missing library: ' ~ route_url(route: 'no_lib_given', arguments: {})
+
+                - type: text
+                  # NB: In future we may support trivial evaluation, in which case this particular concatenation
+                  #     may be resolved statically to a valid ValuedType which would make this valid
+                  text: !expr 'Providing invalid non-exotic non-valued route: ' ~ route_url(route: 'a_lib.a_ro' ~ 'ute')
+
+                - type: text
+                  text: !expr 'Providing invalid exotic type: ' ~ route_url(route: routing_test.create_custom_exotic())
+
+                - type: text
+                  # Test that route arguments are validated (slug must be text, but number is given)
+                  text: >
+                      !expr 'Providing invalid arguments for valid route name'
+                      ~ route_url(route: 'app.my_item_route', arguments: {
+                          my_item_slug: 21
+                      })
+
+    my_navigation_test_view:
+        title: !expr 'Navigation test view'
+        description: For testing navigation
+        widget:
+            type: group
+            children:
+                - type: gui.button
+                  attributes:
+                      label: !expr 'Go to invalid route'
+                  triggers:
+                      gui.click:
+                          instructions:
+                              # Test that route name is validated
+                              - type: navigate
+                                route: !expr 'invalid_lib.invalid_route'
+                              # Test that route arguments are validated
+                              - type: navigate
+                                route: !expr 'app.my_item_route'
+                                # Slug arg must be a text but we're providing a number
+                                arguments: >
+                                    !expr {my_item_slug: 21}

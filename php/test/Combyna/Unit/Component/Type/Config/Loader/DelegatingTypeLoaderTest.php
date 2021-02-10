@@ -15,8 +15,8 @@ use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Type\Config\Loader\DelegatingTypeLoader;
 use Combyna\Component\Type\Config\Loader\TypeTypeLoaderInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
+use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Prophecy\Argument;
@@ -110,7 +110,7 @@ class DelegatingTypeLoaderTest extends TestCase
     {
         $determiner = $this->loader->load('some_undefined_type');
 
-        $this->assert($determiner)->isAnInstanceOf(PresolvedTypeDeterminer::class);
+        $this->assert($determiner)->isAnInstanceOf(UnresolvedTypeDeterminer::class);
         $this->assert($determiner->determine($this->validationContext->reveal())->getSummary())
             ->exactlyEquals('unknown<No loader is registered for types of type "some_undefined_type">');
     }
@@ -122,7 +122,7 @@ class DelegatingTypeLoaderTest extends TestCase
 
         $determiner = $this->loader->load(['some_arg' => 21]);
 
-        $this->assert($determiner)->isAnInstanceOf(PresolvedTypeDeterminer::class);
+        $this->assert($determiner)->isAnInstanceOf(UnresolvedTypeDeterminer::class);
         $this->assert($determiner->determine($this->validationContext->reveal())->getSummary())
             ->exactlyEquals('unknown<Some issue parsing type name>');
     }

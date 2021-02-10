@@ -18,6 +18,8 @@ use Combyna\Component\Router\RouteInterface;
 /**
  * Class Home
  *
+ * Represents the location the app should load at
+ *
  * @author Dan Phillimore <dan@ovms.co>
  */
 class Home implements HomeInterface

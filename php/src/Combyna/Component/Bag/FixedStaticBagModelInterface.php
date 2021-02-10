@@ -14,6 +14,7 @@ namespace Combyna\Component\Bag;
 use Combyna\Component\Bag\Config\Act\DeterminedFixedStaticBagModelInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use Combyna\Component\Type\Exception\IncompatibleNativeForCoercionException;
 use Combyna\Component\Type\TypeInterface;
 
 /**
@@ -41,6 +42,19 @@ interface FixedStaticBagModelInterface extends DeterminedFixedStaticBagModelInte
     public function assertValidStaticBag(StaticBagInterface $staticBag);
 
     /**
+     * Coerces a set of native values for this model to a StaticBag, if possible
+     *
+     * @param array $nativeValues
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticBagInterface
+     * @throws IncompatibleNativeForCoercionException
+     */
+    public function coerceNativeArrayToBag(
+        array $nativeValues,
+        EvaluationContextInterface $evaluationContext
+    );
+
+    /**
      * Given a static value for a defined static of this model:
      * - If a valid "complete" value for the static, the value is returned unmodified
      * - If a valid but "incomplete" value for the static, eg. a structure missing some optional attributes,
@@ -49,10 +63,16 @@ interface FixedStaticBagModelInterface extends DeterminedFixedStaticBagModelInte
      *
      * @param string $name
      * @param EvaluationContextInterface $evaluationContext
+     * @param StaticProviderBagInterface $sourceStaticProviderBag
      * @param StaticInterface|null $static
      * @return StaticInterface
      */
-    public function coerceStatic($name, EvaluationContextInterface $evaluationContext, StaticInterface $static = null);
+    public function coerceStatic(
+        $name,
+        EvaluationContextInterface $evaluationContext,
+        StaticProviderBagInterface $sourceStaticProviderBag,
+        StaticInterface $static = null
+    );
 
     /**
      * Given a static bag for this model:

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use Combyna\Component\Bag\Validation\Context\Specifier\ExpressionBagContextSpecifier;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
@@ -43,6 +44,8 @@ class ExpressionBagNode extends AbstractActNode
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->defineValidationContext(new ExpressionBagContextSpecifier($this->expressionNodes));
+
         foreach ($this->expressionNodes as $expressionNode) {
             $specBuilder->addChildNode($expressionNode);
         }

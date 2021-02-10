@@ -14,6 +14,7 @@ namespace Combyna\Component\Ui\View;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\Evaluation\RootViewEvaluationContext;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
@@ -31,22 +32,28 @@ interface PageViewInterface extends ViewInterface
      *
      * @param EvaluationContextInterface $parentContext
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @param RouterStateInterface $routerState
      * @param PageViewStateInterface|null $pageViewState
      * @return RootViewEvaluationContext
      */
     public function createEvaluationContext(
         EvaluationContextInterface $parentContext,
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        RouterStateInterface $routerState,
         PageViewStateInterface $pageViewState = null
     );
 
     /**
      * Creates an initial state for the page view
      *
+     * @param RouterStateInterface $routerState
      * @param EvaluationContextInterface $rootEvaluationContext
      * @return PageViewStateInterface
      */
-    public function createInitialState(EvaluationContextInterface $rootEvaluationContext);
+    public function createInitialState(
+        RouterStateInterface $routerState,
+        EvaluationContextInterface $rootEvaluationContext
+    );
 
     /**
      * Performs the actual internal handling of a dispatched signal

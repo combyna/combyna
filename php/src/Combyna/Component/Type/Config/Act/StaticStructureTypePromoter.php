@@ -14,6 +14,7 @@ namespace Combyna\Component\Type\Config\Act;
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Type\StaticStructureType;
+use Combyna\Component\Validator\Context\NullValidationContext;
 use LogicException;
 
 /**
@@ -66,6 +67,6 @@ class StaticStructureTypePromoter implements TypeTypePromoterInterface
 
         $promotedAttributeBagModel = $this->bagNodePromoter->promoteFixedStaticBagModel($attributeBagModel);
 
-        return new StaticStructureType($promotedAttributeBagModel);
+        return new StaticStructureType($promotedAttributeBagModel, new NullValidationContext());
     }
 }

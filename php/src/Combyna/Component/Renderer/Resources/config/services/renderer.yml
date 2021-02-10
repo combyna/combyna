@@ -7,6 +7,14 @@ services:
         class: Combyna\Component\Renderer\Html\HtmlRenderer
         autowire: true
 
+    combyna.renderer.trigger:
+        class: Combyna\Component\Renderer\Html\TriggerRenderer
+        autowire: true
+
+    combyna.renderer.html.ui:
+        class: Combyna\Component\Renderer\Html\UiRenderer
+        autowire: true
+
     combyna.renderer.html.widget:
         class: Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer
         autowire: true

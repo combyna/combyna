@@ -111,6 +111,12 @@ class ExpressionParserTest extends TestCase
                     'boolean' => false
                 ]
             ],
+            'plain nothing' => [
+                'nothing',
+                [
+                    'type' => 'nothing'
+                ]
+            ],
             'plain variable reference' => [
                 'my_var',
                 [

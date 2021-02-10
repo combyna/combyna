@@ -55,7 +55,10 @@ class StaticStructureTypeDeterminer extends AbstractTypeDeterminer
             // so we need to determine them (recursively) at this point
             $determinedAttributeBagModel = $this->attributeBagModelNode->determine($validationContext);
 
-            $this->determinedType = new StaticStructureType($determinedAttributeBagModel);
+            $this->determinedType = new StaticStructureType(
+                $determinedAttributeBagModel,
+                $validationContext
+            );
         }
 
         return $this->determinedType;
