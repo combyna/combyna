@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        php-version: [7.1, 7.4]
+
+    steps:
+      # Check out the repository under $GITHUB_WORKSPACE, so this job can access it
+      - uses: actions/checkout@v2
+
+      - name: Use PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Run tests
+        run: vendor/bin/phpunit
