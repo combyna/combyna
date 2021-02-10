@@ -36,19 +36,21 @@
     }
   },
   "dependencies": {
-    "dotphp": "^3.0.0",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "dotphp": "^3.4.0",
+    "phpruntime": "^5.9.2-experimental.5",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "^6.26.3",
     "babel-loader": "^6.4.1",
     "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.6.1",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-react": "^6.24.1",
     "browserify": "^13.1.0",
     "happypack": "^4.0.0",
-    "phpify": "^4.0.1-experimental.1",
-    "source-map-loader": "^0.2.3",
+    "phpify": "^4.0.1-experimental.4",
+    "source-map-loader": "^0.2.4",
     "transform-loader": "^0.2.4",
     "webpack": "^2.7.0"
   },
@@ -56,6 +58,7 @@
     "build:release:client": "mkdir -p dist && cd dist && browserify ../js/client --outfile ./client.js",
     "build:debug:client": "mkdir -p dist && cd dist && browserify --debug ../js/client --outfile ./client.js",
     "server:node": "dotphp php/server.php",
-    "server:zend": "php php/server.php"
+    "server:zend": "php php/server.php",
+    "dev:watch": "webpack --watch --devtool source-map"
   }
 }

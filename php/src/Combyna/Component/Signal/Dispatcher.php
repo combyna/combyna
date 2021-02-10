@@ -11,9 +11,11 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Signal\EventDispatcher\Event\SignalDispatchedEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class Dispatcher
@@ -25,15 +27,22 @@ use Combyna\Component\Bag\StaticBagInterface;
 class Dispatcher implements DispatcherInterface
 {
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
      * @var SignalFactoryInterface
      */
     private $signalFactory;
 
     /**
      * @param SignalFactoryInterface $signalFactory
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(SignalFactoryInterface $signalFactory)
+    public function __construct(SignalFactoryInterface $signalFactory, EventDispatcherInterface $eventDispatcher)
     {
+        $this->eventDispatcher = $eventDispatcher;
         $this->signalFactory = $signalFactory;
     }
 
@@ -47,6 +56,16 @@ class Dispatcher implements DispatcherInterface
         StaticBagInterface $payloadStaticBag
     ) {
         $signal = $this->signalFactory->createSignal($signalDefinition, $payloadStaticBag);
+
+        if ($signalDefinition->isBroadcast()) {
+            // Dispatch an event to provide an extension point for triggering RPC Ajax requests, etc.
+            $this->eventDispatcher->dispatch(
+                SignalEvents::BROADCAST_SIGNAL_DISPATCHED,
+                new SignalDispatchedEvent(
+                    $signal
+                )
+            );
+        }
 
         return $program->handleSignal($programState, $signal);
     }

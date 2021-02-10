@@ -15,6 +15,8 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
 /**
@@ -49,11 +51,15 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
+    public function callFunction(
+        $libraryName,
+        $functionName,
+        StaticBagInterface $argumentStaticBag,
+        TypeInterface $returnType
+    ) {
         $function = $this->environment->getGenericFunctionByName($libraryName, $functionName);
 
-        return $function->call($argumentStaticBag);
+        return $function->call($argumentStaticBag, $returnType);
     }
 
     /**
@@ -91,6 +97,14 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function createSubSignalEvaluationContext(SignalInterface $signal)
+    {
+        return $this->evaluationContextFactory->createSignalContext($this, $signal);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAssuredStatic($assuredStaticName)
     {
         throw new LogicException('No assured static is defined with name "' . $assuredStaticName . '"');
@@ -99,9 +113,44 @@ class RootEvaluationContext implements EvaluationContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getCaptureLeafwise($captureName)
+    {
+        throw new LogicException('Root evaluation context cannot set capture "' . $captureName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureRootwise($captureName)
+    {
+        throw new LogicException('No capture is defined with name "' . $captureName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getEnvironment()
     {
         return $this->environment;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventPayloadStatic($staticName)
+    {
+        throw new LogicException('Event payload static "' . $staticName . '" cannot be fetched outside a trigger');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getSignalPayloadStatic($staticName)
+    {
+        throw new LogicException(
+            'Signal payload static "' . $staticName .
+            '" cannot be fetched outside a signal handler'
+        );
     }
 
     /**
@@ -118,6 +167,26 @@ class RootEvaluationContext implements EvaluationContextInterface
     public function getVariable($variableName)
     {
         throw new LogicException('No variable is defined with name "' . $variableName . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWidgetAttribute($attributeName)
+    {
+        throw new LogicException(
+            'Attribute "' . $attributeName . '" cannot be fetched outside a compound widget definition'
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getWidgetValue($valueName)
+    {
+        throw new LogicException(
+            'Value "' . $valueName . '" cannot be fetched outside a defined widget'
+        );
     }
 
     /**

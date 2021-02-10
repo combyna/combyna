@@ -12,10 +12,13 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\TranslationExpression;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class TranslationExpressionNode
@@ -49,6 +52,31 @@ class TranslationExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        if ($this->translationKey === '') {
+            $specBuilder->addConstraint(new KnownFailureConstraint('Translation key cannot be empty'));
+        }
+
+        if ($this->argumentExpressionBag !== null) {
+            // Validate that parameters all always evaluate to texts
+            foreach ($this->argumentExpressionBag->getExpressions() as $parameterName => $argumentExpressionNode) {
+                $specBuilder->addConstraint(
+                    new ResultTypeConstraint(
+                        $argumentExpressionNode,
+                        new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                        'parameter "' . $parameterName . '"'
+                    )
+                );
+            }
+
+            $specBuilder->addChildNode($this->argumentExpressionBag);
+        }
+    }
+
+    /**
      * Fetches the bag of expressions for any parameters of the message, if set
      *
      * @return ExpressionBagNode|null
@@ -61,9 +89,9 @@ class TranslationExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(TextExpression::class);
+        return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
     }
 
     /**
@@ -74,23 +102,5 @@ class TranslationExpressionNode extends AbstractExpressionNode
     public function getTranslationKey()
     {
         return $this->translationKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        if ($this->translationKey === '') {
-            $subValidationContext->addGenericViolation('Translation key cannot be empty');
-        }
-
-        if ($this->argumentExpressionBag !== null) {
-            // TODO: Validate that parameters all always evaluate to texts
-
-            $this->argumentExpressionBag->validate($subValidationContext);
-        }
     }
 }

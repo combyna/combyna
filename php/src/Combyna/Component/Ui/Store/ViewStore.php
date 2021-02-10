@@ -16,7 +16,6 @@ use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
@@ -147,7 +146,7 @@ class ViewStore implements ViewStoreInterface
     public function makeQuery(
         $name,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     ) {
         try {

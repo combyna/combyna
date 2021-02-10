@@ -1,0 +1,4 @@
+services:
+    combyna.behaviour.factory:
+        class: Combyna\Component\Behaviour\BehaviourFactory
+        autowire: true

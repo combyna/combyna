@@ -12,6 +12,7 @@
 namespace Combyna\Component\Common;
 
 use ReflectionClass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class AbstractComponent
@@ -20,6 +21,13 @@ use ReflectionClass;
  */
 abstract class AbstractComponent implements ComponentInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+    }
+
     /**
      * {@inheritdoc]
      */

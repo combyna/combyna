@@ -1,0 +1,6 @@
+services:
+    combyna.type.validation.resolvable_type_constraint_validator:
+        class: Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

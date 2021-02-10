@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Instruction\Config\Loader;
 
-use Combyna\Component\Common\DelegatorInterface;
-use InvalidArgumentException;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
+use Combyna\Component\Instruction\Config\Act\UnknownInstructionNode;
 
 /**
  * Class DelegatingInstructionLoader
@@ -40,15 +40,15 @@ class DelegatingInstructionLoader implements InstructionLoaderInterface, Delegat
     public function load(array $instructionConfig)
     {
         if (!array_key_exists('type', $instructionConfig)) {
-            throw new InvalidArgumentException('Missing "type" element');
+            // Missing "type" element
+            return new UnknownInstructionNode(null);
         }
 
         $type = $instructionConfig['type'];
 
         if (!array_key_exists($type, $this->loaders)) {
-            throw new InvalidArgumentException(
-                'No loader is registered for instructions of type "' . $type . '"'
-            );
+            // No loader is registered for instructions of this
+            return new UnknownInstructionNode($type);
         }
 
         return $this->loaders[$type]->load($instructionConfig);

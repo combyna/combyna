@@ -11,21 +11,24 @@
 
 namespace Combyna\Component\Validator;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
+use Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidatorInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Environment\Config\Act\EnvironmentNode;
-use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNode;
 use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
-use Combyna\Component\Environment\EnvironmentInterface;
-use Combyna\Component\Validator\Context\ActNodeValidationContextInterface;
-use Combyna\Component\Validator\Context\AssuredValidationContext;
-use Combyna\Component\Validator\Context\GenericValidationContextInterface;
+use Combyna\Component\Expression\Validation\Context\AssuredSubValidationContextInterface;
+use Combyna\Component\Expression\Validation\Context\ScopeSubValidationContextInterface;
+use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Context\ActNodeSubValidationContextInterface;
+use Combyna\Component\Validator\Context\DetachedSubValidationContextInterface;
+use Combyna\Component\Validator\Context\RootSubValidationContextInterface;
 use Combyna\Component\Validator\Context\RootValidationContextInterface;
-use Combyna\Component\Validator\Context\ScopeValidationContextInterface;
+use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 use Combyna\Component\Validator\Violation\DivisionByZeroViolation;
 use Combyna\Component\Validator\Violation\GenericViolation;
 use Combyna\Component\Validator\Violation\TypeMismatchViolation;
-use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface ValidationFactoryInterface
@@ -37,67 +40,135 @@ use Combyna\Component\Type\TypeInterface;
 interface ValidationFactoryInterface
 {
     /**
-     * Creates a new ActNodeValidationContext
+     * Creates a new ActNodeSubValidationContext
      *
-     * @param GenericValidationContextInterface $parentGenericContext
+     * @param SubValidationContextInterface $parentContext
      * @param ActNodeInterface $actNode
-     * @return ActNodeValidationContextInterface
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return ActNodeSubValidationContextInterface
      */
     public function createActNodeContext(
-        GenericValidationContextInterface $parentGenericContext,
-        ActNodeInterface $actNode
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
-     * Creates a new AssuredValidationContext
+     * Creates a new AssuredSubValidationContext
      *
-     * @param GenericValidationContextInterface $parentGenericContext
+     * @param SubValidationContextInterface $parentContext
+     * @param ActNodeInterface $guardExpressionNode
+     * @param BehaviourSpecInterface $guardExpressionNodeBehaviourSpec
      * @param AssuranceNodeInterface[] $assuranceNodes
-     * @return AssuredValidationContext
+     * @param ActNodeInterface $subjectNode
+     * @return AssuredSubValidationContextInterface
      */
     public function createAssuredContext(
-        GenericValidationContextInterface $parentGenericContext,
-        array $assuranceNodes
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $guardExpressionNode,
+        BehaviourSpecInterface $guardExpressionNodeBehaviourSpec,
+        array $assuranceNodes,
+        ActNodeInterface $subjectNode
     );
 
     /**
-     * Creates a new RootValidationContext
+     * Creates a ValidationContext
      *
-     * @param EnvironmentNode $environmentNode
-     * @return RootValidationContextInterface
+     * @param RootValidationContextInterface $rootValidationContext
+     * @param SubValidationContextInterface $subValidationContext
+     * @param BehaviourSpecValidatorInterface $behaviourSpecValidator
+     * @return ValidationContextInterface
      */
-    public function createRootContext(EnvironmentNode $environmentNode);
+    public function createContext(
+        RootValidationContextInterface $rootValidationContext,
+        SubValidationContextInterface $subValidationContext,
+        BehaviourSpecValidatorInterface $behaviourSpecValidator
+    );
 
     /**
-     * Creates a new ScopeValidationContext
+     * Creates a DetachedSubValidationContext
      *
-     * @param GenericValidationContextInterface $parentGenericContext
-     * @return ScopeValidationContextInterface
+     * @param SubValidationContextInterface $parentContext
+     * @param ActNodeInterface $actNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return DetachedSubValidationContextInterface
+     */
+    public function createDetachedContext(
+        SubValidationContextInterface $parentContext,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a RootValidationContext
+     *
+     * @param RootSubValidationContextInterface $rootSubValidationContext
+     * @param BehaviourSpecInterface $rootNodeBehaviourSpec
+     * @param BehaviourSpecValidatorInterface $behaviourSpecValidator
+     * @return RootValidationContextInterface
+     */
+    public function createRootContext(
+        RootSubValidationContextInterface $rootSubValidationContext,
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        BehaviourSpecValidatorInterface $behaviourSpecValidator
+    );
+
+    /**
+     * Creates a new RootSubValidationContext
+     *
+     * @param ActNodeInterface $rootNode
+     * @param BehaviourSpecInterface $rootNodeBehaviourSpec
+     * @param StructuredNodeInterface $subjectNode
+     * @return RootSubValidationContextInterface
+     */
+    public function createRootSubContext(
+        ActNodeInterface $rootNode,
+        BehaviourSpecInterface $rootNodeBehaviourSpec,
+        StructuredNodeInterface $subjectNode
+    );
+
+    /**
+     * Creates a new ScopeSubValidationContext
+     *
+     * @param SubValidationContextInterface $parentContext
+     * @param TypeDeterminerInterface[] $variableTypeDeterminers
+     * @param ActNodeInterface $actNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @param ActNodeInterface $subjectNode
+     * @return ScopeSubValidationContextInterface
      */
     public function createScopeContext(
-        GenericValidationContextInterface $parentGenericContext
+        SubValidationContextInterface $parentContext,
+        array $variableTypeDeterminers,
+        ActNodeInterface $actNode,
+        BehaviourSpecInterface $behaviourSpec,
+        ActNodeInterface $subjectNode
     );
 
     /**
      * Creates a new DivisionByZeroViolation
      *
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $validationContext
      * @return DivisionByZeroViolation
      */
     public function createDivisionByZeroViolation(
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $validationContext
     );
 
     /**
      * Creates a new GenericViolation
      *
      * @param string $description
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $validationContext
      * @return GenericViolation
      */
     public function createGenericViolation(
         $description,
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $validationContext
     );
 
     /**
@@ -105,26 +176,14 @@ interface ValidationFactoryInterface
      *
      * @param TypeInterface $expectedType
      * @param TypeInterface $actualType
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $validationContext
      * @param string $contextDescription
      * @return TypeMismatchViolation
      */
     public function createTypeMismatchViolation(
         TypeInterface $expectedType,
         TypeInterface $actualType,
-        ValidationContextInterface $validationContext,
+        SubValidationContextInterface $validationContext,
         $contextDescription
     );
-
-//    /**
-//     * Creates a new UndefinedAssuredStaticViolation
-//     *
-//     * @param string $assuredStaticName
-//     * @param ValidationContextInterface $validationContext
-//     * @return UndefinedAssuredStaticViolation
-//     */
-//    public function createUndefinedAssuredStaticViolation(
-//        $assuredStaticName,
-//        ValidationContextInterface $validationContext
-//    );
 }

@@ -16,7 +16,7 @@ use Combyna\Component\Bag\StaticBagInterface;
 /**
  * Class Signal
  *
- * Represents an event that has occurred or a request that has been made within the system
+ * Represents an action that has occurred or a request that has been made within the system
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -60,6 +60,14 @@ class Signal implements SignalInterface
     public function getName()
     {
         return $this->definition->getName();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStatic($staticName)
+    {
+        return $this->payloadStaticBag->getStatic($staticName);
     }
 
     /**

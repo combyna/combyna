@@ -61,6 +61,14 @@ class RenderedWidget implements HtmlNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function toGenericArray()
+    {
+        return [$this->toArray()];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toHtml()
     {
         return $this->rootNode->toHtml();

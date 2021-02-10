@@ -11,11 +11,15 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 
@@ -26,6 +30,20 @@ use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
  */
 interface WidgetInterface
 {
+    /**
+     * Creates a WidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @param WidgetStateInterface|null $widgetState
+     * @return WidgetEvaluationContextInterface
+     */
+    public function createEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState = null
+    );
+
     /**
      * Creates an event to dispatch for a rendered instance of this widget
      *
@@ -39,12 +57,24 @@ interface WidgetInterface
     /**
      * Creates an initial state for the widget
      *
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param string|int $name
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @return WidgetStateInterface
      */
     public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
+        $name,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     );
+
+    /**
+     * Determines whether this widget, or any of its descendants, define the specified capture
+     *
+     * @param string $captureName
+     * @return bool
+     */
+    public function descendantsSetCaptureInclusive($captureName);
 
     /**
      * Dispatches an event
@@ -61,6 +91,29 @@ interface WidgetInterface
         EventInterface $event,
         WidgetEvaluationContextInterface $widgetEvaluationContext
     );
+
+    /**
+     * Evaluates and then returns the specified attribute of this widget
+     *
+     * @param string $attributeName
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @return StaticInterface
+     */
+    public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext);
+
+    /**
+     * Fetches the capture expression bag
+     *
+     * @return ExpressionBagInterface
+     */
+    public function getCaptureExpressionBag();
+
+    /**
+     * Fetches the capture static bag model
+     *
+     * @return FixedStaticBagModelInterface
+     */
+    public function getCaptureStaticBagModel();
 
     /**
      * Fetches the unique name for the definition of this widget
@@ -87,14 +140,14 @@ interface WidgetInterface
     /**
      * Fetches the unique name of this widget within its parent
      *
-     * @return string
+     * @return string|int
      */
     public function getName();
 
     /**
      * Fetches the path to this widget, with its view name and all ancestor names
      *
-     * @return string[]
+     * @return string[]|int[]
      */
     public function getPath();
 
@@ -106,15 +159,27 @@ interface WidgetInterface
      */
     public function hasTag($tag);
 
-//    /**
-//     * Renders this widget to a CoreWidgetState
-//     *
-//     * @param ViewEvaluationContextInterface $evaluationContext
-//     * @param WidgetStateInterface|null $parentRenderedWidget
-//     * @return WidgetStateInterface|null Returns the rendered widget or null if invisible
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    );
+    /**
+     * Returns true if the widget can be rendered directly (ie. is primitive or core),
+     * or false if only some of its descendants may be rendered (eg. is compound)
+     *
+     * @return bool
+     */
+    public function isRenderable();
+
+    /**
+     * Re-evaluates the state for the widget, using the old state as a base.
+     * If the newly evaluated state is the same as the old one,
+     * the original state object will be returned
+     *
+     * @param WidgetStateInterface $oldState
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return WidgetStateInterface
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
 }

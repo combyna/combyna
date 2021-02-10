@@ -16,7 +16,6 @@ use Combyna\Component\Common\DependencyInjection\Compiler\MergeExtensionConfigur
 use Combyna\Component\Plugin\PluginInterface;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Class Runtime
@@ -38,22 +37,6 @@ class Runtime
     public function __construct(array $components)
     {
         $this->components = $components;
-    }
-
-    /**
-     * Boots the runtime, modifying the DI container as required
-     *
-     * @param ContainerInterface $container
-     */
-    public function boot(ContainerInterface $container)
-    {
-        // Set up delegators at this point, as they would otherwise set up circular dependencies
-        // between the service definitions
-
-        /** @var DelegatorInitialiser $delegatorInitialiser */
-        $delegatorInitialiser = $container->get(DelegatorInitialiser::SERVICE_ID);
-
-        $delegatorInitialiser->initialise();
     }
 
     /**
@@ -79,6 +62,9 @@ class Runtime
             if ($component instanceof PluginInterface) {
                 $containerBuilder->addCompilerPass($component, PassConfig::TYPE_OPTIMIZE);
             }
+
+            // Allow the component to register any container extensions or compiler passes
+            $component->build($containerBuilder);
         }
 
         // Ensure the extensions for components are always loaded

@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Router;
 
-use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
 

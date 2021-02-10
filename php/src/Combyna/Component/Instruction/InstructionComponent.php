@@ -12,6 +12,9 @@
 namespace Combyna\Component\Instruction;
 
 use Combyna\Component\Common\AbstractComponent;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class InstructionComponent
@@ -20,4 +23,17 @@ use Combyna\Component\Common\AbstractComponent;
  */
 class InstructionComponent extends AbstractComponent
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            new DelegateeTagDefinition(
+                'combyna.instruction_loader',
+                'combyna.instruction.loader',
+                'addLoader'
+            )
+        ]));
+    }
 }

@@ -15,10 +15,8 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Component\Type\TypeInterface;
 use InvalidArgumentException;
-use LogicException;
 use OutOfBoundsException;
 
 /**
@@ -55,7 +53,7 @@ class StaticList implements StaticListInterface
         StaticExpressionFactoryInterface $staticExpressionFactory,
         array $statics
     ) {
-        $this->validateStatics($statics);
+        $this->assertValidStatics($statics);
 
         $this->bagFactory = $bagFactory;
         $this->staticExpressionFactory = $staticExpressionFactory;
@@ -118,26 +116,9 @@ class StaticList implements StaticListInterface
     /**
      * {@inheritdoc}
      */
-    public function getElementType(ValidationContextInterface $validationContext)
+    public function getElementStatics()
     {
-        /** @var TypeInterface|null $combinedType */
-        $combinedType = null;
-
-        if (count($this->statics) === 0) {
-            throw new LogicException('Static list has no elements - unable to determine an element type');
-        }
-
-        foreach ($this->statics as $static) {
-            $type = $static->getResultType($validationContext);
-
-            if ($combinedType === null) {
-                $combinedType = $type;
-            } else {
-                $combinedType = $combinedType->mergeWith($type);
-            }
-        }
-
-        return $combinedType;
+        return $this->statics;
     }
 
     /**
@@ -179,6 +160,39 @@ class StaticList implements StaticListInterface
     /**
      * {@inheritdoc}
      */
+    public function mapArray(
+        $itemVariableName,
+        $indexVariableName,
+        callable $mapCallback,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        $resultArray = [];
+
+        foreach ($this->statics as $index => $static) {
+            $variableStatics = [
+                // Expose one variable with the static's value
+                $itemVariableName => $static
+            ];
+
+            if ($indexVariableName !== null) {
+                // Expose another variable with the current 1-based list element index as a number static
+                $variableStatics[$indexVariableName] =
+                    $this->staticExpressionFactory->createNumberExpression($index + 1);
+            }
+
+            $itemEvaluationContext = $evaluationContext->createSubScopeContext(
+                $this->bagFactory->createStaticBag($variableStatics)
+            );
+
+            $resultArray[] = $mapCallback($itemEvaluationContext, $static, $index);
+        }
+
+        return $resultArray;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setElementStatic($index, StaticInterface $value)
     {
         if (!is_int($index)) {
@@ -207,7 +221,7 @@ class StaticList implements StaticListInterface
      *
      * @param StaticInterface[] $statics
      */
-    private function validateStatics(array $statics)
+    private function assertValidStatics(array $statics)
     {
         foreach ($statics as $name => $static) {
             if (!$static instanceof StaticInterface) {

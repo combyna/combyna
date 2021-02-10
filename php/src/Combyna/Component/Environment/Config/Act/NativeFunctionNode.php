@@ -12,10 +12,14 @@
 namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\NativeFunctionNotInstalledException;
-use Combyna\Component\Environment\Library\NativeFunction;
+use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class NativeFunctionNode
@@ -25,6 +29,11 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
 class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterface
 {
     const TYPE = 'native-function';
+
+    /**
+     * @var callable|null
+     */
+    private $callable = null;
 
     /**
      * @var string
@@ -37,18 +46,63 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     private $libraryName;
 
     /**
-     * @var NativeFunction|null
+     * @var FixedStaticBagModelNode
      */
-    private $nativeFunction = null;
+    private $parameterBagModelNode;
+
+    /**
+     * @var TypeDeterminerInterface
+     */
+    private $returnTypeDeterminer;
 
     /**
      * @param string $libraryName
      * @param string $functionName
+     * @param FixedStaticBagModelNode $parameterBagModelNode
+     * @param TypeDeterminerInterface $returnTypeDeterminer
      */
-    public function __construct($libraryName, $functionName)
-    {
+    public function __construct(
+        $libraryName,
+        $functionName,
+        FixedStaticBagModelNode $parameterBagModelNode,
+        TypeDeterminerInterface $returnTypeDeterminer
+    ) {
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
+        $this->parameterBagModelNode = $parameterBagModelNode;
+        $this->returnTypeDeterminer = $returnTypeDeterminer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->parameterBagModelNode);
+
+        $specBuilder->addConstraint(
+            new CallbackConstraint(
+                function (ValidationContextInterface $validationContext) {
+                    if ($this->callable === null) {
+                        $validationContext->addGenericViolation(
+                            'Native function "' . $this->functionName . '" for library "' .
+                            $this->libraryName . '" was never installed'
+                        );
+                    }
+                }
+            )
+        );
+
+        // Make sure the return type is a resolved, valid type
+        $specBuilder->addConstraint(new ResolvableTypeConstraint($this->returnTypeDeterminer));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->functionName;
     }
 
     /**
@@ -70,58 +124,55 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     }
 
     /**
-     * Fetches the native function set for this node
+     * Fetches the native function callable set for this node
      *
-     * @return NativeFunction
+     * @return callable
      * @throws NativeFunctionNotInstalledException Throws when native function was never installed
      */
-    public function getNativeFunction()
+    public function getCallable()
     {
-        if ($this->nativeFunction === null) {
+        if ($this->callable === null) {
             throw new NativeFunctionNotInstalledException($this->libraryName, $this->functionName);
         }
 
-        return $this->nativeFunction;
+        return $this->callable;
+    }
+
+    /**
+     * Fetches the model for the parameters the function expects
+     *
+     * @return FixedStaticBagModelNode
+     */
+    public function getParameterBagModel()
+    {
+        return $this->parameterBagModelNode;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getReturnTypeDeterminer()
+    {
+        return $this->returnTypeDeterminer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isDefined()
+    {
+        return true;
     }
 
     /**
      * Sets the native function that this node references. If the native function
      * that this node references is never set, then it will fail validation
      *
-     * @param NativeFunction $nativeFunction
+     * @param callable $callable
      */
-    public function setNativeFunction(NativeFunction $nativeFunction)
+    public function setNativeFunctionCallable(callable $callable)
     {
-        $this->nativeFunction = $nativeFunction;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getReturnType()
-    {
-        if (!$this->nativeFunction) {
-            return new UnknownType();
-        }
-
-        return $this->nativeFunction->getReturnType();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        if ($this->nativeFunction === null) {
-            $subValidationContext->addGenericViolation(
-                'Native function "' . $this->functionName . '" for library "' .
-                $this->libraryName . '" was never installed'
-            );
-
-            return;
-        }
+        $this->callable = $callable;
     }
 
     /**
@@ -131,13 +182,10 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
         ValidationContextInterface $validationContext,
         ExpressionBagNode $expressionBagNode
     ) {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        if (!$this->nativeFunction) {
-            // Native function was never installed - ::validate() will handle
-            return;
-        }
-
-        $this->nativeFunction->validateArgumentExpressionBag($subValidationContext, $expressionBagNode);
+        $this->parameterBagModelNode->validateStaticExpressionBag(
+            $validationContext,
+            $expressionBagNode,
+            'parameter'
+        );
     }
 }

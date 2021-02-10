@@ -11,11 +11,9 @@
 
 namespace Combyna\Component\Environment\Library;
 
-use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Parameter\ParameterBagModelInterface;
 use Combyna\Component\Type\TypeInterface;
 use LogicException;
 
@@ -39,40 +37,32 @@ class NativeFunction implements FunctionInterface
     private $name;
 
     /**
-     * @var ParameterBagModelInterface
+     * @var FixedStaticBagModelInterface
      */
     private $parameterBag;
 
     /**
-     * @var TypeInterface
-     */
-    private $returnType;
-
-    /**
      * @param string $name
-     * @param ParameterBagModelInterface $parameterBag A specification for parameters and their types
+     * @param FixedStaticBagModelInterface $parameterBag A specification for parameters and their types
      * @param callable $callable
-     * @param TypeInterface $returnType
      */
     public function __construct(
         $name,
-        ParameterBagModelInterface $parameterBag,
-        callable $callable,
-        TypeInterface $returnType
+        FixedStaticBagModelInterface $parameterBag,
+        callable $callable
     ) {
         $this->callable = $callable;
         $this->name = $name;
         $this->parameterBag = $parameterBag;
-        $this->returnType = $returnType;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function call(StaticBagInterface $argumentStaticBag)
+    public function call(StaticBagInterface $argumentStaticBag, TypeInterface $returnType)
     {
         // Sanity check to ensure all arguments match the parameter list before we continue
-        $this->parameterBag->assertValidArgumentBag($argumentStaticBag);
+        $this->parameterBag->assertValidStaticBag($argumentStaticBag);
 
         $callable = $this->callable;
         $resultStatic = $callable($argumentStaticBag);
@@ -83,10 +73,14 @@ class NativeFunction implements FunctionInterface
         }
 
         // Check that the function returned a static of the type it declares that it returns
-        if (!$this->returnType->allowsStatic($resultStatic)) {
+        if (!$returnType->allowsStatic($resultStatic)) {
             throw new LogicException(
-                'Function must return a [' . $this->returnType->getSummary() . '], ' .
-                get_class($resultStatic) . ' returned'
+                sprintf(
+                    'Function "%s" must return a [%s], %s returned',
+                    $this->name,
+                    $returnType->getSummary(),
+                    get_class($resultStatic)
+                )
             );
         }
 
@@ -99,26 +93,5 @@ class NativeFunction implements FunctionInterface
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getReturnType()
-    {
-        return $this->returnType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateArgumentExpressionBag(
-        ValidationContextInterface $validationContext,
-        ExpressionBagNode $expressionBagNode
-    ) {
-        $this->parameterBag->validateArgumentExpressionBag(
-            $validationContext,
-            $expressionBagNode
-        );
     }
 }

@@ -14,8 +14,11 @@ namespace Combyna\Component\Program;
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\State\ProgramState;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
@@ -54,24 +57,44 @@ class Program implements ProgramInterface
     private $rootEvaluationContext;
 
     /**
+     * @var UiEvaluationContextFactoryInterface
+     */
+    private $uiEvaluationContextFactory;
+
+    /**
      * @param EnvironmentInterface $environment
      * @param ResourceRepositoryInterface $resourceRepository
      * @param PageViewCollectionInterface $pageViewCollection
      * @param OverlayViewCollectionInterface $overlayViewCollection
      * @param EvaluationContextInterface $rootEvaluationContext
+     * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      */
     public function __construct(
         EnvironmentInterface $environment,
         ResourceRepositoryInterface $resourceRepository,
         PageViewCollectionInterface $pageViewCollection,
         OverlayViewCollectionInterface $overlayViewCollection,
-        EvaluationContextInterface $rootEvaluationContext
+        EvaluationContextInterface $rootEvaluationContext,
+        UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
     ) {
         $this->environment = $environment;
         $this->overlayViewCollection = $overlayViewCollection;
         $this->pageViewCollection = $pageViewCollection;
         $this->resourceRepository = $resourceRepository;
         $this->rootEvaluationContext = $rootEvaluationContext;
+        $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createInitialState(RouterStateInterface $routerState)
+    {
+        return new ProgramState(
+            $routerState,
+            $this->pageViewCollection->createInitialState($routerState, $this->rootEvaluationContext),
+            $this->overlayViewCollection->createInitialStates()
+        );
     }
 
     /**
@@ -148,5 +171,23 @@ class Program implements ProgramInterface
 
         // Dispatch to all ViewStores and WidgetStores
         return $this->pageViewCollection->handleSignal($programState, $signal, $this, $this->environment);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateUiState(ProgramStateInterface $programState)
+    {
+        // TODO: Overlay views
+
+        $pageView = $this->pageViewCollection->getView($programState->getPageViewState()->getViewName());
+
+        return $programState->withPageViewState(
+            $pageView->reevaluateState(
+                $programState->getPageViewState(),
+                $this->rootEvaluationContext,
+                $this->uiEvaluationContextFactory
+            )
+        );
     }
 }

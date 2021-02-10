@@ -1,0 +1,6 @@
+services:
+    combyna.signal.promoter.signal_payload_expression_node:
+        class: Combyna\Component\Signal\Config\Act\SignalPayloadExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

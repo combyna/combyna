@@ -11,15 +11,12 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\ComparisonExpression;
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Harness\TestCase;
 use Combyna\Component\Expression\Config\Loader\ComparisonExpressionLoader;
-use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

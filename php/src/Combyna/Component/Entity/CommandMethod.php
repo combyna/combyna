@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Entity;
 
-use Combyna\Component\Entity\Instruction\EntityInstructionInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Parameter\ParameterBagModelInterface;
+use Combyna\Component\Entity\Instruction\EntityInstructionInterface;
 
 /**
  * Class CommandMethod
@@ -35,16 +35,16 @@ class CommandMethod implements CommandMethodInterface
     private $name;
 
     /**
-     * @var ParameterBagModelInterface
+     * @var FixedStaticBagModelInterface
      */
     private $parameterBagModel;
 
     /**
      * @param string $name
-     * @param ParameterBagModelInterface $parameterBagModel
+     * @param FixedStaticBagModelInterface $parameterBagModel
      * @param EntityInstructionInterface[] $instructions
      */
-    public function __construct($name, ParameterBagModelInterface $parameterBagModel, array $instructions)
+    public function __construct($name, FixedStaticBagModelInterface $parameterBagModel, array $instructions)
     {
         $this->instructions = $instructions;
         $this->name = $name;

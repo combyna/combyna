@@ -11,20 +11,16 @@
 
 namespace Combyna\Unit\Component\Expression;
 
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ConcatenationExpression;
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticListType;
-use Combyna\Component\Type\StaticType;
 use LogicException;
 use Prophecy\Argument;
-use Prophecy\Call\Call;
 use Prophecy\Prophecy\ObjectProphecy;
 
 /**
@@ -107,8 +103,7 @@ class ConcatenationExpressionTest extends TestCase
 
         $this->setExpectedException(
             LogicException::class,
-            'ConcatenationExpression :: List can only evaluate to a static-list ' .
-            'or error expression, but got a(n) "number"'
+            'ConcatenationExpression :: List can only evaluate to a static-list, but got a(n) "number"'
         );
 
         $this->expression->toStatic($this->evaluationContext->reveal());

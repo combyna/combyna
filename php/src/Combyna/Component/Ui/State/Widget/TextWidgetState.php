@@ -23,7 +23,7 @@ use Combyna\Component\Ui\Widget\TextWidgetInterface;
 class TextWidgetState implements TextWidgetStateInterface
 {
     /**
-     * @var string
+     * @var int|string
      */
     private $name;
 
@@ -38,20 +38,28 @@ class TextWidgetState implements TextWidgetStateInterface
     private $textWidget;
 
     /**
+     * @param string|int $name
      * @param TextWidgetInterface $textWidget
-     * @param string $name
      * @param string $text
      */
     public function __construct(
-        TextWidgetInterface $textWidget,
         $name,
+        TextWidgetInterface $textWidget,
         $text
     ) {
+        $this->name = $name;
         $this->text = $text;
 
         // FIXME: Remove references from state objects back to the entities like this!
         $this->textWidget = $textWidget;
-        $this->name = $name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualRenderableDescendantStatePath()
+    {
+        return []; // TextWidgets are renderable, nothing to traverse down to
     }
 
     /**
@@ -124,5 +132,20 @@ class TextWidgetState implements TextWidgetStateInterface
         return $this->textWidget->hasTag($tag) ?
             [$stateFactory->createWidgetStatePath(array_merge($parentStates, [$this]))] :
             [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with($text)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->text === $text) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->textWidget, $text);
     }
 }

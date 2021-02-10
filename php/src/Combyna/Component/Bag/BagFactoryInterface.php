@@ -52,13 +52,13 @@ interface BagFactoryInterface
      * Creates a FixedStaticDefinition
      *
      * @param string $name
-     * @param TypeInterface $type
+     * @param TypeInterface $staticType
      * @param ExpressionInterface|null $defaultExpression
      * @return FixedStaticDefinition
      */
     public function createFixedStaticDefinition(
         $name,
-        TypeInterface $type,
+        TypeInterface $staticType,
         ExpressionInterface $defaultExpression = null
     );
 

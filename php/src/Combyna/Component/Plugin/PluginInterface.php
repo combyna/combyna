@@ -21,4 +21,11 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
  */
 interface PluginInterface extends ComponentInterface, CompilerPassInterface
 {
+    /**
+     * Fetches any sub-plugins of this one. Sub-plugins will only be loaded
+     * when using one of the originators that they specify
+     *
+     * @return SubPluginInterface[]
+     */
+    public function getSubPlugins();
 }

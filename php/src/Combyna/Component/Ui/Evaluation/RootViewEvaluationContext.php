@@ -16,9 +16,9 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
-use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
+use Combyna\Component\Ui\State\View\ViewStateInterface;
 use Combyna\Component\Ui\View\ViewInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
+use LogicException;
 
 /**
  * Class RootViewEvaluationContext
@@ -43,47 +43,29 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     private $view;
 
     /**
-     * @var StaticBagInterface|null
+     * @var ViewStateInterface|null
      */
-    private $viewAttributeStaticBag;
-
-    /**
-     * @var ViewStoreStateInterface
-     */
-    private $viewStoreState;
+    private $viewState;
 
     /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @param ViewInterface $view
-     * @param ViewStoreStateInterface $viewStoreState
-     * @param StaticBagInterface $viewAttributeStaticBag
      * @param EvaluationContextInterface $parentContext
      * @param EnvironmentInterface $environment
+     * @param ViewStateInterface|null $viewState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
         ViewInterface $view,
-        ViewStoreStateInterface $viewStoreState,
-        StaticBagInterface $viewAttributeStaticBag,
         EvaluationContextInterface $parentContext,
-        EnvironmentInterface $environment
+        EnvironmentInterface $environment,
+        ViewStateInterface $viewState = null
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
         $this->environment = $environment;
-        $this->evaluationContextFactory = $evaluationContextFactory;
-        $this->parentContext = $parentContext;
         $this->view = $view;
-        $this->viewAttributeStaticBag = $viewAttributeStaticBag;
-        $this->viewStoreState = $viewStoreState;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function callFunction($libraryName, $functionName, StaticBagInterface $argumentStaticBag)
-    {
-        return $this->environment->callViewFunction($libraryName, $functionName, $argumentStaticBag);
+        $this->viewState = $viewState;
     }
 
     /**
@@ -108,9 +90,20 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
     /**
      * {@inheritdoc}
      */
-    public function createSubWidgetEvaluationContext(WidgetInterface $widget)
+    public function getChildOfCurrentCompoundWidget($childName)
     {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
+        throw new LogicException(sprintf(
+            'Cannot fetch child "%s" from outside a compound widget',
+            $childName
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return [$this->view->getName()];
     }
 
     /**
@@ -118,6 +111,12 @@ class RootViewEvaluationContext extends AbstractEvaluationContext implements Vie
      */
     public function makeViewStoreQuery($queryName, StaticBagInterface $argumentStaticBag)
     {
-        return $this->view->makeStoreQuery($queryName, $argumentStaticBag, $this, $this->viewStoreState);
+        $viewStoreState = $this->viewState ?
+            // A previous state already exists - make the query in the context of the existing state
+            $this->viewState->getStoreState() :
+            // No state exists yet - create a new one to make the query in the context of
+            $this->view->getStore()->createInitialState($this);
+
+        return $this->view->makeStoreQuery($queryName, $argumentStaticBag, $this, $viewStoreState);
     }
 }

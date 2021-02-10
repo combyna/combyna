@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\View;
 
-use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
@@ -106,20 +105,5 @@ class PageViewCollection implements PageViewCollectionInterface
     public function hasView($viewName)
     {
         return array_key_exists($viewName, $this->views);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderView(
-        $viewName,
-        StaticBagInterface $viewAttributeStaticBag,
-        EvaluationContextInterface $rootEvaluationContext
-    ) {
-        if (!array_key_exists($viewName, $this->views)) {
-            throw new InvalidArgumentException('No view with name "' . $viewName . '" exists');
-        }
-
-        return $this->views[$viewName]->render($viewAttributeStaticBag, $rootEvaluationContext);
     }
 }

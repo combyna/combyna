@@ -11,13 +11,16 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Expression\Validation\Constraint\VariableExistsConstraint;
+use Combyna\Component\Expression\Validation\Query\VariableTypeQuery;
 use Combyna\Component\Expression\VariableExpression;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class VariableExpressionNode
  *
- * Returns the static value of a variable in the current context
+ * Returns the static value of a variable in the current scope
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -41,9 +44,17 @@ class VariableExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        return $validationContext->getVariableType($this->variableName);
+        $specBuilder->addConstraint(new VariableExistsConstraint($this->variableName));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResultTypeDeterminer()
+    {
+        return new QueriedResultTypeDeterminer(new VariableTypeQuery($this->variableName), $this);
     }
 
     /**
@@ -54,15 +65,5 @@ class VariableExpressionNode extends AbstractExpressionNode
     public function getVariableName()
     {
         return $this->variableName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $subValidationContext->assertVariableExists($this->variableName);
     }
 }

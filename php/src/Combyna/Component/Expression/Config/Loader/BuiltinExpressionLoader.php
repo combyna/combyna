@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
-use InvalidArgumentException;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 
 /**
  * Class BuiltinExpressionLoader
@@ -58,7 +58,7 @@ class BuiltinExpressionLoader implements ExpressionTypeLoaderInterface, Delegato
         $builtinName = $this->configParser->getElement($config, 'name', 'builtin');
 
         if (!array_key_exists($builtinName, $this->builtinLoaders)) {
-            throw new InvalidArgumentException('No loader is registered for builtin "' . $builtinName . '"');
+            return new UnknownExpressionNode('No loader is registered for builtin "' . $builtinName . '"');
         }
 
         return $this->builtinLoaders[$builtinName]->load($config);

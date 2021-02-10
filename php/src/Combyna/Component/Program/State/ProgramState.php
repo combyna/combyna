@@ -25,7 +25,7 @@ use Combyna\Component\Ui\State\View\ViewStateInterface;
 class ProgramState implements ProgramStateInterface
 {
     /**
-     * @var ViewStateInterface
+     * @var PageViewStateInterface
      */
     private $pageViewState;
 
@@ -41,12 +41,12 @@ class ProgramState implements ProgramStateInterface
 
     /**
      * @param RouterStateInterface $routerState
-     * @param ViewStateInterface $pageViewState
+     * @param PageViewStateInterface $pageViewState
      * @param ViewStateInterface[] $visibleOverlayViewStates
      */
     public function __construct(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState,
+        PageViewStateInterface $pageViewState,
         array $visibleOverlayViewStates
     ) {
         $this->pageViewState = $pageViewState;
@@ -89,6 +89,14 @@ class ProgramState implements ProgramStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getVisibleOverlayViewStates()
+    {
+        return $this->visibleOverlayViewStates;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getWidgetStatePathByPath(array $path)
     {
         try {
@@ -111,11 +119,7 @@ class ProgramState implements ProgramStateInterface
      */
     public function getWidgetStatePathByTag($tag)
     {
-        $widgetStatePaths = $this->pageViewState->getWidgetStatePathsByTag($tag);
-
-        foreach ($this->visibleOverlayViewStates as $overlayViewState) {
-            $widgetStatePaths = array_merge($widgetStatePaths, $overlayViewState->getWidgetStatePathsByTag($tag));
-        }
+        $widgetStatePaths = $this->getWidgetStatePathsByTag($tag);
 
         if (count($widgetStatePaths) > 1) {
             throw new NonUniqueResultException(
@@ -135,9 +139,23 @@ class ProgramState implements ProgramStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getWidgetStatePathsByTag($tag)
+    {
+        $widgetStatePaths = $this->pageViewState->getWidgetStatePathsByTag($tag);
+
+        foreach ($this->visibleOverlayViewStates as $overlayViewState) {
+            $widgetStatePaths = array_merge($widgetStatePaths, $overlayViewState->getWidgetStatePathsByTag($tag));
+        }
+
+        return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function withPage(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState
+        PageViewStateInterface $pageViewState
     ) {
         return new self($routerState, $pageViewState, $this->visibleOverlayViewStates);
     }

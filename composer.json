@@ -7,23 +7,28 @@
         }
     },
     "require": {
-        "symfony/event-dispatcher": "^2.8",
-        "symfony/http-foundation": "^2.8",
-        "symfony/yaml": "^2.8",
+        "symfony/event-dispatcher": "~2.8.0",
+        "symfony/http-foundation": "~2.8.0",
+        "symfony/yaml": "~2.8.0",
         "combyna/php-peg": "^2.0",
-        "symfony/dependency-injection": "^2.8",
-        "symfony/config": "^2.8",
-        "symfony/routing": "^2.8",
-        "symfony/translation": "^2.8"
+        "symfony/dependency-injection": "~2.8.0",
+        "symfony/config": "~2.8.0",
+        "symfony/routing": "~2.8.0",
+        "symfony/translation": "~2.8.0"
     },
     "require-dev": {
+        "combyna/gui-plugin": "dev-master",
         "phpunit/phpunit": "^4.6",
         "elliotchance/concise": "^2.1"
     },
     "scripts": {
-        "build:expression-parser": "mkdir -p ./php/dist/Combyna/Component/ExpressionLanguage && peg ./php/src/Combyna/Component/ExpressionLanguage/PegExpressionParser.php.inc ./php/dist/Combyna/Component/ExpressionLanguage/PegExpressionParser.php",
         "server": "php ./php/src/server.php",
-        "simple-server": "php -S localhost:9000 example/simple/app.php"
+        "simple-server": "php -S localhost:9000 example/app.php"
+    },
+    "config": {
+        "platform": {
+            "php": "7.1"
+        }
     },
     "license": "MIT",
     "authors": [

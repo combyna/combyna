@@ -12,10 +12,12 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface WidgetDefinitionNodeInterface
@@ -25,11 +27,28 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
 interface WidgetDefinitionNodeInterface extends ActNodeInterface
 {
     /**
+     * Determines whether this definition defines the specified value
+     *
+     * @param string $valueName
+     * @return bool
+     */
+    public function definesValue($valueName);
+
+    /**
      * Fetches the fixed static bag model for attributes of widgets with this definition
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getAttributeBagModel();
+
+    /**
+     * Fetches a child widget definition by its name, if defined for this widget definition
+     *
+     * @param string $childName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return ChildWidgetDefinitionNode|null
+     */
+    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement);
 
     /**
      * Fetches all event definition references defined for this widget definition
@@ -39,13 +58,6 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
     public function getEventDefinitionReferences();
 
     /**
-     * Fetches the labels for this widget definition
-     *
-     * @return array
-     */
-    public function getLabels();
-
-    /**
      * Fetches the name of the library this definition belongs to
      *
      * @return string
@@ -53,11 +65,27 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
     public function getLibraryName();
 
     /**
+     * Fetches the type of a value defined by this definition
+     *
+     * @param string $valueName
+     * @param QueryRequirementInterface $queryRequirement
+     * @return TypeInterface
+     */
+    public function getValueType($valueName, QueryRequirementInterface $queryRequirement);
+
+    /**
      * Fetches the name of this widget definition
      *
      * @return string
      */
     public function getWidgetDefinitionName();
+
+    /**
+     * Returns whether or not this widget definition is defined
+     *
+     * @return bool
+     */
+    public function isDefined();
 
     /**
      * Validates that the provided widget data will produce a valid widget with this definition

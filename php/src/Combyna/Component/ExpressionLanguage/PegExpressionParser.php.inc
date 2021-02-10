@@ -19,7 +19,7 @@ use hafriedlander\Peg\Parser\Basic;
  * A generated PEG parser for parsing the Combyna expression language
  *
  * NB: This class will be modified by php-peg and output to PegExpressionParser.php in the dist directory,
- *     by `composer run build:expression-parser`.
+ *     by Combyna\Component\ExpressionLanguage\CacheWarmer\ExpressionLanguageParserCacheWarmer.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -55,7 +55,7 @@ class PegExpressionParser extends Basic
         function NumberLiteral(&$result, $sub) {
             $result['node'] = [
                 'type' => 'number',
-                'number' => (float) $sub['value']['text']
+                'number' => is_numeric($sub['value']['text']) ? $sub['value']['text'] * 1 : 0
             ];
         }
         function BooleanLiteral(&$result, $sub) {
@@ -253,22 +253,34 @@ class PegExpressionParser extends Basic
         {
             $result['node']['arguments'] = $sub['arguments'];
         }
-    Expression: > Comparison
+    ConsequentAndAlternate: '?' > consequent:Conditional > ':' > alternate:Conditional >
+    Conditional: Comparison > ( ConsequentAndAlternate ) *
         function Comparison(&$result, $sub) {
+            $result['node'] = $sub['node'];
+        }
+        function ConsequentAndAlternate(&$result, $sub) {
+            $result['node'] = $this->buildTernaryConditionalExpression(
+                $result['node'],
+                $sub['consequent']['node'],
+                $sub['alternate']['node']
+            );
+        }
+    Expression: > Conditional
+        function Conditional(&$result, $sub) {
             $result['node'] = $sub['node'];
         }
     */
 
-    // Comparison just happens to currently be the expression with the highest precedence,
+    // "Conditional" just happens to currently be the expression with the lowest precedence,
     // which is why the top-level Expression references it
 
     /**
-     * @param string $left
+     * @param array $left
      * @param string $operator
-     * @param string $right
+     * @param array $right
      * @return array
      */
-    private function buildBinaryArithmeticExpression($left, $operator, $right)
+    private function buildBinaryArithmeticExpression(array $left, $operator, array $right)
     {
         return [
             'type' => 'binary-arithmetic',
@@ -279,12 +291,12 @@ class PegExpressionParser extends Basic
     }
 
     /**
-     * @param string $left
+     * @param array $left
      * @param string $operator
-     * @param string $right
+     * @param array $right
      * @return array
      */
-    private function buildComparisonExpression($left, $operator, $right)
+    private function buildComparisonExpression(array $left, $operator, array $right)
     {
         return [
             'type' => 'comparison',
@@ -292,5 +304,40 @@ class PegExpressionParser extends Basic
             'left' => $left,
             'right' => $right
         ];
+    }
+
+    /**
+     * @param array $condition
+     * @param array $consequent
+     * @param array $alternate
+     * @return array
+     */
+    private function buildTernaryConditionalExpression(array $condition, array $consequent, array $alternate)
+    {
+        return [
+            'type' => 'conditional',
+            'condition' => $condition,
+            'consequent' => $consequent,
+            'alternate' => $alternate
+        ];
+    }
+
+    /**
+     * Copied from \hafriedlander\Peg\Parser\Basic.
+     * Edited to allow newlines to be matched by whitespace gobbling.
+     *
+     * @return bool|string
+     */
+    public function whitespace()
+    {
+        $matched = preg_match('/\s+/', $this->string, $matches, PREG_OFFSET_CAPTURE, $this->pos);
+
+        if ($matched && $matches[0][1] === $this->pos) {
+            $this->pos += strlen($matches[0][0]);
+
+            return $matches[0][0];
+        }
+
+        return false;
     }
 }

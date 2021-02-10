@@ -12,8 +12,15 @@
 namespace Combyna\Component\Expression\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\FunctionExpression;
+use Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraint;
+use Combyna\Component\Expression\Validation\Query\FunctionReturnTypeQuery;
+use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
+use LogicException;
 
 /**
  * Class FunctionExpressionNode
@@ -42,6 +49,11 @@ class FunctionExpressionNode extends AbstractExpressionNode
     private $libraryName;
 
     /**
+     * @var TypeInterface|null
+     */
+    private $resolvedResultType = null;
+
+    /**
      * @param string $libraryName
      * @param string $functionName
      * @param ExpressionBagNode $argumentExpressionBag
@@ -54,6 +66,38 @@ class FunctionExpressionNode extends AbstractExpressionNode
         $this->argumentExpressionBagNode = $argumentExpressionBag;
         $this->functionName = $functionName;
         $this->libraryName = $libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        // Ensure all argument expressions are valid within themselves
+        $specBuilder->addChildNode($this->argumentExpressionBagNode);
+
+        // Now ensure all argument expressions resolve to valid static types for their corresponding parameters
+        $specBuilder->addConstraint(
+            new ValidFunctionCallConstraint(
+                $this->libraryName,
+                $this->functionName,
+                $this->argumentExpressionBagNode
+            )
+        );
+
+        // Resolve the function's return type when given this call's arguments,
+        // as it can be different depending on the types of the arguments provided
+        // (eg. if a custom TypeDeterminer is used for a parameter's type)
+        $specBuilder->addConstraint(
+            new CallbackConstraint(
+                function (ValidationContextInterface $validationContext) {
+                    $this->resolvedResultType = $validationContext->queryForResultType(
+                        new FunctionReturnTypeQuery($this->libraryName, $this->functionName),
+                        $this
+                    );
+                }
+            )
+        );
     }
 
     /**
@@ -87,34 +131,33 @@ class FunctionExpressionNode extends AbstractExpressionNode
     }
 
     /**
-     * {@inheritdoc}
+     * Fetches the resolved result type for the function call (the function call's return type)
+     *
+     * @return TypeInterface
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResolvedResultType()
     {
-        $returnType = $validationContext->getFunctionReturnType($this->libraryName, $this->functionName);
-
-        if ($returnType === null) {
-            return new UnknownType();
+        if ($this->resolvedResultType === null) {
+            throw new LogicException(
+                sprintf(
+                    'Function "%s.%s" call expression result type was expected to be resolved but was not',
+                    $this->libraryName,
+                    $this->functionName
+                )
+            );
         }
 
-        return $returnType;
+        return $this->resolvedResultType;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // Ensure all argument expressions are valid within themselves
-        $this->argumentExpressionBagNode->validate($subValidationContext);
-
-        // Now ensure all argument expressions resolve to valid static types for their corresponding parameters
-        $subValidationContext->assertValidFunctionCall(
-            $this->libraryName,
-            $this->functionName,
-            $this->argumentExpressionBagNode
+        return new QueriedResultTypeDeterminer(
+            new FunctionReturnTypeQuery($this->libraryName, $this->functionName),
+            $this
         );
     }
 }

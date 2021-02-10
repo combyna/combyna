@@ -18,7 +18,7 @@ You'll need Node.js and PHP 5.5+ to use this project.
 1. `composer install`
 1. `npm install`
 1. `composer run build:expression-parser`
-1. `node_modules/.bin/webpack --watch --devtool source-map`
+1. `npm run dev:watch`
 1. (In a separate terminal) `composer run simple-server --timeout 0`
 
 ## App config

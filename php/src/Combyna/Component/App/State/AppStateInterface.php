@@ -52,9 +52,9 @@ interface AppStateInterface
     public function getWidgetStatePathByPath(array $path);
 
     /**
-     * Fetches a single widget path by a tag on the widget.
-     * If multiple widgets would match, then a NonUniqueResultException will be thrown,
-     * but if no widget is found a NotFoundException will be thrown instead
+     * Fetches a single widget instance's state path by a tag on the widget.
+     * If multiple widget instances would match, then a NonUniqueResultException will be thrown,
+     * but if no widget instance is found a NotFoundException will be thrown instead
      *
      * @param string $tag
      * @return WidgetStatePathInterface
@@ -62,6 +62,14 @@ interface AppStateInterface
      * @throws NotFoundException
      */
     public function getWidgetStatePathByTag($tag);
+
+    /**
+     * Fetches all widget instances' state paths by a tag on the widget.
+     *
+     * @param string $tag
+     * @return WidgetStatePathInterface[]
+     */
+    public function getWidgetStatePathsByTag($tag);
 
     /**
      * Either creates a new app state with the specified program state

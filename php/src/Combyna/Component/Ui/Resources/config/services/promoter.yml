@@ -1,4 +1,10 @@
 services:
+    combyna.ui.promoter.capture_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\CaptureExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
     combyna.ui.promoter.view_node:
         class: Combyna\Component\Ui\Config\Act\ViewNodePromoter
         autowire: true
@@ -29,6 +35,18 @@ services:
         tags:
             - {name: combyna.expression_promoter}
 
+    combyna.ui.promoter.widget_attribute_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\WidgetAttributeExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}
+
     combyna.ui.promoter.widget_node:
         class: Combyna\Component\Ui\Config\Act\WidgetNodePromoter
         autowire: true
+
+    combyna.ui.promoter.widget_value_expression_node:
+        class: Combyna\Component\Ui\Config\Act\Expression\WidgetValueExpressionNodePromoter
+        autowire: true
+        tags:
+            - {name: combyna.expression_promoter}

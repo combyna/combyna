@@ -49,6 +49,10 @@ class ViewStoreInstructionList implements ViewStoreInstructionListInterface
         EvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     ) {
+        // TODO: Look into whether we need to create a new evaluation context
+        //       if a new store state is returned (state objects are immutable)
+        //       - test with a set-slot instruction followed by another instruction
+        //         that reads that same slot
         foreach ($this->instructions as $instruction) {
             $viewStoreState = $instruction->perform($evaluationContext, $viewStoreState);
         }

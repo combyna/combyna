@@ -1,0 +1,4 @@
+services:
+    combyna.event.expression.factory:
+        class: Combyna\Component\Event\Expression\EventExpressionFactory
+        autowire: true

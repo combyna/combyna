@@ -29,6 +29,14 @@ interface TypeInterface
     public function allows(TypeInterface $candidateType);
 
     /**
+     * Returns true if this type is lenient enough to allow an AnyType, false otherwise
+     *
+     * @param AnyType $candidateType
+     * @return bool
+     */
+    public function allowsAnyType(AnyType $candidateType);
+
+    /**
      * Returns true if this type allows all sub-types of the specified multiple type, false otherwise
      *
      * @param MultipleType $candidateType
@@ -63,12 +71,28 @@ interface TypeInterface
     public function allowsStaticType(StaticType $candidateType);
 
     /**
+     * Returns true if this type would allow a VoidType (currently only another VoidType), false otherwise
+     *
+     * @param VoidType $candidateType
+     * @return bool
+     */
+    public function allowsVoidType(VoidType $candidateType);
+
+    /**
      * Returns a summary of the type represented
      * eg. ListExpression<NumberExpression|TextExpression>
      *
      * @return string
      */
     public function getSummary();
+
+    /**
+     * Returns true if this type is allowed by an AnyType (usually anything except an UnknownType),
+     * false otherwise
+     *
+     * @return bool
+     */
+    public function isAllowedByAnyType();
 
     /**
      * Returns true if this type is equivalent to the specified multiple type, false otherwise
@@ -95,6 +119,14 @@ interface TypeInterface
     public function isAllowedByStaticType(StaticType $otherType);
 
     /**
+     * Returns true if both types are void, false otherwise
+     *
+     * @param VoidType $otherType
+     * @return bool
+     */
+    public function isAllowedByVoidType(VoidType $otherType);
+
+    /**
      * Returns a new type that will match everything the current type does and also everything
      * the provided other type does
      *
@@ -102,6 +134,14 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function mergeWith(TypeInterface $otherType);
+
+    /**
+     * Returns a new type that will match everything the current type does and also any other type
+     *
+     * @param AnyType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithAnyType(AnyType $otherType);
 
     /**
      * Returns a new type that will match everything the current type does and also everything
@@ -133,6 +173,33 @@ interface TypeInterface
     public function mergeWithStaticType(StaticType $otherType);
 
     /**
+     * Returns a new type that will match everything the current type does and also everything
+     * the provided unresolved type does
+     *
+     * @param UnresolvedType $unresolvedType
+     * @return TypeInterface
+     */
+    public function mergeWithUnresolvedType(UnresolvedType $unresolvedType);
+
+    /**
+     * For void types, this will just return whichever type is not void, unless both are void
+     * in which case that will be returned
+     *
+     * @param VoidType $otherType
+     * @return TypeInterface
+     */
+    public function mergeWithVoidType(VoidType $otherType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after a special "any" type
+     *
+     * @param AnyType $otherType
+     * @return TypeInterface
+     */
+    public function whenMergedWithAnyType(AnyType $otherType);
+
+    /**
      * Returns a new type that matches everything the current type does,
      * after everything the provided multiple type does
      *
@@ -158,4 +225,22 @@ interface TypeInterface
      * @return TypeInterface
      */
     public function whenMergedWithStaticType(StaticType $candidateType);
+
+    /**
+     * Returns a new type that matches everything the current type does,
+     * after everything the provided unresolved type does
+     *
+     * @param UnresolvedType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithUnresolvedType(UnresolvedType $candidateType);
+
+    /**
+     * For void types, this will just return whichever type is not void, unless both are void
+     * in which case that will be returned
+     *
+     * @param VoidType $candidateType
+     * @return TypeInterface
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType);
 }

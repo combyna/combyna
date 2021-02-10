@@ -17,6 +17,7 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\NumberExpression;
+use Combyna\Component\Expression\TextExpression;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -86,9 +87,69 @@ class ComparisonExpressionTest extends TestCase
         $this->assert($this->expression->getType())->exactlyEquals('comparison');
     }
 
+    public function testToStaticMatchesTwoEqualIntegers()
+    {
+        $this->createExpressionWithNumberOperands(21, ComparisonExpression::EQUAL, 21);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isTrue;
+    }
+
+    public function testToStaticDoesNotMatchTwoUnequalIntegers()
+    {
+        $this->createExpressionWithNumberOperands(1001, ComparisonExpression::EQUAL, 21);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isFalse;
+    }
+
+    public function testToStaticMatchesTwoEqualFloats()
+    {
+        $this->createExpressionWithNumberOperands(123.456, ComparisonExpression::EQUAL, 123.456);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isTrue;
+    }
+
+    public function testToStaticDoesNotMatchTwoUnequalFloats()
+    {
+        $this->createExpressionWithNumberOperands(654.456, ComparisonExpression::EQUAL, 123.456);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isFalse;
+    }
+
+    public function testToStaticMatchesAnIntegerAndEqualFloat()
+    {
+        $this->createExpressionWithNumberOperands(123, ComparisonExpression::EQUAL, 123.0);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isTrue;
+    }
+
+    public function testToStaticDoesNotMatchAnIntegerAndUnequalFloat()
+    {
+        $this->createExpressionWithNumberOperands(123, ComparisonExpression::EQUAL, 123.4);
+
+        $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
+
+        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
+        $this->assert($resultStatic->toNative())->isFalse;
+    }
+
     public function testToStaticMatchesTwoTextsOfDifferentCaseCaseInsensitively()
     {
-        $this->createExpressionWithOperands('world', ComparisonExpression::EQUAL_CASE_INSENSITIVE, 'WORld');
+        $this->createExpressionWithTextOperands('world', ComparisonExpression::EQUAL_CASE_INSENSITIVE, 'WORld');
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
@@ -98,7 +159,7 @@ class ComparisonExpressionTest extends TestCase
 
     public function testToStaticDoesNotMatchTwoDifferentTextsCaseInsensitively()
     {
-        $this->createExpressionWithOperands('world', ComparisonExpression::EQUAL_CASE_INSENSITIVE, 'not it');
+        $this->createExpressionWithTextOperands('world', ComparisonExpression::EQUAL_CASE_INSENSITIVE, 'not it');
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
@@ -108,7 +169,7 @@ class ComparisonExpressionTest extends TestCase
 
     public function testToStaticMatchesTwoIdenticalTextsOfSameCaseCaseSensitively()
     {
-        $this->createExpressionWithOperands('thing', ComparisonExpression::EQUAL, 'thing');
+        $this->createExpressionWithTextOperands('thing', ComparisonExpression::EQUAL, 'thing');
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
@@ -118,7 +179,7 @@ class ComparisonExpressionTest extends TestCase
 
     public function testToStaticDoesNotMatchTwoSameTextsOfDifferentCaseCaseSensitively()
     {
-        $this->createExpressionWithOperands('thing', ComparisonExpression::EQUAL, 'THIng');
+        $this->createExpressionWithTextOperands('thing', ComparisonExpression::EQUAL, 'THIng');
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
@@ -131,13 +192,32 @@ class ComparisonExpressionTest extends TestCase
      * @param string $operator
      * @param int|float $rightOperandNative
      */
-    private function createExpressionWithOperands($leftOperandNative, $operator, $rightOperandNative)
+    private function createExpressionWithNumberOperands($leftOperandNative, $operator, $rightOperandNative)
     {
         $leftOperandStatic = $this->prophesize(NumberExpression::class);
         $leftOperandStatic->toNative()->willReturn($leftOperandNative);
         $this->leftOperandExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
             ->willReturn($leftOperandStatic->reveal());
         $rightOperandStatic = $this->prophesize(NumberExpression::class);
+        $rightOperandStatic->toNative()->willReturn($rightOperandNative);
+        $this->rightOperandExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
+            ->willReturn($rightOperandStatic->reveal());
+
+        $this->createExpression($operator);
+    }
+
+    /**
+     * @param string $leftOperandNative
+     * @param string $operator
+     * @param string $rightOperandNative
+     */
+    private function createExpressionWithTextOperands($leftOperandNative, $operator, $rightOperandNative)
+    {
+        $leftOperandStatic = $this->prophesize(TextExpression::class);
+        $leftOperandStatic->toNative()->willReturn($leftOperandNative);
+        $this->leftOperandExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
+            ->willReturn($leftOperandStatic->reveal());
+        $rightOperandStatic = $this->prophesize(TextExpression::class);
         $rightOperandStatic->toNative()->willReturn($rightOperandNative);
         $this->rightOperandExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
             ->willReturn($rightOperandStatic->reveal());

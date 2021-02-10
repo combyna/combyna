@@ -25,6 +25,15 @@ interface PageViewStateInterface extends ViewStateInterface
     const TYPE = PageViewNode::TYPE;
 
     /**
+     * Either creates a new page view state with the specified root widget state
+     * or just returns the current one, if it already has the same state
+     *
+     * @param WidgetStateInterface $newRootWidgetState
+     * @return PageViewStateInterface
+     */
+    public function withRootWidgetState(WidgetStateInterface $newRootWidgetState);
+
+    /**
      * Either creates a new page view state with the specified store and root widget states
      * or just returns the current one, if it already has the same states
      *

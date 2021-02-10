@@ -14,7 +14,6 @@ namespace Combyna\Component\Router;
 use Combyna\Component\App\HomeInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
-use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 
 /**

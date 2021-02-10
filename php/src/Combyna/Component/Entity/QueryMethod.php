@@ -11,10 +11,10 @@
 
 namespace Combyna\Component\Entity;
 
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
-use Combyna\Parameter\ParameterBagModelInterface;
 
 /**
  * Class QueryMethod
@@ -36,18 +36,18 @@ class QueryMethod implements QueryMethodInterface
     private $name;
 
     /**
-     * @var ParameterBagModelInterface
+     * @var FixedStaticBagModelInterface
      */
     private $parameterBagModel;
 
     /**
      * @param string $name
-     * @param ParameterBagModelInterface $parameterBagModel
+     * @param FixedStaticBagModelInterface $parameterBagModel
      * @param ExpressionInterface $expression
      */
     public function __construct(
         $name,
-        ParameterBagModelInterface $parameterBagModel,
+        FixedStaticBagModelInterface $parameterBagModel,
         ExpressionInterface $expression
     ) {
         $this->name = $name;

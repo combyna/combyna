@@ -13,6 +13,7 @@ namespace Combyna\Client;
 
 use Combyna\Component\App\AppInterface;
 use Combyna\Component\App\State\AppStateInterface;
+use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
 
 /**
@@ -61,6 +62,7 @@ class Client
      * @param string $eventName
      * @param array $eventPayload
      * @return AppStateInterface
+     * @throws NotFoundException
      */
     public function dispatchEvent(
         AppStateInterface $oldAppState,
@@ -78,6 +80,38 @@ class Client
         );
 
         return $newAppState;
+    }
+
+    /**
+     * Navigates to a new route
+     *
+     * @param AppStateInterface $appState
+     * @param string $libraryName
+     * @param string $routeName
+     * @return AppStateInterface
+     */
+    public function navigateTo(AppStateInterface $appState, $libraryName, $routeName)
+    {
+        return $this->app->navigateTo($appState, $libraryName, $routeName);
+    }
+
+    /**
+     * Re-evaluates the visible page view and any visible overlay views,
+     * including the re-evaluation of any widget values by calling their respective
+     * widget value providers. If no changes have occurred, the same immutable
+     * AppState object will be returned.
+     *
+     * TODO: Consider only re-evaluating those parts of the UI whose expressions depend
+     *       on a widget value. It would be complex to figure out exactly which widgets
+     *       would need to be re-evaluated due to Captures, so for now we simply re-evaluate
+     *       the entire visible UI on every input widget change or edit.
+     *
+     * @param AppStateInterface $appState
+     * @return AppStateInterface
+     */
+    public function reevaluateUiState(AppStateInterface $appState)
+    {
+        return $this->app->reevaluateUiState($appState);
     }
 
     /**

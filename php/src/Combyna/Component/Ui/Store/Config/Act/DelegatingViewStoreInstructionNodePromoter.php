@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Ui\Store\Config\Act;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Ui\Store\Instruction\InstructionFactoryInterface;
 use InvalidArgumentException;
 

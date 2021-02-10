@@ -12,8 +12,8 @@
 namespace Combyna\Component\App\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class HomeNode
@@ -50,6 +50,17 @@ class HomeNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->attributeExpressionBagNode);
+
+        $specBuilder->addConstraint(new LibraryExistsConstraint($this->routeLibraryName));
+        $specBuilder->addConstraint(new LibraryDefinesRouteConstraint($this->routeLibraryName, $this->routeName));
+    }
+
+    /**
      * Fetches the bag of expressions to evaluate for the route's attributes
      *
      * @return ExpressionBagNode
@@ -77,19 +88,5 @@ class HomeNode extends AbstractActNode
     public function getRouteName()
     {
         return $this->routeName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // TODO: Assert that library exists with name in prop
-
-        // TODO: Assert that library defines the route with name in prop
-
-        $this->attributeExpressionBagNode->validate($subValidationContext);
     }
 }

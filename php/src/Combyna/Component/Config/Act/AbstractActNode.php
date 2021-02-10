@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Config\Act;
 
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+
 /**
  * Class AbstractActNode
  *
@@ -23,8 +25,24 @@ abstract class AbstractActNode implements ActNodeInterface
     /**
      * {@inheritdoc}
      */
+    public function getIdentifier()
+    {
+        return $this->getType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return static::TYPE;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function makesQuery(QuerySpecifierInterface $querySpecifier)
+    {
+        return false;
     }
 }

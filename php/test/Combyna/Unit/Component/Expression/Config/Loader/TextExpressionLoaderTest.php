@@ -11,12 +11,12 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\TextExpressionNode;
-use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Harness\TestCase;
-use Combyna\Component\Expression\Config\Loader\TextExpressionLoader;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\Config\Act\TextExpressionNode;
+use Combyna\Component\Expression\Config\Loader\TextExpressionLoader;
+use Combyna\Component\Expression\ExpressionFactoryInterface;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

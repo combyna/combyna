@@ -11,9 +11,10 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Trigger\Config\Act\TriggerNode;
 
 /**
  * Interface WidgetNodeInterface
@@ -23,11 +24,18 @@ use Combyna\Component\Trigger\Config\Act\TriggerNode;
 interface WidgetNodeInterface extends ActNodeInterface
 {
     /**
-     * Fetches the children of this widget, if any have been added
+     * Fetches the bag of expressions to assign to captures defined by ancestors
      *
-     * @return WidgetNodeInterface[]
+     * @return ExpressionBagNode
      */
-    public function getChildWidgets();
+    public function getCaptureExpressionBag();
+
+    /**
+     * Fetches the model for values to capture within this widget's context
+     *
+     * @return FixedStaticBagModelNodeInterface
+     */
+    public function getCaptureStaticBagModel();
 
     /**
      * Fetches the name of the library this widget's definition should be fetched from

@@ -69,6 +69,16 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
+     * Fetches all statics in this list
+     *
+     * @return StaticInterface[]
+     */
+    public function getElementStatics()
+    {
+        return $this->staticList->getElementStatics();
+    }
+
+    /**
      * Maps this static list to another, transforming each element with the given expression
      *
      * @param string $itemVariableName
@@ -91,6 +101,24 @@ class StaticListExpression extends AbstractStaticExpression
         );
 
         return $this->expressionFactory->createStaticListExpression($staticList);
+    }
+
+    /**
+     * Maps this static list to a native array, transforming each element with the given callback
+     *
+     * @param string $itemVariableName
+     * @param string|null $indexVariableName
+     * @param callable $mapCallback
+     * @param EvaluationContextInterface $evaluationContext
+     * @return array
+     */
+    public function mapArray(
+        $itemVariableName,
+        $indexVariableName,
+        callable $mapCallback,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        return $this->staticList->mapArray($itemVariableName, $indexVariableName, $mapCallback, $evaluationContext);
     }
 
     /**

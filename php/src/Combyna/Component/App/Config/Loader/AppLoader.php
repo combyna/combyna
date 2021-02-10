@@ -96,8 +96,12 @@ class AppLoader implements AppLoaderInterface
     {
         // Load any translations from the app config into Symfony's translator
         // so that they will be available later
-        if (array_key_exists('translations', $appConfig)) {
+        if (array_key_exists('translations', $appConfig) && is_array($appConfig['translations'])) {
             foreach ($appConfig['translations'] as $locale => $messages) {
+                if (!is_array($messages)) {
+                    continue;
+                }
+
                 $namespacedMessages = [];
 
                 foreach ($messages as $key => $message) {
@@ -139,6 +143,13 @@ class AppLoader implements AppLoaderInterface
 
         $overlayViewNodes = []; // TODO
 
-        return new AppNode($signalDefinitionNodes, $routeNodes, $homeNode, $pageViewNodes, $overlayViewNodes);
+        return new AppNode(
+            $environmentNode,
+            $signalDefinitionNodes,
+            $routeNodes,
+            $homeNode,
+            $pageViewNodes,
+            $overlayViewNodes
+        );
     }
 }

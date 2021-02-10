@@ -11,11 +11,11 @@
 
 namespace Combyna\Unit\Type;
 
-use Combyna\Harness\TestCase;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

@@ -1,0 +1,7 @@
+services:
+    # Early warmers run when compiling the service container itself
+    combyna.cache.early_warmer:
+        class: Combyna\Component\Framework\Cache\CacheWarmerAggregate
+
+    combyna.cache.warmer:
+        class: Combyna\Component\Framework\Cache\CacheWarmerAggregate

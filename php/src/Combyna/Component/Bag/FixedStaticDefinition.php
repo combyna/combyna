@@ -11,13 +11,10 @@
 
 namespace Combyna\Component\Bag;
 
-use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Type\TypeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\ValidationFactoryInterface;
 use LogicException;
 
 /**
@@ -45,18 +42,11 @@ class FixedStaticDefinition
     private $staticType;
 
     /**
-     * @var ValidationFactoryInterface
-     */
-    private $validationFactory;
-
-    /**
-     * @param ValidationFactoryInterface $validationFactory
      * @param string $name
      * @param TypeInterface $staticType
      * @param ExpressionInterface|null $defaultExpression
      */
     public function __construct(
-        ValidationFactoryInterface $validationFactory,
         $name,
         TypeInterface $staticType,
         ExpressionInterface $defaultExpression = null
@@ -64,12 +54,12 @@ class FixedStaticDefinition
         $this->defaultExpression = $defaultExpression;
         $this->name = $name;
         $this->staticType = $staticType;
-        $this->validationFactory = $validationFactory;
     }
 
     /**
      * Fetches the default value for this static, if configured
      *
+     * @param EvaluationContextInterface $evaluationContext
      * @return StaticInterface
      * @throws LogicException when no default static has been configured
      */
@@ -95,6 +85,16 @@ class FixedStaticDefinition
     }
 
     /**
+     * Fetches the type of the static
+     *
+     * @return TypeInterface
+     */
+    public function getStaticType()
+    {
+        return $this->staticType;
+    }
+
+    /**
      * Determines whether this static must be defined in the bag or not
      *
      * @return bool
@@ -102,30 +102,5 @@ class FixedStaticDefinition
     public function isRequired()
     {
         return $this->defaultExpression === null;
-    }
-
-    /**
-     * Checks that the provided expression evaluates to a static
-     * that is compatible with this definition's type
-     *
-     * @param ExpressionNodeInterface $expressionNode
-     * @param ValidationContextInterface $validationContext
-     * @param string $contextDescription
-     */
-    public function validateExpression(
-        ExpressionNodeInterface $expressionNode,
-        ValidationContextInterface $validationContext,
-        $contextDescription
-    ) {
-        if (!$this->staticType->allows($expressionNode->getResultType($validationContext))) {
-            $validationContext->addViolation(
-                $this->validationFactory->createTypeMismatchViolation(
-                    $this->staticType,
-                    $expressionNode->getResultType($validationContext),
-                    $validationContext,
-                    $contextDescription . ' ' . $this->name
-                )
-            );
-        }
     }
 }

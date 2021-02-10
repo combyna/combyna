@@ -12,11 +12,9 @@
 namespace Combyna\Component\Signal\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
-use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Signal\SignalDefinitionCollectionInterface;
 use Combyna\Component\Signal\SignalFactoryInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\PromotionQueryRequirement;
 
 /**
  * Class SignalDefinitionNodePromoter
@@ -57,10 +55,17 @@ class SignalDefinitionNodePromoter
         $signalDefinitions = [];
 
         foreach ($signalDefinitionNodes as $signalDefinitionNode) {
+            $queryRequirement = new PromotionQueryRequirement($signalDefinitionNode);
+
             $signalDefinitions[] = $this->signalFactory->createSignalDefinition(
                 $libraryName,
                 $signalDefinitionNode->getSignalName(),
-                $this->bagNodePromoter->promoteFixedStaticBagModel($signalDefinitionNode->getPayloadStaticBagModel())
+                $this->bagNodePromoter->promoteFixedStaticBagModel(
+                    $signalDefinitionNode->getPayloadStaticBagModel(
+                        $queryRequirement
+                    )
+                ),
+                $signalDefinitionNode->isBroadcast()
             );
         }
 

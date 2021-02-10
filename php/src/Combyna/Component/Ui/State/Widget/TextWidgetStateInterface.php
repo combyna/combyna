@@ -26,4 +26,13 @@ interface TextWidgetStateInterface extends CoreWidgetStateInterface
      * @return string
      */
     public function getText();
+
+    /**
+     * Either creates a new widget state with the specified new sub-states
+     * or just returns the current one, if it already has all of the same sub-states
+     *
+     * @param string $text
+     * @return TextWidgetStateInterface
+     */
+    public function with($text);
 }

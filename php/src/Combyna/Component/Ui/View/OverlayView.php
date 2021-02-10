@@ -118,34 +118,4 @@ class OverlayView implements OverlayViewInterface
     {
         return $this->name;
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        StaticBagInterface $viewAttributeStaticBag,
-//        EvaluationContextInterface $rootEvaluationContext
-//    ) {
-//        $viewEvaluationContext = $this->uiEvaluationContextFactory->createViewEvaluationContext(
-//            $rootEvaluationContext,
-//            $viewAttributeStaticBag
-//        );
-//
-//        if ($this->visibilityExpression) {
-//            $visibleStatic = $this->visibilityExpression->toStatic($viewEvaluationContext);
-//
-//            if ($visibleStatic->toNative() === false) {
-//                // PageView is invisible
-//                return null;
-//            }
-//        }
-//
-//        $rootWidgetState = $this->rootWidget->render($viewEvaluationContext);
-//
-//        return $this->uiStateFactory->createOverlayViewState(
-//            $this,
-//            $viewAttributeStaticBag,
-//            $rootWidgetState
-//        );
-//    }
 }

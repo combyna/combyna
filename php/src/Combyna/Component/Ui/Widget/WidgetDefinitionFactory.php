@@ -11,9 +11,12 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Event\EventDefinitionReferenceCollectionInterface;
 use Combyna\Component\Event\EventFactoryInterface;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
 
 /**
@@ -34,13 +37,23 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
     private $renderedWidgetFactory;
 
     /**
+     * @var UiEvaluationContextFactoryInterface
+     */
+    private $uiEvaluationContextFactory;
+
+    /**
      * @param UiStateFactoryInterface $renderedWidgetFactory
+     * @param UiEvaluationContextFactoryInterface $uiEvaluationContextFactory
      * @param EventFactoryInterface $eventFactory
      */
-    public function __construct(UiStateFactoryInterface $renderedWidgetFactory, EventFactoryInterface $eventFactory)
-    {
+    public function __construct(
+        UiStateFactoryInterface $renderedWidgetFactory,
+        UiEvaluationContextFactoryInterface $uiEvaluationContextFactory,
+        EventFactoryInterface $eventFactory
+    ) {
         $this->eventFactory = $eventFactory;
         $this->renderedWidgetFactory = $renderedWidgetFactory;
+        $this->uiEvaluationContextFactory = $uiEvaluationContextFactory;
     }
 
     /**
@@ -51,16 +64,19 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        ExpressionBagInterface $valueExpressionBag,
+        WidgetInterface $rootWidget
     ) {
         return new CompoundWidgetDefinition(
             $this->renderedWidgetFactory,
+            $this->uiEvaluationContextFactory,
             $this->eventFactory,
             $eventDefinitionReferenceCollection,
             $libraryName,
             $name,
             $attributeBagModel,
-            $labels
+            $valueExpressionBag,
+            $rootWidget
         );
     }
 
@@ -72,16 +88,21 @@ class WidgetDefinitionFactory implements WidgetDefinitionFactoryInterface
         $libraryName,
         $name,
         FixedStaticBagModelInterface $attributeBagModel,
-        array $labels = []
+        FixedStaticBagModelInterface $valueBagModel,
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        array $valueNameToProviderCallableMap
     ) {
         return new PrimitiveWidgetDefinition(
             $this->renderedWidgetFactory,
+            $this->uiEvaluationContextFactory,
             $this->eventFactory,
             $eventDefinitionReferenceCollection,
             $libraryName,
             $name,
             $attributeBagModel,
-            $labels
+            $valueBagModel,
+            $staticExpressionFactory,
+            $valueNameToProviderCallableMap
         );
     }
 }

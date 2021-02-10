@@ -1,0 +1,48 @@
+services:
+    combyna.expression.validation.assured_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\AssuredConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.expression.validation.assured_static_exists_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\AssuredStaticExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.expression.validation.assured_sub_validation_context_factory:
+        class: Combyna\Component\Expression\Validation\Context\Factory\AssuredContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.expression.validation.scope_sub_validation_context_factory:
+        class: Combyna\Component\Expression\Validation\Context\Factory\ScopeContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.expression.validation.possible_matching_result_types_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\PossibleMatchingResultTypesConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.expression.validation.result_type_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.expression.validation.valid_function_call_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\ValidFunctionCallConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.expression.validation.variable_exists_constraint_validator:
+        class: Combyna\Component\Expression\Validation\Constraint\VariableExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

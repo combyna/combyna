@@ -11,11 +11,13 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\DayExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDayExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class DayExpressionNode
@@ -59,6 +61,38 @@ class DayExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->yearExpression);
+        $specBuilder->addChildNode($this->monthExpression);
+        $specBuilder->addChildNode($this->dayExpression);
+
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->yearExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'year'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->monthExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'month'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->dayExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'day'
+            )
+        );
+    }
+
+    /**
      * Fetches the day expression
      *
      * @return ExpressionNodeInterface
@@ -91,36 +125,8 @@ class DayExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(StaticDayExpression::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->yearExpression->validate($subValidationContext);
-        $this->monthExpression->validate($subValidationContext);
-        $this->dayExpression->validate($subValidationContext);
-
-        $subValidationContext->assertResultType(
-            $this->yearExpression,
-            new StaticType(NumberExpression::class),
-            'year'
-        );
-        $subValidationContext->assertResultType(
-            $this->monthExpression,
-            new StaticType(NumberExpression::class),
-            'month'
-        );
-        $subValidationContext->assertResultType(
-            $this->dayExpression,
-            new StaticType(NumberExpression::class),
-            'day'
-        );
+        return new PresolvedTypeDeterminer(new StaticType(StaticDayExpression::class));
     }
 }

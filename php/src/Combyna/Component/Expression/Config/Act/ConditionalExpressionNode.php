@@ -11,10 +11,13 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\ConditionalExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\AdditiveDeterminer;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class ConditionalExpressionNode
@@ -58,6 +61,26 @@ class ConditionalExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->conditionExpression);
+        $specBuilder->addChildNode($this->consequentExpression);
+        $specBuilder->addChildNode($this->alternateExpression);
+
+        // Ensure the condition expression can only ever evaluate to a boolean
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->conditionExpression,
+                new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                'condition'
+            )
+        );
+
+    }
+
+    /**
      * Fetches the alternate expression
      *
      * @return ExpressionNodeInterface
@@ -90,32 +113,11 @@ class ConditionalExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $consequentResultType = $this->consequentExpression->getResultType($subValidationContext);
-        $alternateResultType = $this->alternateExpression->getResultType($subValidationContext);
-
-        return $consequentResultType->mergeWith($alternateResultType);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->conditionExpression->validate($subValidationContext);
-        $this->consequentExpression->validate($subValidationContext);
-        $this->alternateExpression->validate($subValidationContext);
-
-        // Ensure the condition expression can only ever evaluate to a boolean
-        $subValidationContext->assertResultType(
-            $this->conditionExpression,
-            new StaticType(BooleanExpression::class),
-            'condition'
-        );
+        return new AdditiveDeterminer([
+            $this->consequentExpression->getResultTypeDeterminer(),
+            $this->alternateExpression->getResultTypeDeterminer()
+        ]);
     }
 }

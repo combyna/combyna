@@ -11,13 +11,15 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\ConcatenationExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\MultipleType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class ConcatenationExpressionNode
@@ -53,6 +55,33 @@ class ConcatenationExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->operandListExpression);
+
+        // Ensure the list operand can only ever evaluate to a list
+        // with elements that evaluate only to either text or number statics
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->operandListExpression,
+                new PresolvedTypeDeterminer(
+                    new StaticListType(
+                        new MultipleType(
+                            [
+                                new StaticType(TextExpression::class),
+                                new StaticType(NumberExpression::class)
+                            ]
+                        )
+                    )
+                ),
+                'operand list'
+            )
+        );
+    }
+
+    /**
      * Fetches the glue expression, if set
      *
      * @return ExpressionNodeInterface|null
@@ -75,33 +104,8 @@ class ConcatenationExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(TextExpression::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->operandListExpression->validate($subValidationContext);
-
-        // Ensure the list operand can only ever evaluate to a list
-        // with elements that evaluate only to either text or number statics
-        $subValidationContext->assertResultType(
-            $this->operandListExpression,
-            new StaticListType(
-                new MultipleType(
-                    [
-                        new StaticType(TextExpression::class),
-                        new StaticType(NumberExpression::class)
-                    ]
-                )
-            ),
-            'operand list'
-        );
+        return new PresolvedTypeDeterminer(new StaticType(TextExpression::class));
     }
 }

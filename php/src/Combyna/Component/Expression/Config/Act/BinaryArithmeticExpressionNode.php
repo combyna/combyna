@@ -11,11 +11,17 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\AssuredConstraint;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
+use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class BinaryArithmeticExpressionNode
@@ -59,6 +65,81 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->leftOperandExpression);
+        $specBuilder->addChildNode($this->rightOperandExpression);
+
+        // Ensure the left operand expression can only ever evaluate to a number
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->leftOperandExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'left operand'
+            )
+        );
+
+        if (
+            !in_array(
+                $this->operator,
+                [
+                    BinaryArithmeticExpression::ADD,
+                    BinaryArithmeticExpression::SUBTRACT,
+                    BinaryArithmeticExpression::MULTIPLY,
+                    BinaryArithmeticExpression::DIVIDE,
+                ]
+            )
+        ) {
+            $specBuilder->addConstraint(
+                new KnownFailureConstraint(
+                    sprintf(
+                        'Invalid operator "%s" provided',
+                        $this->operator
+                    )
+                )
+            );
+        }
+
+        if ($this->operator === BinaryArithmeticExpression::DIVIDE) {
+            if ($this->rightOperandExpression instanceof NumberExpressionNode) {
+                // Right operand is a number constant - we can just check statically whether it is zero
+                if ((float)$this->rightOperandExpression->toNative() === .0) {
+                    $specBuilder->addConstraint(
+                        new CallbackConstraint(
+                            function (ValidationContextInterface $validationContext) {
+                                $validationContext->addDivisionByZeroViolation();
+                            }
+                        )
+                    );
+                }
+                return;
+            }
+
+            // Ensure that the divisor is an assured expression, protected by a guard expression
+            // to ensure that it will only be evaluated if the divisor is non-zero
+            $specBuilder->addConstraint(
+                new AssuredConstraint(
+                    $this->rightOperandExpression,
+                    NonZeroNumberAssurance::TYPE,
+                    'divisor (right operand)'
+                )
+            );
+
+            return;
+        }
+
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->rightOperandExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'right operand'
+            )
+        );
+    }
+
+    /**
      * Fetches the left operand's expression node
      *
      * @return ExpressionNodeInterface
@@ -81,9 +162,9 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return new StaticType(NumberExpression::class);
+        return new PresolvedTypeDeterminer(new StaticType(NumberExpression::class));
     }
 
     /**
@@ -94,50 +175,5 @@ class BinaryArithmeticExpressionNode extends AbstractExpressionNode
     public function getRightOperandExpression()
     {
         return $this->rightOperandExpression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->leftOperandExpression->validate($subValidationContext);
-        $this->rightOperandExpression->validate($subValidationContext);
-
-        // Ensure the left operand expression can only ever evaluate to a number
-        $subValidationContext->assertResultType(
-            $this->leftOperandExpression,
-            new StaticType(NumberExpression::class),
-            'left operand'
-        );
-
-        if ($this->operator === BinaryArithmeticExpression::DIVIDE) {
-            if ($this->rightOperandExpression instanceof NumberExpressionNode) {
-                // Right operand is a number constant - we can just check statically whether it is zero
-                if ($this->rightOperandExpression->toNative() === 0) {
-                    $subValidationContext->addDivisionByZeroViolation();
-                }
-
-                return;
-            }
-
-            // Ensure that the divisor is an assured expression, protected by a guard expression
-            // to ensure that it will only be evaluated if the divisor is non-zero
-            $subValidationContext->assertAssured(
-                $this->rightOperandExpression,
-                AssuranceInterface::NON_ZERO_NUMBER,
-                'divisor (right operand)'
-            );
-
-            return;
-        }
-
-        $subValidationContext->assertResultType(
-            $this->rightOperandExpression,
-            new StaticType(NumberExpression::class),
-            'right operand'
-        );
     }
 }

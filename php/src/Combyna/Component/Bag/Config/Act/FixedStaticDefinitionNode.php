@@ -11,17 +11,23 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
+use Combyna\Component\Validator\Constraint\CallbackConstraint;
+use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
+use LogicException;
 
 /**
  * Class FixedStaticDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class FixedStaticDefinitionNode extends AbstractActNode
+class FixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDefinitionNodeInterface
 {
     const TYPE = 'fixed-static-definition';
 
@@ -36,29 +42,65 @@ class FixedStaticDefinitionNode extends AbstractActNode
     private $name;
 
     /**
-     * @var TypeInterface
+     * @var TypeInterface|null
      */
-    private $staticType;
+    private $resolvedStaticType = null;
+
+    /**
+     * @var TypeDeterminerInterface
+     */
+    private $staticTypeDeterminer;
 
     /**
      * @param string $name
-     * @param TypeInterface $staticType
+     * @param TypeDeterminerInterface $staticTypeDeterminer
      * @param ExpressionNodeInterface|null $defaultExpressionNode
      */
     public function __construct(
         $name,
-        TypeInterface $staticType,
+        TypeDeterminerInterface $staticTypeDeterminer,
         ExpressionNodeInterface $defaultExpressionNode = null
     ) {
         $this->defaultExpressionNode = $defaultExpressionNode;
         $this->name = $name;
-        $this->staticType = $staticType;
+        $this->staticTypeDeterminer = $staticTypeDeterminer;
     }
 
     /**
-     * Fetches the expression evaluated as the default value for this static, if set
-     *
-     * @return ExpressionNodeInterface|null
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        if ($this->defaultExpressionNode) {
+            $specBuilder->addChildNode($this->defaultExpressionNode);
+
+            // Make sure the default expression is allowed by the type of the definition
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->defaultExpressionNode,
+                    $this->staticTypeDeterminer,
+                    'default expression'
+                )
+            );
+        }
+
+        // Make sure the static's type is a resolved, valid type
+        $specBuilder->addConstraint(new ResolvableTypeConstraint($this->staticTypeDeterminer));
+
+        // Resolve the static's type once all static values are known,
+        // as it can be different depending on the types of the other statics in the bag
+        // (eg. if a custom TypeDeterminer is used for a static's type)
+        $specBuilder->addConstraint(
+            new CallbackConstraint(
+                function (ValidationContextInterface $validationContext) {
+                    $this->resolvedStaticType = $this->staticTypeDeterminer->determine($validationContext);
+                }
+            )
+        );
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getDefaultExpression()
     {
@@ -66,9 +108,15 @@ class FixedStaticDefinitionNode extends AbstractActNode
     }
 
     /**
-     * Fetches the name for this static in its bag
-     *
-     * @return string
+     * {@inheritdoc}
+     */
+    public function getIdentifier()
+    {
+        return self::TYPE . ':' . $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -76,19 +124,32 @@ class FixedStaticDefinitionNode extends AbstractActNode
     }
 
     /**
-     * Fetches the type that a value of this static must match
-     *
-     * @return TypeInterface
+     * {@inheritdoc}
      */
-    public function getStaticType()
+    public function getResolvedStaticType()
     {
-        return $this->staticType;
+        if ($this->resolvedStaticType === null) {
+            throw new LogicException(
+                sprintf(
+                    'Bag static "%s" type was expected to be resolved but was not',
+                    $this->name
+                )
+            );
+        }
+
+        return $this->resolvedStaticType;
     }
 
     /**
-     * Determines whether this static must be defined in the bag or not
-     *
-     * @return bool
+     * {@inheritdoc}
+     */
+    public function getStaticTypeDeterminer()
+    {
+        return $this->staticTypeDeterminer;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function isRequired()
     {
@@ -98,32 +159,18 @@ class FixedStaticDefinitionNode extends AbstractActNode
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        if ($this->defaultExpressionNode) {
-            $this->defaultExpressionNode->validate($subValidationContext);
-        }
-    }
-
-    /**
-     * Checks that the provided expression evaluates to a static
-     * that is compatible with this definition's type
-     *
-     * @param ExpressionNodeInterface $expressionNode
-     * @param ValidationContextInterface $validationContext
-     * @param string $contextDescription
-     */
     public function validateExpression(
         ExpressionNodeInterface $expressionNode,
         ValidationContextInterface $validationContext,
         $contextDescription
     ) {
-        if (!$this->staticType->allows($expressionNode->getResultType($validationContext))) {
+        $expressionResultType = $validationContext->getExpressionResultType($expressionNode);
+        $staticType = $this->staticTypeDeterminer->determine($validationContext);
+
+        if (!$staticType->allows($expressionResultType)) {
             $validationContext->addTypeMismatchViolation(
-                $this->staticType,
-                $expressionNode->getResultType($validationContext),
+                $staticType,
+                $expressionResultType,
                 $contextDescription . ' ' . $this->name
             );
         }

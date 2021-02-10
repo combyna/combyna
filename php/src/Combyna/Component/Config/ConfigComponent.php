@@ -12,6 +12,9 @@
 namespace Combyna\Component\Config;
 
 use Combyna\Component\Common\AbstractComponent;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class ConfigComponent
@@ -20,4 +23,22 @@ use Combyna\Component\Common\AbstractComponent;
  */
 class ConfigComponent extends AbstractComponent
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            new DelegateeTagDefinition(
+                'combyna.parameter_parser',
+                'combyna.config.parameter.parser',
+                'addParser'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.parameter_type_parser',
+                'combyna.config.parameter.type_parser',
+                'addParser'
+            )
+        ]));
+    }
 }

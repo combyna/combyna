@@ -17,11 +17,16 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
-use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
 use Combyna\Component\Ui\State\View\PageViewStateInterface;
+use Combyna\Component\Ui\State\Widget\CoreWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedCompoundWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\DefinedPrimitiveWidgetStateInterface;
 use Combyna\Component\Ui\Store\Evaluation\ViewStoreEvaluationContextInterface;
 use Combyna\Component\Ui\View\ViewInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
+use Combyna\Component\Ui\Widget\CompoundWidgetDefinition;
+use Combyna\Component\Ui\Widget\CoreWidgetInterface;
+use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
+use Combyna\Component\Ui\Widget\PrimitiveWidgetDefinition;
 
 /**
  * Interface UiEvaluationContextFactoryInterface
@@ -30,6 +35,52 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryInterface
 {
+    /**
+     * Creates a CompoundWidgetDefinitionEvaluationContext
+     *
+     * @param CompoundWidgetEvaluationContextInterface $parentContext
+     * @param CompoundWidgetDefinition $widgetDefinition
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedCompoundWidgetStateInterface|null $widgetState
+     * @return CompoundWidgetDefinitionEvaluationContextInterface
+     */
+    public function createCompoundWidgetDefinitionEvaluationContext(
+        CompoundWidgetEvaluationContextInterface $parentContext,
+        CompoundWidgetDefinition $widgetDefinition,
+        DefinedWidgetInterface $widget,
+        DefinedCompoundWidgetStateInterface $widgetState = null
+    );
+
+    /**
+     * Creates a CompoundWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param CompoundWidgetDefinition $widgetDefinition
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedCompoundWidgetStateInterface|null $widgetState
+     * @return CompoundWidgetEvaluationContextInterface
+     */
+    public function createCompoundWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        CompoundWidgetDefinition $widgetDefinition,
+        DefinedWidgetInterface $widget,
+        DefinedCompoundWidgetStateInterface $widgetState = null
+    );
+
+    /**
+     * Creates a CoreWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param CoreWidgetInterface $widget
+     * @param CoreWidgetStateInterface|null $widgetState
+     * @return CoreWidgetEvaluationContextInterface
+     */
+    public function createCoreWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        CoreWidgetInterface $widget,
+        CoreWidgetStateInterface $widgetState = null
+    );
+
     /**
      * Creates a ViewEvaluationContext from a PageViewState
      *
@@ -47,56 +98,74 @@ interface UiEvaluationContextFactoryInterface extends EvaluationContextFactoryIn
     );
 
     /**
+     * Creates a PrimitiveWidgetDefinitionEvaluationContext
+     *
+     * @param PrimitiveWidgetEvaluationContextInterface $parentContext
+     * @param PrimitiveWidgetDefinition $widgetDefinition
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedPrimitiveWidgetStateInterface|null $widgetState
+     * @return PrimitiveWidgetDefinitionEvaluationContextInterface
+     */
+    public function createPrimitiveWidgetDefinitionEvaluationContext(
+        PrimitiveWidgetEvaluationContextInterface $parentContext,
+        PrimitiveWidgetDefinition $widgetDefinition,
+        DefinedWidgetInterface $widget,
+        DefinedPrimitiveWidgetStateInterface $widgetState = null
+    );
+
+    /**
+     * Creates a PrimitiveWidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param PrimitiveWidgetDefinition $widgetDefinition
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedPrimitiveWidgetStateInterface|null $widgetState
+     * @return PrimitiveWidgetEvaluationContextInterface
+     */
+    public function createPrimitiveWidgetEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        PrimitiveWidgetDefinition $widgetDefinition,
+        DefinedWidgetInterface $widget,
+        DefinedPrimitiveWidgetStateInterface $widgetState = null
+    );
+
+    /**
      * Creates a RootViewEvaluationContext
      *
      * @param ViewInterface $view
-     * @param ViewStoreStateInterface $viewStoreState
-     * @param StaticBagInterface $viewAttributeStaticBag
      * @param EvaluationContextInterface $parentContext
      * @param EnvironmentInterface $environment
+     * @param PageViewStateInterface|null $pageViewState
      * @return RootViewEvaluationContext
      */
     public function createRootViewEvaluationContext(
         ViewInterface $view,
-        ViewStoreStateInterface $viewStoreState,
-        StaticBagInterface $viewAttributeStaticBag,
         EvaluationContextInterface $parentContext,
-        EnvironmentInterface $environment
+        EnvironmentInterface $environment,
+        PageViewStateInterface $pageViewState = null
     );
 
     /**
      * Creates a ViewStoreEvaluationContext
      *
-     * @param EvaluationContextInterface $parentContext
+     * @param ViewEvaluationContextInterface $parentContext
      * @param UiStoreStateInterface $viewStoreState
      * @return ViewStoreEvaluationContextInterface
      */
     public function createViewStoreEvaluationContext(
-        EvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         UiStoreStateInterface $viewStoreState
     );
 
     /**
      * Creates a ViewEvaluationContext
      *
-     * @param UiEvaluationContextInterface $parentContext
+     * @param ViewEvaluationContextInterface $parentContext
      * @param StaticBagInterface|null $variableStaticBag
      * @return ViewEvaluationContextInterface
      */
     public function createViewEvaluationContext(
-        UiEvaluationContextInterface $parentContext,
-        StaticBagInterface $variableStaticBag = null
-    );
-
-    /**
-     * Creates a WidgetEvaluationContext
-     *
-     * @param ViewEvaluationContextInterface $parentContext
-     * @param WidgetInterface $widget
-     * @return WidgetEvaluationContextInterface
-     */
-    public function createWidgetEvaluationContext(
         ViewEvaluationContextInterface $parentContext,
-        WidgetInterface $widget
+        StaticBagInterface $variableStaticBag = null
     );
 }

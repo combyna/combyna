@@ -12,12 +12,12 @@
 namespace Combyna\Component\Router;
 
 use Combyna\Component\App\HomeInterface;
-use Combyna\Component\Program\ProgramInterface;
-use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Router\State\RouterState;
 use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;

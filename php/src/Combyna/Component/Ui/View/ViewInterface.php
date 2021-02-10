@@ -13,8 +13,9 @@ namespace Combyna\Component\Ui\View;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\ViewStoreStateInterface;
+use Combyna\Component\Ui\Store\ViewStoreInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
@@ -39,6 +40,13 @@ interface ViewInterface
     public function getName();
 
     /**
+     * Fetches the store for this view
+     *
+     * @return ViewStoreInterface
+     */
+    public function getStore();
+
+    /**
      * Fetches a widget in this view by its name-based path
      *
      * @param string[] $names
@@ -51,26 +59,14 @@ interface ViewInterface
      *
      * @param string $queryName
      * @param StaticBagInterface $argumentStaticBag
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @param ViewStoreStateInterface $viewStoreState
      * @return StaticInterface
      */
     public function makeStoreQuery(
         $queryName,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         ViewStoreStateInterface $viewStoreState
     );
-
-//    /**
-//     * Renders this view to a ViewState
-//     *
-//     * @param StaticBagInterface $viewAttributeStaticBag
-//     * @param EvaluationContextInterface $rootEvaluationContext
-//     * @return ViewStateInterface|null Returns the rendered view or null if invisible
-//     */
-//    public function render(
-//        StaticBagInterface $viewAttributeStaticBag,
-//        EvaluationContextInterface $rootEvaluationContext
-//    );
 }

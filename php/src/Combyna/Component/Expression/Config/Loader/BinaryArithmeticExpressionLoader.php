@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
-use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\BinaryArithmeticExpression;
+use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
 
 /**
  * Class BinaryArithmeticExpressionLoader

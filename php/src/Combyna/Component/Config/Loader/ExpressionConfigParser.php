@@ -14,7 +14,9 @@ namespace Combyna\Component\Config\Loader;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
+use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Config\Act\StaticNodeInterface;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use InvalidArgumentException;
 
@@ -108,6 +110,28 @@ class ExpressionConfigParser
     }
 
     /**
+     * Fetches the expression node of the specified positional argument,
+     * provided that it is defined and is of the specified static class
+     *
+     * @param array $config
+     * @param int $position Zero-based position of the argument to fetch
+     * @param string $context A description of the meaning of the argument
+     * @return ExpressionNodeInterface
+     */
+    public function getPositionalArgument(array $config, $position, $context)
+    {
+        $positionalArgumentConfig = $config[self::POSITIONAL_ARGUMENTS];
+
+        if (!array_key_exists($position, $positionalArgumentConfig)) {
+            return new UnknownExpressionNode(
+                'Missing required argument at position #' . $position . ' for ' . $context
+            );
+        }
+
+        return $this->expressionLoader->load($positionalArgumentConfig[$position]);
+    }
+
+    /**
      * Fetches the native value of the specified positional argument,
      * provided that it is defined and is of the specified static class
      *
@@ -120,15 +144,7 @@ class ExpressionConfigParser
      */
     public function getPositionalArgumentNative(array $config, $position, $requiredStaticType, $context)
     {
-        $positionalArgumentConfig = $config[self::POSITIONAL_ARGUMENTS];
-
-        if (!array_key_exists($position, $positionalArgumentConfig)) {
-            throw new InvalidArgumentException(
-                'Missing required argument at position #' . $position . ' for ' . $context
-            );
-        }
-
-        $expressionNode = $this->expressionLoader->load($positionalArgumentConfig[$position]);
+        $expressionNode = $this->getPositionalArgument($config, $position, $context);
 
         if (!$expressionNode instanceof StaticNodeInterface) {
             throw new InvalidArgumentException(

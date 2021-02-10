@@ -14,6 +14,7 @@ namespace Combyna\Component\Expression;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
 use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface ExpressionFactoryInterface
@@ -145,31 +146,21 @@ interface ExpressionFactoryInterface
     );
 
     /**
-     * Creates a FunctionExpression
+     * Creates a FunctionExpression. The return type must be passed in
+     * as it can be different depending on the types of the arguments provided
+     * (eg. if a custom TypeDeterminer is used for a parameter's type)
      *
      * @param string $libraryName
      * @param string $functionName
      * @param ExpressionBagInterface $argumentExpressionBag
+     * @param TypeInterface $returnType
      * @return FunctionExpression
      */
     public function createFunctionExpression(
         $libraryName,
         $functionName,
-        ExpressionBagInterface $argumentExpressionBag
-    );
-
-    /**
-     * Creates an assurance for a guard expression
-     *
-     * @param ExpressionInterface $expression
-     * @param string $constraint
-     * @param string $assuredStaticName
-     * @return AssuranceInterface
-     */
-    public function createGuardAssurance(
-        ExpressionInterface $expression,
-        $constraint,
-        $assuredStaticName
+        ExpressionBagInterface $argumentExpressionBag,
+        TypeInterface $returnType
     );
 
     /**

@@ -49,7 +49,7 @@ class WidgetStatePath implements WidgetStatePathInterface
     {
         $state = $this->getEndState();
 
-        if (!$state instanceof DefinedWidgetStateInterface && !$state instanceof WidgetGroupStateInterface) {
+        if (!$state instanceof ParentWidgetStateInterface) {
             throw new LogicException('Widget does not support children');
         }
 
@@ -74,6 +74,18 @@ class WidgetStatePath implements WidgetStatePathInterface
     public function getEndStateType()
     {
         return $this->getEndState()->getType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualEndRenderableStatePath()
+    {
+        $state = $this->getEndState();
+
+        $states = array_merge($this->states, $state->getEventualRenderableDescendantStatePath());
+
+        return $this->stateFactory->createWidgetStatePath($states);
     }
 
     /**

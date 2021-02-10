@@ -11,15 +11,16 @@
 
 namespace Combyna\Component\Type\Config\Loader;
 
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\NothingExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDateTimeExpression;
 use Combyna\Component\Expression\StaticDayExpression;
 use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Type\StaticType;
-use InvalidArgumentException;
+use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class StaticTypeLoader
@@ -61,13 +62,13 @@ class StaticTypeLoader implements TypeTypeLoaderInterface
         $type = $this->configParser->getElement($config, 'type', 'type name');
 
         if (!array_key_exists($type, self::$typesToClasses)) {
-            throw new InvalidArgumentException(
+            return new UnresolvedType(
                 'Invalid static type "' . $type . '" given - valid types are "' .
                 implode('", "', array_keys(self::$typesToClasses)) . '"'
             );
         }
 
-        return new StaticType(self::$typesToClasses[$type]);
+        return new PresolvedTypeDeterminer(new StaticType(self::$typesToClasses[$type]));
     }
 
     /**

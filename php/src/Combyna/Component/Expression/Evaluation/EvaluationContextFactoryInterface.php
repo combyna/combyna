@@ -16,6 +16,8 @@ use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Evaluation\EventEvaluationContext;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
+use Combyna\Component\Signal\Evaluation\SignalEvaluationContext;
+use Combyna\Component\Signal\SignalInterface;
 
 /**
  * Interface EvaluationContextFactoryInterface
@@ -38,6 +40,8 @@ interface EvaluationContextFactoryInterface
 
     /**
      * Creates a new EventEvaluationContext
+     *
+     * TODO: Factor this out so that the Expression component doesn't need to know about Events
      *
      * @param EvaluationContextInterface $parentContext
      * @param EventInterface $event
@@ -78,6 +82,20 @@ interface EvaluationContextFactoryInterface
     public function createScopeContext(
         EvaluationContextInterface $parentContext,
         StaticBagInterface $variableStaticBag
+    );
+
+    /**
+     * Creates a new SignalEvaluationContext
+     *
+     * TODO: Factor this out so that the Expression component doesn't need to know about Signals
+     *
+     * @param EvaluationContextInterface $parentContext
+     * @param SignalInterface $signal
+     * @return SignalEvaluationContext
+     */
+    public function createSignalContext(
+        EvaluationContextInterface $parentContext,
+        SignalInterface $signal
     );
 
     /**

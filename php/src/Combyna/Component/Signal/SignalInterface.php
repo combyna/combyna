@@ -12,11 +12,12 @@
 namespace Combyna\Component\Signal;
 
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Expression\StaticInterface;
 
 /**
  * Interface SignalInterface
  *
- * Represents an event that has occurred or a request that has been made within the system
+ * Represents an action that has occurred or a request that has been made within the system
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -37,7 +38,15 @@ interface SignalInterface
     public function getName();
 
     /**
-     * Fetches the static bag containing the signal payload
+     * Fetches the specified static from this signal's payload
+     *
+     * @param string $staticName
+     * @return StaticInterface
+     */
+    public function getPayloadStatic($staticName);
+
+    /**
+     * Fetches the entire payload for this signal
      *
      * @return StaticBagInterface
      */

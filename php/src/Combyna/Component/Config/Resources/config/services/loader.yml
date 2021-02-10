@@ -1,4 +1,8 @@
 services:
+    combyna.config.loader.argument_parser:
+        class: Combyna\Component\Config\Loader\ArgumentParser
+        autowire: true
+
     combyna.config.loader.array_walker:
         class: Combyna\Component\Config\Loader\ArrayWalker
         autowire: true

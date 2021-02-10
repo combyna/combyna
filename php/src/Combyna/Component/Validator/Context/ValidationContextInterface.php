@@ -11,16 +11,24 @@
 
 namespace Combyna\Component\Validator\Context;
 
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
+use Combyna\Component\Behaviour\Query\Specifier\QuerySpecifierInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\ViolationInterface;
 use Combyna\Component\Type\TypeInterface;
-use LogicException;
+use Combyna\Component\Validator\Context\Specifier\SubValidationContextSpecifierInterface;
+use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Component\Validator\Query\ActNodeQueryInterface;
+use Combyna\Component\Validator\Query\BooleanQueryInterface;
+use Combyna\Component\Validator\Query\Requirement\ActNodeQueryRequirement;
+use Combyna\Component\Validator\Query\Requirement\BooleanQueryRequirement;
+use Combyna\Component\Validator\Query\Requirement\TypeQueryRequirement;
+use Combyna\Component\Validator\Query\ResultTypeQueryInterface;
+use Combyna\Component\Validator\ViolationInterface;
 
 /**
- * Class ValidationContextInterface
+ * Interface ValidationContextInterface
  *
  * Represents a current state during validation, tracking any violations
  *
@@ -66,156 +74,78 @@ interface ValidationContextInterface
     public function addViolation(ViolationInterface $violation);
 
     /**
-     * Goes through all assurances in this assured context and checks that for each of them,
-     * any of their assured statics that are "required" (and so must be used) have been
-     * referenced by at least one AssuredExpression via ::assertAssuredStaticExists(...)
+     * Creates a new ActNodeQueryRequirement
+     *
+     * @param ActNodeQueryInterface $query
+     * @param ActNodeInterface $nodeToQueryFrom
+     * @return ActNodeQueryRequirement
      */
-    public function assertAllRequiredAssuredStaticsWereUsed();
+    public function createActNodeQueryRequirement(ActNodeQueryInterface $query, ActNodeInterface $nodeToQueryFrom);
 
     /**
-     * Checks that the expression is an AssuredExpression, and that the assured static
-     * it refers to has the specified constraint
+     * Creates a new BooleanQueryRequirement
+     *
+     * @param BooleanQueryInterface $query
+     * @return BooleanQueryRequirement
+     */
+    public function createBooleanQueryRequirement(BooleanQueryInterface $query);
+
+    /**
+     * Creates a child ValidationContext of the current one
+     *
+     * @param SubValidationContextSpecifierInterface $subContextSpecifier
+     * @param StructuredNodeInterface $structuredNode
+     * @param BehaviourSpecInterface $behaviourSpec
+     * @return ValidationContextInterface
+     */
+    public function createSubContext(
+        SubValidationContextSpecifierInterface $subContextSpecifier,
+        StructuredNodeInterface $structuredNode,
+        BehaviourSpecInterface $behaviourSpec
+    );
+
+    /**
+     * Creates a new TypeQueryRequirement
+     *
+     * @param ResultTypeQueryInterface $query
+     * @return TypeQueryRequirement
+     */
+    public function createTypeQueryRequirement(ResultTypeQueryInterface $query);
+
+    /**
+     * Fetches the ACT node that the current context represents.
+     * This is not necessarily the same as the original node being validated -
+     * to fetch that, see ::getSubjectActNode()
+     *
+     * @return ActNodeInterface
+     */
+    public function getCurrentActNode();
+
+    /**
+     * Fetches the parent of the current ACT node that the current context represents.
+     * This is not necessarily the same as the parent of the original node being validated -
+     * to fetch that, see ::getSubjectActNode()
+     *
+     * @return ActNodeInterface
+     */
+    public function getCurrentParentActNode();
+
+    /**
+     * Fetches all descendant nodes of the current ACT node (which is not necessarily an expression node)
+     * that perform a query matching the given query specifier
+     *
+     * @param QuerySpecifierInterface $querySpecifier
+     * @return BehaviourSpecInterface[]
+     */
+    public function getDescendantSpecsWithQuery(QuerySpecifierInterface $querySpecifier);
+
+    /**
+     * Fetches the result type for the specified expression node
      *
      * @param ExpressionNodeInterface $expressionNode
-     * @param string $constraint
-     * @param string $contextDescription A description of the context: eg. 'left operand'
-     */
-    public function assertAssured(
-        ExpressionNodeInterface $expressionNode,
-        $constraint,
-        $contextDescription
-    );
-
-    /**
-     * Checks that an assured static exists with the given name in the hierarchy
-     *
-     * @param string $assuredStaticName
-     */
-    public function assertAssuredStaticExists($assuredStaticName);
-
-    /**
-     * Checks that the expression resolves to a StaticListExpression
-     * (the type of its elements is ignored)
-     *
-     * @param ExpressionNodeInterface $expressionNode
-     * @param string $contextDescription
-     */
-    public function assertListResultType(ExpressionNodeInterface $expressionNode, $contextDescription);
-
-    /**
-     * Checks that the provided operator is included in the allowed set
-     *
-     * @param string $operator
-     * @param string[] $allowedOperators
-     */
-    public function assertOperator($operator, array $allowedOperators);
-
-    /**
-     * Checks that both of the specified expressions can both only ever evaluate to match
-     * one of the provided static types together. If the expressions are only able to evaluate
-     * to a static type that doesn't match, then a validation violation will be logged
-     *
-     * @param ExpressionNodeInterface $leftOperandExpressionNode
-     * @param $leftOperandContextDescription
-     * @param ExpressionNodeInterface $rightOperandExpressionNode
-     * @param $rightOperandContextDescription
-     * @param TypeInterface[] $allowedMatchingResultTypes
-     */
-    public function assertPossibleMatchingResultTypes(
-        ExpressionNodeInterface $leftOperandExpressionNode,
-        $leftOperandContextDescription,
-        ExpressionNodeInterface $rightOperandExpressionNode,
-        $rightOperandContextDescription,
-        array $allowedMatchingResultTypes
-    );
-
-    /**
-     * Checks that the specified expression can only ever evaluate to match the static type
-     * specified. If the expression is able to evaluate to a static type that doesn't match,
-     * then a validation violation will be logged
-     *
-     * @param ExpressionNodeInterface $expressionNode
-     * @param TypeInterface $allowedType Type allowed for the expression to evaluate to
-     * @param string $contextDescription A description of the context: eg. 'left operand'
-     */
-    public function assertResultType(
-        ExpressionNodeInterface $expressionNode,
-        TypeInterface $allowedType,
-        $contextDescription
-    );
-
-    /**
-     * Validates that the provided function exists and that the argument expressions
-     * evaluate to valid statics for that function's parameters. At the root level
-     * this will just check for a GenericFunction, but deeper validation contexts
-     * will allow the more specific types of function (eg. ViewStoreFunction) too
-     *
-     * @param string $libraryName
-     * @param string $functionName
-     * @param ExpressionBagNode $argumentExpressionBagNode
-     */
-    public function assertValidFunctionCall(
-        $libraryName,
-        $functionName,
-        ExpressionBagNode $argumentExpressionBagNode
-    );
-
-    /**
-     * Checks that a variable exists with the given name in the hierarchy
-     *
-     * @param string $variableName
-     */
-    public function assertVariableExists($variableName);
-
-    /**
-     * Creates a sub-assured context
-     *
-     * @param AssuranceNodeInterface[] $assuranceNodes
-     * @return AssuredValidationContextInterface
-     */
-    public function createSubAssuredContext(array $assuranceNodes);
-
-    /**
-     * Creates a sub-context of this one that is aware of the current ACT node,
-     * so that any failures may be mapped to the correct node in the tree
-     *
-     * @param ActNodeInterface $actNode
-     * @return ActNodeValidationContextInterface
-     */
-    public function createSubActNodeContext(ActNodeInterface $actNode);
-
-    /**
-     * Creates a sub-context of this one that can have variables defined in its scope
-     *
-     * @return ScopeValidationContextInterface
-     */
-    public function createSubScopeContext();
-
-    /**
-     * Fetches the assurance for an assured static
-     *
-     * @param string $assuredStaticName
-     * @return AssuranceNodeInterface
-     */
-    public function getAssuredStaticAssurance($assuredStaticName);
-
-    /**
-     * Fetches the type for an assured static
-     *
-     * @param string $assuredStaticName
      * @return TypeInterface
-     * @throws LogicException Throws when no assured static is defined with the given type
      */
-    public function getAssuredStaticType($assuredStaticName);
-
-    /**
-     * Fetches the return type for a function of the correct type for the current context
-     *
-     * @param string $libraryName
-     * @param string $functionName
-     * @return TypeInterface|null
-     */
-    public function getFunctionReturnType($libraryName, $functionName);
+    public function getExpressionResultType(ExpressionNodeInterface $expressionNode);
 
     /**
      * Builds the path to this validation context in the expression tree
@@ -225,11 +155,59 @@ interface ValidationContextInterface
     public function getPath();
 
     /**
-     * Fetches the type for a variable defined in this context
+     * Fetches the original ACT node currently being validated
      *
-     * @param string $variableName
-     * @return TypeInterface
-     * @throws LogicException Throws when no assured static is defined with the given type
+     * @return ActNodeInterface
      */
-    public function getVariableType($variableName);
+    public function getSubjectActNode();
+
+    /**
+     * Fetches the sub-validation context
+     *
+     * @return SubValidationContextInterface
+     */
+    public function getSubValidationContext();
+
+    /**
+     * Performs a query that will result in a boolean
+     *
+     * @param ActNodeQueryInterface $actNodeQuery
+     * @param ActNodeInterface $nodeToQueryFrom
+     * @return ActNodeInterface
+     */
+    public function queryForActNode(
+        ActNodeQueryInterface $actNodeQuery,
+        ActNodeInterface $nodeToQueryFrom
+    );
+
+    /**
+     * Performs a query that will result in a boolean
+     *
+     * @param BooleanQueryInterface $booleanQuery
+     * @param ActNodeInterface $nodeToQueryFrom
+     * @return bool|null
+     */
+    public function queryForBoolean(
+        BooleanQueryInterface $booleanQuery,
+        ActNodeInterface $nodeToQueryFrom
+    );
+
+    /**
+     * Performs a query that will result in a Type
+     *
+     * @param ResultTypeQueryInterface $resultTypeQuery
+     * @param ActNodeInterface $nodeToQueryFrom
+     * @return TypeInterface|null
+     */
+    public function queryForResultType(
+        ResultTypeQueryInterface $resultTypeQuery,
+        ActNodeInterface $nodeToQueryFrom
+    );
+
+    /**
+     * Throws if any violations have been added to this context, does nothing otherwise
+     *
+     * @throws ValidationFailureException
+     */
+    public function throwIfViolated();
 }

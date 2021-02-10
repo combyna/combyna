@@ -46,11 +46,11 @@ class EventDefinitionNodePromoter
     /**
      * Promotes an EventDefinitionNode to an EventDefinition
      *
-     * @param EventDefinitionNode $eventDefinitionNode
+     * @param EventDefinitionNodeInterface $eventDefinitionNode
      * @param string $libraryName
      * @return EventDefinitionInterface
      */
-    public function promote(EventDefinitionNode $eventDefinitionNode, $libraryName)
+    public function promote(EventDefinitionNodeInterface $eventDefinitionNode, $libraryName)
     {
         return $this->eventFactory->createEventDefinition(
             $libraryName,
@@ -60,7 +60,7 @@ class EventDefinitionNodePromoter
     }
 
     /**
-     * Promotes a set of EventDefinitionNodes to a EventDefinitionCollection
+     * Promotes a set of EventDefinitionNodes to an EventDefinitionCollection
      *
      * @param EventDefinitionNode[] $eventDefinitionNodes
      * @param string $libraryName

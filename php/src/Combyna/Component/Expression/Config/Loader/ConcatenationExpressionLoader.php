@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Expression\Config\Act\ConcatenationExpressionNode;
-use Combyna\Component\Expression\ConcatenationExpression;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Expression\ConcatenationExpression;
+use Combyna\Component\Expression\Config\Act\ConcatenationExpressionNode;
 
 /**
  * Class ConcatenationExpressionLoader
@@ -50,7 +50,7 @@ class ConcatenationExpressionLoader implements ExpressionTypeLoaderInterface
     public function load(array $config)
     {
         $operandListConfig = $this->configParser->getElement($config, 'list', 'operand list expression', 'array');
-        $glueConfig = $this->configParser->getOptionalElement($config, 'glue', 'glue expression', null);
+        $glueConfig = $this->configParser->getOptionalElement($config, 'glue', 'glue expression', null, 'array');
 
         $operandListExpression = $this->expressionLoader->load($operandListConfig);
 

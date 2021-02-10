@@ -11,8 +11,16 @@
 
 namespace Combyna\Component\Ui\Widget;
 
+use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\StaticBagInterface;
+use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Event\EventInterface;
+use Combyna\Component\Ui\Evaluation\DefinedWidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\WidgetDefinitionEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Event\Exception\EventDefinitionNotReferencedByWidgetException;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 
 /**
@@ -30,25 +38,61 @@ interface WidgetDefinitionInterface
     public function assertValidAttributeStaticBag(StaticBagInterface $attributeStaticBag);
 
     /**
+     * Creates a WidgetDefinitionEvaluationContext
+     *
+     * @param DefinedWidgetEvaluationContextInterface $parentContext
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedWidgetStateInterface|null $widgetState
+     * @return WidgetDefinitionEvaluationContextInterface
+     */
+    public function createDefinitionEvaluationContextForWidget(
+        DefinedWidgetEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget,
+        DefinedWidgetStateInterface $widgetState = null
+    );
+
+    /**
+     * Creates a WidgetEvaluationContext
+     *
+     * @param ViewEvaluationContextInterface $parentContext
+     * @param DefinedWidgetInterface $widget
+     * @param DefinedWidgetStateInterface|null $widgetState
+     * @return WidgetEvaluationContextInterface
+     */
+    public function createEvaluationContextForWidget(
+        ViewEvaluationContextInterface $parentContext,
+        DefinedWidgetInterface $widget,
+        DefinedWidgetStateInterface $widgetState = null
+    );
+
+    /**
      * Creates an event to dispatch for a rendered instance of a widget of this definition
      *
      * @param string $libraryName
      * @param string $eventName
      * @param StaticBagInterface $payloadStaticBag
      * @return EventInterface
+     * @throws EventDefinitionNotReferencedByWidgetException
+     * @throws LibraryNotInstalledException
      */
     public function createEvent($libraryName, $eventName, StaticBagInterface $payloadStaticBag);
 
     /**
-     * Creates a DefinedWidgetState
+     * Creates a DefinedCompoundWidgetState or DefinedPrimitiveWidgetState
      *
+     * @param string|int $name
      * @param DefinedWidgetInterface $widget
-     * @param StaticBagInterface $attributeStaticBag
+     * @param ExpressionBagInterface $attributeExpressionBag
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
      * @return DefinedWidgetStateInterface
      */
-    public function createInitialState(
+    public function createInitialStateForWidget(
+        $name,
         DefinedWidgetInterface $widget,
-        StaticBagInterface $attributeStaticBag
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     );
 
     /**
@@ -66,21 +110,31 @@ interface WidgetDefinitionInterface
     public function getName();
 
     /**
-     * Returns true if this widget definition has the specified label, false otherwise
+     * Renderable widgets may be rendered directly, without needing to be "resolved" further.
+     * For example, a compound widget is not renderable as its root widget is the one
+     * that will actually be rendered (if that widget is itself renderable - if not,
+     * then its root widget will be rendered instead, and so on).
      *
-     * @param string $label
      * @return bool
      */
-    public function hasLabel($label);
+    public function isRenderable();
 
-//    /**
-//     * Ensures that the provided attribute bag is valid
-//     *
-//     * @param ValidationContextInterface $validationContext
-//     * @param ExpressionBagNode $expressionBagNode
-//     */
-//    public function validateAttributeExpressions(
-//        ValidationContextInterface $validationContext,
-//        ExpressionBagNode $expressionBagNode
-//    );
+    /**
+     * Reevaluates the state of a widget of this definition, and returns a new state object
+     * if needed. If nothing has changed, the same state object will be returned as it is immutable
+     *
+     * @param DefinedWidgetStateInterface $oldState
+     * @param DefinedWidgetInterface $widget
+     * @param ExpressionBagInterface $attributeExpressionBag
+     * @param ViewEvaluationContextInterface $evaluationContext
+     * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
+     * @return DefinedWidgetStateInterface
+     */
+    public function reevaluateStateForWidget(
+        DefinedWidgetStateInterface $oldState,
+        DefinedWidgetInterface $widget,
+        ExpressionBagInterface $attributeExpressionBag,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    );
 }

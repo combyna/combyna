@@ -1,0 +1,4 @@
+services:
+    combyna.behaviour.compiler.behaviour_spec_tree_compiler:
+        class: Combyna\Component\Behaviour\Compiler\BehaviourSpecTreeCompiler
+        autowire: true

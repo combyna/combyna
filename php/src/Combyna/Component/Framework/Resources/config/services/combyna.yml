@@ -1,4 +1,11 @@
+parameters:
+    # These are set in CombynaBootstrap when building the container
+    combyna.cache_path: ~
+    combyna.debug: ~
+
 services:
     combyna:
         class: Combyna\Component\Framework\Combyna
         autowire: true
+        arguments:
+            - '@service_container'

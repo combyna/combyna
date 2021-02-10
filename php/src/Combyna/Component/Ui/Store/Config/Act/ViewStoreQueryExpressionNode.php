@@ -12,11 +12,13 @@
 namespace Combyna\Component\Ui\Store\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
-use Combyna\Component\Expression\TextExpression;
-use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Store\Expression\ViewStoreQueryExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Store\Validation\Constraint\ValidViewStoreQueryConstraint;
+use Combyna\Component\Ui\Store\Validation\Query\ViewStoreQueryResultTypeQuery;
+use Combyna\Component\Ui\Validation\Constraint\InsideViewConstraint;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class ViewStoreQueryExpressionNode
@@ -50,6 +52,24 @@ class ViewStoreQueryExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        if ($this->argumentExpressionBag !== null) {
+            $specBuilder->addChildNode($this->argumentExpressionBag);
+        }
+
+        $specBuilder->addConstraint(new InsideViewConstraint());
+        $specBuilder->addConstraint(
+            new ValidViewStoreQueryConstraint(
+                $this->queryName,
+                $this->argumentExpressionBag
+            )
+        );
+    }
+
+    /**
      * Fetches the bag of expressions for any parameters of the message, if set
      *
      * @return ExpressionBagNode|null
@@ -62,12 +82,12 @@ class ViewStoreQueryExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-//        return $validationContext->getViewStoreQueryType($this->queryName);
-
-        // FIXME!
-        return new StaticType(TextExpression::class);
+        return new QueriedResultTypeDeterminer(
+            new ViewStoreQueryResultTypeQuery($this->queryName),
+            $this
+        );
     }
 
     /**
@@ -78,22 +98,5 @@ class ViewStoreQueryExpressionNode extends AbstractExpressionNode
     public function getQueryName()
     {
         return $this->queryName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-//        $subValidationContext->assertInsideView();
-//        $subValidationContext->assertViewHasQuery($this->queryName);
-
-        if ($this->argumentExpressionBag !== null) {
-            $this->argumentExpressionBag->validate($subValidationContext);
-        }
-
-//        $subValidationContext->assertValidViewQuery($this->argumentExpressionBag);
     }
 }

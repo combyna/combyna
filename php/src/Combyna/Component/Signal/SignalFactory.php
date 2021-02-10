@@ -38,9 +38,10 @@ class SignalFactory implements SignalFactoryInterface
     public function createSignalDefinition(
         $libraryName,
         $signalName,
-        FixedStaticBagModelInterface $payloadStaticBagModel
+        FixedStaticBagModelInterface $payloadStaticBagModel,
+        $isBroadcast
     ) {
-        return new SignalDefinition($libraryName, $signalName, $payloadStaticBagModel);
+        return new SignalDefinition($libraryName, $signalName, $payloadStaticBagModel, $isBroadcast);
     }
 
     /**

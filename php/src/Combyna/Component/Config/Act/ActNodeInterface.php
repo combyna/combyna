@@ -11,27 +11,26 @@
 
 namespace Combyna\Component\Config\Act;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Behaviour\Node\StructuredNodeInterface;
 
 /**
  * Interface ActNodeInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface ActNodeInterface
+interface ActNodeInterface extends StructuredNodeInterface
 {
+    /**
+     * Fetches an identifier for this node, usually its type along with its name or index if applicable
+     *
+     * @return string
+     */
+    public function getIdentifier();
+
     /**
      * Fetches the type of node, eg. `fixed-static-bag-model`
      *
      * @return string
      */
     public function getType();
-
-    /**
-     * Checks that all operands/arguments for this node validate recursively and that they will only
-     * resolve to the expected types of static expression
-     *
-     * @param ValidationContextInterface $validationContext
-     */
-    public function validate(ValidationContextInterface $validationContext);
 }

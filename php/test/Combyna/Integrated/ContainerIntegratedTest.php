@@ -11,7 +11,6 @@
 
 namespace Combyna\Integrated;
 
-use Combyna\CombynaBootstrap;
 use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\Container;
 
@@ -30,7 +29,8 @@ class ContainerIntegratedTest extends TestCase
      */
     public function testServiceCanBeCreated($serviceId)
     {
-        $container = (new CombynaBootstrap())->getContainer();
+        global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
+        $container = $combynaBootstrap->createContainer();
 
         // Try to get the service to ensure it can be constructed
         $container->get($serviceId);
@@ -43,10 +43,11 @@ class ContainerIntegratedTest extends TestCase
      */
     public function serviceIdProvider()
     {
+        global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
         $calls = [];
 
         /** @var Container $container */
-        $container = (new CombynaBootstrap())->getContainer();
+        $container = $combynaBootstrap->createContainer();
 
         foreach ($container->getServiceIds() as $id) {
             if (

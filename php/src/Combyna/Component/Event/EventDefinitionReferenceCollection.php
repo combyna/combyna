@@ -12,6 +12,7 @@
 namespace Combyna\Component\Event;
 
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
 
 /**
  * Class EventDefinitionReferenceCollection
@@ -56,6 +57,9 @@ class EventDefinitionReferenceCollection implements EventDefinitionReferenceColl
             }
         }
 
+        // This collection does not mention the specified event definition,
+        // so it cannot be fetched
+        // (Widget definitions define a list of events they support)
         throw new EventDefinitionNotReferencedException($libraryName, $eventName);
     }
 }

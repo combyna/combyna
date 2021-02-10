@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Ui\View;
 
-use Combyna\Component\Bag\StaticBagInterface;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use InvalidArgumentException;
 
 /**
@@ -77,16 +75,5 @@ class OverlayViewCollection implements OverlayViewCollectionInterface
     public function hasView($viewName)
     {
         return array_key_exists($viewName, $this->views);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function renderView(
-        $viewName,
-        StaticBagInterface $viewAttributeStaticBag,
-        EvaluationContextInterface $rootEvaluationContext
-    ) {
-        // TODO: Implement renderView() method.
     }
 }

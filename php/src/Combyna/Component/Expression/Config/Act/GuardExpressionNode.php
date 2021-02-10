@@ -11,9 +11,13 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Expression\Behaviour\Query\Specifier\AssuredStaticTypeQuerySpecifier;
 use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
 use Combyna\Component\Expression\GuardExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Context\Specifier\AssuredContextSpecifier;
+use Combyna\Component\Validator\Constraint\DescendantHasEquivalentQueryConstraint;
+use Combyna\Component\Validator\Type\AdditiveDeterminer;
 
 /**
  * Class GuardExpressionNode
@@ -59,6 +63,35 @@ class GuardExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        foreach ($this->assuranceNodes as $assuranceNode) {
+            $specBuilder->addChildNode($assuranceNode);
+
+            $specBuilder->addConstraint(
+                new DescendantHasEquivalentQueryConstraint(
+                    new AssuredStaticTypeQuerySpecifier(
+                        $assuranceNode->getAssuredStaticName()
+                    )
+                )
+            );
+        }
+
+        $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
+            // Only give the consequent and alternate expressions the assured context,
+            // as the assurances cannot refer to each other's assured statics
+            $subSpecBuilder->defineValidationContext(
+                new AssuredContextSpecifier()
+            );
+
+            $subSpecBuilder->addChildNode($this->consequentExpression);
+            $subSpecBuilder->addChildNode($this->alternateExpression);
+        });
+    }
+
+    /**
      * Fetches the alternate expression
      *
      * @return ExpressionNodeInterface
@@ -91,35 +124,13 @@ class GuardExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $consequentResultType = $this->consequentExpression->getResultType($subValidationContext);
-        $alternateResultType = $this->alternateExpression->getResultType($subValidationContext);
-
         // The result of the guard expression could be either the consequent or the alternate expression,
         // so return a type that specifies both
-        return $consequentResultType->mergeWith($alternateResultType);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        foreach ($this->assuranceNodes as $assuranceNode) {
-            $assuranceNode->validate($subValidationContext);
-        }
-
-        $this->alternateExpression->validate($subValidationContext);
-
-        $assuredValidationContext = $subValidationContext->createSubAssuredContext($this->assuranceNodes);
-
-        $this->consequentExpression->validate($assuredValidationContext);
-
-        $assuredValidationContext->assertAllRequiredAssuredStaticsWereUsed();
+        return new AdditiveDeterminer([
+            $this->consequentExpression->getResultTypeDeterminer(),
+            $this->alternateExpression->getResultTypeDeterminer()
+        ]);
     }
 }

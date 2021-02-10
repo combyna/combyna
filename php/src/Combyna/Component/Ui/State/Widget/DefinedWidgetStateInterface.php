@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\State\Widget;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
 use InvalidArgumentException;
 
@@ -19,32 +20,44 @@ use InvalidArgumentException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface DefinedWidgetStateInterface extends WidgetStateInterface
+interface DefinedWidgetStateInterface extends ParentWidgetStateInterface, WidgetStateInterface
 {
-    const TYPE = 'defined-widget';
-
     /**
-     * Adds another rendered widget as a child of this one
-     *
-     * @param string $childName
-     * @param WidgetStateInterface $childWidget
-     */
-    public function addChildState($childName, WidgetStateInterface $childWidget);
-
-    /**
-     * Fetches the specified attribute, evaluated to a static for this rendered widget
+     * Fetches the specified attribute for this widget, evaluated to a static
      *
      * @param string $name
      * @return StaticInterface
-     * @throws InvalidArgumentException Throws when the bag does not contain the specified static
+     * @throws InvalidArgumentException Throws when the widget does not define the specified attribute
      */
     public function getAttribute($name);
 
     /**
-     * Fetches the specified child widget state of this one
+     * Fetches the names of all attributes for the widget this state is for
+     *
+     * @return string[]
+     */
+    public function getAttributeNames();
+
+    /**
+     * Fetches the attribute bag for the widget this state is for
+     *
+     * @return StaticBagInterface
+     */
+    public function getAttributeStaticBag();
+
+    /**
+     * Fetches the names of the children of the widget this state is for
+     *
+     * @return string[]
+     */
+    public function getChildNames();
+
+    /**
+     * Fetches the specified value for this widget, wrapped as a static
      *
      * @param string $name
-     * @return WidgetStateInterface
+     * @return StaticInterface
+     * @throws InvalidArgumentException Throws when the widget does not define the specified value
      */
-    public function getChildState($name);
+    public function getValue($name);
 }

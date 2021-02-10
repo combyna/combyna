@@ -12,7 +12,7 @@
 namespace Combyna\Component\Type\Config\Loader;
 
 use Combyna\Component\Config\Loader\ConfigParser;
-use Combyna\Component\Type\StaticListType;
+use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
 
 /**
  * Class StaticListTypeLoader
@@ -46,11 +46,17 @@ class StaticListTypeLoader implements TypeTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $elementTypeConfig = $this->configParser->getElement($config, 'element', 'type for elements');
+        $elementTypeConfig = $this->configParser->getOptionalElement(
+            $config,
+            'element',
+            'type for elements',
+            ['type' => 'any'],
+            ['array', 'string'] // Type could just be a string or be an array for the expanded variant
+        );
 
-        $elementType = $this->typeLoader->load($elementTypeConfig);
+        $elementTypeDeterminer = $this->typeLoader->load($elementTypeConfig);
 
-        return new StaticListType($elementType);
+        return new StaticListTypeDeterminer($elementTypeDeterminer);
     }
 
     /**

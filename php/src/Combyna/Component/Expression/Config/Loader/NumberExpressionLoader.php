@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class NumberExpressionLoader
@@ -40,7 +40,7 @@ class NumberExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $number = $this->configParser->getElement($config, 'number', 'number expression');
+        $number = $this->configParser->getElement($config, 'number', 'number expression', 'number');
 
         return new NumberExpressionNode($number);
     }

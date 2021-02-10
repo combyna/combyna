@@ -11,10 +11,11 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\AssuredExpression;
-use Combyna\Component\Expression\ExpressionFactoryInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\AssuredStaticExistsConstraint;
+use Combyna\Component\Expression\Validation\Query\AssuredStaticTypeQuery;
+use Combyna\Component\Validator\Type\QueriedResultTypeDeterminer;
 
 /**
  * Class AssuredExpressionNode
@@ -36,29 +37,32 @@ class AssuredExpressionNode extends AbstractExpressionNode
     /**
      * @param string $assuredStaticName
      */
-    public function __construct(
-        $assuredStaticName
-    ) {
+    public function __construct($assuredStaticName)
+    {
         $this->assuredStaticName = $assuredStaticName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
-        return $validationContext->getAssuredStaticType($this->assuredStaticName);
+        $specBuilder->addConstraint(
+            new AssuredStaticExistsConstraint($this->assuredStaticName)
+        );
     }
 
     /**
-     * Fetches the assurance for the assured static
-     *
-     * @param ValidationContextInterface $validationContext
-     * @return AssuranceInterface
+     * {@inheritdoc}
      */
-    public function getAssurance(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        return $validationContext->getAssuredStaticAssurance($this->assuredStaticName);
+        return new QueriedResultTypeDeterminer(
+            new AssuredStaticTypeQuery(
+                $this->assuredStaticName
+            ),
+            $this
+        );
     }
 
     /**
@@ -69,26 +73,5 @@ class AssuredExpressionNode extends AbstractExpressionNode
     public function getAssuredStaticName()
     {
         return $this->assuredStaticName;
-    }
-
-    /**
-     * Promotes this node to an actual AssuredExpression
-     *
-     * @param ExpressionFactoryInterface $expressionFactory
-     * @return AssuredExpression
-     */
-    public function promote(ExpressionFactoryInterface $expressionFactory)
-    {
-        return $expressionFactory->createAssuredExpression($this->assuredStaticName);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $subValidationContext->assertAssuredStaticExists($this->assuredStaticName);
     }
 }

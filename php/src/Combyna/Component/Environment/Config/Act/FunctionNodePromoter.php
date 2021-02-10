@@ -11,10 +11,12 @@
 
 namespace Combyna\Component\Environment\Config\Act;
 
+use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Environment\Exception\NativeFunctionNotInstalledException;
 use Combyna\Component\Environment\Library\FunctionCollectionInterface;
 use Combyna\Component\Environment\Library\FunctionFactoryInterface;
 use Combyna\Component\Environment\Library\FunctionInterface;
+use Combyna\Component\Environment\Library\NativeFunction;
 use RuntimeException;
 
 /**
@@ -25,15 +27,24 @@ use RuntimeException;
 class FunctionNodePromoter
 {
     /**
+     * @var BagNodePromoter
+     */
+    private $bagNodePromoter;
+
+    /**
      * @var FunctionFactoryInterface
      */
     private $functionFactory;
 
     /**
+     * @param BagNodePromoter $bagNodePromoter
      * @param FunctionFactoryInterface $functionFactory
      */
-    public function __construct(FunctionFactoryInterface $functionFactory)
-    {
+    public function __construct(
+        BagNodePromoter $bagNodePromoter,
+        FunctionFactoryInterface $functionFactory
+    ) {
+        $this->bagNodePromoter = $bagNodePromoter;
         $this->functionFactory = $functionFactory;
     }
 
@@ -43,6 +54,7 @@ class FunctionNodePromoter
      * @param FunctionNodeInterface[] $functionNodes
      * @param string $libraryName
      * @return FunctionCollectionInterface
+     * @throws NativeFunctionNotInstalledException
      */
     public function promoteCollection(array $functionNodes, $libraryName)
     {
@@ -65,7 +77,11 @@ class FunctionNodePromoter
     public function promoteFunction(FunctionNodeInterface $functionNode)
     {
         if ($functionNode instanceof NativeFunctionNode) {
-            return $functionNode->getNativeFunction();
+            return new NativeFunction(
+                $functionNode->getName(),
+                $this->bagNodePromoter->promoteFixedStaticBagModel($functionNode->getParameterBagModel()),
+                $functionNode->getCallable()
+            );
         }
 
         throw new RuntimeException('Only native functions are supported for now');

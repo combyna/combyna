@@ -11,11 +11,17 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\MapExpression;
 use Combyna\Component\Expression\NumberExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
+use Combyna\Component\Expression\Validation\Context\Specifier\ScopeContextSpecifier;
+use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\ListElementTypeDeterminer;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\StaticListTypeDeterminer;
 
 /**
  * Class MapExpressionNode
@@ -68,6 +74,43 @@ class MapExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->listExpression);
+
+        // Validate the map expression in a sub-context that has access to the item and/or index vars
+        $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
+            $scopeContextSpecifier = new ScopeContextSpecifier();
+            $scopeContextSpecifier->defineVariable(
+                $this->itemVariableName,
+                new ListElementTypeDeterminer($this->listExpression->getResultTypeDeterminer())
+            );
+
+            if ($this->indexVariableName !== null) {
+                $scopeContextSpecifier->defineVariable(
+                    $this->indexVariableName,
+                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class))
+                );
+            }
+
+            $subSpecBuilder->defineValidationContext($scopeContextSpecifier);
+
+            $subSpecBuilder->addChildNode($this->mapExpression);
+        });
+
+        // Ensure the list operand can only ever evaluate to a list
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->listExpression,
+                new PresolvedTypeDeterminer(new StaticListType(new AnyType())),
+                'list operand'
+            )
+        );
+    }
+
+    /**
      * Fetches the name of the variable to define in the context with the current element's index
      *
      * @return string|null
@@ -110,67 +153,10 @@ class MapExpressionNode extends AbstractExpressionNode
     /**
      * {@inheritdoc}
      */
-    public function getResultType(ValidationContextInterface $validationContext)
+    public function getResultTypeDeterminer()
     {
-        $subValidationContext = $this->createSubValidationContext($validationContext);
-
         // The map expression will be evaluated for each element, so the resulting static's type
         // will be a static list with the map expression as the element type
-        $elementType = $this->mapExpression->getResultType($subValidationContext);
-
-        return new StaticListType($elementType);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $this->createSubValidationContext($validationContext);
-
-        $this->listExpression->validate($subValidationContext);
-        $this->mapExpression->validate($subValidationContext);
-
-        // Ensure the list operand can only ever evaluate to a list
-        // with elements that evaluate only to either text or number statics
-        $subValidationContext->assertListResultType(
-            $this->listExpression,
-            'list operand'
-        );
-    }
-
-    /**
-     * Creates a sub-validation context for this expression, with the index and item
-     * variables defined along with their types
-     *
-     * @param ValidationContextInterface $validationContext
-     * @return ValidationContextInterface
-     */
-    private function createSubValidationContext(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext
-            ->createSubActNodeContext($this)
-            ->createSubScopeContext();
-
-        $listResultType = $this->listExpression->getResultType($subValidationContext);
-
-        if ($listResultType instanceof StaticListType) {
-            // Will also ensure the item variable name is not defined by a parent context to prevent shadowing
-            $subValidationContext->defineVariable(
-                $this->itemVariableName,
-                $listResultType->getElementType()
-            );
-        }
-
-        if ($this->indexVariableName !== null) {
-            // Define the variable for the index of the item in the list
-            // Will also ensure the index variable name is not defined by a parent context to prevent shadowing
-            $subValidationContext->defineVariable(
-                $this->indexVariableName,
-                new StaticType(NumberExpression::class)
-            );
-        }
-
-        return $subValidationContext;
+        return new StaticListTypeDeterminer($this->mapExpression->getResultTypeDeterminer());
     }
 }

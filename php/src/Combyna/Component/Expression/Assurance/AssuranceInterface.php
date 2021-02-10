@@ -26,8 +26,6 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
  */
 interface AssuranceInterface
 {
-    const NON_ZERO_NUMBER = 'non-zero-number';
-
     /**
      * Determines whether this assurance defines a static with the given name
      *

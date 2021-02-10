@@ -52,7 +52,7 @@ class NumberExpressionLoaderTest extends TestCase
             'type' => 'number',
             'number' => $number
         ];
-        $this->configParser->getElement($config, 'number', Argument::any())
+        $this->configParser->getElement($config, 'number', Argument::any(), 'number')
             ->willReturn($number);
 
         $numberExpression = $this->loader->load($config);

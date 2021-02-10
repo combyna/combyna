@@ -12,11 +12,10 @@
 namespace Combyna\Component\Ui\Store\Evaluation;
 
 use Combyna\Component\Expression\Evaluation\AbstractEvaluationContext;
-use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
-use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
-use Combyna\Component\Ui\Widget\WidgetInterface;
+use LogicException;
 
 /**
  * Class ViewStoreEvaluationContext
@@ -31,23 +30,45 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     protected $evaluationContextFactory;
 
     /**
+     * @var ViewEvaluationContextInterface
+     */
+    protected $parentContext;
+
+    /**
      * @var UiStoreStateInterface
      */
     private $viewStoreState;
 
     /**
      * @param UiEvaluationContextFactoryInterface $evaluationContextFactory
-     * @param EvaluationContextInterface $parentContext
+     * @param ViewEvaluationContextInterface $parentContext
      * @param UiStoreStateInterface $viewStoreState
      */
     public function __construct(
         UiEvaluationContextFactoryInterface $evaluationContextFactory,
-        EvaluationContextInterface $parentContext,
+        ViewEvaluationContextInterface $parentContext,
         UiStoreStateInterface $viewStoreState
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
 
         $this->viewStoreState = $viewStoreState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getChildOfCurrentCompoundWidget($childName)
+    {
+        // TODO: Restructure interfaces so that this method stub is not needed here
+        throw new LogicException('View stores cannot define child widgets');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPath()
+    {
+        return array_merge($this->parentContext->getPath(), ['store']);
     }
 
     /**
@@ -64,16 +85,5 @@ class ViewStoreEvaluationContext extends AbstractEvaluationContext implements Vi
     public function createSubStoreContext(UiStoreStateInterface $storeState)
     {
         return $this->evaluationContextFactory->createViewStoreEvaluationContext($this, $storeState);
-    }
-
-    /**
-     * Creates a WidgetEvaluationContext
-     *
-     * @param WidgetInterface $widget
-     * @return WidgetEvaluationContextInterface
-     */
-    public function createSubWidgetEvaluationContext(WidgetInterface $widget)
-    {
-        return $this->evaluationContextFactory->createWidgetEvaluationContext($this, $widget);
     }
 }

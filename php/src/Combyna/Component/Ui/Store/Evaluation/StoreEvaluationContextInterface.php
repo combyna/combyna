@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Ui\Store\Evaluation;
 
-use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 
 /**

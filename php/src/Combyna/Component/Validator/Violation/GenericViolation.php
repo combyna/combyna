@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Validator\Violation;
 
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Context\SubValidationContextInterface;
 use Combyna\Component\Validator\ViolationInterface;
 
 /**
@@ -29,20 +29,20 @@ class GenericViolation implements ViolationInterface
     private $description;
 
     /**
-     * @var ValidationContextInterface
+     * @var SubValidationContextInterface
      */
-    private $validationContext;
+    private $subValidationContext;
 
     /**
-     * @param ValidationContextInterface $validationContext
+     * @param SubValidationContextInterface $subValidationContext
      * @param string $description
      */
     public function __construct(
         $description,
-        ValidationContextInterface $validationContext
+        SubValidationContextInterface $subValidationContext
     ) {
         $this->description = $description;
-        $this->validationContext = $validationContext;
+        $this->subValidationContext = $subValidationContext;
     }
 
     /**
@@ -58,6 +58,6 @@ class GenericViolation implements ViolationInterface
      */
     public function getPath()
     {
-        return $this->validationContext->getPath();
+        return $this->subValidationContext->getPath();
     }
 }

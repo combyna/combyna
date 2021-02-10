@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Ui\Store;
 
-use Combyna\Component\Bag\FixedStaticBagModelInterface;
-
 /**
  * Class WidgetStore
  *

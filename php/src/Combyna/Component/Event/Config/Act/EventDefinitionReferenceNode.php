@@ -11,8 +11,9 @@
 
 namespace Combyna\Component\Event\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Event\Validation\Constraint\EventDefinitionExistsConstraint;
 
 /**
  * Class EventDefinitionReferenceNode
@@ -21,6 +22,8 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  */
 class EventDefinitionReferenceNode extends AbstractActNode
 {
+    const TYPE = 'event-definition-reference';
+
     /**
      * @var string
      */
@@ -42,6 +45,19 @@ class EventDefinitionReferenceNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addConstraint(
+            new EventDefinitionExistsConstraint(
+                $this->libraryName,
+                $this->eventName
+            )
+        );
+    }
+
+    /**
      * Fetches the unique name of the event
      *
      * @return string
@@ -59,15 +75,5 @@ class EventDefinitionReferenceNode extends AbstractActNode
     public function getLibraryName()
     {
         return $this->libraryName;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        // ...
     }
 }

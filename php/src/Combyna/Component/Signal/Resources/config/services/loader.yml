@@ -14,3 +14,9 @@ services:
     combyna.signal.loader.signal_handler_collection:
         class: Combyna\Component\Signal\Config\Loader\SignalHandlerCollectionLoader
         autowire: true
+
+    combyna.signal.loader.signal_payload_expression:
+        class: Combyna\Component\Signal\Config\Loader\SignalPayloadExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}

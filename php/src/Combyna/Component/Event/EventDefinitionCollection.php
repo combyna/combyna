@@ -11,6 +11,8 @@
 
 namespace Combyna\Component\Event;
 
+use Combyna\Component\Event\Exception\EventDefinitionNotFoundException;
+
 /**
  * Class EventDefinitionCollection
  *

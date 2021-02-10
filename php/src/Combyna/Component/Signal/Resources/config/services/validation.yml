@@ -1,0 +1,37 @@
+services:
+    combyna.signal.validation.factory:
+        class: Combyna\Component\Signal\Validation\SignalValidationFactory
+        autowire: true
+        # Ensure autowiring picks the SignalValidationFactory when typehinting for this interface,
+        # rather than its sub-interfaces/classes
+        autowiring_types: Combyna\Component\Signal\Validation\SignalValidationFactoryInterface
+
+    combyna.signal.validation.inside_signal_handler_constraint_validator:
+        class: Combyna\Component\Signal\Validation\Constraint\InsideSignalHandlerConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.signal.validation.signal_definition_exists_constraint_validator:
+        class: Combyna\Component\Signal\Validation\Constraint\SignalDefinitionExistsConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.signal.validation.signal_definition_has_payload_static_constraint_validator:
+        class: Combyna\Component\Signal\Validation\Constraint\SignalDefinitionHasPayloadStaticConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.signal.validation.signal_handler_sub_validation_context_factory:
+        class: Combyna\Component\Signal\Validation\Context\Factory\SignalHandlerContextFactory
+        autowire: true
+        tags:
+            - {name: combyna.sub_validation_context_factory}
+
+    combyna.signal.validation.source_signal_has_payload_static_constraint_validator:
+        class: Combyna\Component\Signal\Validation\Constraint\SourceSignalHasPayloadStaticConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

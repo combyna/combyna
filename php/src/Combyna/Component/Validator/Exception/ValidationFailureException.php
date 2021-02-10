@@ -11,32 +11,30 @@
 
 namespace Combyna\Component\Validator\Exception;
 
-use Combyna\Component\Validator\Context\RootGenericValidationContextInterface;
+use Combyna\Component\Validator\Context\RootValidationContextInterface;
 use Exception;
 
 /**
  * Class ValidationFailureException
- *
- *
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
 class ValidationFailureException extends Exception
 {
     /**
-     * @var RootGenericValidationContextInterface
+     * @var RootValidationContextInterface
      */
-    private $validationContext;
+    private $rootValidationContext;
 
     /**
-     * @param RootGenericValidationContextInterface $validationContext
+     * @param RootValidationContextInterface $rootValidationContext
      * @param string $descriptions
      */
-    public function __construct(RootGenericValidationContextInterface $validationContext, $descriptions)
+    public function __construct(RootValidationContextInterface $rootValidationContext, $descriptions)
     {
         parent::__construct($descriptions);
 
-        $this->validationContext = $validationContext;
+        $this->rootValidationContext = $rootValidationContext;
     }
 
     // ...

@@ -16,19 +16,13 @@ function is_string($value) {
     return true;
 }
 
-use Combyna\Client\ClientFactory;
 use Combyna\CombynaBootstrap;
-use Combyna\Component\Framework\Combyna;
-use Combyna\Component\Renderer\Html\ArrayRenderer;
 
 // Load Composer's autoloader
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 $combynaBootstrap = new CombynaBootstrap();
-$container = $combynaBootstrap->getContainer(false);
-/** @var Combyna $combyna */
-$combyna = $container->get('combyna');
-/** @var ArrayRenderer $arrayRenderer */
-$arrayRenderer = $container->get('combyna.renderer.array');
 
-return new ClientFactory($combyna, $arrayRenderer);
+$container = $combynaBootstrap->createContainer();
+
+return $container->get('combyna.client_factory');

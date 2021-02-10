@@ -11,10 +11,10 @@
 
 namespace Combyna\Component\Router;
 
-use Combyna\Component\Program\ProgramInterface;
-use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
+use Combyna\Component\Program\ProgramInterface;
+use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
@@ -37,7 +37,7 @@ interface RouterInterface
     /**
      * Navigates the app to a new location, using the specified route and its arguments
      *
-     * @param \Combyna\Component\Program\State\ProgramStateInterface $programState
+     * @param ProgramStateInterface $programState
      * @param ProgramInterface $program
      * @param string $libraryName
      * @param string $routeName

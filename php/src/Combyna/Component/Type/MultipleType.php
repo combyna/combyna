@@ -46,6 +46,21 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsAnyType(AnyType $candidateType)
+    {
+        // Check that at least one of our sub-types allows the "any" type
+        foreach ($this->subTypes as $ourSubType) {
+            if ($ourSubType->allows($candidateType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsMultipleType(MultipleType $candidateType, array $subSubTypes)
     {
         // Check that each sub-type of the candidate type is allowed by at least one sub-type of this super type
@@ -116,6 +131,22 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsVoidType(VoidType $candidateType)
+    {
+        return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByAnyType()
+    {
+        return true; // Special "any" type allows any other type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isAllowedByMultipleType(MultipleType $superType)
     {
         return $superType->allowsMultipleType($this, $this->subTypes);
@@ -135,6 +166,14 @@ class MultipleType implements TypeInterface
     public function isAllowedByStaticType(StaticType $superType)
     {
         return $superType->allowsMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByVoidType(VoidType $otherType)
+    {
+        return $otherType->allowsMultipleType($this, $this->subTypes);
     }
 
     /**
@@ -162,6 +201,14 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithAnyType(AnyType $otherType)
+    {
+        return new MultipleType(array_merge($this->subTypes, [$otherType]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithMultipleType(MultipleType $otherType, array $subSubTypes)
     {
         $combinedSubTypes = array_merge($this->subTypes, $subSubTypes);
@@ -181,11 +228,7 @@ class MultipleType implements TypeInterface
     }
 
     /**
-     * Returns a new type that will match everything the current type does and also everything
-     * the provided static type does
-     *
-     * @param StaticType $otherType
-     * @return TypeInterface
+     * {@inheritdoc}
      */
     public function mergeWithStaticType(StaticType $otherType)
     {
@@ -193,6 +236,33 @@ class MultipleType implements TypeInterface
         $combinedSubTypes[] = $otherType;
 
         return new MultipleType($combinedSubTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithUnresolvedType(UnresolvedType $unresolvedType)
+    {
+        $combinedSubTypes = $this->subTypes;
+        $combinedSubTypes[] = $unresolvedType;
+
+        return new MultipleType($combinedSubTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function mergeWithVoidType(VoidType $otherType)
+    {
+        return $this; // Void types cannot be passed, so only keep the Multiple type
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithAnyType(AnyType $otherType)
+    {
+        return $otherType->mergeWithMultipleType($this, $this->subTypes);
     }
 
     /**
@@ -217,5 +287,21 @@ class MultipleType implements TypeInterface
     public function whenMergedWithStaticType(StaticType $otherType)
     {
         return $otherType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithUnresolvedType(UnresolvedType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithVoidType(VoidType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
     }
 }

@@ -45,7 +45,7 @@ class NothingExpressionTest extends TestCase
         $this->assert($this->expression->getType())->exactlyEquals('nothing');
     }
 
-    public function testToNativeReturnsTheNull()
+    public function testToNativeReturnsNull()
     {
         $this->assert($this->expression->toNative())->isNull;
     }

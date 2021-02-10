@@ -146,6 +146,29 @@ class PageViewState implements PageViewStateInterface
         return $this->rootWidgetState->getWidgetStatePathsByTag($tag, [$this], $this->stateFactory);
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function withRootWidgetState(WidgetStateInterface $newRootWidgetState)
+    {
+        if ($this->rootWidgetState === $newRootWidgetState) {
+            // We already have the provided sub-states, no need to create a new view state
+            return $this;
+        }
+
+        // Otherwise create a new page view state, but with the new store state
+        return new self(
+            $this->stateFactory,
+            $this->view,
+            $this->storeState,
+            $newRootWidgetState,
+            $this->viewAttributeStaticBag
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function withState(ViewStoreStateInterface $newStoreState, WidgetStateInterface $newRootWidgetState)
     {
         if ($this->storeState === $newStoreState && $this->rootWidgetState === $newRootWidgetState) {

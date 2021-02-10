@@ -128,10 +128,19 @@ class BinaryArithmeticExpressionTest extends TestCase
         $this->assert($resultStatic->toNative())->exactlyEquals(5);
     }
 
-    public function testToStaticThrowsLogicExceptionOnDivideByByZero()
+    public function testToStaticThrowsLogicExceptionOnDivideByIntegerZero()
     {
         $this->createExpressionWithOperands(20, BinaryArithmeticExpression::DIVIDE, 0);
         
+        $this->setExpectedException(LogicException::class, 'Divide by zero - divisor operand should have been assured');
+
+        $this->expression->toStatic($this->evaluationContext->reveal());
+    }
+
+    public function testToStaticThrowsLogicExceptionOnDivideByFloatZero()
+    {
+        $this->createExpressionWithOperands(20, BinaryArithmeticExpression::DIVIDE, .0);
+
         $this->setExpectedException(LogicException::class, 'Divide by zero - divisor operand should have been assured');
 
         $this->expression->toStatic($this->evaluationContext->reveal());

@@ -1,4 +1,23 @@
 services:
+    combyna.expression.loader.assurance:
+        class: Combyna\Component\Expression\Config\Loader\Assurance\DelegatingAssuranceLoader
+        autowire: true
+        # Ensure autowiring picks the DelegatingAssuranceLoader when typehinting for this interface,
+        # rather than its sub-interfaces/classes like NonZeroNumberAssuranceLoader etc.
+        autowiring_types: Combyna\Component\Expression\Config\Loader\Assurance\AssuranceLoaderInterface
+
+    combyna.expression.loader.assurance.known_type_value:
+        class: Combyna\Component\Expression\Config\Loader\Assurance\KnownTypeValueAssuranceLoader
+        autowire: true
+        tags:
+            - {name: combyna.assurance_loader}
+
+    combyna.expression.loader.assurance.non_zero_number:
+        class: Combyna\Component\Expression\Config\Loader\Assurance\NonZeroNumberAssuranceLoader
+        autowire: true
+        tags:
+            - {name: combyna.assurance_loader}
+
     combyna.expression.loader.assured:
         class: Combyna\Component\Expression\Config\Loader\AssuredExpressionLoader
         autowire: true
@@ -60,6 +79,12 @@ services:
         tags:
             - {name: combyna.expression_loader}
 
+    combyna.expression.loader.map:
+        class: Combyna\Component\Expression\Config\Loader\MapExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.expression_loader}
+
     combyna.expression.loader.number_conversion:
         class: Combyna\Component\Expression\Config\Loader\NumberConversionExpressionLoader
         autowire: true
@@ -71,6 +96,12 @@ services:
         autowire: true
         tags:
             - {name: combyna.expression_loader}
+
+    combyna.expression.loader.guard:
+        class: Combyna\Component\Expression\Config\Loader\GuardExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
 
     combyna.expression.loader.text_conversion:
         class: Combyna\Component\Expression\Config\Loader\TextConversionExpressionLoader

@@ -11,8 +11,10 @@
 
 namespace Combyna\Component\Type\Config\Loader;
 
-use Combyna\Component\Common\DelegatorInterface;
+use Combyna\Component\Common\Delegator\DelegatorInterface;
 use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use InvalidArgumentException;
 
 /**
@@ -58,20 +60,36 @@ class DelegatingTypeLoader implements TypeLoaderInterface, DelegatorInterface
     public function load($config)
     {
         if (is_array($config)) {
-            $type = $this->configParser->getElement($config, 'type', 'type name');
+            try {
+                $typeName = $this->configParser->getElement($config, 'type', 'type name');
+            } catch (InvalidArgumentException $exception) {
+                return new PresolvedTypeDeterminer(new UnresolvedType($exception->getMessage()));
+            }
+        } elseif (strpos($config, '|') !== false) {
+            // Type is the pipe shorthand for multiple
+            $subTypeNames = explode('|', $config);
+            $typeName = 'multiple';
+            $config = [
+                'type' => $typeName,
+                'types' => $subTypeNames
+            ];
         } else {
-            $type = $config;
+            // Type is just a string, the name of the type to load
+            $typeName = $config;
             $config = [
                 'type' => $config
             ];
         }
 
-        if (!array_key_exists($type, $this->loaders)) {
-            throw new InvalidArgumentException(
-                'No loader is registered for types of type "' . $type . '"'
+        if (!array_key_exists($typeName, $this->loaders)) {
+            return new PresolvedTypeDeterminer(
+                new UnresolvedType(sprintf(
+                    'No loader is registered for types of type "%s"',
+                    $typeName
+                ))
             );
         }
 
-        return $this->loaders[$type]->load($config);
+        return $this->loaders[$typeName]->load($config);
     }
 }

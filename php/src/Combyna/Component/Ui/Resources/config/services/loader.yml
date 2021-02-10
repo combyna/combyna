@@ -3,6 +3,26 @@ services:
         class: Combyna\Component\Ui\Config\Loader\ViewLoader
         autowire: true
 
+    combyna.ui.loader.capture_expression:
+        class: Combyna\Component\Ui\Config\Loader\Expression\CaptureExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
+    combyna.ui.loader.child_widget_definition:
+        class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionLoader
+        autowire: true
+
+    combyna.ui.loader.child_widget_definition_collection:
+        class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionCollectionLoader
+        autowire: true
+
+    combyna.ui.loader.set_view_store_slot_instruction:
+        class: Combyna\Component\Ui\Store\Config\Loader\SetViewStoreSlotInstructionLoader
+        autowire: true
+        tags:
+            - {name: combyna.instruction_loader}
+
     combyna.ui.loader.view_store_query_expression:
         class: Combyna\Component\Ui\Store\Config\Loader\ViewStoreQueryExpressionLoader
         autowire: true
@@ -27,6 +47,12 @@ services:
         class: Combyna\Component\Ui\Config\Loader\WidgetLoader
         autowire: true
 
+    combyna.ui.loader.widget_attribute_expression:
+        class: Combyna\Component\Ui\Config\Loader\Expression\WidgetAttributeExpressionLoader
+        autowire: true
+        tags:
+            - {name: combyna.builtin_expression_loader}
+
     combyna.ui.loader.widget_collection:
         class: Combyna\Component\Ui\Config\Loader\WidgetCollectionLoader
         autowire: true
@@ -35,8 +61,8 @@ services:
         class: Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoader
         autowire: true
 
-    combyna.ui.loader.set_view_store_slot_instruction:
-        class: Combyna\Component\Ui\Store\Config\Loader\SetViewStoreSlotInstructionLoader
+    combyna.ui.loader.widget_value_expression:
+        class: Combyna\Component\Ui\Config\Loader\WidgetValueExpressionLoader
         autowire: true
         tags:
-            - {name: combyna.instruction_loader}
+            - {name: combyna.builtin_expression_loader}

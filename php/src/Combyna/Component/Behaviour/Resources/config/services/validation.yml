@@ -1,0 +1,8 @@
+services:
+    combyna.behaviour.validation.behaviour_spec_validator:
+        class: Combyna\Component\Behaviour\Validation\Validator\BehaviourSpecValidator
+        autowire: true
+
+    combyna.behaviour.spec.spec_tree_walker:
+        class: Combyna\Component\Behaviour\Spec\BehaviourSpecTreeWalker
+        autowire: true

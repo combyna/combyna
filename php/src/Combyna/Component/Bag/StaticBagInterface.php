@@ -51,6 +51,8 @@ interface StaticBagInterface
      * Either creates a new static bag with the specified slot static value
      * or just returns the current one, if it already has the same static value
      *
+     * TODO: Rename this to just ->withStatic(...)
+     *
      * @param string $slotName
      * @param StaticInterface $newSlotStatic
      * @return StaticBagInterface

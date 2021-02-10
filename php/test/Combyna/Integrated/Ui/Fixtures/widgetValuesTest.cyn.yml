@@ -1,0 +1,79 @@
+name: Widget values test app
+signals:
+    pokable_button_was_poked:
+        payload:
+            noise_made: text
+    addable_button_was_clicked:
+        payload:
+            my_sum: number
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+
+page_views:
+    my_view:
+        title: !expr 'Widget values test'
+        description: A test of the widget values feature
+        widget:
+            type: group
+            children:
+                - type: text
+                  text: !expr 'Value of the pokable button: "' ~ view_query('get_noise_made') ~ '"'
+                - type: widget_values.pokable_button
+                  tags:
+                      - the_pokable_button
+                  triggers:
+                      widget_values.poked:
+                          instructions:
+                              - type: signal
+                                signal: app.pokable_button_was_poked
+                                payload:
+                                    noise_made: !expr widget_value('noise')
+
+                - type: text
+                  text: !expr 'Value of the addable button: "' ~ view_query('get_the_sum') ~ '"'
+                - type: widget_values.adder_button
+                  tags:
+                      - the_addable_button
+                  attributes:
+                      my_first: !expr 21
+                      my_second: !expr 40
+                  triggers:
+                      gui.click:
+                          instructions:
+                              - type: signal
+                                signal: app.addable_button_was_clicked
+                                payload:
+                                    my_sum: !expr widget_value('my_sum')
+        store:
+            slots:
+                noise_made:
+                    type: text
+                    default: !expr ''
+                the_sum:
+                    type: number
+                    default: !expr 0
+            commands: ~
+            queries:
+                get_noise_made:
+                    parameters: ~
+                    expression: !expr slot('noise_made')
+                get_the_sum:
+                    parameters: ~
+                    expression: !expr slot('the_sum')
+            signal_handlers:
+                app.pokable_button_was_poked:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: noise_made
+                          value: !expr signal_payload('noise_made')
+                app.addable_button_was_clicked:
+                    guard: ~
+                    instructions:
+                        - type: set_slot
+                          slot: the_sum
+                          value: !expr signal_payload('my_sum')

@@ -12,9 +12,9 @@
 namespace Combyna\Component\Expression\Config\Loader;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
+use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Expression\Config\Act\FunctionExpressionNode;
 use Combyna\Component\Expression\FunctionExpression;
-use Combyna\Component\Config\Loader\ConfigParser;
 
 /**
  * Class FunctionExpressionLoader
@@ -50,8 +50,8 @@ class FunctionExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $libraryName = $this->configParser->getElement($config, 'library', 'function expression', 'array');
-        $functionName = $this->configParser->getElement($config, 'name', 'function expression');
+        $libraryName = $this->configParser->getElement($config, 'library', 'function expression', 'string');
+        $functionName = $this->configParser->getElement($config, 'name', 'function expression', 'string');
         $argumentConfigs = $this->configParser->getElement($config, 'arguments', 'function expression', 'array');
 
         $argumentExpressionNodes = [];

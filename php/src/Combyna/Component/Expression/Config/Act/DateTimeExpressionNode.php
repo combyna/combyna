@@ -11,11 +11,13 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\DateTimeExpression;
 use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticDateTimeExpression;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class DateTimeExpressionNode
@@ -91,6 +93,76 @@ class DateTimeExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->yearExpression);
+        $specBuilder->addChildNode($this->monthExpression);
+        $specBuilder->addChildNode($this->dayExpression);
+        $specBuilder->addChildNode($this->hourExpression);
+        $specBuilder->addChildNode($this->minuteExpression);
+        $specBuilder->addChildNode($this->secondExpression);
+
+        if ($this->millisecondExpression !== null) {
+            $specBuilder->addChildNode($this->millisecondExpression);
+        }
+
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->yearExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'year'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->monthExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'month'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->dayExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'day'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->hourExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'hour'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->minuteExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'minute'
+            )
+        );
+        $specBuilder->addConstraint(
+            new ResultTypeConstraint(
+                $this->secondExpression,
+                new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                'second'
+            )
+        );
+
+        if ($this->millisecondExpression !== null) {
+            $specBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->millisecondExpression,
+                    new PresolvedTypeDeterminer(new StaticType(NumberExpression::class)),
+                    'millisecond'
+                )
+            );
+        }
+    }
+
+    /**
      * Fetches the day expression
      *
      * @return ExpressionNodeInterface
@@ -141,6 +213,14 @@ class DateTimeExpressionNode extends AbstractExpressionNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getResultTypeDeterminer()
+    {
+        return new PresolvedTypeDeterminer(new StaticType(StaticDateTimeExpression::class));
+    }
+
+    /**
      * Fetches the second expression
      *
      * @return ExpressionNodeInterface
@@ -158,71 +238,5 @@ class DateTimeExpressionNode extends AbstractExpressionNode
     public function getYearExpression()
     {
         return $this->yearExpression;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getResultType(ValidationContextInterface $validationContext)
-    {
-        return new StaticType(StaticDateTimeExpression::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->yearExpression->validate($subValidationContext);
-        $this->monthExpression->validate($subValidationContext);
-        $this->dayExpression->validate($subValidationContext);
-        $this->hourExpression->validate($subValidationContext);
-        $this->minuteExpression->validate($subValidationContext);
-        $this->secondExpression->validate($subValidationContext);
-
-        if ($this->millisecondExpression !== null) {
-            $this->millisecondExpression->validate($subValidationContext);
-        }
-
-        $subValidationContext->assertResultType(
-            $this->yearExpression,
-            new StaticType(NumberExpression::class),
-            'year'
-        );
-        $subValidationContext->assertResultType(
-            $this->monthExpression,
-            new StaticType(NumberExpression::class),
-            'month'
-        );
-        $subValidationContext->assertResultType(
-            $this->dayExpression,
-            new StaticType(NumberExpression::class),
-            'day'
-        );
-        $subValidationContext->assertResultType(
-            $this->hourExpression,
-            new StaticType(NumberExpression::class),
-            'hour'
-        );
-        $subValidationContext->assertResultType(
-            $this->minuteExpression,
-            new StaticType(NumberExpression::class),
-            'minute'
-        );
-        $subValidationContext->assertResultType(
-            $this->secondExpression,
-            new StaticType(NumberExpression::class),
-            'second'
-        );
-
-        if ($this->millisecondExpression !== null) {
-            $subValidationContext->assertResultType(
-                $this->millisecondExpression,
-                new StaticType(NumberExpression::class),
-                'millisecond'
-            );
-        }
     }
 }

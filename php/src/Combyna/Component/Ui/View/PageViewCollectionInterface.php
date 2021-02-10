@@ -17,7 +17,7 @@ use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
 use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalInterface;
-use Combyna\Component\Ui\State\View\ViewStateInterface;
+use Combyna\Component\Ui\State\View\PageViewStateInterface;
 
 /**
  * Interface PageViewCollectionInterface
@@ -31,7 +31,7 @@ interface PageViewCollectionInterface extends ViewCollectionInterface
      *
      * @param RouterStateInterface $routerState
      * @param EvaluationContextInterface $evaluationContext
-     * @return ViewStateInterface
+     * @return PageViewStateInterface
      */
     public function createInitialState(
         RouterStateInterface $routerState,

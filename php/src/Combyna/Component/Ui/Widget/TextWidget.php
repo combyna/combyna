@@ -11,15 +11,19 @@
 
 namespace Combyna\Component\Ui\Widget;
 
-use Combyna\Component\Bag\BagFactoryInterface;
+use Combyna\Component\Bag\ExpressionBagInterface;
+use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Event\EventInterface;
 use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\UiEvaluationContextFactoryInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\Evaluation\WidgetEvaluationContextInterface;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
+use Combyna\Component\Ui\State\Widget\TextWidgetStateInterface;
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use LogicException;
 
 /**
@@ -32,12 +36,17 @@ class TextWidget implements TextWidgetInterface
     const DEFINITION = 'text';
 
     /**
-     * @var BagFactoryInterface
+     * @var ExpressionBagInterface
      */
-    private $bagFactory;
+    private $captureExpressionBag;
 
     /**
-     * @var int
+     * @var FixedStaticBagModelInterface
+     */
+    private $captureStaticBagModel;
+
+    /**
+     * @var string|int
      */
     private $name;
 
@@ -68,10 +77,11 @@ class TextWidget implements TextWidgetInterface
 
     /**
      * @param WidgetInterface $parentWidget
-     * @param int $name
+     * @param string|int $name
      * @param ExpressionInterface $textExpression
-     * @param BagFactoryInterface $bagFactory
      * @param UiStateFactoryInterface $uiStateFactory
+     * @param FixedStaticBagModelInterface $captureStaticBagModel
+     * @param ExpressionBagInterface $captureExpressionBag
      * @param ExpressionInterface|null $visibilityExpression
      * @param array $tags
      */
@@ -79,18 +89,41 @@ class TextWidget implements TextWidgetInterface
         WidgetInterface $parentWidget,
         $name,
         ExpressionInterface $textExpression,
-        BagFactoryInterface $bagFactory,
         UiStateFactoryInterface $uiStateFactory,
+        FixedStaticBagModelInterface $captureStaticBagModel,
+        ExpressionBagInterface $captureExpressionBag,
         ExpressionInterface $visibilityExpression = null,
         array $tags = []
     ) {
-        $this->bagFactory = $bagFactory;
+        $this->captureExpressionBag = $captureExpressionBag;
+        $this->captureStaticBagModel = $captureStaticBagModel;
         $this->name = $name;
         $this->parentWidget = $parentWidget;
         $this->tags = $tags;
         $this->textExpression = $textExpression;
         $this->uiStateFactory = $uiStateFactory;
         $this->visibilityExpression = $visibilityExpression;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createEvaluationContext(
+        ViewEvaluationContextInterface $parentContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory,
+        WidgetStateInterface $widgetState = null
+    ) {
+        if ($widgetState && !$widgetState instanceof TextWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected a %s, got %s',
+                    TextWidgetStateInterface::class,
+                    get_class($widgetState)
+                )
+            );
+        }
+
+        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**
@@ -105,17 +138,26 @@ class TextWidget implements TextWidgetInterface
      * {@inheritdoc}
      */
     public function createInitialState(
-        UiEvaluationContextInterface $evaluationContext
+        $name,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
     ) {
-        $textStatic = $this->textExpression->toStatic($evaluationContext);
+        // Make any capture-definitions (that this widget defines) and any capture-sets
+        // that this widget or any child widget makes available to descendants
+        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
 
-        return $this->uiStateFactory->createTextWidgetState(
-            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-            $textStatic
-        );
+        $textStatic = $this->textExpression->toStatic($subEvaluationContext);
+
+        return $this->uiStateFactory->createTextWidgetState($name, $this, $textStatic->toNative());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function descendantsSetCaptureInclusive($captureName)
+    {
+        // TextWidgets cannot have descendants, but can set captures themselves
+        return $this->captureExpressionBag->hasExpression($captureName);
     }
 
     /**
@@ -128,6 +170,33 @@ class TextWidget implements TextWidgetInterface
         WidgetEvaluationContextInterface $widgetEvaluationContext
     ) {
         throw new LogicException('TextWidgets cannot handle events');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
+    {
+        throw new LogicException(sprintf(
+            'TextWidgets cannot have attributes, so attribute "%s" cannot be fetched',
+            $attributeName
+        ));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureExpressionBag()
+    {
+        return $this->captureExpressionBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCaptureStaticBagModel()
+    {
+        return $this->captureStaticBagModel;
     }
 
     /**
@@ -175,24 +244,41 @@ class TextWidget implements TextWidgetInterface
      */
     public function hasTag($tag)
     {
-        return false; // TODO
+        return array_key_exists($tag, $this->tags) && $this->tags[$tag] === true;
     }
 
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function render(
-//        ViewEvaluationContextInterface $evaluationContext,
-//        WidgetStateInterface $parentRenderedWidget = null
-//    ) {
-//        $textStatic = $this->textExpression->toStatic($evaluationContext);
-//
-//        return $this->uiStateFactory->createRenderedCoreWidget(
-//            $parentRenderedWidget,
-//            $this,
-//            $this->bagFactory->createStaticBag([
-//                'text' => $textStatic
-//            ])
-//        );
-//    }
+    /**
+     * {@inheritdoc}
+     */
+    public function isRenderable()
+    {
+        return true; // TextWidgets cannot be resolved further, so they are always renderable
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function reevaluateState(
+        WidgetStateInterface $oldState,
+        ViewEvaluationContextInterface $evaluationContext,
+        UiEvaluationContextFactoryInterface $evaluationContextFactory
+    ) {
+        if (!$oldState instanceof TextWidgetStateInterface) {
+            throw new LogicException(
+                sprintf(
+                    'Expected %s, got %s',
+                    TextWidgetStateInterface::class,
+                    get_class($oldState)
+                )
+            );
+        }
+
+        // Make any capture-definitions (that this widget defines) and any capture-sets
+        // that this widget or any child widget makes available to descendants
+        $subEvaluationContext = $this->createEvaluationContext($evaluationContext, $evaluationContextFactory);
+
+        $textStatic = $this->textExpression->toStatic($subEvaluationContext);
+
+        return $oldState->with($textStatic->toNative());
+    }
 }

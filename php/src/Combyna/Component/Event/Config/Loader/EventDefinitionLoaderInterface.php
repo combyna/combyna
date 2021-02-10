@@ -21,7 +21,7 @@ use Combyna\Component\Event\Config\Act\EventDefinitionNode;
 interface EventDefinitionLoaderInterface
 {
     /**
-     * Creates a event definition from a config array
+     * Creates an event definition from a config array
      *
      * @param string $libraryName
      * @param string $eventName

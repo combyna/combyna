@@ -12,6 +12,9 @@
 namespace Combyna\Component\Type;
 
 use Combyna\Component\Common\AbstractComponent;
+use Combyna\Component\Common\Delegator\DelegateeTagDefinition;
+use Combyna\Component\Common\DependencyInjection\Compiler\RegisterDelegateesPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
  * Class TypeComponent
@@ -20,4 +23,17 @@ use Combyna\Component\Common\AbstractComponent;
  */
 class TypeComponent extends AbstractComponent
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilder $containerBuilder)
+    {
+        $containerBuilder->addCompilerPass(new RegisterDelegateesPass([
+            new DelegateeTagDefinition(
+                'combyna.type_loader',
+                'combyna.type.loader',
+                'addLoader'
+            )
+        ]));
+    }
 }

@@ -29,6 +29,8 @@ use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Component\Expression\TranslationExpression;
 use Combyna\Component\Expression\VariableExpression;
+use Combyna\Component\Framework\Context\ModeContext;
+use Combyna\Component\Type\AnyType;
 use InvalidArgumentException;
 
 /**
@@ -53,6 +55,11 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
      */
     private $expressionNodePromoter;
 
+    /**
+     * @var ModeContext
+     */
+    private $modeContext;
+
     private static $typesToMethods = [
         BinaryArithmeticExpressionNode::TYPE => 'promoteBinaryArithmeticExpression',
         BooleanExpressionNode::TYPE => 'promoteBooleanExpression',
@@ -76,15 +83,18 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
      * @param ExpressionFactoryInterface $expressionFactory
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
      * @param BagNodePromoter $bagNodePromoter
+     * @param ModeContext $modeContext
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
         DelegatingExpressionNodePromoter $expressionNodePromoter,
-        BagNodePromoter $bagNodePromoter
+        BagNodePromoter $bagNodePromoter,
+        ModeContext $modeContext
     ) {
         $this->expressionFactory = $expressionFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;
         $this->bagNodePromoter = $bagNodePromoter;
+        $this->modeContext = $modeContext;
     }
 
     /**
@@ -272,7 +282,14 @@ class BasicExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
             $expressionNode->getFunctionName(),
             $this->bagNodePromoter->promoteExpressionBag(
                 $expressionNode->getArgumentExpressionBag()
-            )
+            ),
+            // In development mode, fetch the resolved result type of the function call
+            // (which can depend on the arguments being passed in)
+            // - otherwise for production mode, the behaviour spec tree won't have been loaded
+            // so we just allow any type
+            $this->modeContext->getMode()->isDevelopment() ?
+                $expressionNode->getResolvedResultType() :
+                new AnyType()
         );
     }
 

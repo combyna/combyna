@@ -31,4 +31,11 @@ interface HtmlNodeInterface
      * @return string
      */
     public function toHtml();
+
+    /**
+     * Returns an array
+     *
+     * @return array
+     */
+    public function toGenericArray();
 }

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Ui\Evaluation;
 
+use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\Widget\WidgetInterface;
 
 /**
@@ -26,4 +27,11 @@ interface WidgetEvaluationContextInterface extends ViewEvaluationContextInterfac
      * @return WidgetInterface
      */
     public function getWidget();
+
+    /**
+     * Fetches the state of the widget the context is for, if set
+     *
+     * @return WidgetStateInterface|null
+     */
+    public function getWidgetState();
 }

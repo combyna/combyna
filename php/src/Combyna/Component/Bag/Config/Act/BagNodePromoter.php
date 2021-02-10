@@ -17,6 +17,8 @@ use Combyna\Component\Bag\ExpressionListInterface;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
+use Combyna\Component\Framework\Context\ModeContext;
+use Combyna\Component\Type\AnyType;
 
 /**
  * Class BagNodePromoter
@@ -36,15 +38,23 @@ class BagNodePromoter
     private $expressionNodePromoter;
 
     /**
+     * @var ModeContext
+     */
+    private $modeContext;
+
+    /**
      * @param BagFactoryInterface $bagFactory
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
+     * @param ModeContext $modeContext
      */
     public function __construct(
         BagFactoryInterface $bagFactory,
-        DelegatingExpressionNodePromoter $expressionNodePromoter
+        DelegatingExpressionNodePromoter $expressionNodePromoter,
+        ModeContext $modeContext
     ) {
         $this->bagFactory = $bagFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;
+        $this->modeContext = $modeContext;
     }
 
     /**
@@ -84,10 +94,10 @@ class BagNodePromoter
     /**
      * Promotes a FixedStaticBagModelNode to a FixedStaticBagModel
      *
-     * @param FixedStaticBagModelNode $modelNode
+     * @param FixedStaticBagModelNodeInterface $modelNode
      * @return FixedStaticBagModelInterface
      */
-    public function promoteFixedStaticBagModel(FixedStaticBagModelNode $modelNode)
+    public function promoteFixedStaticBagModel(FixedStaticBagModelNodeInterface $modelNode)
     {
         $staticDefinitions = [];
 
@@ -101,10 +111,10 @@ class BagNodePromoter
     /**
      * Promotes a FixedStaticDefinitionNode to a FixedStaticDefinition
      *
-     * @param FixedStaticDefinitionNode $definitionNode
+     * @param FixedStaticDefinitionNodeInterface $definitionNode
      * @return FixedStaticDefinition
      */
-    public function promoteFixedStaticDefinition(FixedStaticDefinitionNode $definitionNode)
+    public function promoteFixedStaticDefinition(FixedStaticDefinitionNodeInterface $definitionNode)
     {
         // Allow the static to specify a default value
         $defaultExpression = $definitionNode->getDefaultExpression() ?
@@ -113,7 +123,13 @@ class BagNodePromoter
 
         return $this->bagFactory->createFixedStaticDefinition(
             $definitionNode->getName(),
-            $definitionNode->getStaticType(),
+            // In development mode, fetch the resolved type of the static
+            // (which can depend on the other statics in the bag)
+            // - otherwise for production mode, the behaviour spec tree won't have been loaded
+            // so we just allow any type
+            $this->modeContext->getMode()->isDevelopment() ?
+                $definitionNode->getResolvedStaticType() :
+                new AnyType(),
             $defaultExpression
         );
     }

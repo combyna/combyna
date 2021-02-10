@@ -16,4 +16,4 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 $combynaBootstrap = new CombynaBootstrap();
 
-return $combynaBootstrap->getContainer()->get('combyna');
+return $combynaBootstrap->createContainer()->get('combyna');

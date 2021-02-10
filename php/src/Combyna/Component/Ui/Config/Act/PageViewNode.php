@@ -12,19 +12,24 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\BooleanExpression;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Expression\Validation\Constraint\ResultTypeConstraint;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreNode;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Ui\Validation\Context\Specifier\ViewContextSpecifier;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 
 /**
  * Class PageViewNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class PageViewNode extends AbstractActNode
+class PageViewNode extends AbstractActNode implements ViewNodeInterface
 {
     const TYPE = 'page-view';
 
@@ -91,6 +96,48 @@ class PageViewNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        $specBuilder->addChildNode($this->attributeBagModelNode);
+
+        $specBuilder->addSubSpec(function (SubBehaviourSpecBuilderInterface $subSpecBuilder) {
+            $subSpecBuilder->defineValidationContext(new ViewContextSpecifier());
+
+            $subSpecBuilder->addChildNode($this->rootWidgetNode);
+
+            if ($this->storeNode) {
+                $subSpecBuilder->addChildNode($this->storeNode);
+            }
+
+            $subSpecBuilder->addChildNode($this->titleExpressionNode);
+
+            // Make sure the title expression always evaluates to text
+            $subSpecBuilder->addConstraint(
+                new ResultTypeConstraint(
+                    $this->titleExpressionNode,
+                    new PresolvedTypeDeterminer(new StaticType(TextExpression::class)),
+                    'title'
+                )
+            );
+
+            if ($this->visibilityExpressionNode !== null) {
+                $subSpecBuilder->addChildNode($this->visibilityExpressionNode);
+
+                // Make sure the visibility expression always evaluates to a boolean
+                $subSpecBuilder->addConstraint(
+                    new ResultTypeConstraint(
+                        $this->visibilityExpressionNode,
+                        new PresolvedTypeDeterminer(new StaticType(BooleanExpression::class)),
+                        'visibility'
+                    )
+                );
+            }
+        });
+    }
+
+    /**
      * Fetches the model for attributes of this view
      *
      * @return FixedStaticBagModelNode
@@ -111,9 +158,7 @@ class PageViewNode extends AbstractActNode
     }
 
     /**
-     * Fetches the unique name of this view
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {
@@ -131,9 +176,7 @@ class PageViewNode extends AbstractActNode
     }
 
     /**
-     * Fetches the store for this view, if set
-     *
-     * @return ViewStoreNode|null
+     * {@inheritdoc}
      */
     public function getStore()
     {
@@ -158,27 +201,5 @@ class PageViewNode extends AbstractActNode
     public function getVisibilityExpression()
     {
         return $this->visibilityExpressionNode;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        $this->titleExpressionNode->validate($subValidationContext);
-
-        if ($this->visibilityExpressionNode !== null) {
-            $this->visibilityExpressionNode->validate($subValidationContext);
-
-            $subValidationContext->assertResultType(
-                $this->visibilityExpressionNode,
-                new StaticType(BooleanExpression::class),
-                'visibility'
-            );
-        }
-
-        $this->rootWidgetNode->validate($subValidationContext);
     }
 }

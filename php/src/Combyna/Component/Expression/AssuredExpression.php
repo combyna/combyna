@@ -12,8 +12,6 @@
 namespace Combyna\Component\Expression;
 
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
 
 /**
  * Class AssuredExpression
@@ -55,17 +53,6 @@ class AssuredExpression extends AbstractExpression
     public function toStatic(EvaluationContextInterface $evaluationContext)
     {
         return $evaluationContext->getAssuredStatic($this->assuredStaticName);
-    }
-
-    /**
-     * Fetches the assurance for the assured static
-     *
-     * @param ValidationContextInterface $validationContext
-     * @return AssuranceInterface
-     */
-    public function getAssurance(ValidationContextInterface $validationContext)
-    {
-        return $validationContext->getAssuredStaticAssurance($this->assuredStaticName);
     }
 
     /**

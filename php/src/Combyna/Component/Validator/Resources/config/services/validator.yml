@@ -1,8 +1,26 @@
 services:
+    combyna.validator.callback_constraint_validator:
+        class: Combyna\Component\Validator\Constraint\CallbackConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
+    combyna.validator.delegating_constraint_validator:
+        class: Combyna\Component\Validator\Constraint\DelegatingConstraintValidator
+        autowire: true
+
+    combyna.validator.descendant_has_equivalent_query_constraint_validator:
+        class: Combyna\Component\Validator\Constraint\DescendantHasEquivalentQueryConstraintValidator
+        autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}
+
     combyna.validator.factory:
         class: Combyna\Component\Validator\ValidationFactory
         autowire: true
 
-    combyna.validator:
-        class: Combyna\Component\Validator\Validator
+    combyna.validator.known_failure_constraint_validator:
+        class: Combyna\Component\Validator\Constraint\KnownFailureConstraintValidator
         autowire: true
+        tags:
+            - {name: combyna.validation_constraint_validator}

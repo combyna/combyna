@@ -13,7 +13,6 @@ namespace Combyna\Component\Ui\State\Widget;
 
 use Combyna\Component\Common\Exception\NotFoundException;
 use Combyna\Component\Ui\State\UiStateFactoryInterface;
-use Combyna\Component\Ui\Widget\DefinedWidgetInterface;
 use Combyna\Component\Ui\Widget\WidgetGroupInterface;
 
 /**
@@ -26,28 +25,31 @@ class WidgetGroupState implements WidgetGroupStateInterface
     /**
      * @var WidgetStateInterface[]
      */
-    private $childWidgetStates = [];
+    private $childWidgetStates;
 
     /**
-     * @var DefinedWidgetInterface
+     * @var int|string
+     */
+    private $name;
+
+    /**
+     * @var WidgetGroupInterface
      */
     private $widgetGroup;
 
     /**
-     * @param DefinedWidgetInterface $widgetGroup
+     * @param string|int $name
+     * @param WidgetGroupInterface $widgetGroup
+     * @param array $childWidgetStates
      */
     public function __construct(
-        WidgetGroupInterface $widgetGroup
+        $name,
+        WidgetGroupInterface $widgetGroup,
+        array $childWidgetStates
     ) {
+        $this->childWidgetStates = $childWidgetStates;
+        $this->name = $name;
         $this->widgetGroup = $widgetGroup;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function addChild(WidgetStateInterface $childWidget)
-    {
-        $this->childWidgetStates[] = $childWidget;
     }
 
     /**
@@ -69,9 +71,25 @@ class WidgetGroupState implements WidgetGroupStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getChildStates()
+    {
+        return $this->childWidgetStates;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventualRenderableDescendantStatePath()
+    {
+        return []; // WidgetGroups are renderable, nothing to traverse down to
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getStateName()
     {
-        return $this->widgetGroup->getName();
+        return $this->name;
     }
 
     /**
@@ -156,5 +174,28 @@ class WidgetGroupState implements WidgetGroupStateInterface
         }
 
         return $widgetStatePaths;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasChildState($name)
+    {
+        return array_key_exists($name, $this->childWidgetStates);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function with(array $childWidgetStates)
+    {
+        // Sub-state objects will all be immutable, so we only need to compare them for identity
+        if ($this->childWidgetStates === $childWidgetStates) {
+            // This state already has all of the specified sub-components of state: no need to create a new one
+            return $this;
+        }
+
+        // At least one sub-component of the state has changed, so we need to create a new one
+        return new self($this->name, $this->widgetGroup, $childWidgetStates);
     }
 }

@@ -11,25 +11,27 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class FixedStaticBagModelNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class FixedStaticBagModelNode extends AbstractActNode
+class FixedStaticBagModelNode extends AbstractActNode implements FixedStaticBagModelNodeInterface
 {
     const TYPE = 'fixed-static-bag-model';
 
     /**
-     * @var FixedStaticDefinitionNode[]
+     * @var FixedStaticDefinitionNodeInterface[]
      */
     private $staticDefinitionNodes = [];
 
     /**
-     * @param FixedStaticDefinitionNode[] $staticDefinitionNodes
+     * @param FixedStaticDefinitionNodeInterface[] $staticDefinitionNodes
      */
     public function __construct(array $staticDefinitionNodes)
     {
@@ -42,31 +44,47 @@ class FixedStaticBagModelNode extends AbstractActNode
     /**
      * {@inheritdoc}
      */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        foreach ($this->staticDefinitionNodes as $staticDefinitionNode) {
+            $specBuilder->addChildNode($staticDefinitionNode);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function definesStatic($name)
     {
         return array_key_exists($name, $this->staticDefinitionNodes);
     }
 
     /**
-     * Fetches the definitions for statics in bags of this model
-     *
-     * @return FixedStaticDefinitionNode[]
+     * {@inheritdoc}
      */
-    public function getStaticDefinitions()
+    public function getStaticDefinitionByName($definitionName, QueryRequirementInterface $queryRequirement)
     {
-        return $this->staticDefinitionNodes;
+        if (array_key_exists($definitionName, $this->staticDefinitionNodes)) {
+            return $this->staticDefinitionNodes[$definitionName];
+        }
+
+        return new UnknownFixedStaticDefinitionNode($definitionName, $queryRequirement);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function validate(ValidationContextInterface $validationContext)
+    public function getStaticDefinitionNames()
     {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
+        return array_keys($this->staticDefinitionNodes);
+    }
 
-        foreach ($this->staticDefinitionNodes as $staticDefinitionNode) {
-            $staticDefinitionNode->validate($subValidationContext);
-        }
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticDefinitions()
+    {
+        return $this->staticDefinitionNodes;
     }
 
     /**
@@ -77,24 +95,23 @@ class FixedStaticBagModelNode extends AbstractActNode
         ExpressionBagNode $expressionBagNode,
         $contextDescription
     ) {
-        // First check that the expressions in the bag are valid within themselves
-        $expressionBagNode->validate($validationContext);
-
         // Check there are no required statics that are missing an expression
         foreach ($this->staticDefinitionNodes as $staticName => $definitionNode) {
             if (!$expressionBagNode->hasExpression($staticName) && $definitionNode->isRequired()) {
-                $validationContext->addGenericViolation(
-                    $contextDescription . ' is missing an expression for ' . $staticName
-                );
+                $validationContext->addGenericViolation(sprintf(
+                    $contextDescription . ' is missing an expression for attribute "%s"',
+                    $staticName
+                ));
             }
         }
 
         // Check there are no expressions that aren't needed/are extra
         foreach ($expressionBagNode->getExpressionNames() as $staticName) {
             if (!$this->definesStatic($staticName)) {
-                $validationContext->addGenericViolation(
-                    $contextDescription . ' has an unnecessary extra expression for ' . $staticName
-                );
+                $validationContext->addGenericViolation(sprintf(
+                    $contextDescription . ' has an unnecessary extra expression for undefined attribute "%s"',
+                    $staticName
+                ));
             }
         }
 

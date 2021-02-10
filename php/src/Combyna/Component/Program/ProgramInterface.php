@@ -13,6 +13,7 @@ namespace Combyna\Component\Program;
 
 use Combyna\Component\Expression\Evaluation\RootEvaluationContext;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\State\RouterStateInterface;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Signal\SignalInterface;
 use Combyna\Component\Ui\View\PageViewInterface;
@@ -26,6 +27,14 @@ use Combyna\Component\Ui\Widget\WidgetInterface;
  */
 interface ProgramInterface
 {
+    /**
+     * Creates an initial state for the program
+     *
+     * @param RouterStateInterface $routerState
+     * @return ProgramStateInterface
+     */
+    public function createInitialState(RouterStateInterface $routerState);
+
     /**
      * Fetches a page view by its unique name
      *
@@ -78,4 +87,20 @@ interface ProgramInterface
         ProgramStateInterface $programState,
         SignalInterface $signal
     );
+
+    /**
+     * Re-evaluates the visible page view and any visible overlay views,
+     * including the re-evaluation of any widget values by calling their respective
+     * widget value providers. If no changes have occurred, the same immutable
+     * ProgramState object will be returned.
+     *
+     * TODO: Consider only re-evaluating those parts of the UI whose expressions depend
+     *       on a widget value. It would be complex to figure out exactly which widgets
+     *       would need to be re-evaluated due to Captures, so for now we simply re-evaluate
+     *       the entire visible UI on every input widget change or edit.
+     *
+     * @param ProgramStateInterface $programState
+     * @return ProgramStateInterface
+     */
+    public function reevaluateUiState(ProgramStateInterface $programState);
 }

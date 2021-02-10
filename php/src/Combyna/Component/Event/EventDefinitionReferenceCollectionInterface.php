@@ -11,6 +11,9 @@
 
 namespace Combyna\Component\Event;
 
+use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
+use Combyna\Component\Event\Exception\EventDefinitionNotReferencedException;
+
 /**
  * Class EventDefinitionReferenceCollection
  *
@@ -25,6 +28,7 @@ interface EventDefinitionReferenceCollectionInterface
      * @param string $eventName
      * @return EventDefinitionInterface
      * @throws EventDefinitionNotReferencedException When not referenced
+     * @throws LibraryNotInstalledException
      */
     public function getDefinitionByName($libraryName, $eventName);
 }

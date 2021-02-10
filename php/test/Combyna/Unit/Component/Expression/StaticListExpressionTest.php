@@ -17,10 +17,9 @@ use Combyna\Component\Expression\ExpressionInterface;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticListExpression;
 use Combyna\Component\Expression\TextExpression;
+use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
 use Combyna\Harness\TestCase;
-use Combyna\Component\Type\StaticListType;
-use Combyna\Component\Type\TypeInterface;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 

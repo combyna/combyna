@@ -11,10 +11,13 @@
 
 namespace Combyna\Component\Bag\Config\Act;
 
+use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Type\VoidType;
+use Combyna\Component\Validator\Type\AdditiveDeterminer;
+use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Class ExpressionListNode
@@ -39,32 +42,49 @@ class ExpressionListNode extends AbstractActNode
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
+    {
+        foreach ($this->expressionNodes as $expressionNode) {
+            $specBuilder->addChildNode($expressionNode);
+        }
+    }
+
+    /**
      * Returns a type that represents all possible return types for the elements in the list
      * (eg. if all elements could only evaluate to NumberExpressions,
      *      then this would return StaticType<NumberExpression>. If one element
      *      could evaluate to a TextExpression, then it would return
      *      MultipleType<NumberExpression, TextExpression>)
      *
-     * @param ValidationContextInterface $validationContext
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
-    public function getElementResultType(ValidationContextInterface $validationContext)
+    public function getElementResultTypeDeterminer()
     {
-        /** @var TypeInterface|null $resultType */
-        $resultType = null;
-
-        foreach ($this->expressionNodes as $expressionNode) {
-            $elementResultType = $expressionNode->getResultType($validationContext);
-
-            if ($resultType === null) {
-                $resultType = $elementResultType;
-            } else {
-                $resultType = $resultType->mergeWith($elementResultType);
-            }
+        if (count($this->expressionNodes) === 0) {
+            // We cannot determine the type of the elements in an empty expression list,
+            // as there are no elements to look at the types of
+            return new PresolvedTypeDeterminer(new VoidType('expression list element type'));
         }
 
-        // An expression list should never be empty, so this should never return null
-        return $resultType;
+        /*
+         * Otherwise, take all of the elements in the list and combine their types into one that would
+         * accept any of their values, eg:
+         * - if (the result types of all element expressions) are text, the element type would be `text`
+         * - if (the result types of all element expressions) are numbers, the element type would be `number`
+         * - if there are two elements, one whose expression result type is text and one whose is number,
+         *   the element type would be `text|number`
+         */
+
+        return new AdditiveDeterminer(
+            array_map(
+                function (ExpressionNodeInterface $expressionNode) {
+                    return $expressionNode->getResultTypeDeterminer();
+                },
+                $this->expressionNodes
+            )
+        );
     }
 
     /**
@@ -75,17 +95,5 @@ class ExpressionListNode extends AbstractActNode
     public function getExpressions()
     {
         return $this->expressionNodes;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidationContextInterface $validationContext)
-    {
-        $subValidationContext = $validationContext->createSubActNodeContext($this);
-
-        foreach ($this->expressionNodes as $expressionNode) {
-            $expressionNode->validate($subValidationContext);
-        }
     }
 }

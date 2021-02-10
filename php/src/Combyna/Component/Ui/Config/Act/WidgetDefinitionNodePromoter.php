@@ -13,8 +13,8 @@ namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
 use Combyna\Component\Environment\EnvironmentInterface;
-use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter;
+use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use LogicException;
@@ -37,23 +37,39 @@ class WidgetDefinitionNodePromoter
     private $eventDefinitionReferenceNodePromoter;
 
     /**
+     * @var StaticExpressionFactoryInterface
+     */
+    private $staticExpressionFactory;
+
+    /**
      * @var WidgetDefinitionFactoryInterface
      */
     private $widgetDefinitionFactory;
 
     /**
+     * @var WidgetNodePromoter
+     */
+    private $widgetNodePromoter;
+
+    /**
      * @param BagNodePromoter $bagNodePromoter
      * @param EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter
+     * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
+     * @param WidgetNodePromoter $widgetNodePromoter
      */
     public function __construct(
         BagNodePromoter $bagNodePromoter,
         EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter,
-        WidgetDefinitionFactoryInterface $widgetDefinitionFactory
+        StaticExpressionFactoryInterface $staticExpressionFactory,
+        WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
+        WidgetNodePromoter $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->eventDefinitionReferenceNodePromoter = $eventDefinitionReferenceNodePromoter;
+        $this->staticExpressionFactory = $staticExpressionFactory;
         $this->widgetDefinitionFactory = $widgetDefinitionFactory;
+        $this->widgetNodePromoter = $widgetNodePromoter;
     }
 
     /**
@@ -76,22 +92,37 @@ class WidgetDefinitionNodePromoter
         );
 
         if ($widgetDefinitionNode instanceof CompoundWidgetDefinitionNode) {
+            $valueExpressionBag = $this->bagNodePromoter->promoteExpressionBag(
+                $widgetDefinitionNode->getValueExpressionBag()
+            );
+
             return $this->widgetDefinitionFactory->createCompoundWidgetDefinition(
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
                 $attributeBagModel,
-                $widgetDefinitionNode->getLabels()
+                $valueExpressionBag,
+                $this->widgetNodePromoter->promoteWidget(
+                    'root',
+                    $widgetDefinitionNode->getRootWidget(),
+                    $environment
+                )
             );
         }
 
         if ($widgetDefinitionNode instanceof PrimitiveWidgetDefinitionNode) {
+            $valueBagModel = $this->bagNodePromoter->promoteFixedStaticBagModel(
+                $widgetDefinitionNode->getValueBagModel()
+            );
+
             return $this->widgetDefinitionFactory->createPrimitiveWidgetDefinition(
                 $eventDefinitionReferenceCollection,
                 $widgetDefinitionNode->getLibraryName(),
                 $widgetDefinitionNode->getWidgetDefinitionName(),
                 $attributeBagModel,
-                $widgetDefinitionNode->getLabels()
+                $valueBagModel,
+                $this->staticExpressionFactory,
+                $widgetDefinitionNode->getValueNameToProviderCallableMap()
             );
         }
 

@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Expression\Config\Act;
 
-use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodePromoter;
+use Combyna\Component\Expression\Config\Act\Assurance\DelegatingAssuranceNodePromoter;
 use Combyna\Component\Expression\ExpressionFactoryInterface;
 use InvalidArgumentException;
 
@@ -23,7 +23,7 @@ use InvalidArgumentException;
 class GuardExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
 {
     /**
-     * @var AssuranceNodePromoter
+     * @var DelegatingAssuranceNodePromoter
      */
     private $assuranceNodePromoter;
 
@@ -40,12 +40,12 @@ class GuardExpressionNodePromoter implements ExpressionNodeTypePromoterInterface
     /**
      * @param ExpressionFactoryInterface $expressionFactory
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
-     * @param AssuranceNodePromoter $assuranceNodePromoter
+     * @param DelegatingAssuranceNodePromoter $assuranceNodePromoter
      */
     public function __construct(
         ExpressionFactoryInterface $expressionFactory,
         DelegatingExpressionNodePromoter $expressionNodePromoter,
-        AssuranceNodePromoter $assuranceNodePromoter
+        DelegatingAssuranceNodePromoter $assuranceNodePromoter
     ) {
         $this->assuranceNodePromoter = $assuranceNodePromoter;
         $this->expressionFactory = $expressionFactory;

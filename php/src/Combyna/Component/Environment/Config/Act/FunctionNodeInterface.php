@@ -13,8 +13,8 @@ namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Config\Act\ActNodeInterface;
-use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface FunctionNodeInterface
@@ -33,9 +33,16 @@ interface FunctionNodeInterface extends ActNodeInterface
     /**
      * Fetches the type of static that this function will return
      *
-     * @return TypeInterface
+     * @return TypeDeterminerInterface
      */
-    public function getReturnType();
+    public function getReturnTypeDeterminer();
+
+    /**
+     * Returns whether or not this function is defined
+     *
+     * @return bool
+     */
+    public function isDefined();
 
     /**
      * Checks that all expressions in the bag only ever evaluate to valid values for

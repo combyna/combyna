@@ -43,6 +43,13 @@ interface ProgramStateInterface extends StateInterface
     public function getRouterState();
 
     /**
+     * Fetches the state of the currently visible overlay views
+     *
+     * @return ViewStateInterface[]
+     */
+    public function getVisibleOverlayViewStates();
+
+    /**
      * Fetches the state of the current page view and any visible overlay views
      *
      * @return ViewStateInterface[]
@@ -60,9 +67,9 @@ interface ProgramStateInterface extends StateInterface
     public function getWidgetStatePathByPath(array $path);
 
     /**
-     * Fetches a single widget path by a tag on the widget.
-     * If multiple widgets would match, then a NonUniqueResultException will be thrown,
-     * but if no widget is found a NotFoundException will be thrown instead
+     * Fetches a single widget instance's state path by a tag on the widget.
+     * If multiple widget instances would match, then a NonUniqueResultException will be thrown,
+     * but if no widget instance is found a NotFoundException will be thrown instead
      *
      * @param string $tag
      * @return WidgetStatePathInterface
@@ -72,15 +79,23 @@ interface ProgramStateInterface extends StateInterface
     public function getWidgetStatePathByTag($tag);
 
     /**
+     * Fetches all widget instances' state paths by a tag on the widget.
+     *
+     * @param string $tag
+     * @return WidgetStatePathInterface[]
+     */
+    public function getWidgetStatePathsByTag($tag);
+
+    /**
      * Creates a new ProgramState, with its sub-states set to the specified ones
      *
      * @param RouterStateInterface $routerState
-     * @param ViewStateInterface $pageViewState
+     * @param PageViewStateInterface $pageViewState
      * @return ProgramStateInterface
      */
     public function withPage(
         RouterStateInterface $routerState,
-        ViewStateInterface $pageViewState
+        PageViewStateInterface $pageViewState
     );
 
     /**

@@ -13,7 +13,7 @@ namespace Combyna\Component\Ui\Store\Query;
 
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Ui\Evaluation\UiEvaluationContextInterface;
+use Combyna\Component\Ui\Evaluation\ViewEvaluationContextInterface;
 use Combyna\Component\Ui\State\Store\UiStoreStateInterface;
 
 /**
@@ -28,14 +28,14 @@ interface StoreQueryCollectionInterface
      *
      * @param string $queryName
      * @param StaticBagInterface $argumentStaticBag
-     * @param UiEvaluationContextInterface $evaluationContext
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @param UiStoreStateInterface $storeState
      * @return StaticInterface
      */
     public function makeQuery(
         $queryName,
         StaticBagInterface $argumentStaticBag,
-        UiEvaluationContextInterface $evaluationContext,
+        ViewEvaluationContextInterface $evaluationContext,
         UiStoreStateInterface $storeState
     );
 }

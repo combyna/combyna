@@ -24,6 +24,11 @@ use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 class EventEvaluationContext extends AbstractEvaluationContext
 {
     /**
+     * @var EventInterface
+     */
+    private $event;
+
+    /**
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
      * @param EvaluationContextInterface $parentContext
      * @param EventInterface $event
@@ -34,5 +39,15 @@ class EventEvaluationContext extends AbstractEvaluationContext
         EventInterface $event
     ) {
         parent::__construct($evaluationContextFactory, $parentContext);
+
+        $this->event = $event;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getEventPayloadStatic($staticName)
+    {
+        return $this->event->getPayloadStatic($staticName);
     }
 }

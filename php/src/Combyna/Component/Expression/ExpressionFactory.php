@@ -15,10 +15,7 @@ use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Bag\ExpressionBagInterface;
 use Combyna\Component\Bag\ExpressionListInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextFactoryInterface;
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
-use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
-use Combyna\Component\Validator\ValidationFactoryInterface;
-use InvalidArgumentException;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Class ExpressionFactory
@@ -45,26 +42,18 @@ class ExpressionFactory implements ExpressionFactoryInterface
     private $staticExpressionFactory;
 
     /**
-     * @var ValidationFactoryInterface
-     */
-    private $validationFactory;
-
-    /**
      * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param BagFactoryInterface $bagFactory
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
-     * @param ValidationFactoryInterface $validationFactory
      */
     public function __construct(
         StaticExpressionFactoryInterface $staticExpressionFactory,
         BagFactoryInterface $bagFactory,
-        EvaluationContextFactoryInterface $evaluationContextFactory,
-        ValidationFactoryInterface $validationFactory
+        EvaluationContextFactoryInterface $evaluationContextFactory
     ) {
         $this->bagFactory = $bagFactory;
         $this->evaluationContextFactory = $evaluationContextFactory;
         $this->staticExpressionFactory = $staticExpressionFactory;
-        $this->validationFactory = $validationFactory;
     }
 
     /**
@@ -197,27 +186,10 @@ class ExpressionFactory implements ExpressionFactoryInterface
     public function createFunctionExpression(
         $libraryName,
         $functionName,
-        ExpressionBagInterface $argumentExpressionBag
+        ExpressionBagInterface $argumentExpressionBag,
+        TypeInterface $returnType
     ) {
-        return new FunctionExpression($this, $libraryName, $functionName, $argumentExpressionBag);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createGuardAssurance(
-        ExpressionInterface $expression,
-        $constraint,
-        $assuredStaticName
-    ) {
-        switch ($constraint) {
-            case AssuranceInterface::NON_ZERO_NUMBER:
-                return new NonZeroNumberAssurance($expression, $assuredStaticName);
-            default:
-                throw new InvalidArgumentException(
-                    'Invalid assurance constraint "' . $constraint . '" given'
-                );
-        }
+        return new FunctionExpression($this, $libraryName, $functionName, $argumentExpressionBag, $returnType);
     }
 
     /**
@@ -232,7 +204,6 @@ class ExpressionFactory implements ExpressionFactoryInterface
             $this,
             $this->bagFactory,
             $this->evaluationContextFactory,
-            $this->validationFactory,
             $assurances,
             $consequentExpression,
             $alternateExpression

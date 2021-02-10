@@ -11,10 +11,9 @@
 
 namespace Combyna\Component\Bag;
 
-use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
-use Combyna\Component\Validator\Context\ValidationContextInterface;
+use Combyna\Component\Type\TypeInterface;
 
 /**
  * Interface FixedStaticBagModelInterface
@@ -41,6 +40,31 @@ interface FixedStaticBagModelInterface
     public function assertValidStaticBag(StaticBagInterface $staticBag);
 
     /**
+     * Creates a new StaticBag from a set of statics that is guaranteed to meet this fixed model.
+     * Any optional statics in the model (those which have a default expression set) are missing
+     * from the statics array provided, their default expressions will be evaluated to give their values.
+     * The default expressions may be evaluated using a different evaluation context.
+     *
+     * @param ExpressionBagInterface $expressionBag
+     * @param EvaluationContextInterface $explicitEvaluationContext
+     * @param EvaluationContextInterface $defaultsEvaluationContext
+     * @return StaticBagInterface
+     */
+    public function createBag(
+        ExpressionBagInterface $expressionBag,
+        EvaluationContextInterface $explicitEvaluationContext,
+        EvaluationContextInterface $defaultsEvaluationContext
+    );
+
+    /**
+     * Creates a new StaticBag from a callback that retrieves statics that is guaranteed to meet this fixed model
+     *
+     * @param callable $staticFetcher
+     * @return StaticBagInterface
+     */
+    public function createBagWithCallback(callable $staticFetcher);
+
+    /**
      * Creates a StaticBag with all the default statics of definitions in this model
      *
      * @param EvaluationContextInterface $evaluationContext
@@ -57,17 +81,18 @@ interface FixedStaticBagModelInterface
     public function definesStatic($name);
 
     /**
-     * Checks that all expressions in the provided bag evaluate to statics that match
-     * the types for their corresponding parameters, and that there are no extra arguments
-     * with no matching parameter or required parameters that are missing an argument in the bag
+     * Evaluates and returns the default expression for the specified static of the model
      *
-     * @param ValidationContextInterface $validationContext
-     * @param ExpressionBagNode $expressionBagNode
-     * @param string $contextDescription
+     * @param string $name
+     * @param EvaluationContextInterface $evaluationContext
+     * @return StaticInterface
      */
-    public function validateStaticExpressionBag(
-        ValidationContextInterface $validationContext,
-        ExpressionBagNode $expressionBagNode,
-        $contextDescription
-    );
+    public function getDefaultStatic($name, EvaluationContextInterface $evaluationContext);
+
+    /**
+     * Fetches the type of the specified static in the model
+     *
+     * @return TypeInterface
+     */
+    public function getStaticType($name);
 }
