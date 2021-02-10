@@ -17,7 +17,7 @@
         "symfony/translation": "^3.4"
     },
     "require-dev": {
-        "combyna/gui-plugin": "dev-master",
+        "combyna/gui-plugin": "dev-symfony3",
         "phpunit/phpunit": "^4.8",
         "elliotchance/concise": "^2.1"
     },

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0cd41b284b3a76542a123777fa4029a6",
+    "content-hash": "7fc3b000db5d703414bbe76793c466c2",
     "packages": [
         {
             "name": "combyna/php-peg",
@@ -919,20 +919,20 @@
     "packages-dev": [
         {
             "name": "combyna/gui-plugin",
-            "version": "dev-master",
+            "version": "dev-symfony3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/combyna/gui-plugin.git",
-                "reference": "e267d32c8423c7f86beb7f9ce2c075033bcc7453"
+                "reference": "70bdf44dcb17979bd98147407a4a4e920e34cb85"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/e267d32c8423c7f86beb7f9ce2c075033bcc7453",
-                "reference": "e267d32c8423c7f86beb7f9ce2c075033bcc7453",
+                "url": "https://api.github.com/repos/combyna/gui-plugin/zipball/70bdf44dcb17979bd98147407a4a4e920e34cb85",
+                "reference": "70bdf44dcb17979bd98147407a4a4e920e34cb85",
                 "shasum": ""
             },
             "require-dev": {
-                "combyna/combyna": "dev-navigation",
+                "combyna/combyna": "dev-symfony3",
                 "phpunit/phpunit": "^4.6"
             },
             "type": "library",
@@ -944,7 +944,7 @@
             },
             "notification-url": "https://packagist.org/downloads/",
             "description": "A plugin for Combyna that provides basic GUI components",
-            "time": "2020-04-05T00:27:57+00:00"
+            "time": "2021-02-10T20:27:47+00:00"
         },
         {
             "name": "doctrine/instantiator",
