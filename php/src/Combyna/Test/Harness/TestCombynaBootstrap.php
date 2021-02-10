@@ -34,9 +34,18 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
 
     /**
      * @param PluginInterface[] $plugins
+     * @param string|null $rootPath
+     * @param string|null $relativeCachePath
+     * @param string|null $compiledContainerNamespace
+     * @param string|null $compiledContainerClass
      */
-    public function __construct(array $plugins = [])
-    {
+    public function __construct(
+        array $plugins = [],
+        $rootPath = null,
+        $relativeCachePath = null,
+        $compiledContainerNamespace = null,
+        $compiledContainerClass = null
+    ) {
         $hasGuiPlugin = false;
 
         foreach ($plugins as $plugin) {
@@ -50,7 +59,15 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
             $plugins[] = new GuiPlugin();
         }
 
-        $this->combynaBootstrap = new CombynaBootstrap($plugins);
+        $this->combynaBootstrap = new CombynaBootstrap(
+            $plugins,
+            null,
+            false,
+            $rootPath,
+            $relativeCachePath,
+            $compiledContainerNamespace,
+            $compiledContainerClass
+        );
     }
 
     /**
@@ -69,21 +86,6 @@ class TestCombynaBootstrap implements CombynaBootstrapInterface
                 $bootstrapConfig->getPlugins(),
                 $additionalPlugins
             )
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContainer(
-        $cachePath = null,
-        $compiledContainerNamespace = null,
-        $compiledContainerClass = null
-    ) {
-        $this->combynaBootstrap->configureContainer(
-            $cachePath,
-            $compiledContainerNamespace,
-            $compiledContainerClass
         );
     }
 

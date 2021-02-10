@@ -16,7 +16,7 @@ signals:
                 type: exotic
                 name: route_arguments
                 route_static: route
-                default: '!expr {}'
+                default: "={}"
 home:
     route: app.my_list_route
 routes:
@@ -44,14 +44,14 @@ widgets:
                 type: exotic
                 name: route_arguments
                 route_static: route
-                default: '!expr {}'
+                default: "={}"
         children:
             contents: ~
         root:
             type: gui.route_link
             attributes:
-                route: !expr widget_attr('route')
-                arguments: !expr widget_attr('arguments')
+                route: "=widget_attr('route')"
+                arguments: "=widget_attr('arguments')"
             children:
                 contents:
                     type: child
@@ -59,25 +59,25 @@ widgets:
 
 page_views:
     my_list_view:
-        title: !expr 'Routing test list view'
+        title: "='Routing test list view'"
         description: The list view of the routing test
         widget:
             type: group
             children:
                 - type: gui.route_link
                   attributes:
-                      route: !expr 'app.my_item_route'
-                      arguments: !expr {my_item_slug: 'item_1234'}
+                      route: "='app.my_item_route'"
+                      arguments: "={my_item_slug: 'item_1234'}"
                   children:
                       contents:
                           type: text
-                          text: !expr 'See the example item'
+                          text: "='See the example item'"
                   tags:
                       - list_view.view_item_button
 
                 - type: routing_test.navigable_thing
                   attributes:
-                      label: !expr 'Navigate me'
+                      label: "='Navigate me'"
                   tags:
                       - list_view.navigable_thing
                   triggers:
@@ -86,50 +86,50 @@ page_views:
                               - type: signal
                                 signal: app.navigation_detected
                                 payload:
-                                    which_route: !expr event_payload('route')
+                                    which_route: "=event_payload('route')"
 
     my_item_view:
-        title: !expr 'Routing test item view'
+        title: "='Routing test item view'"
         description: The item view of the routing test
         widget:
             type: group
             children:
                 - type: text
-                  text: !expr 'The item slug is: ' ~ route_arg('my_item_slug')
+                  text: "='The item slug is: ' ~ route_arg('my_item_slug')"
                 - type: gui.route_link
                   attributes:
-                      route: !expr 'app.my_list_route'
+                      route: "='app.my_list_route'"
                   children:
                       contents:
                           type: text
-                          text: !expr 'Go back home'
+                          text: "='Go back home'"
 
     my_about_view:
-        title: !expr 'About view'
+        title: "='About view'"
         description: The about view of the routing test
         widget:
             type: group
             children:
                 - type: app.my_fancier_route_link
                   attributes:
-                      route: !expr 'app.my_list_route'
+                      route: "='app.my_list_route'"
                   children:
                       contents:
                           type: text
-                          text: !expr 'Go back home'
+                          text: "='Go back home'"
                 - type: text
-                  text: !expr 'Provided URL: ' ~ view_query('get_provided_url')
+                  text: "='Provided URL: ' ~ view_query('get_provided_url')"
         store:
             slots:
                 provided_url:
                     type: text
-                    default: !expr '(None)'
+                    default: "='(None)'"
             queries:
                 get_provided_url:
-                    expression: !expr slot('provided_url')
+                    expression: "=slot('provided_url')"
             signal_handlers:
                 app.provide_some_route_data:
                     instructions:
                         - type: set_slot
                           slot: provided_url
-                          value: !expr route_url(route: signal_payload('route'), arguments: signal_payload('arguments'))
+                          value: "=route_url(route: signal_payload('route'), arguments: signal_payload('arguments'))"

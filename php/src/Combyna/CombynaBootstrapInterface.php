@@ -22,19 +22,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 interface CombynaBootstrapInterface
 {
     /**
-     * Allows the compiled Symfony DI container to be customised
-     *
-     * @param string|null $cachePath
-     * @param string|null $compiledContainerNamespace
-     * @param string $compiledContainerClass
-     */
-    public function configureContainer(
-        $cachePath = null,
-        $compiledContainerNamespace = null,
-        $compiledContainerClass = null
-    );
-
-    /**
      * Creates a new Combyna service container
      *
      * @return ContainerInterface

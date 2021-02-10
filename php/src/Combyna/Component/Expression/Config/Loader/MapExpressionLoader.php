@@ -49,8 +49,8 @@ class MapExpressionLoader implements ExpressionTypeLoaderInterface
     {
         $itemVariable = $this->configParser->getElement($config, 'item_variable', 'map expression', 'string');
         $indexVariable = $this->configParser->getElement($config, 'index_variable', 'map expression', 'string');
-        $list = $this->configParser->getElement($config, 'list', 'map expression', 'array');
-        $map = $this->configParser->getElement($config, 'map', 'map expression', 'array');
+        $list = $this->configParser->getElement($config, 'list', 'map expression', ['array', 'string']);
+        $map = $this->configParser->getElement($config, 'map', 'map expression', ['array', 'string']);
 
         $listExpressionNode = $this->expressionLoader->load($list);
         $mapExpressionNode = $this->expressionLoader->load($map);

@@ -11,9 +11,14 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Exception\ArgumentParseException;
+use Combyna\Component\Config\Parameter\NamedParameter;
+use Combyna\Component\Config\Parameter\Type\ExpressionParameterType;
+use Combyna\Component\Config\Parameter\Type\StringParameterType;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 
 /**
  * Class BinaryArithmeticExpressionLoader
@@ -23,25 +28,16 @@ use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
 class BinaryArithmeticExpressionLoader implements ExpressionTypeLoaderInterface
 {
     /**
-     * @var ConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @var ExpressionLoaderInterface
+     * @param ExpressionConfigParserInterface $configParser
      */
-    private $expressionLoader;
-
-    /**
-     * @param ConfigParser $configParser
-     * @param ExpressionLoaderInterface $expressionLoader
-     */
-    public function __construct(
-        ConfigParser $configParser,
-        ExpressionLoaderInterface $expressionLoader
-    ) {
+    public function __construct(ExpressionConfigParserInterface $configParser)
+    {
         $this->configParser = $configParser;
-        $this->expressionLoader = $expressionLoader;
     }
 
     /**
@@ -49,17 +45,20 @@ class BinaryArithmeticExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $leftOperandConfig = $this->configParser->getElement($config, 'left', 'binary arithmetic expression', 'array');
-        $operator = $this->configParser->getElement($config, 'operator', 'binary arithmetic expression');
-        $rightOperandConfig = $this->configParser->getElement($config, 'right', 'binary arithmetic expression', 'array');
-
-        $leftOperandExpressionNode = $this->expressionLoader->load($leftOperandConfig);
-        $rightOperandExpressionNode = $this->expressionLoader->load($rightOperandConfig);
+        try {
+            $parsedArgumentBag = $this->configParser->parseArguments($config, [
+                new NamedParameter('left', new ExpressionParameterType('left operand')),
+                new NamedParameter('operator', new StringParameterType('operator')),
+                new NamedParameter('right', new ExpressionParameterType('right operand'))
+            ]);
+        } catch (ArgumentParseException $exception) {
+            return new UnknownExpressionNode($exception->getMessage(), new NullActNodeAdopter());
+        }
 
         return new BinaryArithmeticExpressionNode(
-            $leftOperandExpressionNode,
-            $operator,
-            $rightOperandExpressionNode
+            $parsedArgumentBag->getNamedExpressionArgument('left'),
+            $parsedArgumentBag->getNamedStringArgument('operator'),
+            $parsedArgumentBag->getNamedExpressionArgument('right')
         );
     }
 

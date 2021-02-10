@@ -25,7 +25,7 @@ widgets:
             type: group
             children:
                 - type: text
-                  text: !expr 'Inner text: ' ~ widget_attr('inner_text')
+                  text: "='Inner text: ' ~ widget_attr('inner_text')"
                 - type: child
                   name: inner_child
     outer_compound:
@@ -38,11 +38,11 @@ widgets:
             type: group
             children:
                 - type: text
-                  text: !expr 'Outer text: ' ~ widget_attr('outer_text') ~ ' '
+                  text: "='Outer text: ' ~ widget_attr('outer_text') ~ ' '"
                 - type: app.inner_compound
                   attributes:
                       # fix me!
-                      inner_text: !expr 'Hi inner, from outer (' ~ widget_attr('outer_text') ~ ')! '
+                      inner_text: "='Hi inner, from outer (' ~ widget_attr('outer_text') ~ ')! '"
                   children:
                       inner_child:
                           type: child
@@ -50,13 +50,13 @@ widgets:
 
 page_views:
     my_view:
-        title: !expr 'Compound widgets test'
+        title: "='Compound widgets test'"
         description: A test of the compound widgets feature
         widget:
             type: app.outer_compound
             attributes:
-                outer_text: !expr 'OUTER'
+                outer_text: "='OUTER'"
             children:
                 outer_child:
                     type: text
-                    text: !expr 'HI FROM OUTER'
+                    text: "='HI FROM OUTER'"

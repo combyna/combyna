@@ -17,10 +17,12 @@ use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Program\ProgramInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Router\EventDispatcher\Event\RouteNavigatedEvent;
 use Combyna\Component\Router\State\RouterState;
 use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class Router
@@ -33,6 +35,11 @@ class Router implements RouterInterface
      * @var DispatcherInterface
      */
     private $dispatcher;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * @var HomeInterface
@@ -50,18 +57,21 @@ class Router implements RouterInterface
     private $signalDefinitionRepository;
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param DispatcherInterface $dispatcher
      * @param RouteRepositoryInterface $routeRepository
      * @param HomeInterface $home
      * @param SignalDefinitionRepositoryInterface $signalDefinitionRepository
      */
     public function __construct(
+        EventDispatcherInterface $eventDispatcher,
         DispatcherInterface $dispatcher,
         RouteRepositoryInterface $routeRepository,
         HomeInterface $home,
         SignalDefinitionRepositoryInterface $signalDefinitionRepository
     ) {
         $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
         $this->home = $home;
         $this->routeRepository = $routeRepository;
         $this->signalDefinitionRepository = $signalDefinitionRepository;
@@ -105,8 +115,8 @@ class Router implements RouterInterface
         $newPageViewState = $pageViewCollection->createInitialState($newRouterState, $evaluationContext);
 
         // After navigating to the new page, we now have a new state for the router (its new route and args)
-        // and a corresponding new view state, so we can create a new app state
-        $newAppState = $programState->withPage($newRouterState, $newPageViewState);
+        // and a corresponding new view state, so we can create a new program state
+        $newProgramStateAfterNavigation = $programState->withPage($newRouterState, $newPageViewState);
 
         $navigatedSignalDefinition = $this->signalDefinitionRepository->getByName(
             LibraryInterface::CORE,
@@ -121,11 +131,21 @@ class Router implements RouterInterface
                 $evaluationContext
             );
 
-        return $this->dispatcher->dispatchSignal(
+        $newProgramStateAfterDispatch = $this->dispatcher->dispatchSignal(
             $program,
-            $newAppState,
+            $newProgramStateAfterNavigation,
             $navigatedSignalDefinition,
             $payloadStaticBag
         );
+
+        // Dispatch an event to provide an extension point for updating the address bar with pushState, etc.
+        $this->eventDispatcher->dispatch(
+            RouterEvents::ROUTE_NAVIGATED,
+            new RouteNavigatedEvent(
+                $newRouterState
+            )
+        );
+
+        return $newProgramStateAfterDispatch;
     }
 }

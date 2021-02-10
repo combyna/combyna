@@ -11,11 +11,13 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Exception\ArgumentParseException;
+use Combyna\Component\Config\Parameter\ArgumentBagInterface;
 use Combyna\Component\Expression\Config\Act\ComparisonExpressionNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Expression\Config\Loader\ComparisonExpressionLoader;
-use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -28,14 +30,14 @@ use Prophecy\Prophecy\ObjectProphecy;
 class ComparisonExpressionLoaderTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|ConfigParser
+     * @var ObjectProphecy|ArgumentBagInterface
      */
-    private $configParser;
+    private $argumentBag;
 
     /**
-     * @var ObjectProphecy|ExpressionLoaderInterface
+     * @var ObjectProphecy|ExpressionConfigParserInterface
      */
-    private $expressionLoader;
+    private $configParser;
 
     /**
      * @var ComparisonExpressionLoader
@@ -44,18 +46,10 @@ class ComparisonExpressionLoaderTest extends TestCase
 
     public function setUp()
     {
-        $this->configParser = $this->prophesize(ConfigParser::class);
-        $this->expressionLoader = $this->prophesize(ExpressionLoaderInterface::class);
+        $this->argumentBag = $this->prophesize(ArgumentBagInterface::class);
+        $this->configParser = $this->prophesize(ExpressionConfigParserInterface::class);
 
-        $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->will(function (array $args) {
-                return $args[0][$args[1]];
-            });
-
-        $this->loader = new ComparisonExpressionLoader(
-            $this->configParser->reveal(),
-            $this->expressionLoader->reveal()
-        );
+        $this->loader = new ComparisonExpressionLoader($this->configParser->reveal());
     }
 
     public function testLoadReturnsACorrectlyBuiltComparisonExpressionNode()
@@ -72,17 +66,34 @@ class ComparisonExpressionLoaderTest extends TestCase
                 'number' => 101.99
             ]
         ];
-        $leftOperandExpression = $this->prophesize(ExpressionNodeInterface::class);
-        $rightOperandExpression = $this->prophesize(ExpressionNodeInterface::class);
-        $this->expressionLoader->load($config['left'])->willReturn($leftOperandExpression->reveal());
-        $this->expressionLoader->load($config['right'])->willReturn($rightOperandExpression->reveal());
+        $leftOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
+        $rightOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
+        $this->configParser->parseArguments($config, Argument::any())
+            ->willReturn($this->argumentBag);
+        $this->argumentBag->getNamedExpressionArgument('left')
+            ->willReturn($leftOperandExpressionNode);
+        $this->argumentBag->getNamedStringArgument('operator')
+            ->willReturn('+');
+        $this->argumentBag->getNamedExpressionArgument('right')
+            ->willReturn($rightOperandExpressionNode);
 
         $resultExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultExpressionNode)->isAnInstanceOf(ComparisonExpressionNode::class);
-        $this->assert($resultExpressionNode->getLeftOperandExpression())->isTheSameAs($leftOperandExpression->reveal());
-        $this->assert($resultExpressionNode->getOperator())->isTheSameAs('<>');
-        $this->assert($resultExpressionNode->getRightOperandExpression())->isTheSameAs($rightOperandExpression->reveal());
+        self::assertInstanceOf(ComparisonExpressionNode::class, $resultExpressionNode);
+        self::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
+        self::assertSame('+', $resultExpressionNode->getOperator());
+        self::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
+    }
+
+    public function testLoadReturnsAnUnknownExpressionNodeWhenParseFails()
+    {
+        $config = ['my' => 'invalid config'];
+        $this->configParser->parseArguments($config, Argument::any())
+            ->willThrow(new ArgumentParseException('Oh no, the arg parse failed!'));
+
+        $resultExpressionNode = $this->loader->load($config);
+
+        self::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
     }
 
     public function testGetTypeReturnsTheCorrectType()

@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\ExpressionLanguage;
 
-use InvalidArgumentException;
+use Combyna\Component\ExpressionLanguage\Exception\ParseFailedException;
 use RuntimeException;
 
 /**
@@ -19,10 +19,8 @@ use RuntimeException;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ExpressionParser
+class ExpressionParser implements ExpressionParserInterface
 {
-    const RELATIVE_CACHED_PARSER_PATH = '/ExpressionLanguage/PegExpressionParser.php';
-
     /**
      * @var string
      */
@@ -41,6 +39,7 @@ class ExpressionParser
      *
      * @param string $expression
      * @return array
+     * @throws ParseFailedException
      */
     public function parse($expression)
     {
@@ -58,11 +57,11 @@ class ExpressionParser
         $result = $parser->match_Expression() ;
 
         if ($result === false) {
-            throw new InvalidArgumentException('Could not parse expression string "' . $expression . '"');
+            throw new ParseFailedException('Could not parse expression string "' . $expression . '"');
         }
 
         if ($result['text'] !== $expression) {
-            throw new InvalidArgumentException('Could not parse expression string "' . $expression . '"');
+            throw new ParseFailedException('Could not parse expression string "' . $expression . '"');
         }
 
         return $result['node'];

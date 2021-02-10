@@ -16,6 +16,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Signal\DispatcherInterface;
 use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
  * Class RouterFactory
@@ -30,11 +31,18 @@ class RouterFactory implements RouterFactoryInterface
     private $dispatcher;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param DispatcherInterface $dispatcher
      */
-    public function __construct(DispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher, DispatcherInterface $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -62,6 +70,7 @@ class RouterFactory implements RouterFactoryInterface
         SignalDefinitionRepositoryInterface $signalDefinitionRepository
     ) {
         return new Router(
+            $this->eventDispatcher,
             $this->dispatcher,
             $routeRepository,
             $home,

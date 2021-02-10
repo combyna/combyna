@@ -22,6 +22,7 @@ use Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterType;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Store\Config\Act\QueryNode;
 use Combyna\Component\Store\Config\Act\UnknownQueryNode;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 
 /**
  * Class QueryLoader
@@ -76,7 +77,7 @@ class QueryLoader implements QueryLoaderInterface
                 new NamedParameter('expression', new ExpressionParameterType('expression to evaluate for the query'))
             ]);
         } catch (ArgumentParseException $exception) {
-            return new UnknownQueryNode($exception->getMessage());
+            return new UnknownQueryNode($exception->getMessage(), new NullActNodeAdopter());
         }
 
         $parameterBagModel = $parsedArgumentBag->getNamedFixedStaticBagModelArgument('parameters');

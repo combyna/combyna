@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Ui\Store\Config\Loader;
 
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Loader\BuiltinLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreSlotExpressionNode;
 
 /**
@@ -25,14 +25,14 @@ class ViewStoreSlotExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'slot';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @param ExpressionConfigParser $configParser
+     * @param ExpressionConfigParserInterface $configParser
      */
-    public function __construct(ExpressionConfigParser $configParser)
+    public function __construct(ExpressionConfigParserInterface $configParser)
     {
         $this->configParser = $configParser;
     }

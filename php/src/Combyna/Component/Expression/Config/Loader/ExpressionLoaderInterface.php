@@ -23,8 +23,8 @@ interface ExpressionLoaderInterface
     /**
      * Parses the given expression config and creates an expression ACT node structure
      *
-     * @param array $config
+     * @param mixed $config
      * @return ExpressionNodeInterface
      */
-    public function load(array $config);
+    public function load($config);
 }

@@ -73,6 +73,12 @@ services:
         # rather than its sub-interfaces/classes like BooleanExpressionLoader etc.
         autowiring_types: Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface
 
+    combyna.expression.loader.expression_config_parser:
+        class: Combyna\Component\Expression\Config\Loader\ExpressionConfigParser
+        autowire: true
+        # Ensure autowiring picks the ExpressionConfigParser when typehinting for this interface
+        autowiring_types: Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface
+
     combyna.expression.loader.function:
         class: Combyna\Component\Expression\Config\Loader\FunctionExpressionLoader
         autowire: true

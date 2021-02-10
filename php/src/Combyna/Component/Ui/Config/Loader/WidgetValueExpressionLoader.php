@@ -11,8 +11,8 @@
 
 namespace Combyna\Component\Ui\Config\Loader;
 
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Loader\BuiltinLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Component\Ui\Config\Act\Expression\WidgetValueExpressionNode;
 
 /**
@@ -25,14 +25,14 @@ class WidgetValueExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'widget_value';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @param ExpressionConfigParser $configParser
+     * @param ExpressionConfigParserInterface $configParser
      */
-    public function __construct(ExpressionConfigParser $configParser)
+    public function __construct(ExpressionConfigParserInterface $configParser)
     {
         $this->configParser = $configParser;
     }

@@ -49,8 +49,8 @@ class ConcatenationExpressionLoader implements ExpressionTypeLoaderInterface
      */
     public function load(array $config)
     {
-        $operandListConfig = $this->configParser->getElement($config, 'list', 'operand list expression', 'array');
-        $glueConfig = $this->configParser->getOptionalElement($config, 'glue', 'glue expression', null, 'array');
+        $operandListConfig = $this->configParser->getElement($config, 'list', 'operand list expression', ['array', 'string']);
+        $glueConfig = $this->configParser->getOptionalElement($config, 'glue', 'glue expression', null, ['array', 'string']);
 
         $operandListExpression = $this->expressionLoader->load($operandListConfig);
 

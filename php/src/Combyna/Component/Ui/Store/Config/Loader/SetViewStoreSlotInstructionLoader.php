@@ -67,7 +67,7 @@ class SetViewStoreSlotInstructionLoader implements InstructionTypeLoaderInterfac
             $instructionConfig,
             'value',
             'value expression',
-            'array'
+            ['array', 'string']
         );
         $valueExpressionNode = $this->expressionLoader->load($valueExpressionConfig);
 

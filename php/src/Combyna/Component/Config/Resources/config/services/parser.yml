@@ -1,4 +1,10 @@
 services:
-    combyna.config.yaml_parser:
-        class: Combyna\Component\Config\YamlParser
+    _defaults:
         autowire: true
+        autoconfigure: true
+
+    Combyna\Component\Config\YamlParser: ~
+
+    Symfony\Component\Yaml\Parser: ~
+
+    combyna.config.yaml_parser: '@Combyna\Component\Config\YamlParser'

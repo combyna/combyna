@@ -29,7 +29,7 @@ class ExpressionLanguageParserCacheWarmer implements CacheWarmerInterface
     public function warmUp($cachePath)
     {
         $sourcePegPath = __DIR__ . '/../PegExpressionParser.php.inc';
-        $cachedParserPath = $cachePath . '/' . ExpressionParser::RELATIVE_CACHED_PARSER_PATH;
+        $cachedParserPath = $cachePath . ExpressionParser::RELATIVE_CACHED_PARSER_PATH;
         $cachedParserDir = dirname($cachedParserPath);
 
         if (!is_dir($cachedParserDir)) {

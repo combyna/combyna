@@ -21,6 +21,7 @@ use Combyna\Component\Framework\Context\ModeContext;
 use Combyna\Component\Framework\EventDispatcher\Event\EnvironmentLoadedEvent;
 use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
+use Combyna\Component\Router\RouterEvents;
 use Combyna\Component\Signal\SignalEvents;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use LogicException;
@@ -195,6 +196,16 @@ class Combyna
     public function onBroadcastSignal(callable $callback)
     {
         $this->eventDispatcher->addListener(SignalEvents::BROADCAST_SIGNAL_DISPATCHED, $callback);
+    }
+
+    /**
+     * Adds a callback to be called when any route is navigated to
+     *
+     * @param callable $callback
+     */
+    public function onRouteNavigated(callable $callback)
+    {
+        $this->eventDispatcher->addListener(RouterEvents::ROUTE_NAVIGATED, $callback);
     }
 
     /**

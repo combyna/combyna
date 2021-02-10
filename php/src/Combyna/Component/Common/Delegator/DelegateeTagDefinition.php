@@ -57,23 +57,11 @@ class DelegateeTagDefinition
     {
         $delegatorService = $containerBuilder->findDefinition($this->delegatorId);
 
-        if ($delegatorService->getConfigurator() === null) {
-            // Make sure that when a delegator is fetched, its delegatees are registered
-            $delegatorService->setConfigurator([
-                new Reference(DelegatorInitialiserInterface::SERVICE_ID),
-                'initialise'
-            ]);
-        }
-
-        $delegatorInitialiserService = $containerBuilder->findDefinition(DelegatorInitialiserInterface::SERVICE_ID);
-
         foreach ($containerBuilder->findTaggedServiceIds($this->tag) as $delegateeServiceId => $tags) {
-            $delegatorInitialiserService->addMethodCall(
-                'addDelegatee',
+            $delegatorService->addMethodCall(
+                $this->delegateeInstallerMethodName,
                 [
-                    $this->delegatorId,
-                    $delegateeServiceId,
-                    $this->delegateeInstallerMethodName
+                    new Reference($delegateeServiceId)
                 ]
             );
         }

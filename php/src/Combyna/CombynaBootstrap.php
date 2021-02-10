@@ -52,7 +52,7 @@ class CombynaBootstrap implements CombynaBootstrapInterface
     /**
      * @var string
      */
-    private $commonCachePath;
+    private $absoluteCommonCachePath;
 
     /**
      * @var string
@@ -85,9 +85,9 @@ class CombynaBootstrap implements CombynaBootstrapInterface
     private $originator;
 
     /**
-     * @var PluginInterface[]
+     * @var string
      */
-    private $plugins;
+    private $relativeCommonCachePath;
 
     /**
      * @var Runtime
@@ -98,33 +98,42 @@ class CombynaBootstrap implements CombynaBootstrapInterface
      * @param PluginInterface[] $plugins
      * @param string|null $originator One of the Originators::* constants
      * @param bool $debug
-     * @param string|null $cachePath
-     * @param string $compiledContainerNamespace
-     * @param string $compiledContainerClass
+     * @param string|null $rootPath
+     * @param string|null $relativeCachePath
+     * @param string|null $compiledContainerNamespace
+     * @param string|null $compiledContainerClass
      */
     public function __construct(
         array $plugins = [],
         $originator = null,
         $debug = false,
-        $cachePath = null,
-        $compiledContainerNamespace = 'Combyna\Container',
-        $compiledContainerClass = 'CompiledCombynaContainer'
+        $rootPath = null,
+        $relativeCachePath = null,
+        $compiledContainerNamespace = null,
+        $compiledContainerClass = null
     ) {
         $originator = $originator !== null ?
             $originator :
             Originators::CLIENT;
         $plugins = $this->resolvePlugins($plugins, $originator);
-        $cachePath = $cachePath !== null ?
-            rtrim($cachePath, '/') :
-            __DIR__ . '/../../dist';
+        $rootPath = $rootPath !== null ?
+            rtrim($rootPath, '/') :
+            __DIR__ . '/../../..';
+        $relativeCachePath = $relativeCachePath !== null ?
+            trim($relativeCachePath, '/') :
+            'php/dist';
 
-        $this->commonCachePath = $cachePath . '/common';
-        $this->compiledContainerClass = $compiledContainerClass;
-        $this->compiledContainerNamespace = $compiledContainerNamespace;
-        $this->containerCachePath = $cachePath . '/' . $originator;
+        $this->relativeCommonCachePath = $relativeCachePath . '/common';
+        $this->absoluteCommonCachePath = $rootPath . '/' . $this->relativeCommonCachePath;
+        $this->compiledContainerClass = $compiledContainerClass !== null ?
+            $compiledContainerClass :
+            'CompiledCombynaContainer';
+        $this->compiledContainerNamespace = $compiledContainerNamespace !== null ?
+            $compiledContainerNamespace :
+            'Combyna\Container';
+        $this->containerCachePath = $relativeCachePath . '/' . $originator;
         $this->debug = $debug;
         $this->originator = $originator;
-        $this->plugins = $plugins;
 
         $this->runtime = new Runtime(
             array_merge(
@@ -155,7 +164,7 @@ class CombynaBootstrap implements CombynaBootstrapInterface
                     // Plugins
                     new CorePlugin()
                 ],
-                $this->plugins
+                $plugins
             )
         );
     }
@@ -194,27 +203,6 @@ class CombynaBootstrap implements CombynaBootstrapInterface
     /**
      * {@inheritdoc}
      */
-    public function configureContainer(
-        $cachePath = null,
-        $compiledContainerNamespace = null,
-        $compiledContainerClass = null
-    ) {
-        if ($compiledContainerClass !== null) {
-            $this->compiledContainerClass = $compiledContainerClass;
-        }
-
-        if ($compiledContainerNamespace !== null) {
-            $this->compiledContainerNamespace = $compiledContainerNamespace;
-        }
-
-        if ($cachePath !== null) {
-            $this->containerCachePath = $cachePath;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function createContainer()
     {
         $containerConfigCache = new ConfigCache($this->getCompiledContainerPath(), $this->debug);
@@ -247,7 +235,7 @@ class CombynaBootstrap implements CombynaBootstrapInterface
      */
     public function getCommonCachePath()
     {
-        return $this->commonCachePath;
+        return $this->absoluteCommonCachePath;
     }
 
     /**
@@ -285,9 +273,15 @@ class CombynaBootstrap implements CombynaBootstrapInterface
         }
 
         if ($this->containerBuilder === null) {
+            // We only want to expose the absolute cache path for non-client originators
+            $safeCachePath = $this->originator === Originators::CLIENT ?
+                $this->relativeCommonCachePath :
+                $this->absoluteCommonCachePath;
+
             // First time the container builder has been accessed - create it
             $this->containerBuilder = new ContainerBuilder(new ParameterBag([
-                'combyna.cache_path' => $this->commonCachePath,
+                'combyna.absolute_cache_path' => $this->absoluteCommonCachePath,
+                'combyna.cache_path' => $safeCachePath,
                 'combyna.debug' => $this->debug
             ]));
             $this->runtime->compile($this->containerBuilder);

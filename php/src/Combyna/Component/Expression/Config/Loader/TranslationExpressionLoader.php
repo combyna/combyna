@@ -11,8 +11,6 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Act\TranslationExpressionNode;
 
 /**
@@ -25,25 +23,16 @@ class TranslationExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'trans';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @var ExpressionBagLoaderInterface
+     * @param ExpressionConfigParserInterface $configParser
      */
-    private $expressionBagLoader;
-
-    /**
-     * @param ExpressionConfigParser $configParser
-     * @param ExpressionBagLoaderInterface $expressionBagLoader
-     */
-    public function __construct(
-        ExpressionConfigParser $configParser,
-        ExpressionBagLoaderInterface $expressionBagLoader
-    ) {
+    public function __construct(ExpressionConfigParserInterface $configParser)
+    {
         $this->configParser = $configParser;
-        $this->expressionBagLoader = $expressionBagLoader;
     }
 
     /**

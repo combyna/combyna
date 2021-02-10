@@ -22,7 +22,7 @@ use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownExpressionTypeNode extends AbstractExpressionNode
+class UnknownExpressionTypeNode extends AbstractExpressionNode implements InvalidExpressionNodeInterface
 {
     const TYPE = 'unknown';
 
@@ -57,5 +57,15 @@ class UnknownExpressionTypeNode extends AbstractExpressionNode
         $type = $this->type !== null ? $this->type : '[missing]';
 
         return new UnresolvedTypeDeterminer('Expression type "' . $type . '"');
+    }
+
+    /**
+     * Fetches the type of expression that is unknown, eg. `some_unknown_type`
+     *
+     * @return string
+     */
+    public function getUnknownType()
+    {
+        return $this->type;
     }
 }

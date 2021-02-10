@@ -11,9 +11,9 @@
 
 namespace Combyna\Unit\Component\ExpressionLanguage;
 
+use Combyna\Component\ExpressionLanguage\Exception\ParseFailedException;
 use Combyna\Component\ExpressionLanguage\ExpressionParser;
 use Combyna\Harness\TestCase;
-use InvalidArgumentException;
 
 /**
  * Class ExpressionParserTest
@@ -63,7 +63,7 @@ class ExpressionParserTest extends TestCase
     public function testParseThrowsExceptionWhenUnableToParseExpression()
     {
         $this->setExpectedException(
-            InvalidArgumentException::class,
+            ParseFailedException::class,
             'Could not parse expression string "@@@!! [Not] a valid - expression !!"'
         );
 

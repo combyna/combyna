@@ -8,7 +8,7 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Known type value guard assurance test'
+        title: "='Known type value guard assurance test'"
         description: A test of the known type value guard assurance feature
         widget:
             type: group
@@ -18,17 +18,17 @@ page_views:
             children:
                 - type: gui.textbox
                   attributes:
-                      value: !expr 'not a number'
+                      value: "='not a number'"
                   captures:
                       set:
                           value_to_perhaps_double: >
-                              !expr number(widget_value('text')) = 40.0 ?
+                              =number(widget_value('text')) = 40.0 ?
                                   number(widget_value('text')) :
                                   widget_value('text')
 
                 - type: text
                   text: >
-                      !expr guard(
+                      =guard(
                           name: 'my_definite_number_to_double',
                           constraint: 'known-type-value',
                           expression: capture('value_to_perhaps_double'),

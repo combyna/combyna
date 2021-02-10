@@ -52,7 +52,7 @@ class FunctionExpressionLoader implements ExpressionTypeLoaderInterface
     {
         $libraryName = $this->configParser->getElement($config, 'library', 'function expression', 'string');
         $functionName = $this->configParser->getElement($config, 'name', 'function expression', 'string');
-        $argumentConfigs = $this->configParser->getElement($config, 'arguments', 'function expression', 'array');
+        $argumentConfigs = $this->configParser->getElement($config, 'arguments', 'function expression', ['array', 'string']);
 
         $argumentExpressionNodes = [];
 

@@ -8,7 +8,7 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Captures validation test'
+        title: "='Captures validation test'"
         description: A test of the validation for the captures feature
         widget:
             type: group
@@ -32,34 +32,34 @@ page_views:
                     # and are `...|nothing` for a conditional
                     a_capture_that_is_set_inside_repeater_then_conditional_but_wrong_type:
                         type: number
-                        default: !expr 4
+                        default: "=4"
             children:
                 # Test that a capture being set more than once is invalid
                 # (if support for this is wanted, use multiple captures and handle
                 # the different possibilities with expression logic)
                 - type: text
-                  text: !expr 'I set the a_capture_that_gets_set_multiple_times capture for the first time'
+                  text: "='I set the a_capture_that_gets_set_multiple_times capture for the first time'"
                   captures:
                       set:
-                          a_capture_that_gets_set_multiple_times: !expr 'First value'
+                          a_capture_that_gets_set_multiple_times: "='First value'"
                 - type: group
                   children:
                       - type: text
-                        text: !expr 'My group sets the a_capture_that_gets_set_multiple_times capture for the second time'
+                        text: "='My group sets the a_capture_that_gets_set_multiple_times capture for the second time'"
                   captures:
                       set:
-                          a_capture_that_gets_set_multiple_times: !expr 'Second value'
+                          a_capture_that_gets_set_multiple_times: "='Second value'"
                 - type: gui.button
                   attributes:
-                      label: !expr 'I set the a_capture_that_gets_set_multiple_times capture for the third time'
+                      label: "='I set the a_capture_that_gets_set_multiple_times capture for the third time'"
                   captures:
                       set:
-                          a_capture_that_gets_set_multiple_times: !expr 'Third value'
+                          a_capture_that_gets_set_multiple_times: "='Third value'"
 
                 # Test that a capture definition may not shadow a definition of an ancestor widget:
                 # ie. if an ancestor defines a capture, none of its descendants may redefine it
                 - type: text
-                  text: !expr 'I define a capture that would shadow one of the same name defined by one of my ancestors'
+                  text: "='I define a capture that would shadow one of the same name defined by one of my ancestors'"
                   captures:
                       define:
                           # Shadow the capture with this same name that the parent widget defines
@@ -67,38 +67,38 @@ page_views:
                       set:
                           # Set a value for the shadowed capture, just so we don't end up duplicating testing
                           # of the constraint that ensures the capture is set exactly once
-                          a_capture_that_gets_shadowed: !expr 'Some value'
+                          a_capture_that_gets_shadowed: "='Some value'"
 
                 # Test that a capture that is read must be defined
                 - type: text
-                  text: !expr 'This capture does not exist: ' ~ capture('an_undefined_capture')
+                  text: "='This capture does not exist: ' ~ capture('an_undefined_capture')"
 
                 # Test that a capture that is defined outside but set inside a conditional must have a default
                 - type: conditional
-                  condition: !expr true # Even when guaranteed to be present
+                  condition: "=true" # Even when guaranteed to be present
                   then:
                       type: text
-                      text: !expr 'A text widget'
+                      text: "='A text widget'"
                       captures:
                           set:
-                              a_capture_that_is_inside_conditional_but_has_no_default: !expr 'A value'
+                              a_capture_that_is_inside_conditional_but_has_no_default: "='A value'"
 
                 # Test that a capture that is defined outside but set inside a repeater must have a default
                 - type: repeater
-                  items: !expr [4, 5, 6]
+                  items: "=[4, 5, 6]"
                   index_variable: this_item_index
                   item_variable: this_item
                   repeated:
                       type: text
-                      text: !expr 'A text widget'
+                      text: "='A text widget'"
                       captures:
                           set:
-                              a_capture_that_is_inside_repeater_but_has_no_default: !expr 'A value'
+                              a_capture_that_is_inside_repeater_but_has_no_default: "='A value'"
 
                 # Test that a capture that is defined inside a conditional but set unconditionally
                 # must _not_ have a default
                 - type: conditional
-                  condition: !expr true
+                  condition: "=true"
                   then:
                       type: group
                       captures:
@@ -108,28 +108,28 @@ page_views:
                               # do _not_ have a default
                               a_capture_that_is_defined_inside_conditional_but_set_unconditionally:
                                   type: text
-                                  default: !expr 'I should not have a default set like this'
+                                  default: "='I should not have a default set like this'"
                       children:
                           - type: text
-                            text: !expr 'A text widget'
+                            text: "='A text widget'"
                             captures:
                                 set:
-                                    a_capture_that_is_defined_inside_conditional_but_set_unconditionally: !expr 'A value'
+                                    a_capture_that_is_defined_inside_conditional_but_set_unconditionally: "='A value'"
 
                 # Test that capture types are correctly wrapped in `list<...>` (for a repeater)
                 # and are `...|nothing` for a conditional
                 - type: repeater
-                  items: !expr [4, 5, 6]
+                  items: "=[4, 5, 6]"
                   index_variable: this_item_index
                   item_variable: this_item
                   repeated:
                       type: conditional
-                      condition: !expr true
+                      condition: "=true"
                       then:
                           type: text
-                          text: !expr 'A text widget that is inside a repeater and then a conditional'
+                          text: "='A text widget that is inside a repeater and then a conditional'"
                           captures:
                               set:
                                   # The capture's type should be defined above as `list<text|nothing>`
                                   # but is just `number`
-                                  a_capture_that_is_set_inside_repeater_then_conditional_but_wrong_type: !expr 'A value'
+                                  a_capture_that_is_set_inside_repeater_then_conditional_but_wrong_type: "='A value'"

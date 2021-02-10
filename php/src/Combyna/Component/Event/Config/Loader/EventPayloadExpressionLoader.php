@@ -11,9 +11,9 @@
 
 namespace Combyna\Component\Event\Config\Loader;
 
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Event\Config\Act\EventPayloadExpressionNode;
 use Combyna\Component\Expression\Config\Loader\BuiltinLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 
 /**
  * Class EventPayloadExpressionLoader
@@ -25,14 +25,14 @@ class EventPayloadExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'event_payload';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @param ExpressionConfigParser $configParser
+     * @param ExpressionConfigParserInterface $configParser
      */
-    public function __construct(ExpressionConfigParser $configParser)
+    public function __construct(ExpressionConfigParserInterface $configParser)
     {
         $this->configParser = $configParser;
     }

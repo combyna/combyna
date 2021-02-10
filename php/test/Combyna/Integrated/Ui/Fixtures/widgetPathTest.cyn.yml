@@ -9,7 +9,7 @@ routes:
 page_views:
     my_entry_page:
         attributes: ~
-        title: !expr 'Widget path test'
+        title: "='Widget path test'"
         description: A test of widget path behaviour
         widget:
             type: gui.box
@@ -21,24 +21,24 @@ page_views:
                         - type: text
                           tags:
                               - my_text_widget
-                          text: !expr 'My random piece of text'
+                          text: "='My random piece of text'"
                         - type: repeater
                           tags:
                               - my_repeater_widget
-                          items: !expr [21, 101, 107]
+                          items: "=[21, 101, 107]"
                           index_variable: this_item_index
                           item_variable: this_item
                           repeated:
                               type: text
                               tags:
                                   - my_descendant_of_repeater_widget
-                              text: !expr '(' ~ this_item_index ~ ')' ~ this_item
+                              text: "='(' ~ this_item_index ~ ')' ~ this_item"
                         - type: conditional
                           tags:
                               - my_conditional_widget
-                          condition: !expr true
+                          condition: "=true"
                           then:
                               type: text
                               tags:
                                   - my_descendant_of_conditional_widget
-                              text: !expr 'I am present'
+                              text: "='I am present'"

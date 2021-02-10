@@ -43,10 +43,13 @@ class ExpressionLanguageComponent extends AbstractComponent
                 )
             ]),
             new CallbackPass(function (ContainerBuilder $fullContainerBuilder) {
-                $cachePath = $fullContainerBuilder->getParameter('combyna.cache_path');
+                $absoluteCachePath = $fullContainerBuilder->getParameter('combyna.absolute_cache_path');
+                // We don't want to expose the absolute cache path in the compiled container
+                $fullContainerBuilder->getParameterBag()->remove('combyna.absolute_cache_path');
+
                 $earlyCacheWarmer = $fullContainerBuilder->get('combyna.cache.early_warmer');
 
-                $earlyCacheWarmer->warmUp($cachePath);
+                $earlyCacheWarmer->warmUp($absoluteCachePath);
             })
         ]));
 

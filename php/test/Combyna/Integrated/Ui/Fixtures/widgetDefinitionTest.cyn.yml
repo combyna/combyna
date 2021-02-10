@@ -30,13 +30,13 @@ widgets:
                 attributes:
                     suffix:
                         type: text
-                        default: !expr ' (my suffix)'
+                        default: "=' (my suffix)'"
         children:
             compounds_child: ~
         root:
             type: app.my_primitive_widget
             attributes:
-                primitives_label: !expr 'Some text for my label: ' ~ widget_attr('compounds_label') ~ widget_attr('incomplete_structure').suffix
+                primitives_label: "='Some text for my label: ' ~ widget_attr('compounds_label') ~ widget_attr('incomplete_structure').suffix"
             children:
                 primitives_child:
                     # Pass the child provided to this compound widget as "compounds_child"
@@ -46,17 +46,17 @@ widgets:
 
 page_views:
     my_view:
-        title: !expr 'Widget definitions test'
+        title: "='Widget definitions test'"
         description: A test of the widget definitions feature
         widget:
             type: group
             children:
                 - type: app.my_compound_widget
                   attributes:
-                      compounds_label: !expr 'Hello from the label attr!'
+                      compounds_label: "='Hello from the label attr!'"
                       # Only specify part of the structure, to ensure it is coerced
-                      incomplete_structure: !expr {}
+                      incomplete_structure: "={}"
                   children:
                       compounds_child:
                           type: text
-                          text: !expr 'Hello from the child widget!'
+                          text: "='Hello from the child widget!'"
