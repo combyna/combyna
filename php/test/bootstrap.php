@@ -20,13 +20,13 @@ $autoloader->addPsr4('Combyna\\Integrated\\', __DIR__ . '/Combyna/Integrated');
 $autoloader->addPsr4('Combyna\\Integration\\', __DIR__ . '/Combyna/Integration');
 $autoloader->addPsr4('Combyna\\Unit\\', __DIR__ . '/Combyna/Unit');
 
-$cachePath = __DIR__ . '/../dist';
+$rootPath = __DIR__ . '/../..';
+$relativeCachePath = 'php/dist';
 
 // Make sure the cache is up-to-date for each test run
 $fileSystem = new Filesystem();
-$fileSystem->remove($cachePath);
+$fileSystem->remove($rootPath . '/' . $relativeCachePath);
 
-$combynaBootstrap = new TestCombynaBootstrap();
-$combynaBootstrap->configureContainer($cachePath);
+$combynaBootstrap = new TestCombynaBootstrap([], $rootPath, $relativeCachePath);
 
 $combynaBootstrap->warmUp();

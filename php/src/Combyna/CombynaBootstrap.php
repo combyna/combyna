@@ -100,8 +100,8 @@ class CombynaBootstrap implements CombynaBootstrapInterface
      * @param bool $debug
      * @param string|null $rootPath
      * @param string|null $relativeCachePath
-     * @param string $compiledContainerNamespace
-     * @param string $compiledContainerClass
+     * @param string|null $compiledContainerNamespace
+     * @param string|null $compiledContainerClass
      */
     public function __construct(
         array $plugins = [],
@@ -109,8 +109,8 @@ class CombynaBootstrap implements CombynaBootstrapInterface
         $debug = false,
         $rootPath = null,
         $relativeCachePath = null,
-        $compiledContainerNamespace = 'Combyna\Container',
-        $compiledContainerClass = 'CompiledCombynaContainer'
+        $compiledContainerNamespace = null,
+        $compiledContainerClass = null
     ) {
         $originator = $originator !== null ?
             $originator :
@@ -125,8 +125,12 @@ class CombynaBootstrap implements CombynaBootstrapInterface
 
         $this->relativeCommonCachePath = $relativeCachePath . '/common';
         $this->absoluteCommonCachePath = $rootPath . '/' . $this->relativeCommonCachePath;
-        $this->compiledContainerClass = $compiledContainerClass;
-        $this->compiledContainerNamespace = $compiledContainerNamespace;
+        $this->compiledContainerClass = $compiledContainerClass !== null ?
+            $compiledContainerClass :
+            'CompiledCombynaContainer';
+        $this->compiledContainerNamespace = $compiledContainerNamespace !== null ?
+            $compiledContainerNamespace :
+            'Combyna\Container';
         $this->containerCachePath = $relativeCachePath . '/' . $originator;
         $this->debug = $debug;
         $this->originator = $originator;
@@ -194,27 +198,6 @@ class CombynaBootstrap implements CombynaBootstrapInterface
         }
 
         return $resolvedPlugins;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function configureContainer(
-        $cachePath = null,
-        $compiledContainerNamespace = null,
-        $compiledContainerClass = null
-    ) {
-        if ($compiledContainerClass !== null) {
-            $this->compiledContainerClass = $compiledContainerClass;
-        }
-
-        if ($compiledContainerNamespace !== null) {
-            $this->compiledContainerNamespace = $compiledContainerNamespace;
-        }
-
-        if ($cachePath !== null) {
-            $this->containerCachePath = $cachePath;
-        }
     }
 
     /**
