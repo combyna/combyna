@@ -23,8 +23,10 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ListElementTypeDeterminer implements TypeDeterminerInterface
+class ListElementTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'list-element';
+
     /**
      * @var TypeDeterminerInterface
      */

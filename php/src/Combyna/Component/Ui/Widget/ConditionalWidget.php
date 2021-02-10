@@ -127,7 +127,7 @@ class ConditionalWidget implements ConditionalWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+        return $evaluationContextFactory->createConditionalWidgetEvaluationContext(
             $parentContext,
             $this,
             $widgetState

@@ -129,7 +129,7 @@ class WidgetGroup implements WidgetGroupInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+        return $evaluationContextFactory->createWidgetGroupEvaluationContext(
             $parentContext,
             $this,
             $widgetState

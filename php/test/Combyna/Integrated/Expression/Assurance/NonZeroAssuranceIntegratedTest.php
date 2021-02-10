@@ -92,7 +92,7 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The quotient is: 20.' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEditingTheDividendTextbox()
@@ -132,7 +132,7 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The quotient is: 4.' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterEditingTheDivisorTextboxToBeZero()
@@ -172,6 +172,6 @@ class NonZeroAssuranceIntegratedTest extends TestCase
             'The divisor is zero, so the quotient cannot be determined' .
             "\n" .
             '</div>';
-        $this->assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
+        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState));
     }
 }

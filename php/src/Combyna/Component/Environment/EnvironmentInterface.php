@@ -19,9 +19,9 @@ use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
 use Combyna\Component\Environment\Exception\WidgetDefinitionNotSupportedException;
 use Combyna\Component\Environment\Library\FunctionInterface;
 use Combyna\Component\Environment\Library\LibraryInterface;
-use Combyna\Component\Event\EventDefinitionInterface;
 use Combyna\Component\Program\ResourceRepositoryInterface;
 use Combyna\Component\Router\RouteInterface;
+use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
 use Combyna\Component\Signal\SignalDefinitionInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 
@@ -32,18 +32,6 @@ use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
  */
 interface EnvironmentInterface extends ResourceRepositoryInterface
 {
-    /**
-     * Fetches an event definition from a library installed into this environment.
-     * Throws a LibraryNotInstalled or EventDefinitionNotSupported exception on failure
-     *
-     * @param string $libraryName
-     * @param string $eventName
-     * @return EventDefinitionInterface
-     * @throws LibraryNotInstalledException
-     * @throws EventDefinitionNotSupportedException
-     */
-    public function getEventDefinitionByName($libraryName, $eventName);
-
     /**
      * Fetches a generic function from a library installed into this environment.
      * Throws a LibraryNotInstalled or FunctionNotSupported exception on failure
@@ -77,7 +65,7 @@ interface EnvironmentInterface extends ResourceRepositoryInterface
      * @param string $signalName
      * @return SignalDefinitionInterface
      * @throws LibraryNotInstalledException
-     * @throws SignalDefinitionNotSupportedException
+     * @throws SignalDefinitionNotFoundException
      */
     public function getSignalDefinitionByName($libraryName, $signalName);
 

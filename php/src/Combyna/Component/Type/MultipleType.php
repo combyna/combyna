@@ -11,7 +11,9 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
+use LogicException;
 
 /**
  * Class MultipleType
@@ -116,6 +118,21 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        // Check that at least one of our sub-types allows the static structure type
+        foreach ($this->subTypes as $ourSubType) {
+            if ($ourSubType->allows($candidateType)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         // Check that at least one of our sub-types allows the static type
@@ -134,6 +151,24 @@ class MultipleType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        // Coerce to the first sub-type that allows the static in its current, potentially "incomplete" form
+        foreach ($this->subTypes as $subType) {
+            if ($subType->allowsStatic($static)) {
+                return $subType->coerceStatic($static, $evaluationContext);
+            }
+        }
+
+        throw new LogicException(sprintf(
+            'No sub-type allows the given static of type "%s"',
+            $static->getType()
+        ));
     }
 
     /**
@@ -158,6 +193,14 @@ class MultipleType implements TypeInterface
     public function isAllowedByStaticListType(StaticListType $superType)
     {
         return $superType->allowsMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
+    {
+        return $otherType->allowsMultipleType($this, $this->subTypes);
     }
 
     /**
@@ -230,6 +273,17 @@ class MultipleType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        $combinedSubTypes = $this->subTypes;
+        $combinedSubTypes[] = $otherType;
+
+        return new MultipleType($combinedSubTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         $combinedSubTypes = $this->subTypes;
@@ -279,6 +333,14 @@ class MultipleType implements TypeInterface
     public function whenMergedWithStaticListType(StaticListType $otherType)
     {
         return $otherType->mergeWithMultipleType($this, $this->subTypes);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithMultipleType($this, $this->subTypes);
     }
 
     /**

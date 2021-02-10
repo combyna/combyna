@@ -70,8 +70,8 @@ class ArgumentParserTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_first_param'))->exactlyEquals('first value');
-        $this->assert($argumentBag->getNamedTextArgument('my_second_param'))->exactlyEquals('second value');
+        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
+        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 
@@ -89,7 +89,7 @@ class ArgumentParserTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_explicit_param'))->exactlyEquals('explicit value');
+        $this->assert($argumentBag->getNamedStringArgument('my_explicit_param'))->exactlyEquals('explicit value');
         $this->assert($argumentBag->getExtraArguments())->equals([
             'some_other_arg' => 21,
             'another_arg' => 1001

@@ -145,6 +145,54 @@ class ExpressionParserTest extends TestCase
                     ]
                 ]
             ],
+            'empty structure expression' => [
+                '{}',
+                [
+                    'type' => 'structure',
+                    'attributes' => []
+                ]
+            ],
+            'structure expression with two attributes containing scalars' => [
+                '{first: 21, second: \'my text\'}',
+                [
+                    'type' => 'structure',
+                    'attributes' => [
+                        'first' => [
+                            'type' => 'number',
+                            'number' => 21
+                        ],
+                        'second' => [
+                            'type' => 'text',
+                            'text' => 'my text'
+                        ]
+                    ]
+                ]
+            ],
+            'nested structure expression' => [
+                '{first: 21, second: {third: 1001, fourth: \'your text\'}}',
+                [
+                    'type' => 'structure',
+                    'attributes' => [
+                        'first' => [
+                            'type' => 'number',
+                            'number' => 21
+                        ],
+                        'second' => [
+                            'type' => 'structure',
+                            'attributes' => [
+                                'third' => [
+                                    'type' => 'number',
+                                    'number' => 1001
+                                ],
+                                'fourth' => [
+                                    'type' => 'text',
+                                    'text' => 'your text'
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
             'adding two numbers' => [
                 '12 + 4',
                 [
@@ -538,6 +586,47 @@ class ExpressionParserTest extends TestCase
                             'text' => 'hello'
                         ]
                     ]
+                ]
+            ],
+            'dereferencing then doubling a structure attribute of the result of a function call' => [
+                'my_lib.my_func(only: 902).my_attr * 2',
+                [
+                    'type' => 'binary-arithmetic',
+                    'left' => [
+                        'type' => 'attribute',
+                        'structure' => [
+                            'type' => 'function',
+                            'library' => 'my_lib',
+                            'name' => 'my_func',
+                            'arguments' => [
+                                'only' => [
+                                    'type' => 'number',
+                                    'number' => 902
+                                ]
+                            ]
+                        ],
+                        'attribute' => 'my_attr'
+                    ],
+                    'operator' => '*',
+                    'right' => [
+                        'type' => 'number',
+                        'number' => 2
+                    ]
+                ]
+            ],
+            'chained dereferences of nested structure attributes' => [
+                'my_var.my_high_attr.my_low_attr',
+                [
+                    'type' => 'attribute',
+                    'structure' => [
+                        'type' => 'attribute',
+                        'structure' => [
+                            'type' => 'variable',
+                            'variable' => 'my_var'
+                        ],
+                        'attribute' => 'my_high_attr'
+                    ],
+                    'attribute' => 'my_low_attr'
                 ]
             ],
             'comparing whether two numbers are equal' => [

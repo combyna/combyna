@@ -54,6 +54,14 @@ class MutableStaticBag implements MutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getStaticNames()
+    {
+        return array_keys($this->statics);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasStatic($name)
     {
         return array_key_exists($name, $this->statics);
@@ -84,7 +92,15 @@ class MutableStaticBag implements MutableStaticBagInterface
     /**
      * {@inheritdoc}
      */
-    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    public function withStatic($name, StaticInterface $newStatic)
+    {
+        throw new \Exception('Not implemented');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withStatics(array $newStatics)
     {
         throw new \Exception('Not implemented');
     }

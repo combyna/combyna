@@ -45,7 +45,7 @@ class RouteNodePromoter
     /**
      * Promotes the provided list of RouteNodes to actual Route instances
      *
-     * @param RouteNode[] $routeNodes
+     * @param RouteNodeInterface[] $routeNodes
      * @return RouteCollectionInterface
      */
     public function promoteCollection(array $routeNodes)
@@ -55,7 +55,10 @@ class RouteNodePromoter
         foreach ($routeNodes as $routeNode) {
             $routes[$routeNode->getName()] = $this->routerFactory->createRoute(
                 $routeNode->getName(),
-                $this->bagNodePromoter->promoteFixedStaticBagModel($routeNode->getAttributeBagModel()),
+                $routeNode->getUrlPattern(),
+                $this->bagNodePromoter->promoteFixedStaticBagModel(
+                    $routeNode->getParameterBagModel()
+                ),
                 $routeNode->getPageViewName()
             );
         }

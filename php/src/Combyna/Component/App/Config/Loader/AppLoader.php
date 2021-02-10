@@ -15,9 +15,11 @@ use Combyna\Component\App\AppFactoryInterface;
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\Config\Loader\ConfigParser;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Router\Config\Loader\RouteCollectionLoaderInterface;
 use Combyna\Component\Signal\Config\Loader\SignalDefinitionLoaderInterface;
 use Combyna\Component\Ui\Config\Loader\ViewCollectionLoaderInterface;
+use Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoaderInterface;
 use Symfony\Component\Translation\Translator;
 
 /**
@@ -63,6 +65,11 @@ class AppLoader implements AppLoaderInterface
     private $viewCollectionLoader;
 
     /**
+     * @var WidgetDefinitionLoaderInterface
+     */
+    private $widgetDefinitionLoader;
+
+    /**
      * @param ConfigParser $configParser
      * @param AppFactoryInterface $appFactory
      * @param HomeLoaderInterface $homeLoader
@@ -70,6 +77,7 @@ class AppLoader implements AppLoaderInterface
      * @param Translator $translator
      * @param RouteCollectionLoaderInterface $routeCollectionLoader
      * @param SignalDefinitionLoaderInterface $signalDefinitionLoader
+     * @param WidgetDefinitionLoaderInterface $widgetDefinitionLoader
      */
     public function __construct(
         ConfigParser $configParser,
@@ -78,7 +86,8 @@ class AppLoader implements AppLoaderInterface
         ViewCollectionLoaderInterface $viewCollectionLoader,
         Translator $translator,
         RouteCollectionLoaderInterface $routeCollectionLoader,
-        SignalDefinitionLoaderInterface $signalDefinitionLoader
+        SignalDefinitionLoaderInterface $signalDefinitionLoader,
+        WidgetDefinitionLoaderInterface $widgetDefinitionLoader
     ) {
         $this->appFactory = $appFactory;
         $this->configParser = $configParser;
@@ -87,6 +96,7 @@ class AppLoader implements AppLoaderInterface
         $this->signalDefinitionLoader = $signalDefinitionLoader;
         $this->translator = $translator;
         $this->viewCollectionLoader = $viewCollectionLoader;
+        $this->widgetDefinitionLoader = $widgetDefinitionLoader;
     }
 
     /**
@@ -120,17 +130,36 @@ class AppLoader implements AppLoaderInterface
             'array'
         );
 
+        $widgetDefinitionConfigs = $this->configParser->getOptionalElement(
+            $appConfig,
+            'widgets',
+            'widget definitions',
+            [],
+            'array'
+        );
+
         $signalDefinitionNodes = [];
 
         foreach ($signalDefinitionConfigs as $signalName => $signalDefinitionConfig) {
             $signalDefinitionNodes[] = $this->signalDefinitionLoader->load(
-                AppNode::TYPE,
+                LibraryInterface::APP,
                 $signalName,
                 $signalDefinitionConfig
             );
         }
 
+        $widgetDefinitionNodes = [];
+
+        foreach ($widgetDefinitionConfigs as $widgetName => $widgetDefinitionConfig) {
+            $widgetDefinitionNodes[] = $this->widgetDefinitionLoader->load(
+                LibraryInterface::APP,
+                $widgetName,
+                $widgetDefinitionConfig
+            );
+        }
+
         $routeNodes = $this->routeCollectionLoader->loadRouteCollection(
+            LibraryInterface::APP,
             $appConfig['routes']
         );
 
@@ -146,6 +175,7 @@ class AppLoader implements AppLoaderInterface
         return new AppNode(
             $environmentNode,
             $signalDefinitionNodes,
+            $widgetDefinitionNodes,
             $routeNodes,
             $homeNode,
             $pageViewNodes,

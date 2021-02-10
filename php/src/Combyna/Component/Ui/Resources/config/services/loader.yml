@@ -17,6 +17,36 @@ services:
         class: Combyna\Component\Ui\Config\Loader\ChildWidgetDefinitionCollectionLoader
         autowire: true
 
+    combyna.ui.loader.core_widget.child_reference_widget_loader:
+        class: Combyna\Component\Ui\Config\Loader\Core\ChildReferenceWidgetLoader
+        autowire: true
+        tags:
+            - {name: combyna.core_widget_loader}
+
+    combyna.ui.loader.core_widget.conditional_widget_loader:
+        class: Combyna\Component\Ui\Config\Loader\Core\ConditionalWidgetLoader
+        autowire: true
+        tags:
+            - {name: combyna.core_widget_loader}
+
+    combyna.ui.loader.core_widget.repeater_widget_loader:
+        class: Combyna\Component\Ui\Config\Loader\Core\RepeaterWidgetLoader
+        autowire: true
+        tags:
+            - {name: combyna.core_widget_loader}
+
+    combyna.ui.loader.core_widget.text_widget_loader:
+        class: Combyna\Component\Ui\Config\Loader\Core\TextWidgetLoader
+        autowire: true
+        tags:
+            - {name: combyna.core_widget_loader}
+
+    combyna.ui.loader.core_widget.widget_group_loader:
+        class: Combyna\Component\Ui\Config\Loader\Core\WidgetGroupLoader
+        autowire: true
+        tags:
+            - {name: combyna.core_widget_loader}
+
     combyna.ui.loader.set_view_store_slot_instruction:
         class: Combyna\Component\Ui\Store\Config\Loader\SetViewStoreSlotInstructionLoader
         autowire: true
@@ -44,7 +74,7 @@ services:
         autowire: true
 
     combyna.ui.loader.widget:
-        class: Combyna\Component\Ui\Config\Loader\WidgetLoader
+        class: Combyna\Component\Ui\Config\Loader\DelegatingWidgetLoader
         autowire: true
 
     combyna.ui.loader.widget_attribute_expression:
@@ -56,6 +86,11 @@ services:
     combyna.ui.loader.widget_collection:
         class: Combyna\Component\Ui\Config\Loader\WidgetCollectionLoader
         autowire: true
+
+    combyna.ui.loader.widget_config_parser:
+        class: Combyna\Component\Ui\Config\Loader\WidgetConfigParser
+        autowire: true
+        autowiring_types: Combyna\Component\Ui\Config\Loader\WidgetConfigParserInterface
 
     combyna.ui.loader.widget_definition:
         class: Combyna\Component\Ui\Config\Loader\WidgetDefinitionLoader

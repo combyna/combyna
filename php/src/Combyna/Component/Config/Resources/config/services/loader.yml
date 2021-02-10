@@ -10,6 +10,7 @@ services:
     combyna.config.loader.config_parser:
         class: Combyna\Component\Config\Loader\ConfigParser
         autowire: true
+        autowiring_types: Combyna\Component\Config\Loader\ConfigParserInterface
 
     combyna.config.loader.expression_config_parser:
         class: Combyna\Component\Config\Loader\ExpressionConfigParser

@@ -231,4 +231,21 @@ class StaticList implements StaticListInterface
             }
         }
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withElements(array $newElementStatics)
+    {
+        if ($newElementStatics === $this->statics) {
+            return $this; // Just return the original list if none of its elements changed
+        }
+
+        // Otherwise create a new list with the new set of elements
+        return new StaticList(
+            $this->bagFactory,
+            $this->staticExpressionFactory,
+            $newElementStatics
+        );
+    }
 }

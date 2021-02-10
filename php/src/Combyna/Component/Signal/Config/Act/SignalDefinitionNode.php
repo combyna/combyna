@@ -11,10 +11,10 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 
 /**
  * Class SignalDefinitionNode
@@ -26,12 +26,22 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     const TYPE = 'signal-definition';
 
     /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
+
+    /**
      * @var bool
      */
     private $isBroadcast;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var string
+     */
+    private $libraryName;
+
+    /**
+     * @var FixedStaticBagModelNodeInterface
      */
     private $payloadStaticBagModelNode;
 
@@ -41,13 +51,20 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     private $signalName;
 
     /**
+     * @param string $libraryName
      * @param string $signalName
-     * @param FixedStaticBagModelNode $payloadStaticBagModelNode
+     * @param FixedStaticBagModelNodeInterface $payloadStaticBagModelNode
      * @param bool $isBroadcast
      */
-    public function __construct($signalName, FixedStaticBagModelNode $payloadStaticBagModelNode, $isBroadcast = false)
-    {
+    public function __construct(
+        $libraryName,
+        $signalName,
+        FixedStaticBagModelNodeInterface $payloadStaticBagModelNode,
+        $isBroadcast = false
+    ) {
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->isBroadcast = $isBroadcast;
+        $this->libraryName = $libraryName;
         $this->payloadStaticBagModelNode = $payloadStaticBagModelNode;
         $this->signalName = $signalName;
     }
@@ -57,6 +74,7 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
         $specBuilder->addChildNode($this->payloadStaticBagModelNode);
     }
 
@@ -71,7 +89,15 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getLibraryName()
+    {
+        return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticBagModel()
     {
         return $this->payloadStaticBagModelNode;
     }
@@ -79,11 +105,14 @@ class SignalDefinitionNode extends AbstractActNode implements SignalDefinitionNo
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticType($staticName, QueryRequirementInterface $queryRequirement)
+    public function getPayloadStaticType($staticName)
     {
-        $definition = $this->payloadStaticBagModelNode->getStaticDefinitionByName($staticName, $queryRequirement);
+        $definition = $this->payloadStaticBagModelNode->getStaticDefinitionByName(
+            $staticName,
+            $this->dynamicContainerNode
+        );
 
-        return $queryRequirement->determineType($definition->getStaticTypeDeterminer());
+        return $this->dynamicContainerNode->determineType($definition->getStaticTypeDeterminer());
     }
 
     /**

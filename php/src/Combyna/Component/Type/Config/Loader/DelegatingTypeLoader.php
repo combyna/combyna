@@ -43,7 +43,7 @@ class DelegatingTypeLoader implements TypeLoaderInterface, DelegatorInterface
     }
 
     /**
-     * Adds a loader for a new type of type
+     * Adds a loader for a new kind of type
      *
      * @param TypeTypeLoaderInterface $typeTypeLoader
      */

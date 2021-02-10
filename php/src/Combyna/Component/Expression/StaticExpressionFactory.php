@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Expression;
 
+use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Bag\StaticListInterface;
 use InvalidArgumentException;
 
@@ -82,6 +83,14 @@ class StaticExpressionFactory implements StaticExpressionFactoryInterface
     public function createStaticListExpression(StaticListInterface $elementStaticList)
     {
         return new StaticListExpression($this, $elementStaticList);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStaticStructureExpression(StaticBagInterface $attributeStaticBag)
+    {
+        return new StaticStructureExpression($attributeStaticBag);
     }
 
     /**

@@ -21,6 +21,7 @@ use Combyna\Component\Config\Parameter\Type\TextParameterType;
 use Combyna\Component\Expression\Config\Act\GuardExpressionNode;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Expression\Config\Loader\Assurance\AssuranceLoaderInterface;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 
 /**
  * Class GuardExpressionLoader
@@ -84,11 +85,11 @@ class GuardExpressionLoader implements BuiltinLoaderInterface
                 new ExtraParameter()
             ]);
         } catch (ArgumentParseException $exception) {
-            return new UnknownExpressionNode($exception->getMessage());
+            return new UnknownExpressionNode($exception->getMessage(), new NullActNodeAdopter());
         }
 
-        $assuredStaticName = $parsedArgumentBag->getNamedTextArgument('name');
-        $constraintName = $parsedArgumentBag->getNamedTextArgument('constraint');
+        $assuredStaticName = $parsedArgumentBag->getNamedStringArgument('name');
+        $constraintName = $parsedArgumentBag->getNamedStringArgument('constraint');
         $expressionNode = $parsedArgumentBag->getNamedExpressionArgument('expression');
         $consequentExpressionNode = $parsedArgumentBag->getNamedExpressionArgument('then');
         $alternateExpressionNode = $parsedArgumentBag->getNamedExpressionArgument('else');

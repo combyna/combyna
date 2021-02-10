@@ -81,7 +81,7 @@ class Router implements RouterInterface
      */
     public function createInitialState(EvaluationContextInterface $evaluationContext)
     {
-        $homeRouteArgumentStaticBag = $this->home->attributeExpressionBagToStaticBag($evaluationContext);
+        $homeRouteArgumentStaticBag = $this->home->argumentExpressionBagToStaticBag($evaluationContext);
 
         return new RouterState($this->home->getRoute(), $homeRouteArgumentStaticBag);
     }
@@ -126,7 +126,7 @@ class Router implements RouterInterface
             $program,
             $newAppState,
             $navigatedSignalDefinition,
-            $this->bagFactory->createStaticBag([
+            $this->bagFactory->coerceStaticBag([
                 'library' => $libraryName,
                 'route' => $routeName
             ])

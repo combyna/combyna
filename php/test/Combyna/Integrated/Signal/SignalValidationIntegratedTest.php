@@ -82,6 +82,8 @@ class SignalValidationIntegratedTest extends TestCase
             // Test that view store slot instructions must refer to a defined slot
             'ACT node [app].[page-view].[view:my_view].[view-store].[view store].[signal:app.my_unknown_signal handler].[set_slot]' .
             ' - View store does not contain a slot with name "an_unknown_slot". :: ' .
+            'ACT node [app].[page-view].[view:my_view].[view-store].[dynamic].[unknown-fixed-static-definition]' .
+            ' - Unknown fixed static "an_unknown_slot". :: ' .
 
             // Test that view store slot instruction expressions must result in a type allowed by the slot
             'ACT node [app].[page-view].[view:my_view].[view-store].[view store].[signal:app.my_unknown_signal handler].[set_slot]' .

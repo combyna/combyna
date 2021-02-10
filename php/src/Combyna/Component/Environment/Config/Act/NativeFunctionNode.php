@@ -12,10 +12,11 @@
 namespace Combyna\Component\Environment\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Environment\Exception\NativeFunctionNotInstalledException;
+use Combyna\Component\Type\Config\Act\TypeNode;
 use Combyna\Component\Type\Validation\Constraint\ResolvableTypeConstraint;
 use Combyna\Component\Validator\Constraint\CallbackConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
@@ -46,7 +47,7 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     private $libraryName;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $parameterBagModelNode;
 
@@ -58,13 +59,13 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     /**
      * @param string $libraryName
      * @param string $functionName
-     * @param FixedStaticBagModelNode $parameterBagModelNode
+     * @param FixedStaticBagModelNodeInterface $parameterBagModelNode
      * @param TypeDeterminerInterface $returnTypeDeterminer
      */
     public function __construct(
         $libraryName,
         $functionName,
-        FixedStaticBagModelNode $parameterBagModelNode,
+        FixedStaticBagModelNodeInterface $parameterBagModelNode,
         TypeDeterminerInterface $returnTypeDeterminer
     ) {
         $this->functionName = $functionName;
@@ -95,6 +96,9 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
 
         // Make sure the return type is a resolved, valid type
         $specBuilder->addConstraint(new ResolvableTypeConstraint($this->returnTypeDeterminer));
+
+        // Make sure the function's return type itself is validated as necessary
+        $specBuilder->addChildNode(new TypeNode($this->returnTypeDeterminer));
     }
 
     /**
@@ -141,7 +145,7 @@ class NativeFunctionNode extends AbstractActNode implements FunctionNodeInterfac
     /**
      * Fetches the model for the parameters the function expects
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getParameterBagModel()
     {

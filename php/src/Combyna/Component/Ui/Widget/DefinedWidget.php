@@ -264,7 +264,11 @@ class DefinedWidget implements DefinedWidgetInterface
      */
     public function getAttribute($attributeName, ViewEvaluationContextInterface $evaluationContext)
     {
-        return $this->attributeExpressions->getExpression($attributeName)->toStatic($evaluationContext);
+        return $this->definition->getAttribute(
+            $attributeName,
+            $this->attributeExpressions,
+            $evaluationContext
+        );
     }
 
     /**

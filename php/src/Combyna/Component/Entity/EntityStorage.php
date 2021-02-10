@@ -106,7 +106,7 @@ class EntityStorage implements EntityStorageInterface
     /**
      * {@inheritdoc}
      */
-    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    public function withStatic($name, StaticInterface $newStatic)
     {
         throw new \Exception('Not implemented');
     }

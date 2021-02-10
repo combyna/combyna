@@ -11,12 +11,14 @@
 
 namespace Combyna\Component\Config;
 
+use Combyna\Component\Common\Delegator\DelegatorInterface;
+
 /**
  * Class NodeVisitor
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NodeVisitor implements NodeVisitorInterface
+class NodeVisitor implements DelegatorInterface, NodeVisitorInterface
 {
     /**
      * @var NodeVisitorInterface[]

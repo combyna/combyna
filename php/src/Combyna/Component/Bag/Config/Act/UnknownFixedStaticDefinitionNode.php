@@ -14,22 +14,29 @@ namespace Combyna\Component\Bag\Config\Act;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
 use Combyna\Component\Config\Act\DynamicActNodeInterface;
-use Combyna\Component\Expression\Config\Act\DynamicUnknownExpressionNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Type\UnresolvedType;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
+use LogicException;
 
 /**
  * Class UnknownFixedStaticDefinitionNode
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedStaticDefinitionNodeInterface, DynamicActNodeInterface
+class UnknownFixedStaticDefinitionNode extends AbstractActNode implements DeterminedFixedStaticDefinitionInterface, FixedStaticDefinitionNodeInterface, DynamicActNodeInterface
 {
     const TYPE = 'unknown-fixed-static-definition';
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -37,21 +44,23 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
     private $name;
 
     /**
-     * @var QueryRequirementInterface
+     * @param string $name
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    private $queryRequirement;
+    public function __construct($name, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
+    {
+        $this->dynamicContainerNode = new DynamicContainerNode();
+        $this->name = $name;
+
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
+    }
 
     /**
-     * @param string $name
-     * @param QueryRequirementInterface $queryRequirement
+     * {@inheritdoc}
      */
-    public function __construct($name, QueryRequirementInterface $queryRequirement)
+    public function allowsStaticDefinition(DeterminedFixedStaticDefinitionInterface $otherDefinition)
     {
-        $this->name = $name;
-        $this->queryRequirement = $queryRequirement;
-
-        // Apply the validation for this dynamically created ACT node
-        $queryRequirement->adoptDynamicActNode($this);
+        return false; // Unknown definitions cannot allow any others
     }
 
     /**
@@ -59,6 +68,8 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
                 'Unknown fixed static "' . $this->name . '"'
@@ -69,11 +80,19 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
     /**
      * {@inheritdoc}
      */
+    public function determine(ValidationContextInterface $validationContext)
+    {
+        throw new LogicException('Cannot determine an unknown fixed static definition node');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getDefaultExpression()
     {
-        return new DynamicUnknownExpressionNode(
+        return new UnknownExpressionNode(
             'Unknown fixed static "' . $this->name . '"',
-            $this->queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
@@ -90,7 +109,23 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
      */
     public function getResolvedStaticType()
     {
+        return $this->getStaticType();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticType()
+    {
         return new UnresolvedType('Unknown fixed static "' . $this->name . '"');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticTypeSummary()
+    {
+        return $this->getStaticType()->getSummary();
     }
 
     /**
@@ -98,9 +133,7 @@ class UnknownFixedStaticDefinitionNode extends AbstractActNode implements FixedS
      */
     public function getStaticTypeDeterminer()
     {
-        return new PresolvedTypeDeterminer(
-            new UnresolvedType('Unknown fixed static "' . $this->name . '"')
-        );
+        return new PresolvedTypeDeterminer($this->getStaticType());
     }
 
     /**

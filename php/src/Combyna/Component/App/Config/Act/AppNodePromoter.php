@@ -23,6 +23,8 @@ use Combyna\Component\Router\RouterFactoryInterface;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodePromoter;
 use Combyna\Component\Signal\SignalFactoryInterface;
 use Combyna\Component\Ui\Config\Act\ViewNodePromoter;
+use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodePromoter;
+use Combyna\Component\Ui\Widget\WidgetDefinitionFactoryInterface;
 
 /**
  * Class AppNodePromoter
@@ -82,15 +84,27 @@ class AppNodePromoter
     private $viewNodePromoter;
 
     /**
+     * @var WidgetDefinitionFactoryInterface
+     */
+    private $widgetDefinitionFactory;
+
+    /**
+     * @var WidgetDefinitionNodePromoter
+     */
+    private $widgetDefinitionNodePromoter;
+
+    /**
      * @param AppFactoryInterface $appFactory
      * @param ProgramFactoryInterface $programFactory
      * @param EnvironmentNodePromoter $environmentNodePromoter
      * @param ViewNodePromoter $viewNodePromoter
      * @param RouteNodePromoter $routeNodePromoter
      * @param SignalDefinitionNodePromoter $signalDefinitionNodePromoter
+     * @param WidgetDefinitionNodePromoter $widgetDefinitionNodePromoter
      * @param EvaluationContextFactoryInterface $evaluationContextFactory
      * @param SignalFactoryInterface $signalFactory
      * @param RouterFactoryInterface $routerFactory
+     * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
      * @param HomeNodePromoter $homeNodePromoter
      */
     public function __construct(
@@ -100,9 +114,11 @@ class AppNodePromoter
         ViewNodePromoter $viewNodePromoter,
         RouteNodePromoter $routeNodePromoter,
         SignalDefinitionNodePromoter $signalDefinitionNodePromoter,
+        WidgetDefinitionNodePromoter $widgetDefinitionNodePromoter,
         EvaluationContextFactoryInterface $evaluationContextFactory,
         SignalFactoryInterface $signalFactory,
         RouterFactoryInterface $routerFactory,
+        WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
         HomeNodePromoter $homeNodePromoter
     ) {
         $this->appFactory = $appFactory;
@@ -115,6 +131,8 @@ class AppNodePromoter
         $this->signalDefinitionNodePromoter = $signalDefinitionNodePromoter;
         $this->signalFactory = $signalFactory;
         $this->viewNodePromoter = $viewNodePromoter;
+        $this->widgetDefinitionFactory = $widgetDefinitionFactory;
+        $this->widgetDefinitionNodePromoter = $widgetDefinitionNodePromoter;
     }
 
     /**
@@ -127,6 +145,7 @@ class AppNodePromoter
     public function promoteApp(AppNode $appNode, EnvironmentNode $environmentNode)
     {
         $environment = $this->environmentNodePromoter->promoteEnvironment($environmentNode);
+        $resourceRepository = $this->programFactory->createResourceRepository($environment);
 
         $rootEvaluationContext = $this->evaluationContextFactory->createRootContext($environment);
 
@@ -142,13 +161,15 @@ class AppNodePromoter
             $appSignalDefinitionCollection
         );
 
-//        $widgetDefinitionCollection = $this->widgetDefinitionNodePromoter->promoteCollection(
-//            $appNode->getWidgetDefinitions()
-//        );
-//        $widgetDefinitionRepository = $this->widgetFactory->createWidgetDefinitionRepository(
-//            $environment,
-//            $widgetDefinitionCollection
-//        );
+        $appWidgetDefinitionCollection = $this->widgetDefinitionNodePromoter->promoteCollection(
+            $appNode->getWidgetDefinitions(),
+            $resourceRepository,
+            LibraryInterface::APP
+        );
+        $widgetDefinitionRepository = $this->widgetDefinitionFactory->createWidgetDefinitionRepository(
+            $environment,
+            $appWidgetDefinitionCollection
+        );
 
         $router = $this->routerFactory->createRouter(
             $routeRepository,
@@ -156,10 +177,12 @@ class AppNodePromoter
             $signalDefinitionRepository
         );
 
-        $resourceRepository = $this->programFactory->createResourceRepository(
-            $environment,
-            $signalDefinitionRepository
-        );
+        // These need to be set late, to solve the catch-22 of the promoter calls above
+        // needing the root repository to be provided in order to create the sub-repositories
+        // _but_ the root repository also needing the sub-repositories itself
+        $resourceRepository->setSignalDefinitionRepository($signalDefinitionRepository);
+        $resourceRepository->setWidgetDefinitionRepository($widgetDefinitionRepository);
+
         $pageViewCollection = $this->viewNodePromoter->promotePageViewCollection(
             $appNode->getPageViews(),
             $resourceRepository

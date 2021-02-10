@@ -18,7 +18,7 @@ use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\FixedStaticDefinition;
 use Combyna\Component\Expression\Config\Act\DelegatingExpressionNodePromoter;
 use Combyna\Component\Framework\Context\ModeContext;
-use Combyna\Component\Type\AnyType;
+use Combyna\Component\Type\Config\Act\TypePromoterInterface;
 
 /**
  * Class BagNodePromoter
@@ -43,18 +43,26 @@ class BagNodePromoter
     private $modeContext;
 
     /**
+     * @var TypePromoterInterface
+     */
+    private $typePromoter;
+
+    /**
      * @param BagFactoryInterface $bagFactory
      * @param DelegatingExpressionNodePromoter $expressionNodePromoter
+     * @param TypePromoterInterface $typePromoter
      * @param ModeContext $modeContext
      */
     public function __construct(
         BagFactoryInterface $bagFactory,
         DelegatingExpressionNodePromoter $expressionNodePromoter,
+        TypePromoterInterface $typePromoter,
         ModeContext $modeContext
     ) {
         $this->bagFactory = $bagFactory;
         $this->expressionNodePromoter = $expressionNodePromoter;
         $this->modeContext = $modeContext;
+        $this->typePromoter = $typePromoter;
     }
 
     /**
@@ -126,10 +134,8 @@ class BagNodePromoter
             // In development mode, fetch the resolved type of the static
             // (which can depend on the other statics in the bag)
             // - otherwise for production mode, the behaviour spec tree won't have been loaded
-            // so we just allow any type
-            $this->modeContext->getMode()->isDevelopment() ?
-                $definitionNode->getResolvedStaticType() :
-                new AnyType(),
+            // so we use the type if it is a simple one, otherwise just allow any type
+            $this->typePromoter->promote($definitionNode->getResolvedStaticType()),
             $defaultExpression
         );
     }

@@ -36,9 +36,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeInterface, WidgetNodeInterface
+class RepeaterWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface, OptionalWidgetNodeInterface
 {
     const TYPE = 'repeater';
+    const WIDGET_TYPE = 'repeater';
 
     /**
      * @var ExpressionBagNode
@@ -266,6 +267,6 @@ class RepeaterWidgetNode extends AbstractActNode implements OptionalWidgetNodeIn
      */
     public function getWidgetDefinitionName()
     {
-        return 'repeater';
+        return self::WIDGET_TYPE;
     }
 }

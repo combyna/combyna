@@ -11,9 +11,11 @@
 
 namespace Combyna\Component\Type;
 
+use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Expression\StaticInterface;
 use Combyna\Component\Expression\StaticListExpression;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * Class StaticType
@@ -108,6 +110,14 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function allowsStaticStructureType(StaticStructureType $candidateType)
+    {
+        return false; // A static structure can never be a valid value for a non-structure static
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function allowsStaticType(StaticType $candidateType)
     {
         // Another static type will match this one if they simply match the same static expression class
@@ -120,6 +130,23 @@ class StaticType implements TypeInterface
     public function allowsVoidType(VoidType $candidateType)
     {
         return true; // Void type can be passed anywhere
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function coerceStatic(StaticInterface $static, EvaluationContextInterface $evaluationContext)
+    {
+        // Just check that the static is valid for this type
+        if (!$this->allowsStatic($static)) {
+            throw new LogicException(sprintf(
+                'Expected a %s, got a %s',
+                $this->staticClass,
+                get_class($static)
+            ));
+        }
+
+        return $static;
     }
 
     /**
@@ -144,6 +171,14 @@ class StaticType implements TypeInterface
     public function isAllowedByStaticListType(StaticListType $superType)
     {
         return $superType->allowsStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowedByStaticStructureType(StaticStructureType $otherType)
+    {
+        return $otherType->allowsStaticType($this);
     }
 
     /**
@@ -211,6 +246,16 @@ class StaticType implements TypeInterface
     /**
      * {@inheritdoc}
      */
+    public function mergeWithStaticStructureType(StaticStructureType $otherType)
+    {
+        // There is nothing common to merge between a static structure type and a static type,
+        // so just return a MultipleType that allows both
+        return new MultipleType([$this, $otherType]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function mergeWithStaticType(StaticType $otherType)
     {
         if ($this->staticClass === $otherType->staticClass) {
@@ -271,6 +316,14 @@ class StaticType implements TypeInterface
     public function whenMergedWithStaticType(StaticType $otherType)
     {
         return $otherType->mergeWithStaticType($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function whenMergedWithStaticStructureType(StaticStructureType $candidateType)
+    {
+        return $candidateType->mergeWithStaticType($this);
     }
 
     /**

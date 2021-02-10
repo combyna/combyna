@@ -14,18 +14,18 @@ namespace Combyna\Component\App\Config\Act;
 use Combyna\Component\App\Validation\Context\Specifier\AppContextSpecifier;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
-use Combyna\Component\Environment\Config\Act\DynamicUnknownFunctionNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Environment\Config\Act\FunctionNodeInterface;
+use Combyna\Component\Environment\Config\Act\UnknownFunctionNode;
 use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Framework\Config\Act\RootNodeInterface;
 use Combyna\Component\Router\Config\Act\RouteNode;
-use Combyna\Component\Signal\Config\Act\DynamicUnknownSignalDefinitionNode;
 use Combyna\Component\Signal\Config\Act\SignalDefinitionNodeInterface;
+use Combyna\Component\Signal\Config\Act\UnknownSignalDefinitionNode;
 use Combyna\Component\Ui\Config\Act\PageViewNode;
 use Combyna\Component\Ui\Config\Act\UnknownWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 
 /**
  * Class AppNode
@@ -67,8 +67,14 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     private $signalDefinitionNodes = [];
 
     /**
+     * @var WidgetDefinitionNodeInterface[]
+     */
+    private $widgetDefinitionNodes = [];
+
+    /**
      * @param EnvironmentNode $environmentNode
      * @param SignalDefinitionNodeInterface[] $signalDefinitionNodes
+     * @param WidgetDefinitionNodeInterface[] $widgetDefinitionNodes
      * @param RouteNode[] $routeNodes
      * @param HomeNode $homeNode
      * @param PageViewNode[] $pageViewNodes
@@ -77,6 +83,7 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     public function __construct(
         EnvironmentNode $environmentNode,
         array $signalDefinitionNodes,
+        array $widgetDefinitionNodes,
         array $routeNodes,
         HomeNode $homeNode,
         array $pageViewNodes,
@@ -98,6 +105,11 @@ class AppNode extends AbstractActNode implements RootNodeInterface
         // Index signal definitions by name to simplify lookups
         foreach ($signalDefinitionNodes as $signalDefinitionNode) {
             $this->signalDefinitionNodes[$signalDefinitionNode->getSignalName()] = $signalDefinitionNode;
+        }
+
+        // Index widget definitions by name to simplify lookups
+        foreach ($widgetDefinitionNodes as $widgetDefinitionNode) {
+            $this->widgetDefinitionNodes[$widgetDefinitionNode->getWidgetDefinitionName()] = $widgetDefinitionNode;
         }
     }
 
@@ -128,6 +140,10 @@ class AppNode extends AbstractActNode implements RootNodeInterface
         foreach ($this->signalDefinitionNodes as $signalDefinitionNode) {
             $specBuilder->addChildNode($signalDefinitionNode);
         }
+
+        foreach ($this->widgetDefinitionNodes as $widgetDefinitionNode) {
+            $specBuilder->addChildNode($widgetDefinitionNode);
+        }
     }
 
     /**
@@ -143,18 +159,22 @@ class AppNode extends AbstractActNode implements RootNodeInterface
     /**
      * Fetches a function defined by the app.
      * If it does not define the specified function,
-     * then a DynamicUnknownFunctionNode will be returned
+     * then an UnknownFunctionNode will be returned
      *
      * @param string $libraryName
      * @param string $functionName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return FunctionNodeInterface
      */
-    public function getGenericFunction($libraryName, $functionName, QueryRequirementInterface $queryRequirement)
+    public function getGenericFunction($libraryName, $functionName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         // TODO: Not yet implemented - only the libraries in the environment can define functions for now
 
-        return new DynamicUnknownFunctionNode($libraryName, $functionName, $queryRequirement);
+        return new UnknownFunctionNode(
+            $libraryName,
+            $functionName,
+            $dynamicActNodeAdopter
+        );
     }
 
     /**
@@ -201,14 +221,18 @@ class AppNode extends AbstractActNode implements RootNodeInterface
      * Fetches a single signal definition in the app
      *
      * @param string $signalName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return SignalDefinitionNodeInterface
      */
-    public function getSignalDefinition($signalName, QueryRequirementInterface $queryRequirement)
+    public function getSignalDefinition($signalName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         return array_key_exists($signalName, $this->signalDefinitionNodes) ?
             $this->signalDefinitionNodes[$signalName] :
-            new DynamicUnknownSignalDefinitionNode(LibraryInterface::APP, $signalName, $queryRequirement);
+            new UnknownSignalDefinitionNode(
+                LibraryInterface::APP,
+                $signalName,
+                $dynamicActNodeAdopter
+            );
     }
 
     /**
@@ -227,17 +251,27 @@ class AppNode extends AbstractActNode implements RootNodeInterface
      * then an UnknownWidgetDefinitionNode will be returned
      *
      * @param string $name
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return WidgetDefinitionNodeInterface
      */
-    public function getWidgetDefinition($name, QueryRequirementInterface $queryRequirement)
+    public function getWidgetDefinition($name, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
-        // TODO: Implement widget definitions within an app's config
+        return array_key_exists($name, $this->widgetDefinitionNodes) ?
+            $this->widgetDefinitionNodes[$name] :
+            new UnknownWidgetDefinitionNode(
+                LibraryInterface::APP,
+                $name,
+                $dynamicActNodeAdopter
+            );
+    }
 
-        return new UnknownWidgetDefinitionNode(
-            LibraryInterface::APP,
-            $name,
-            $queryRequirement
-        );
+    /**
+     * Fetches the collection of widget definitions in the app
+     *
+     * @return WidgetDefinitionNodeInterface[]
+     */
+    public function getWidgetDefinitions()
+    {
+        return $this->widgetDefinitionNodes;
     }
 }

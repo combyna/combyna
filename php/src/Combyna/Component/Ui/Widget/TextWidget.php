@@ -123,7 +123,7 @@ class TextWidget implements TextWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext($parentContext, $this, $widgetState);
+        return $evaluationContextFactory->createTextWidgetEvaluationContext($parentContext, $this, $widgetState);
     }
 
     /**

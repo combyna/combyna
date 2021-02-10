@@ -48,6 +48,14 @@ abstract class AbstractExpressionFactory implements ExpressionFactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createAttributeExpression(ExpressionInterface $structureExpression, $attributeName)
+    {
+        return $this->parentExpressionFactory->createAttributeExpression($structureExpression, $attributeName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createBinaryArithmeticExpression(
         ExpressionInterface $leftOperandExpression,
         $operator,
@@ -230,6 +238,14 @@ abstract class AbstractExpressionFactory implements ExpressionFactoryInterface
     public function createNumberExpression($number)
     {
         return $this->parentExpressionFactory->createNumberExpression($number);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createStructureExpression(ExpressionBagInterface $expressionBag)
+    {
+        return $this->parentExpressionFactory->createStructureExpression($expressionBag);
     }
 
     /**

@@ -60,8 +60,8 @@ class ArgumentParserIntegratedTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_first_param'))->exactlyEquals('first value');
-        $this->assert($argumentBag->getNamedTextArgument('my_second_param'))->exactlyEquals('second value');
+        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
+        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 
@@ -79,7 +79,7 @@ class ArgumentParserIntegratedTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_explicit_param'))->exactlyEquals('explicit value');
+        $this->assert($argumentBag->getNamedStringArgument('my_explicit_param'))->exactlyEquals('explicit value');
         $this->assert($argumentBag->getExtraArguments())->equals([
             'some_other_arg' => 21,
             'another_arg' => 1001
@@ -121,8 +121,32 @@ class ArgumentParserIntegratedTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_required_param'))->exactlyEquals('required value');
-        $this->assert($argumentBag->getNamedTextArgument('my_optional_param'))->exactlyEquals('the default value');
+        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
+        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('the default value');
+        $this->assert($argumentBag->getExtraArguments())->equals([]);
+    }
+
+    public function testParseArgumentsReturnsDefaultForOptionalArgumentsSetToNull()
+    {
+        $argumentBag = $this->parser->parseArguments([
+            ArgumentParser::NAMED_ARGUMENTS => [
+                'my_required_param' => ['type' => 'text', 'text' => 'required value'],
+                'my_optional_param' => null
+            ]
+        ], [
+            new NamedParameter('my_required_param', new TextParameterType('required param')),
+            new OptionalParameter(
+                new NamedParameter(
+                    'my_optional_param',
+                    new TextParameterType('optional param')
+                ),
+                'the default value'
+            )
+        ]);
+
+        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
+        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
+        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('the default value');
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 
@@ -145,8 +169,8 @@ class ArgumentParserIntegratedTest extends TestCase
         ]);
 
         $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedTextArgument('my_required_param'))->exactlyEquals('required value');
-        $this->assert($argumentBag->getNamedTextArgument('my_optional_param'))->exactlyEquals('optional but specified value');
+        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
+        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('optional but specified value');
         $this->assert($argumentBag->getExtraArguments())->equals([]);
     }
 

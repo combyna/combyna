@@ -30,9 +30,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInterface
+class ChildReferenceWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
 {
     const TYPE = 'child-reference-widget';
+    const WIDGET_TYPE = 'child';
 
     /**
      * @var ExpressionBagNode
@@ -163,6 +164,6 @@ class ChildReferenceWidgetNode extends AbstractActNode implements WidgetNodeInte
      */
     public function getWidgetDefinitionName()
     {
-        return 'child';
+        return self::WIDGET_TYPE;
     }
 }

@@ -26,11 +26,8 @@ use Combyna\Component\Config\Parameter\ParameterParserInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ArgumentParser
+class ArgumentParser implements ArgumentParserInterface
 {
-    const NAMED_ARGUMENTS = 'named-arguments';
-    const POSITIONAL_ARGUMENTS = 'positional-arguments';
-
     /**
      * @var ParameterParserInterface
      */

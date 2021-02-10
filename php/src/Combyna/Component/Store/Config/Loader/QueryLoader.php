@@ -11,10 +11,17 @@
 
 namespace Combyna\Component\Store\Config\Loader;
 
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Exception\ArgumentParseException;
+use Combyna\Component\Config\Loader\ConfigParserInterface;
+use Combyna\Component\Config\Parameter\CallbackOptionalParameter;
+use Combyna\Component\Config\Parameter\NamedParameter;
+use Combyna\Component\Config\Parameter\Type\ExpressionParameterType;
+use Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterType;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
 use Combyna\Component\Store\Config\Act\QueryNode;
+use Combyna\Component\Store\Config\Act\UnknownQueryNode;
 
 /**
  * Class QueryLoader
@@ -29,7 +36,7 @@ class QueryLoader implements QueryLoaderInterface
     private $bagModelLoader;
 
     /**
-     * @var ConfigParser
+     * @var ConfigParserInterface
      */
     private $configParser;
 
@@ -39,12 +46,12 @@ class QueryLoader implements QueryLoaderInterface
     private $expressionLoader;
 
     /**
-     * @param ConfigParser $configParser
+     * @param ConfigParserInterface $configParser
      * @param ExpressionLoaderInterface $expressionLoader
      * @param FixedStaticBagModelLoaderInterface $bagModelLoader
      */
     public function __construct(
-        ConfigParser $configParser,
+        ConfigParserInterface $configParser,
         ExpressionLoaderInterface $expressionLoader,
         FixedStaticBagModelLoaderInterface $bagModelLoader
     ) {
@@ -58,23 +65,23 @@ class QueryLoader implements QueryLoaderInterface
      */
     public function load($name, array $config)
     {
-        $parameterBagModelConfig = $this->configParser->getElement(
-            $config,
-            'parameters',
-            'query parameter model',
-            'array'
-        );
-        $expressionConfig = $this->configParser->getElement(
-            $config,
-            'expression',
-            'query expression',
-            'array'
-        );
+        try {
+            $parsedArgumentBag = $this->configParser->parseArguments($config, [
+                new CallbackOptionalParameter(
+                    new NamedParameter('parameters', new FixedStaticBagModelParameterType('query parameters')),
+                    function () {
+                        return new FixedStaticBagModelNode([]);
+                    }
+                ),
+                new NamedParameter('expression', new ExpressionParameterType('expression to evaluate for the query'))
+            ]);
+        } catch (ArgumentParseException $exception) {
+            return new UnknownQueryNode($exception->getMessage());
+        }
 
-        return new QueryNode(
-            $name,
-            $this->bagModelLoader->load($parameterBagModelConfig),
-            $this->expressionLoader->load($expressionConfig)
-        );
+        $parameterBagModel = $parsedArgumentBag->getNamedFixedStaticBagModelArgument('parameters');
+        $expressionNode = $parsedArgumentBag->getNamedExpressionArgument('expression');
+
+        return new QueryNode($name, $parameterBagModel, $expressionNode);
     }
 }

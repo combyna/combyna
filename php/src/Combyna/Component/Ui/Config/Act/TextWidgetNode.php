@@ -30,9 +30,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
+class TextWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface
 {
     const TYPE = 'text-widget';
+    const WIDGET_TYPE = 'text';
 
     /**
      * @var ExpressionBagNode
@@ -135,7 +136,7 @@ class TextWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return 'text';
+        return self::WIDGET_TYPE;
     }
 
     /**

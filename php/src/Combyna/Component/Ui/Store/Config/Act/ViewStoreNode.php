@@ -11,16 +11,17 @@
 
 namespace Combyna\Component\Ui\Store\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Signal\Config\Act\SignalHandlerNode;
-use Combyna\Component\Store\Config\Act\DynamicUnknownQueryNode;
 use Combyna\Component\Store\Config\Act\QueryNode;
 use Combyna\Component\Store\Config\Act\QueryNodeInterface;
+use Combyna\Component\Store\Config\Act\UnknownQueryNode;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Store\Validation\Context\Specifier\ViewStoreContextSpecifier;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 
 /**
  * Class ViewStoreNode
@@ -34,6 +35,11 @@ class ViewStoreNode extends AbstractActNode
     const TYPE = 'view-store';
 
     /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
+
+    /**
      * @var QueryNode[]
      */
     private $queryNodes;
@@ -44,17 +50,21 @@ class ViewStoreNode extends AbstractActNode
     private $signalHandlerNodes;
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $slotBagModelNode;
 
     /**
-     * @param FixedStaticBagModelNode $slotBagModelNode
+     * @param FixedStaticBagModelNodeInterface $slotBagModelNode
      * @param QueryNode[] $queryNodes
      * @param SignalHandlerNode[] $signalHandlerNodes
      */
-    public function __construct(FixedStaticBagModelNode $slotBagModelNode, array $queryNodes, array $signalHandlerNodes)
-    {
+    public function __construct(
+        FixedStaticBagModelNodeInterface $slotBagModelNode,
+        array $queryNodes,
+        array $signalHandlerNodes
+    ) {
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->queryNodes = $queryNodes;
         $this->signalHandlerNodes = $signalHandlerNodes;
         $this->slotBagModelNode = $slotBagModelNode;
@@ -65,6 +75,7 @@ class ViewStoreNode extends AbstractActNode
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
         $specBuilder->addChildNode($this->slotBagModelNode);
 
         $specBuilder->addSubSpec(function (BehaviourSpecBuilderInterface $subSpecBuilder) {
@@ -95,14 +106,14 @@ class ViewStoreNode extends AbstractActNode
      * Fetches a query this store defines by its name
      *
      * @param string $name
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return QueryNodeInterface
      */
-    public function getQueryByName($name, QueryRequirementInterface $queryRequirement)
+    public function getQueryByName($name, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         return array_key_exists($name, $this->queryNodes) ?
             $this->queryNodes[$name] :
-            new DynamicUnknownQueryNode($name, $queryRequirement);
+            new UnknownQueryNode($name, $dynamicActNodeAdopter);
     }
 
     /**
@@ -118,7 +129,7 @@ class ViewStoreNode extends AbstractActNode
     /**
      * Fetches the static bag model for slots in this store
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getSlotBagModel()
     {
@@ -129,19 +140,19 @@ class ViewStoreNode extends AbstractActNode
      * Fetches the static type of the specified slot, if it exists
      *
      * @param string $slotName
-     * @param QueryRequirementInterface $queryRequirement
      * @return TypeInterface|null
      */
-    public function getSlotStaticType(
-        $slotName,
-        QueryRequirementInterface $queryRequirement
-    ) {
-        $slotStaticDefinition = $this->slotBagModelNode->getStaticDefinitionByName($slotName, $queryRequirement);
+    public function getSlotStaticType($slotName)
+    {
+        $slotStaticDefinition = $this->slotBagModelNode->getStaticDefinitionByName(
+            $slotName,
+            $this->dynamicContainerNode
+        );
 
         if ($slotStaticDefinition === null) {
             return null;
         }
 
-        return $queryRequirement->determineType($slotStaticDefinition->getStaticTypeDeterminer());
+        return $this->dynamicContainerNode->determineType($slotStaticDefinition->getStaticTypeDeterminer());
     }
 }

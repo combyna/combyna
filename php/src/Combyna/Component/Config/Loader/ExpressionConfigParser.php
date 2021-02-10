@@ -18,6 +18,7 @@ use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Expression\Config\Act\StaticNodeInterface;
 use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
+use Combyna\Component\Validator\Config\Act\NullActNodeAdopter;
 use InvalidArgumentException;
 
 /**
@@ -124,7 +125,8 @@ class ExpressionConfigParser
 
         if (!array_key_exists($position, $positionalArgumentConfig)) {
             return new UnknownExpressionNode(
-                'Missing required argument at position #' . $position . ' for ' . $context
+                'Missing required argument at position #' . $position . ' for ' . $context,
+                new NullActNodeAdopter()
             );
         }
 

@@ -33,7 +33,25 @@ class StaticBag implements StaticBagInterface
      */
     public function __construct(array $statics)
     {
+        $this->assertValidStatics($statics);
+
         $this->statics = $statics;
+    }
+
+    /**
+     * Validates that all statics in the provided list are actually StaticInterfaces
+     *
+     * @param StaticInterface[] $statics
+     */
+    private function assertValidStatics(array $statics)
+    {
+        foreach ($statics as $name => $static) {
+            if (!$static instanceof StaticInterface) {
+                throw new InvalidArgumentException(
+                    'Bag static "' . $name . '" is actually a ' . get_class($static)
+                );
+            }
+        }
     }
 
     /**
@@ -49,6 +67,14 @@ class StaticBag implements StaticBagInterface
         }
 
         return $this->statics[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getStaticNames()
+    {
+        return array_keys($this->statics);
     }
 
     /**
@@ -76,15 +102,29 @@ class StaticBag implements StaticBagInterface
     /**
      * {@inheritdoc}
      */
-    public function withSlotStatic($slotName, StaticInterface $newSlotStatic)
+    public function withStatic($name, StaticInterface $newStatic)
     {
-        if ($this->getStatic($slotName)->toNative() === $newSlotStatic->toNative()) {
-            // Slot already has the provided static value, no need to create a new static bag
+        if ($this->getStatic($name)->toNative() === $newStatic->toNative()) {
+            // Static already has the provided value, no need to create a new static bag
             return $this;
         }
 
         return new self(array_merge($this->statics, [
-            $slotName => $newSlotStatic
+            $name => $newStatic
         ]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withStatics(array $newStatics)
+    {
+        $mergedStatics = array_merge($this->statics, $newStatics);
+
+        if ($mergedStatics === $this->statics) {
+            return $this; // Just return this original bag if it was complete
+        }
+
+        return new StaticBag($mergedStatics);
     }
 }

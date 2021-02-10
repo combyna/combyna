@@ -159,7 +159,11 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
         ValidationContextInterface $validationContext,
         ActNodeInterface $nodeQueriedFrom
     ) {
-        if (!$this->widgetGroupNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName())) {
+        $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
+
+        if (!$this->widgetGroupNode->getCaptureStaticBagModel()
+            ->definesStatic($query->getCaptureName())
+        ) {
             // The widget group does not define the capture - nothing to do
             return null;
         }
@@ -168,7 +172,7 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
             ->getCaptureStaticBagModel()
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
-                $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom)
+                $queryRequirement
             );
     }
 
@@ -180,7 +184,9 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
      */
     public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
     {
-        return $this->widgetGroupNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName()) ?: null;
+        return $this->widgetGroupNode
+            ->getCaptureStaticBagModel()
+            ->definesStatic($query->getCaptureName()) ?: null;
     }
 
     /**
@@ -236,16 +242,19 @@ class WidgetGroupSubValidationContext implements WidgetGroupSubValidationContext
      * @param CaptureHasOptionalAncestorWidgetQuery $query
      * @return bool|null
      */
-    public function queryForWhetherCaptureHasOptionalAncestor(CaptureHasOptionalAncestorWidgetQuery $query)
-    {
+    public function queryForWhetherCaptureHasOptionalAncestor(
+        CaptureHasOptionalAncestorWidgetQuery $query
+    ) {
         /*
          * If this widget defines the capture, return false as if this node was reached, no optional widget
          * was found between its setter widget and this one.
          * Otherwise, return null so that the query will continue on up the tree
          * until either an optional widget is found or the widget that defines the capture is found.
          */
-        return $this->widgetGroupNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName()) ?
-            false :
-            null;
+        return $this->widgetGroupNode
+            ->getCaptureStaticBagModel()
+            ->definesStatic($query->getCaptureName()) ?
+                false :
+                null;
     }
 }

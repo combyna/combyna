@@ -33,6 +33,11 @@ class TypeComponent extends AbstractComponent
                 'combyna.type_loader',
                 'combyna.type.loader',
                 'addLoader'
+            ),
+            new DelegateeTagDefinition(
+                'combyna.type_promoter',
+                'combyna.type.promoter',
+                'addPromoter'
             )
         ]));
     }

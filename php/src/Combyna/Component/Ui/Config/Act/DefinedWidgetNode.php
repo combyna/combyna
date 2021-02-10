@@ -57,6 +57,11 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     private $childWidgetNodes;
 
     /**
+     * @var WidgetDefinitionReferenceNode
+     */
+    private $definitionReferenceNode;
+
+    /**
      * The name of this widget, unique amongst its siblings
      *
      * @var string|int
@@ -79,18 +84,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
     private $visibilityExpressionNode;
 
     /**
-     * @var string
-     */
-    private $widgetDefinitionLibraryName;
-
-    /**
-     * @var string
-     */
-    private $widgetDefinitionName;
-
-    /**
-     * @param string $widgetDefinitionLibraryName
-     * @param string $widgetDefinitionName
+     * @param WidgetDefinitionReferenceNode $definitionReferenceNode
      * @param ExpressionBagNode $attributeExpressionBagNode
      * @param FixedStaticBagModelNodeInterface $captureStaticBagModelNode
      * @param ExpressionBagNode $captureExpressionBagNode
@@ -101,8 +95,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      * @param array $tags
      */
     public function __construct(
-        $widgetDefinitionLibraryName,
-        $widgetDefinitionName,
+        WidgetDefinitionReferenceNode $definitionReferenceNode,
         ExpressionBagNode $attributeExpressionBagNode,
         FixedStaticBagModelNodeInterface $captureStaticBagModelNode,
         ExpressionBagNode $captureExpressionBagNode,
@@ -116,12 +109,11 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
         $this->captureExpressionBagNode = $captureExpressionBagNode;
         $this->captureStaticBagModelNode = $captureStaticBagModelNode;
         $this->childWidgetNodes = $childWidgetNodes;
+        $this->definitionReferenceNode = $definitionReferenceNode;
         $this->name = $name;
         $this->tags = $tags;
         $this->triggerNodes = $triggerNodes;
         $this->visibilityExpressionNode = $visibilityExpressionNode;
-        $this->widgetDefinitionLibraryName = $widgetDefinitionLibraryName;
-        $this->widgetDefinitionName = $widgetDefinitionName;
     }
 
     /**
@@ -129,13 +121,14 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->definitionReferenceNode);
         $specBuilder->addChildNode($this->attributeExpressionBagNode);
 
         // Validate that this widget is a well-formed instance of its definition
         $specBuilder->addConstraint(
             new ValidWidgetConstraint(
-                $this->widgetDefinitionLibraryName,
-                $this->widgetDefinitionName,
+                $this->definitionReferenceNode->getLibraryName(),
+                $this->definitionReferenceNode->getWidgetDefinitionName(),
                 $this->attributeExpressionBagNode,
                 $this->childWidgetNodes
             )
@@ -223,7 +216,7 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getLibraryName()
     {
-        return $this->widgetDefinitionLibraryName;
+        return $this->definitionReferenceNode->getLibraryName();
     }
 
     /**
@@ -267,6 +260,16 @@ class DefinedWidgetNode extends AbstractActNode implements WidgetNodeInterface
      */
     public function getWidgetDefinitionName()
     {
-        return $this->widgetDefinitionName;
+        return $this->definitionReferenceNode->getWidgetDefinitionName();
+    }
+
+    /**
+     * Fetches the widget definition reference ACT node
+     *
+     * @return WidgetDefinitionReferenceNode
+     */
+    public function getWidgetDefinitionReference()
+    {
+        return $this->definitionReferenceNode;
     }
 }

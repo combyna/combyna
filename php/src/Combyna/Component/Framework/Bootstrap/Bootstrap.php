@@ -17,7 +17,7 @@ use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
- * Interface BootstrapInterface
+ * Class Bootstrap
  *
  * @author Dan Phillimore <dan@ovms.co>
  */

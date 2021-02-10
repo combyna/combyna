@@ -16,6 +16,7 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
 use Combyna\Component\Trigger\Config\Act\TriggerNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
+use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 use Combyna\Component\Ui\Config\Act\WidgetNodeInterface;
 use Combyna\Component\Validator\Context\ActNodeSubValidationContextInterface;
 use Combyna\Harness\TestCase;
@@ -86,8 +87,7 @@ class DefinedWidgetNodeTest extends TestCase
         $this->visibilityExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
 
         $this->node = new DefinedWidgetNode(
-            'my_lib',
-            'my_widget',
+            new WidgetDefinitionReferenceNode('my_lib', 'my_widget'),
             $this->attributeExpressionBagNode->reveal(),
             $this->captureStaticBagModelNode->reveal(),
             $this->captureExpressionBagNode->reveal(),

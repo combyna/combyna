@@ -24,6 +24,7 @@ use Combyna\Component\Signal\Validation\Query\SignalDefinitionHasPayloadStaticQu
 use Combyna\Component\Signal\Validation\Query\SignalDefinitionPayloadStaticTypeQuery;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Ui\Config\Act\WidgetDefinitionNodeInterface;
+use Combyna\Component\Ui\Validation\Query\WidgetDefinitionExistsQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionHasValueQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionNodeQuery;
 use Combyna\Component\Ui\Validation\Query\WidgetDefinitionValueTypeQuery;
@@ -119,6 +120,7 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             FunctionReturnTypeQuery::class => [$this, 'queryForFunctionReturnType'],
             SignalDefinitionExistsQuery::class => [$this, 'queryForSignalDefinitionExistence'],
             SignalDefinitionPayloadStaticTypeQuery::class => [$this, 'queryForSignalPayloadStaticType'],
+            WidgetDefinitionExistsQuery::class => [$this, 'queryForWidgetDefinitionExistence'],
             WidgetDefinitionHasValueQuery::class => [$this, 'queryForWidgetValueExistence'],
             WidgetDefinitionNodeQuery::class => [$this, 'queryForWidgetDefinitionNode'],
             WidgetDefinitionValueTypeQuery::class => [$this, 'queryForWidgetValueType']
@@ -268,7 +270,7 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             $queryRequirement
         );
 
-        return $signalDefinitionNode->getPayloadStaticBagModel($queryRequirement)
+        return $signalDefinitionNode->getPayloadStaticBagModel()
             ->definesStatic($query->getPayloadStaticName());
     }
 
@@ -291,7 +293,34 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             $queryRequirement
         );
 
-        return $signalDefinitionNode->getPayloadStaticType($query->getPayloadStaticName(), $queryRequirement);
+        return $signalDefinitionNode->getPayloadStaticType($query->getPayloadStaticName());
+    }
+
+    /**
+     * Determines whether the specified widget definition exists
+     *
+     * @param WidgetDefinitionExistsQuery $query
+     * @param ValidationContextInterface $validationContext
+     * @return bool|null
+     */
+    public function queryForWidgetDefinitionExistence(
+        WidgetDefinitionExistsQuery $query,
+        ValidationContextInterface $validationContext
+    ) {
+        $widgetDefinitionNode = $this->environmentNode->getWidgetDefinition(
+            $query->getLibraryName(),
+            $query->getWidgetDefinitionName(),
+            $validationContext->createBooleanQueryRequirement($query)
+        );
+
+        if ($widgetDefinitionNode->isDefined()) {
+            // We've discovered that the library _does_ define the requested widget definition
+            return true;
+        }
+
+        // The library doesn't define the requested widget definition - return null
+        // so that we can bubble up to an ancestor context that does define it
+        return null;
     }
 
     /**
@@ -355,6 +384,6 @@ class EnvironmentSubValidationContext implements EnvironmentSubValidationContext
             $queryRequirement
         );
 
-        return $widgetDefinitionNode->getValueType($query->getValueName(), $queryRequirement);
+        return $widgetDefinitionNode->getValueType($query->getValueName());
     }
 }

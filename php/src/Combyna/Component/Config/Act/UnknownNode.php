@@ -12,6 +12,7 @@
 namespace Combyna\Component\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 
 /**
@@ -19,7 +20,7 @@ use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownNode extends AbstractActNode
+class UnknownNode extends AbstractActNode implements DynamicActNodeInterface
 {
     const TYPE = 'unknown';
 
@@ -30,10 +31,13 @@ class UnknownNode extends AbstractActNode
 
     /**
      * @param string $contextDescription
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      */
-    public function __construct($contextDescription)
+    public function __construct($contextDescription, DynamicActNodeAdopterInterface $dynamicActNodeAdopter)
     {
         $this->contextDescription = $contextDescription;
+
+        $dynamicActNodeAdopter->adoptDynamicActNode($this);
     }
 
     /**

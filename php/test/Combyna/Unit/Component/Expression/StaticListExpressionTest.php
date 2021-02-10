@@ -143,4 +143,39 @@ class StaticListExpressionTest extends TestCase
         $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
             ->exactlyEquals($this->expression);
     }
+
+    public function testWithElementsReturnsTheSameListExpressionObjectWhenAllAndOnlySpecifiedStaticsAreAlreadyPresent()
+    {
+        $firstElement = new TextExpression('first element');
+        $secondElement = new TextExpression('second element');
+        $staticListExpression = new StaticListExpression(
+            $this->expressionFactory->reveal(),
+            $this->staticList->reveal()
+        );
+        $this->staticList->withElements([$firstElement, $secondElement])
+            ->willReturn($this->staticList);
+
+        self::assertSame($staticListExpression, $staticListExpression->withElements([$firstElement, $secondElement]));
+    }
+
+    public function testWithElementsReturnsANewListWhenAtLeastOneStaticIsNotAlreadyPresent()
+    {
+        $firstElement = new TextExpression('first element');
+        $secondElement = new TextExpression('second element');
+        $staticListExpression = new StaticListExpression(
+            $this->expressionFactory->reveal(),
+            $this->staticList->reveal()
+        );
+        $newElement = new TextExpression('new element');
+        $newStaticList = $this->prophesize(StaticListInterface::class);
+        $newStaticList->getElementStatics()
+            ->willReturn([$firstElement, $secondElement, $newElement]);
+        $this->staticList->withElements([$firstElement, $secondElement, $newElement])
+            ->willReturn($newStaticList);
+
+        $newStaticListExpression = $staticListExpression->withElements([$firstElement, $secondElement, $newElement]);
+
+        self::assertNotSame($staticListExpression, $newStaticListExpression);
+        self::assertSame($newElement, $newStaticListExpression->getElementStatics()[2]);
+    }
 }

@@ -80,7 +80,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 0],
             $appState->getWidgetStatePathByPath(['my_entry_page', 'root', 'contents', 0])
                 ->getWidgetStatePath()
@@ -91,7 +91,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 0],
             $appState->getWidgetStatePathByTag('my_text_widget')->getWidgetStatePath()
         );
@@ -101,7 +101,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 1],
             $appState->getWidgetStatePathByPath(['my_entry_page', 'root', 'contents', 1])
                 ->getWidgetStatePath()
@@ -112,7 +112,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 1],
             $appState->getWidgetStatePathByTag('my_repeater_widget')->getWidgetStatePath()
         );
@@ -122,7 +122,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 1, 2],
             $appState->getWidgetStatePathByPath(['my_entry_page', 'root', 'contents', 1, 2])
                 ->getWidgetStatePath()
@@ -133,7 +133,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             [
                 ['my_entry_page', 'root', 'contents', 1, 0],
                 ['my_entry_page', 'root', 'contents', 1, 1],
@@ -149,7 +149,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 2],
             $appState->getWidgetStatePathByPath(['my_entry_page', 'root', 'contents', 2])
                 ->getWidgetStatePath()
@@ -160,7 +160,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 2],
             $appState->getWidgetStatePathByTag('my_conditional_widget')->getWidgetStatePath()
         );
@@ -170,7 +170,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 2, 'consequent'],
             $appState->getWidgetStatePathByPath(['my_entry_page', 'root', 'contents', 2, 'consequent'])
                 ->getWidgetStatePath()
@@ -181,7 +181,7 @@ class WidgetPathIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->assertEquals(
+        self::assertEquals(
             ['my_entry_page', 'root', 'contents', 2, 'consequent'],
             $appState->getWidgetStatePathByTag('my_descendant_of_conditional_widget')
                 ->getWidgetStatePath()

@@ -11,12 +11,12 @@
 
 namespace Combyna\Component\Signal\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\DynamicUnknownFixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\UnknownFixedStaticBagModelNode;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
+use Combyna\Component\Config\Act\DynamicContainerNode;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Class InvalidSignalDefinitionNode
@@ -31,6 +31,11 @@ class InvalidSignalDefinitionNode extends AbstractActNode implements SignalDefin
      * @var string
      */
     private $contextDescription;
+
+    /**
+     * @var DynamicContainerNode
+     */
+    private $dynamicContainerNode;
 
     /**
      * @var string
@@ -50,6 +55,7 @@ class InvalidSignalDefinitionNode extends AbstractActNode implements SignalDefin
     public function __construct($libraryName, $signalName, $contextDescription)
     {
         $this->contextDescription = $contextDescription;
+        $this->dynamicContainerNode = new DynamicContainerNode();
         $this->libraryName = $libraryName;
         $this->signalName = $signalName;
     }
@@ -59,6 +65,8 @@ class InvalidSignalDefinitionNode extends AbstractActNode implements SignalDefin
      */
     public function buildBehaviourSpec(BehaviourSpecBuilderInterface $specBuilder)
     {
+        $specBuilder->addChildNode($this->dynamicContainerNode);
+
         // Make sure validation fails, because this node is invalid
         $specBuilder->addConstraint(
             new KnownFailureConstraint(
@@ -75,22 +83,30 @@ class InvalidSignalDefinitionNode extends AbstractActNode implements SignalDefin
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticBagModel(QueryRequirementInterface $queryRequirement)
+    public function getLibraryName()
     {
-        return new DynamicUnknownFixedStaticBagModelNode(
+        return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPayloadStaticBagModel()
+    {
+        return new UnknownFixedStaticBagModelNode(
             sprintf(
                 'Payload static bag model for invalid signal "%s" of library "%s"',
                 $this->signalName,
                 $this->libraryName
             ),
-            $queryRequirement
+            $this->dynamicContainerNode
         );
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPayloadStaticType($staticName, QueryRequirementInterface $queryRequirement)
+    public function getPayloadStaticType($staticName)
     {
         return new UnresolvedType(
             sprintf(

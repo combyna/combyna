@@ -27,11 +27,12 @@ interface RouterFactoryInterface
      * Creates a new Route
      *
      * @param string $name
-     * @param FixedStaticBagModelInterface $attributeStaticBagModel
+     * @param string $urlPattern
+     * @param FixedStaticBagModelInterface $parameterBagModel
      * @param string $pageViewName
      * @return RouteInterface
      */
-    public function createRoute($name, FixedStaticBagModelInterface $attributeStaticBagModel, $pageViewName);
+    public function createRoute($name, $urlPattern, FixedStaticBagModelInterface $parameterBagModel, $pageViewName);
 
     /**
      * Creates a new RouteCollection

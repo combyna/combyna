@@ -1,0 +1,62 @@
+name: Widget definitions test app
+signals:
+    store_new_age:
+        payload:
+            new_age: number
+home:
+    route: app.my_route
+routes:
+    my_route:
+        pattern: '/'
+        page_view: my_view
+widgets:
+    # A lowest-level definition
+    my_primitive_widget:
+        type: primitive
+        attributes:
+            primitives_label: text
+        children:
+            primitives_child: ~
+
+    # A definition that is composed of other widgets
+    my_compound_widget:
+        type: compound
+        attributes:
+            compounds_label: text
+            incomplete_structure:
+                # Test that defaults and coercion are used by having this attribute
+                # that never has a "complete" argument provided
+                type: structure
+                attributes:
+                    suffix:
+                        type: text
+                        default: !expr ' (my suffix)'
+        children:
+            compounds_child: ~
+        root:
+            type: app.my_primitive_widget
+            attributes:
+                primitives_label: !expr 'Some text for my label: ' ~ widget_attr('compounds_label') ~ widget_attr('incomplete_structure').suffix
+            children:
+                primitives_child:
+                    # Pass the child provided to this compound widget as "compounds_child"
+                    # through to the primitive widget as "primitives_child"
+                    type: child
+                    name: compounds_child
+
+page_views:
+    my_view:
+        title: !expr 'Widget definitions test'
+        description: A test of the widget definitions feature
+        widget:
+            type: group
+            children:
+                - type: app.my_compound_widget
+                  attributes:
+                      compounds_label: !expr 'Hello from the label attr!'
+                      # Only specify part of the structure, to ensure it is coerced
+                      incomplete_structure: !expr {}
+                  children:
+                      compounds_child:
+                          type: text
+                          text: !expr 'Hello from the child widget!'

@@ -159,7 +159,11 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         ValidationContextInterface $validationContext,
         ActNodeInterface $nodeQueriedFrom
     ) {
-        if (!$this->repeaterWidgetNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName())) {
+        $queryRequirement = $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom);
+
+        if (!$this->repeaterWidgetNode->getCaptureStaticBagModel()
+            ->definesStatic($query->getCaptureName())
+        ) {
             // The repeater does not define the capture - nothing to do
             return null;
         }
@@ -168,7 +172,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
             ->getCaptureStaticBagModel()
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
-                $validationContext->createActNodeQueryRequirement($query, $nodeQueriedFrom)
+                $queryRequirement
             );
     }
 
@@ -180,7 +184,9 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
      */
     public function queryForCaptureExistence(CaptureIsDefinedQuery $query)
     {
-        return $this->repeaterWidgetNode->getCaptureStaticBagModel()->definesStatic($query->getCaptureName()) ?: null;
+        return $this->repeaterWidgetNode
+            ->getCaptureStaticBagModel()
+            ->definesStatic($query->getCaptureName()) ?: null;
     }
 
     /**
@@ -194,6 +200,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         CaptureTypeQuery $query,
         ValidationContextInterface $validationContext
     ) {
+        $queryRequirement = $validationContext->createTypeQueryRequirement($query);
         $captureStaticBagModel = $this->repeaterWidgetNode->getCaptureStaticBagModel();
 
         if (!$captureStaticBagModel->definesStatic($query->getCaptureName())) {
@@ -203,7 +210,7 @@ class RepeaterWidgetSubValidationContext implements RepeaterWidgetSubValidationC
         return $captureStaticBagModel
             ->getStaticDefinitionByName(
                 $query->getCaptureName(),
-                $validationContext->createTypeQueryRequirement($query)
+                $queryRequirement
             )
             ->getStaticTypeDeterminer()->determine($validationContext);
     }

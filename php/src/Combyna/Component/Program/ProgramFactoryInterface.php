@@ -13,7 +13,6 @@ namespace Combyna\Component\Program;
 
 use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
-use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 use Combyna\Component\Ui\View\OverlayViewCollectionInterface;
 use Combyna\Component\Ui\View\PageViewCollectionInterface;
 
@@ -46,11 +45,7 @@ interface ProgramFactoryInterface
      * Creates a new ResourceRepository
      *
      * @param EnvironmentInterface $environment
-     * @param SignalDefinitionRepositoryInterface $signalDefinitionRepository
-     * @return ResourceRepositoryInterface
+     * @return RootResourceRepositoryInterface
      */
-    public function createResourceRepository(
-        EnvironmentInterface $environment,
-        SignalDefinitionRepositoryInterface $signalDefinitionRepository
-    );
+    public function createResourceRepository(EnvironmentInterface $environment);
 }

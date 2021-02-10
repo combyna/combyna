@@ -132,7 +132,7 @@ class ChildReferenceWidget implements ChildReferenceWidgetInterface
             );
         }
 
-        return $evaluationContextFactory->createCoreWidgetEvaluationContext(
+        return $evaluationContextFactory->createChildReferenceWidgetEvaluationContext(
             $parentContext,
             $this,
             $widgetState

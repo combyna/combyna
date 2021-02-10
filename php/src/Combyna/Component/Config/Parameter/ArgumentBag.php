@@ -49,6 +49,14 @@ class ArgumentBag implements ArgumentBagInterface
     /**
      * {@inheritdoc}
      */
+    public function getNamedArrayArgument($name)
+    {
+        return $this->arguments[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getNamedExpressionArgument($name)
     {
         return $this->arguments[$name];
@@ -57,7 +65,31 @@ class ArgumentBag implements ArgumentBagInterface
     /**
      * {@inheritdoc}
      */
-    public function getNamedTextArgument($name)
+    public function getNamedExpressionBagArgument($name)
+    {
+        return $this->arguments[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamedFixedStaticBagModelArgument($name)
+    {
+        return $this->arguments[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamedStringArgument($name)
+    {
+        return $this->arguments[$name];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getNamedWidgetArgument($name)
     {
         return $this->arguments[$name];
     }

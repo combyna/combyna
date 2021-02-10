@@ -12,9 +12,11 @@
 namespace Combyna\Component\Ui\Config\Act;
 
 use Combyna\Component\Bag\Config\Act\BagNodePromoter;
-use Combyna\Component\Environment\EnvironmentInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNodePromoter;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
+use Combyna\Component\Ui\Config\Promoter\WidgetNodePromoterInterface;
+use Combyna\Component\Ui\Widget\WidgetDefinitionCollectionInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionFactoryInterface;
 use Combyna\Component\Ui\Widget\WidgetDefinitionInterface;
 use LogicException;
@@ -47,7 +49,7 @@ class WidgetDefinitionNodePromoter
     private $widgetDefinitionFactory;
 
     /**
-     * @var WidgetNodePromoter
+     * @var WidgetNodePromoterInterface
      */
     private $widgetNodePromoter;
 
@@ -56,14 +58,14 @@ class WidgetDefinitionNodePromoter
      * @param EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter
      * @param StaticExpressionFactoryInterface $staticExpressionFactory
      * @param WidgetDefinitionFactoryInterface $widgetDefinitionFactory
-     * @param WidgetNodePromoter $widgetNodePromoter
+     * @param WidgetNodePromoterInterface $widgetNodePromoter
      */
     public function __construct(
         BagNodePromoter $bagNodePromoter,
         EventDefinitionReferenceNodePromoter $eventDefinitionReferenceNodePromoter,
         StaticExpressionFactoryInterface $staticExpressionFactory,
         WidgetDefinitionFactoryInterface $widgetDefinitionFactory,
-        WidgetNodePromoter $widgetNodePromoter
+        WidgetNodePromoterInterface $widgetNodePromoter
     ) {
         $this->bagNodePromoter = $bagNodePromoter;
         $this->eventDefinitionReferenceNodePromoter = $eventDefinitionReferenceNodePromoter;
@@ -76,19 +78,19 @@ class WidgetDefinitionNodePromoter
      * Creates a widget definition from its ACT node
      *
      * @param WidgetDefinitionNodeInterface $widgetDefinitionNode
-     * @param EnvironmentInterface $environment
+     * @param ResourceRepositoryInterface $resourceRepository
      * @return WidgetDefinitionInterface
      */
     public function promoteDefinition(
         WidgetDefinitionNodeInterface $widgetDefinitionNode,
-        EnvironmentInterface $environment
+        ResourceRepositoryInterface $resourceRepository
     ) {
         $attributeBagModel = $this->bagNodePromoter->promoteFixedStaticBagModel(
             $widgetDefinitionNode->getAttributeBagModel()
         );
         $eventDefinitionReferenceCollection = $this->eventDefinitionReferenceNodePromoter->promoteCollection(
             $widgetDefinitionNode->getEventDefinitionReferences(),
-            $environment
+            $resourceRepository
         );
 
         if ($widgetDefinitionNode instanceof CompoundWidgetDefinitionNode) {
@@ -105,7 +107,7 @@ class WidgetDefinitionNodePromoter
                 $this->widgetNodePromoter->promoteWidget(
                     'root',
                     $widgetDefinitionNode->getRootWidget(),
-                    $environment
+                    $resourceRepository
                 )
             );
         }
@@ -127,5 +129,27 @@ class WidgetDefinitionNodePromoter
         }
 
         throw new LogicException('Unknown widget definition type');
+    }
+
+    /**
+     * Promotes a set of WidgetDefinitionNodes to a WidgetDefinitionCollection
+     *
+     * @param WidgetDefinitionNodeInterface[] $widgetDefinitionNodes
+     * @param ResourceRepositoryInterface $resourceRepository
+     * @param string $libraryName
+     * @return WidgetDefinitionCollectionInterface
+     */
+    public function promoteCollection(
+        array $widgetDefinitionNodes,
+        ResourceRepositoryInterface $resourceRepository,
+        $libraryName
+    ) {
+        $widgetDefinitions = [];
+
+        foreach ($widgetDefinitionNodes as $widgetDefinitionNode) {
+            $widgetDefinitions[] = $this->promoteDefinition($widgetDefinitionNode, $resourceRepository);
+        }
+
+        return $this->widgetDefinitionFactory->createWidgetDefinitionCollection($widgetDefinitions, $libraryName);
     }
 }

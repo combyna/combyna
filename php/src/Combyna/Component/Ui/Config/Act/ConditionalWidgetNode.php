@@ -30,9 +30,10 @@ use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNodeInterface, WidgetNodeInterface
+class ConditionalWidgetNode extends AbstractActNode implements CoreWidgetNodeInterface, OptionalWidgetNodeInterface
 {
     const TYPE = 'conditional';
+    const WIDGET_TYPE = 'conditional';
 
     /**
      * @var WidgetNodeInterface|null
@@ -210,6 +211,6 @@ class ConditionalWidgetNode extends AbstractActNode implements OptionalWidgetNod
      */
     public function getWidgetDefinitionName()
     {
-        return self::TYPE;
+        return self::WIDGET_TYPE;
     }
 }

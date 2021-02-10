@@ -22,8 +22,10 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class MultipleTypeDeterminer implements TypeDeterminerInterface
+class MultipleTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'multiple';
+
     /**
      * @var TypeDeterminerInterface[]
      */

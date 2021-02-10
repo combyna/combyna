@@ -16,8 +16,8 @@ use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Config\Act\ActNodeInterface;
 use Combyna\Component\Event\Config\Act\EventDefinitionReferenceNode;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Query\Requirement\QueryRequirementInterface;
 
 /**
  * Interface WidgetDefinitionNodeInterface
@@ -45,10 +45,10 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      * Fetches a child widget definition by its name, if defined for this widget definition
      *
      * @param string $childName
-     * @param QueryRequirementInterface $queryRequirement
+     * @param DynamicActNodeAdopterInterface $dynamicActNodeAdopter
      * @return ChildWidgetDefinitionNode|null
      */
-    public function getChildDefinition($childName, QueryRequirementInterface $queryRequirement);
+    public function getChildDefinition($childName, DynamicActNodeAdopterInterface $dynamicActNodeAdopter);
 
     /**
      * Fetches all event definition references defined for this widget definition
@@ -68,10 +68,9 @@ interface WidgetDefinitionNodeInterface extends ActNodeInterface
      * Fetches the type of a value defined by this definition
      *
      * @param string $valueName
-     * @param QueryRequirementInterface $queryRequirement
      * @return TypeInterface
      */
-    public function getValueType($valueName, QueryRequirementInterface $queryRequirement);
+    public function getValueType($valueName);
 
     /**
      * Fetches the name of this widget definition

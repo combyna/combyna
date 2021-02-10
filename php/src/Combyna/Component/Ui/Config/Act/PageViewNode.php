@@ -11,7 +11,7 @@
 
 namespace Combyna\Component\Ui\Config\Act;
 
-use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
+use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNodeInterface;
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Behaviour\Spec\SubBehaviourSpecBuilderInterface;
 use Combyna\Component\Config\Act\AbstractActNode;
@@ -34,7 +34,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
     const TYPE = 'page-view';
 
     /**
-     * @var FixedStaticBagModelNode
+     * @var FixedStaticBagModelNodeInterface
      */
     private $attributeBagModelNode;
 
@@ -72,7 +72,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
      * @param string $name
      * @param ExpressionNodeInterface $titleExpressionNode
      * @param string $description
-     * @param FixedStaticBagModelNode $attributeBagModelNode
+     * @param FixedStaticBagModelNodeInterface $attributeBagModelNode
      * @param WidgetNodeInterface $rootWidgetNode
      * @param ViewStoreNode|null $storeNode
      * @param ExpressionNodeInterface|null $visibilityExpressionNode
@@ -81,7 +81,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
         $name,
         ExpressionNodeInterface $titleExpressionNode,
         $description,
-        FixedStaticBagModelNode $attributeBagModelNode,
+        FixedStaticBagModelNodeInterface $attributeBagModelNode,
         WidgetNodeInterface $rootWidgetNode,
         ViewStoreNode $storeNode = null,
         ExpressionNodeInterface $visibilityExpressionNode = null
@@ -140,7 +140,7 @@ class PageViewNode extends AbstractActNode implements ViewNodeInterface
     /**
      * Fetches the model for attributes of this view
      *
-     * @return FixedStaticBagModelNode
+     * @return FixedStaticBagModelNodeInterface
      */
     public function getAttributeBagModel()
     {

@@ -14,6 +14,7 @@ namespace Combyna\Component\Event;
 use Combyna\Component\Bag\FixedStaticBagModelInterface;
 use Combyna\Component\Bag\StaticBagInterface;
 use Combyna\Component\Environment\EnvironmentInterface;
+use Combyna\Component\Program\ResourceRepositoryInterface;
 
 /**
  * Class EventFactory
@@ -59,9 +60,9 @@ class EventFactory implements EventFactoryInterface
      */
     public function createEventDefinitionReferenceCollection(
         array $eventDefinitionReferences,
-        EnvironmentInterface $environment
+        ResourceRepositoryInterface $resourceRepository
     ) {
-        return new EventDefinitionReferenceCollection($eventDefinitionReferences, $environment);
+        return new EventDefinitionReferenceCollection($eventDefinitionReferences, $resourceRepository);
     }
 
     /**

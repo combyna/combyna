@@ -11,10 +11,13 @@
 
 namespace Combyna\Component\Signal;
 
+use Combyna\Component\Environment\Exception\LibraryNotInstalledException;
+use Combyna\Component\Signal\Exception\SignalDefinitionNotFoundException;
+
 /**
  * Interface SignalDefinitionRepositoryInterface
  *
- *
+ * A facade to allow addressing all signal definitions defined by installed libraries or the app itself
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -26,6 +29,8 @@ interface SignalDefinitionRepositoryInterface
      * @param string $libraryName
      * @param string $signalName
      * @return SignalDefinitionInterface
+     * @throws LibraryNotInstalledException
+     * @throws SignalDefinitionNotFoundException
      */
     public function getByName($libraryName, $signalName);
 }

@@ -17,7 +17,7 @@ use Combyna\Component\Type\AnyType;
 use Combyna\Component\Type\StaticListType;
 use Combyna\Component\Type\UnresolvedType;
 use Combyna\Component\Validator\Context\ValidationContextInterface;
-use Combyna\Component\Validator\Type\TypeDeterminerInterface;
+use Combyna\Component\Validator\Type\AbstractTypeDeterminer;
 
 /**
  * Class ListConcatReturnTypeDeterminer
@@ -29,8 +29,10 @@ use Combyna\Component\Validator\Type\TypeDeterminerInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ListConcatReturnTypeDeterminer implements TypeDeterminerInterface
+class ListConcatReturnTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'list.concat';
+
     /**
      * {@inheritdoc}
      */

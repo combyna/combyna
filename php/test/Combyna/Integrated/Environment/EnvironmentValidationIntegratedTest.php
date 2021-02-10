@@ -33,6 +33,7 @@ use Combyna\Component\Ui\Config\Act\CompoundWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\DefinedWidgetNode;
 use Combyna\Component\Ui\Config\Act\PrimitiveWidgetDefinitionNode;
 use Combyna\Component\Ui\Config\Act\TextWidgetNode;
+use Combyna\Component\Ui\Config\Act\WidgetDefinitionReferenceNode;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Combyna\Component\Validator\Type\PresolvedTypeDeterminer;
 use Combyna\Component\Validator\ValidationFactory;
@@ -110,6 +111,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                 ],
                 [
                     new SignalDefinitionNode(
+                        'my_lib',
                         'my_signal',
                         new FixedStaticBagModelNode([
                             new FixedStaticDefinitionNode(
@@ -167,8 +169,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
                             )
                         ],
                         new DefinedWidgetNode(
-                            'some_undefined_lib',
-                            'some_widget',
+                            new WidgetDefinitionReferenceNode('some_undefined_lib', 'some_widget'),
                             new ExpressionBagNode([
                                 'some_attr' => new UnknownExpressionTypeNode('unknown_expr_type')
                             ]),
@@ -202,6 +203,7 @@ class EnvironmentValidationIntegratedTest extends TestCase
             $environmentNode,
             [],
             [],
+            [],
             new HomeNode('app', 'home', new ExpressionBagNode([])),
             [],
             []
@@ -231,6 +233,9 @@ class EnvironmentValidationIntegratedTest extends TestCase
 
             'ACT node [environment].[library:my_lib].[compound-widget-def:my_widget].[defined-widget:root].[unknown-library-for-widget-definition]' .
             ' - Library "some_undefined_lib" does not exist in order to define widget definition "some_widget". :: ' .
+
+            'ACT node [environment].[library:my_lib].[compound-widget-def:my_widget].[defined-widget:root].[widget-definition-reference]' .
+            ' - Widget definition "some_undefined_lib.some_widget" is not defined. :: ' .
 
             'ACT node [environment].[library:my_lib].[compound-widget-def:my_widget].[defined-widget:root].[expression-bag].[unknown]' .
             ' - Expression is of unknown type "unknown_expr_type". :: ' .

@@ -269,6 +269,23 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAttribute(
+        $name,
+        ExpressionBagInterface $attributeExpressionBag,
+        EvaluationContextInterface $evaluationContext
+    ) {
+        return $this->attributeBagModel->coerceStatic(
+            $name,
+            $evaluationContext,
+            $attributeExpressionBag->hasExpression($name) ?
+                $attributeExpressionBag->getExpression($name)->toStatic($evaluationContext) :
+                null
+        );
+    }
+
+    /**
      * Evaluates and returns the default expression for a widget value
      *
      * @param string $valueName
@@ -301,10 +318,14 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
      *
      * @param string $valueName
      * @param string[]|int[] $widgetStatePath
+     * @param ViewEvaluationContextInterface $evaluationContext
      * @return StaticInterface
      */
-    public function getWidgetValue($valueName, array $widgetStatePath)
-    {
+    public function getWidgetValue(
+        $valueName,
+        array $widgetStatePath,
+        ViewEvaluationContextInterface $evaluationContext
+    ) {
         if (!array_key_exists($valueName, $this->valueNameToProviderCallableMap)) {
             throw new LogicException(
                 sprintf(
@@ -348,7 +369,8 @@ class PrimitiveWidgetDefinition implements WidgetDefinitionInterface
             );
         }
 
-        return $valueStatic;
+        // Coerce the static to match the type, so that any incomplete values are made complete
+        return $valueType->coerceStatic($valueStatic, $evaluationContext);
     }
 
     /**

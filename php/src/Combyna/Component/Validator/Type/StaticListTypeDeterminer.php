@@ -22,8 +22,10 @@ use Combyna\Component\Validator\Context\ValidationContextInterface;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class StaticListTypeDeterminer implements TypeDeterminerInterface
+class StaticListTypeDeterminer extends AbstractTypeDeterminer
 {
+    const TYPE = 'list';
+
     /**
      * @var TypeDeterminerInterface
      */

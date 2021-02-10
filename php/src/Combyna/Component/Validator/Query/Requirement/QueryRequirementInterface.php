@@ -11,26 +11,31 @@
 
 namespace Combyna\Component\Validator\Query\Requirement;
 
-use Combyna\Component\Config\Act\DynamicActNodeInterface;
 use Combyna\Component\Type\TypeInterface;
+use Combyna\Component\Validator\Config\Act\DynamicActNodeAdopterInterface;
 use Combyna\Component\Validator\Type\TypeDeterminerInterface;
 
 /**
  * Interface QueryRequirementInterface
  *
+ * Passed into getter methods for definition ACT nodes (eg. "get widget definition from library")
+ * in order to allow any dynamically-created ones (usually for "unknown" or "invalid" definitions)
+ * to be added to the ACT.
+ *
+ * Inside a non-definition ACT node class, create a DynamicContainerNode, add it as a child
+ * and dynamically add children to that rather than passing in a QueryRequirement.
+ *
  * @author Dan Phillimore <dan@ovms.co>
  */
-interface QueryRequirementInterface
+interface QueryRequirementInterface extends DynamicActNodeAdopterInterface
 {
     /**
-     * Applies the validation for the provided dynamically-created ACT node
-     *
-     * @param DynamicActNodeInterface $actNode
-     */
-    public function adoptDynamicActNode(DynamicActNodeInterface $actNode);
-
-    /**
      * Determines a type for the current validation context
+     *
+     * @deprecated We should never be resolving a type from where a definition
+     *             was used (eg. a widget using a widget definition), only from
+     *             where it was defined (eg. the LibraryNode) which should add it
+     *             to its DynamicContainerNode.
      *
      * @param TypeDeterminerInterface $typeDeterminer
      * @return TypeInterface

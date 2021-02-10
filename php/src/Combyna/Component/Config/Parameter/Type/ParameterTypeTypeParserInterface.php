@@ -12,7 +12,7 @@
 namespace Combyna\Component\Config\Parameter\Type;
 
 /**
- * Interface ParameterTypeParserInterface
+ * Interface ParameterTypeTypeParserInterface
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
