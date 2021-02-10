@@ -11,7 +11,6 @@
 
 namespace Combyna\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Act\AssuredExpressionNode;
 use Combyna\Component\Expression\TextExpression;
 
@@ -25,14 +24,14 @@ class AssuredExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'assured';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
     /**
-     * @param ExpressionConfigParser $configParser
+     * @param ExpressionConfigParserInterface $configParser
      */
-    public function __construct(ExpressionConfigParser $configParser)
+    public function __construct(ExpressionConfigParserInterface $configParser)
     {
         $this->configParser = $configParser;
     }

@@ -16,21 +16,21 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Signal validation test'
+        title: "='Signal validation test'"
         description: A test of the validation of the signal feature
         widget:
             type: group
             children:
                 - type: gui.button
                   attributes:
-                      label: !expr 'My button'
+                      label: "='My button'"
                   triggers:
                       gui.click:
                           instructions:
                               - type: signal
                                 signal: app.my_signal_with_no_defined_payload
                                 payload:
-                                    an_undefined_static: !expr 'I cannot be set'
+                                    an_undefined_static: "='I cannot be set'"
         store:
             signal_handlers:
                 app.my_unknown_signal:
@@ -38,4 +38,4 @@ page_views:
                     instructions:
                         - type: set_slot
                           slot: an_unknown_slot
-                          value: !expr signal_payload('an_unknown_payload_static')
+                          value: "=signal_payload('an_unknown_payload_static')"

@@ -45,7 +45,10 @@ class ExpressionParameterTypeParser implements ParameterTypeTypeParserInterface
         ExpressionParameterType $type,
         $value
     ) {
-        return is_array($value);
+        // Allow any array or string value for expressions: the parser should return a special type of expression
+        // to represent an invalid expression format
+        // TODO: Allow number/boolean literals to be specified as a shorthand?
+        return is_array($value) || is_string($value);
     }
 
     /**
@@ -72,12 +75,12 @@ class ExpressionParameterTypeParser implements ParameterTypeTypeParserInterface
      * Fetches the actual argument value for this type from its raw value
      *
      * @param ExpressionParameterType $type
-     * @param array $rawValue
+     * @param array|string $rawValue Allow any type of argument, but should be an array or string
      * @return ExpressionNodeInterface
      */
     public function parseArgument(
         ExpressionParameterType $type,
-        array $rawValue
+        $rawValue
     ) {
         return $this->expressionLoader->load($rawValue);
     }

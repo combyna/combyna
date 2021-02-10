@@ -11,9 +11,9 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Act\AssuredExpressionNode;
 use Combyna\Component\Expression\Config\Loader\AssuredExpressionLoader;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Component\Expression\TextExpression;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
@@ -27,7 +27,7 @@ use Prophecy\Prophecy\ObjectProphecy;
 class AssuredExpressionLoaderTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|ExpressionConfigParser
+     * @var ObjectProphecy|ExpressionConfigParserInterface
      */
     private $configParser;
 
@@ -38,7 +38,7 @@ class AssuredExpressionLoaderTest extends TestCase
 
     public function setUp()
     {
-        $this->configParser = $this->prophesize(ExpressionConfigParser::class);
+        $this->configParser = $this->prophesize(ExpressionConfigParserInterface::class);
 
         $this->loader = new AssuredExpressionLoader($this->configParser->reveal());
     }

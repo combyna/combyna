@@ -81,6 +81,7 @@ class ClientFactoryTest extends TestCase
             )
             ->willReturn($this->environmentNode);
         $this->combyna->onBroadcastSignal(Argument::type(Closure::class))->willReturn();
+        $this->combyna->onRouteNavigated(Argument::type(Closure::class))->willReturn();
         $this->combyna->useProductionMode()->willReturn();
 
         $this->factory = new ClientFactory(
@@ -163,6 +164,16 @@ class ClientFactoryTest extends TestCase
         $this->factory->onBroadcastSignal($callback);
 
         $this->combyna->onBroadcastSignal(Argument::is($callback))
+            ->shouldHaveBeenCalledOnce();
+    }
+
+    public function testOnRouteNavigatedAsksCombynaToAddTheListener()
+    {
+        $callback = function () {};
+
+        $this->factory->onRouteNavigated($callback);
+
+        $this->combyna->onRouteNavigated(Argument::is($callback))
             ->shouldHaveBeenCalledOnce();
     }
 

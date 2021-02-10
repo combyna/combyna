@@ -13,6 +13,7 @@ namespace Combyna\Component\ExpressionLanguage\Config\Act;
 
 use Combyna\Component\Behaviour\Spec\BehaviourSpecBuilderInterface;
 use Combyna\Component\Expression\Config\Act\AbstractExpressionNode;
+use Combyna\Component\Expression\Config\Act\InvalidExpressionNodeInterface;
 use Combyna\Component\Validator\Constraint\KnownFailureConstraint;
 use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
 
@@ -23,7 +24,7 @@ use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnparsableExpressionNode extends AbstractExpressionNode
+class UnparsableExpressionNode extends AbstractExpressionNode implements InvalidExpressionNodeInterface
 {
     const TYPE = 'unparsable';
 

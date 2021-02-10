@@ -24,7 +24,7 @@ use Combyna\Component\Validator\Type\UnresolvedTypeDeterminer;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class UnknownExpressionNode extends AbstractExpressionNode implements DynamicActNodeInterface
+class UnknownExpressionNode extends AbstractExpressionNode implements DynamicActNodeInterface, InvalidExpressionNodeInterface
 {
     const TYPE = 'unknown';
 

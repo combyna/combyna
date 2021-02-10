@@ -24,11 +24,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Bootstrap implements BootstrapInterface
 {
     /**
-     * @var string|null
-     */
-    private $cachePath;
-
-    /**
      * @var BootstrapConfigInterface
      */
     private $config;
@@ -54,15 +49,30 @@ class Bootstrap implements BootstrapInterface
     private $originator;
 
     /**
+     * @var string|null
+     */
+    private $relativeCachePath;
+
+    /**
+     * @var string|null
+     */
+    private $rootPath;
+
+    /**
      * @param BootstrapConfigInterface|null $config
      * @param string|null $originator
-     * @param string|null $cachePath
+     * @param string|null $rootPath
+     * @param string|null $relativeCachePath
      * @param bool $debug
      */
     public function __construct(
         BootstrapConfigInterface $config = null,
         $originator = null,
-        $cachePath = null,   // Path to the directory where the compiled container etc. will be stored
+        // Path to the project directory
+        $rootPath = null,
+        // Path to the directory where the compiled container etc. will be stored,
+        // relative to the root path
+        $relativeCachePath = null,
         $debug = false // Whether debug mode is enabled
     ) {
         if ($config === null) {
@@ -78,10 +88,11 @@ class Bootstrap implements BootstrapInterface
             );
         }
 
-        $this->cachePath = $cachePath;
         $this->config = $config;
         $this->debug = $debug;
         $this->originator = $originator;
+        $this->relativeCachePath = $relativeCachePath;
+        $this->rootPath = $rootPath;
     }
 
     /**
@@ -95,7 +106,8 @@ class Bootstrap implements BootstrapInterface
                 $this->config->getPlugins(),
                 $this->originator,
                 $this->debug,
-                $this->cachePath
+                $this->rootPath,
+                $this->relativeCachePath
             );
         }
 

@@ -105,6 +105,16 @@ class ClientFactory
     }
 
     /**
+     * Adds a callback to be called when any route is navigated to
+     *
+     * @param callable $callback
+     */
+    public function onRouteNavigated(callable $callback)
+    {
+        $this->combyna->onRouteNavigated($callback);
+    }
+
+    /**
      * Switches to production mode (non-reversible, and can only be done before any app is loaded)
      */
     public function useProductionMode()

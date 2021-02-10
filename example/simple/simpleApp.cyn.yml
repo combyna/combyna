@@ -25,7 +25,7 @@ routes:
 page_views:
     list:
         attributes: ~
-        title: !expr 'My simple demo'
+        title: "='My simple demo'"
         description: The simplest Combyna demo, with two buttons and a textbox
         widget:
             type: gui.box
@@ -36,15 +36,15 @@ page_views:
                     children:
                         -
                             type: text
-                            text: !expr 'Click one of the buttons to change the text: '
+                            text: "='Click one of the buttons to change the text: '"
                         -
                             type: gui.textbox
                             attributes:
-                                value: !expr view_query('get_current_text')
+                                value: "=view_query('get_current_text')"
                         -
                             type: gui.button
                             attributes:
-                                label: !expr trans('app.button_title', new_text: trans('app.first_new_text'))
+                                label: "=trans('app.button_title', new_text: trans('app.first_new_text'))"
                             tags:
                                 - list.first_set_text_button
                             graphics: ~
@@ -56,11 +56,11 @@ page_views:
                                             type: signal
                                             signal: app.change_text
                                             payload:
-                                                new_text: !expr trans('app.first_new_text')
+                                                new_text: "=trans('app.first_new_text')"
                         -
                             type: gui.button
                             attributes:
-                                label: !expr trans('app.button_title', new_text: trans('app.second_new_text'))
+                                label: "=trans('app.button_title', new_text: trans('app.second_new_text'))"
                             tags:
                                 - list.second_set_text_button
                             graphics: ~
@@ -72,17 +72,17 @@ page_views:
                                             type: signal
                                             signal: app.change_text
                                             payload:
-                                                new_text: !expr trans('app.second_new_text')
+                                                new_text: "=trans('app.second_new_text')"
         store:
             slots:
                 current_text:
                     type: text
-                    default: !expr trans('app.initial_text')
+                    default: "=trans('app.initial_text')"
             commands: ~
             queries:
                 get_current_text:
                     parameters: ~
-                    expression: !expr slot('current_text')
+                    expression: "=slot('current_text')"
             signal_handlers:
                 app.change_text:
                     guard: ~
@@ -90,7 +90,7 @@ page_views:
                         -
                             type: set_slot
                             slot: current_text
-                            value: !expr signal_payload('new_text')
+                            value: "=signal_payload('new_text')"
 embed_views: []
 overlay_views: []
 

@@ -8,11 +8,18 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Unparsable expression test'
+        title: "='Unparsable expression test'"
         description: A test of the expression parser error handling feature
         widget:
             type: group
             children:
                 - type: text
-                  text: >
-                      !expr this @ is most definitely [ an invalid } expression #
+                  text: "=this @ is most definitely [ an invalid } expression #"
+                - type: text
+                  text: "I am missing the leading formula equals sign"
+                - type: text
+                  text: false # Cannot use just a literal boolean (for now?)
+                - type: text
+                  text: 21 # Cannot use just a literal number (for now?)
+                - type: text
+                  text: iaminvalid # Cannot use just a literal string (for now?)

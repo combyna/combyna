@@ -3,22 +3,22 @@
     "description": "Combyna - build things.",
     "autoload": {
         "psr-4": {
-            "Combyna\\": ["php/src/Combyna/", "php/dist/Combyna/"]
+            "Combyna\\": ["php/src/Combyna/"]
         }
     },
     "require": {
-        "symfony/event-dispatcher": "~2.8.0",
-        "symfony/http-foundation": "~2.8.0",
-        "symfony/yaml": "~2.8.0",
+        "symfony/event-dispatcher": "^3.4",
+        "symfony/http-foundation": "^3.4",
+        "symfony/yaml": "^3.4",
         "combyna/php-peg": "^2.0",
-        "symfony/dependency-injection": "~2.8.0",
-        "symfony/config": "~2.8.0",
-        "symfony/routing": "~2.8.0",
-        "symfony/translation": "~2.8.0"
+        "symfony/dependency-injection": "^3.4",
+        "symfony/config": "^3.4",
+        "symfony/routing": "^3.4",
+        "symfony/translation": "^3.4"
     },
     "require-dev": {
         "combyna/gui-plugin": "dev-master",
-        "phpunit/phpunit": "^4.6",
+        "phpunit/phpunit": "^4.8",
         "elliotchance/concise": "^2.1"
     },
     "scripts": {

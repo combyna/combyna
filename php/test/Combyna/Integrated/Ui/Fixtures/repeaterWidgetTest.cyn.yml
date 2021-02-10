@@ -16,21 +16,21 @@ routes:
 
 page_views:
     item_viewer:
-        title: !expr 'Repeater widgets test'
+        title: "='Repeater widgets test'"
         description: A test of the repeater widgets feature
         widget:
             type: group
             children:
                 - type: text
-                  text: !expr 'Selected item: ' ~ view_query('get_selected_item')
+                  text: "='Selected item: ' ~ view_query('get_selected_item')"
 
                 - type: gui.horizontal_rule
 
                 - type: text
-                  text: !expr 'Items: '
+                  text: "='Items: '"
                 - type: repeater
                   items: >
-                      !expr [
+                      =[
                           'first',
                           'second',
                           'third'
@@ -42,7 +42,8 @@ page_views:
                       children:
                           - type: gui.button
                             attributes:
-                                label: !expr 'Select item "' ~ this_item ~ '"'
+                                label: >
+                                    ='Select item "' ~ this_item ~ '"'
                             tags:
                                 - list_view.select_item_button
                             triggers:
@@ -51,19 +52,19 @@ page_views:
                                         - type: signal
                                           signal: app.select_item
                                           payload:
-                                              item_text: !expr this_item
+                                              item_text: "=this_item"
 
         store:
             slots:
                 selected_item:
                     type: text|nothing
-                    default: !expr nothing
+                    default: "=nothing"
             commands: ~
             queries:
                 get_selected_item:
                     parameters: ~
                     expression: >
-                        !expr guard(
+                        =guard(
                             name: 'my_non_nothing_selection',
                             constraint: 'known-type-value',
                             expression: slot('selected_item'),
@@ -77,4 +78,4 @@ page_views:
                     instructions:
                         - type: set_slot
                           slot: selected_item
-                          value: !expr signal_payload('item_text')
+                          value: "=signal_payload('item_text')"

@@ -12,19 +12,20 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Widget events test'
+        title: "='Widget events test'"
         description: A test of the widget events feature
         widget:
             type: group
             children:
                 - type: text
-                  text: !expr 'How the thing was switched: "' ~ view_query('get_how_it_was_switched') ~ '"'
+                  text: >
+                      ='How the thing was switched: "' ~ view_query('get_how_it_was_switched') ~ '"'
                 - type: widget_events.a_generic_compound_wrapper
                   children:
                       contents:
                           type: widget_events.switchable_thing
                           attributes:
-                              label: !expr 'Switch me!'
+                              label: "='Switch me!'"
                           tags:
                               - the_switchable_thing
                           triggers:
@@ -33,21 +34,21 @@ page_views:
                                       - type: signal
                                         signal: app.switchable_thing_was_switched
                                         payload:
-                                            how_it_was_switched: !expr event_payload('how').myInnerValue
+                                            how_it_was_switched: "=event_payload('how').myInnerValue"
 
         store:
             slots:
                 how_it_was_switched:
                     type: text
-                    default: !expr '(Not yet switched)'
+                    default: "='(Not yet switched)'"
             commands: ~
             queries:
                 get_how_it_was_switched:
                     parameters: ~
-                    expression: !expr slot('how_it_was_switched')
+                    expression: "=slot('how_it_was_switched')"
             signal_handlers:
                 app.switchable_thing_was_switched:
                     instructions:
                         - type: set_slot
                           slot: how_it_was_switched
-                          value: !expr signal_payload('how_it_was_switched')
+                          value: "=signal_payload('how_it_was_switched')"

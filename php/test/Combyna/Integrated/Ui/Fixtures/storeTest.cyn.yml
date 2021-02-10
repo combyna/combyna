@@ -12,7 +12,7 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Stores test'
+        title: "='Stores test'"
         description: A test of the stores feature
         widget:
             type: group
@@ -21,25 +21,26 @@ page_views:
                     the_entered_age: number
             children:
                 - type: text
-                  text: !expr 'The age: "' ~ view_query('get_age') ~ '"'
-
-                - type: text
-                  # Only specify part of the structure, to ensure it is coerced
                   text: >
-                      !expr 'Double the age: "' ~
-                            view_query('get_age_multiplied_by', multiplier: 2, incomplete_structure: {}) ~
-                            '"'
+                      ='The age: "' ~ view_query('get_age') ~ '"'
+
+                # Only specify part of the structure, to ensure it is coerced
+                - type: text
+                  text: >
+                      ='Double the age: "' ~
+                       view_query('get_age_multiplied_by', multiplier: 2, incomplete_structure: {}) ~
+                       '"'
 
                 - type: gui.textbox
                   attributes:
-                      value: !expr '4'
+                      value: "='4'"
                   captures:
                       set:
-                          the_entered_age: !expr number(widget_value('text'))
+                          the_entered_age: "=number(widget_value('text'))"
 
                 - type: gui.button
                   attributes:
-                      label: !expr 'Save new age'
+                      label: "='Save new age'"
                   tags:
                       - my_app.save_new_age_button
                   triggers:
@@ -48,16 +49,16 @@ page_views:
                               - type: signal
                                 signal: app.store_new_age
                                 payload:
-                                    new_age: !expr capture('the_entered_age')
+                                    new_age: "=capture('the_entered_age')"
         store:
             slots:
                 the_stored_age:
                     type: number
-                    default: !expr 4
+                    default: "=4"
             commands: ~
             queries:
                 get_age:
-                    expression: !expr slot('the_stored_age')
+                    expression: "=slot('the_stored_age')"
                 get_age_multiplied_by:
                     parameters:
                         multiplier: number
@@ -68,12 +69,12 @@ page_views:
                             attributes:
                                 multiplier:
                                     type: number
-                                    default: !expr 1
-                    expression: !expr slot('the_stored_age') * multiplier * incomplete_structure.multiplier
+                                    default: "=1"
+                    expression: "=slot('the_stored_age') * multiplier * incomplete_structure.multiplier"
             signal_handlers:
                 app.store_new_age:
                     guard: ~
                     instructions:
                         - type: set_slot
                           slot: the_stored_age
-                          value: !expr signal_payload('new_age')
+                          value: "=signal_payload('new_age')"

@@ -20,16 +20,16 @@ widgets:
         root:
             type: my_invalid_lib.my_invalid_primitive_widget
             attributes:
-                my_invalid_attr: !expr This (!) is not a valid expression inside definition!
+                my_invalid_attr: "=This (!) is not a valid expression inside definition!"
             children:
                 primitives_child:
                     type: my_invalid_lib.my_invalid_widget_definition
 
 page_views:
     my_view:
-        title: !expr 'Widget definitions validation test'
+        title: "='Widget definitions validation test'"
         description: A test of the validation for the widget definitions feature
         widget:
             type: app.my_invalid_app_compound
             attributes:
-                compounds_label: !expr This (!) is not a valid expression for label!
+                compounds_label: "=This (!) is not a valid expression for label!"

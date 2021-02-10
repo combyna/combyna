@@ -12,8 +12,8 @@
 namespace Combyna\Component\Ui\Store\Config\Loader;
 
 use Combyna\Component\Bag\Config\Loader\ExpressionBagLoaderInterface;
-use Combyna\Component\Config\Loader\ExpressionConfigParser;
 use Combyna\Component\Expression\Config\Loader\BuiltinLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Component\Ui\Store\Config\Act\ViewStoreQueryExpressionNode;
 
 /**
@@ -26,7 +26,7 @@ class ViewStoreQueryExpressionLoader implements BuiltinLoaderInterface
     const BUILTIN_NAME = 'view_query';
 
     /**
-     * @var ExpressionConfigParser
+     * @var ExpressionConfigParserInterface
      */
     private $configParser;
 
@@ -36,11 +36,11 @@ class ViewStoreQueryExpressionLoader implements BuiltinLoaderInterface
     private $expressionBagLoader;
 
     /**
-     * @param ExpressionConfigParser $configParser
+     * @param ExpressionConfigParserInterface $configParser
      * @param ExpressionBagLoaderInterface $expressionBagLoader
      */
     public function __construct(
-        ExpressionConfigParser $configParser,
+        ExpressionConfigParserInterface $configParser,
         ExpressionBagLoaderInterface $expressionBagLoader
     ) {
         $this->configParser = $configParser;

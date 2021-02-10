@@ -8,7 +8,7 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Structure expression test'
+        title: "='Structure expression test'"
         description: A test of the structure expression feature
         widget:
             type: group
@@ -21,17 +21,17 @@ page_views:
                             my_second_attr: number
                             my_third_attr:
                                 type: number
-                                default: !expr 9876
+                                default: "=9876"
             children:
                 - type: gui.textbox
                   attributes:
-                      value: !expr 'Some default text'
+                      value: "='Some default text'"
                   captures:
                       set:
                           # As part of this, make sure that optional attributes do not need a value specified
                           # by not specifying an expression for "my_third_attr"
                           my_capture: >
-                              !expr {
+                              ={
                                   my_first_attr: widget_value('text'),
                                   my_second_attr: 1001
                               }
@@ -39,14 +39,14 @@ page_views:
                 # Make sure that a required attribute value may be fetched (simple case)
                 - type: text
                   text: >
-                      !expr 'First attribute has this value: ' ~ capture('my_capture').my_first_attr
+                      ='First attribute has this value: ' ~ capture('my_capture').my_first_attr
 
                 # Make sure that default attribute values may be relied on
                 - type: text
                   text: >
-                      !expr 'Third attribute has this value: ' ~ capture('my_capture').my_third_attr
+                      ='Third attribute has this value: ' ~ capture('my_capture').my_third_attr
 
                 # Make sure that attributes may be immediately dereferenced inline
                 - type: text
                   text: >
-                      !expr 'Immediate attribute has this value: ' ~ {my_immediate: 21}.my_immediate
+                      ='Immediate attribute has this value: ' ~ {my_immediate: 21}.my_immediate

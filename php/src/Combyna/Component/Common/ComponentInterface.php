@@ -12,7 +12,6 @@
 namespace Combyna\Component\Common;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * Interface ComponentInterface
@@ -31,7 +30,7 @@ interface ComponentInterface
     /**
      * Fetches the Symfony container extension defined for this component, if any
      *
-     * @return ExtensionInterface|null
+     * @return ComponentExtensionInterface|null
      */
     public function getContainerExtension();
 

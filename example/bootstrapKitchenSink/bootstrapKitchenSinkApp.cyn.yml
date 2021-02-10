@@ -16,7 +16,7 @@ routes:
 page_views:
     demo_page:
         attributes: ~
-        title: !expr 'Bootstrap plugin kitchen sink demo'
+        title: "='Bootstrap plugin kitchen sink demo'"
         description: A demonstration of all widget definitions provided by the Bootstrap plugin
         widget:
             type: gui.box
@@ -27,7 +27,7 @@ page_views:
                     children:
                         -
                             type: text
-                            text: !expr 'Bootstrap plugin widgets: '
+                            text: "='Bootstrap plugin widgets: '"
                         -
                             type: bootstrap.breadcrumb
                             attributes: ~

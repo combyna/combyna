@@ -26,6 +26,7 @@ use Combyna\Component\Framework\Mode\DevelopmentMode;
 use Combyna\Component\Framework\Mode\ProductionMode;
 use Combyna\Component\Plugin\LibraryConfigCollection;
 use Combyna\Component\Program\Validation\Validator\NodeValidatorInterface;
+use Combyna\Component\Router\RouterEvents;
 use Combyna\Component\Signal\SignalEvents;
 use Combyna\Component\Validator\Context\RootValidationContextInterface;
 use Combyna\Harness\TestCase;
@@ -248,6 +249,16 @@ class CombynaTest extends TestCase
         $this->combyna->onBroadcastSignal($callback);
 
         $this->eventDispatcher->addListener(SignalEvents::BROADCAST_SIGNAL_DISPATCHED, Argument::is($callback))
+            ->shouldHaveBeenCalledOnce();
+    }
+
+    public function testOnRouteNavigatedAddsTheListenerForTheCorrectEvent()
+    {
+        $callback = function () {};
+
+        $this->combyna->onRouteNavigated($callback);
+
+        $this->eventDispatcher->addListener(RouterEvents::ROUTE_NAVIGATED, Argument::is($callback))
             ->shouldHaveBeenCalledOnce();
     }
 

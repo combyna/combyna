@@ -11,11 +11,13 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Loader;
 
-use Combyna\Component\Config\Loader\ConfigParser;
+use Combyna\Component\Config\Exception\ArgumentParseException;
+use Combyna\Component\Config\Parameter\ArgumentBagInterface;
 use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
+use Combyna\Component\Expression\Config\Act\UnknownExpressionNode;
 use Combyna\Component\Expression\Config\Loader\BinaryArithmeticExpressionLoader;
-use Combyna\Component\Expression\Config\Loader\ExpressionLoaderInterface;
+use Combyna\Component\Expression\Config\Loader\ExpressionConfigParserInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -28,14 +30,14 @@ use Prophecy\Prophecy\ObjectProphecy;
 class BinaryArithmeticExpressionLoaderTest extends TestCase
 {
     /**
-     * @var ObjectProphecy|ConfigParser
+     * @var ObjectProphecy|ArgumentBagInterface
      */
-    private $configParser;
+    private $argumentBag;
 
     /**
-     * @var ObjectProphecy|ExpressionLoaderInterface
+     * @var ObjectProphecy|ExpressionConfigParserInterface
      */
-    private $expressionLoader;
+    private $configParser;
 
     /**
      * @var BinaryArithmeticExpressionLoader
@@ -44,18 +46,10 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
 
     public function setUp()
     {
-        $this->configParser = $this->prophesize(ConfigParser::class);
-        $this->expressionLoader = $this->prophesize(ExpressionLoaderInterface::class);
+        $this->argumentBag = $this->prophesize(ArgumentBagInterface::class);
+        $this->configParser = $this->prophesize(ExpressionConfigParserInterface::class);
 
-        $this->configParser->getElement(Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->will(function (array $args) {
-                return $args[0][$args[1]];
-            });
-
-        $this->loader = new BinaryArithmeticExpressionLoader(
-            $this->configParser->reveal(),
-            $this->expressionLoader->reveal()
-        );
+        $this->loader = new BinaryArithmeticExpressionLoader($this->configParser->reveal());
     }
 
     public function testLoadReturnsACorrectlyBuiltBinaryArithmeticExpressionNode()
@@ -74,19 +68,36 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
         ];
         $leftOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
         $rightOperandExpressionNode = $this->prophesize(ExpressionNodeInterface::class);
-        $this->expressionLoader->load($config['left'])->willReturn($leftOperandExpressionNode->reveal());
-        $this->expressionLoader->load($config['right'])->willReturn($rightOperandExpressionNode->reveal());
+        $this->configParser->parseArguments($config, Argument::any())
+            ->willReturn($this->argumentBag);
+        $this->argumentBag->getNamedExpressionArgument('left')
+            ->willReturn($leftOperandExpressionNode);
+        $this->argumentBag->getNamedStringArgument('operator')
+            ->willReturn('+');
+        $this->argumentBag->getNamedExpressionArgument('right')
+            ->willReturn($rightOperandExpressionNode);
 
         $resultExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultExpressionNode)->isAnInstanceOf(BinaryArithmeticExpressionNode::class);
-        $this->assert($resultExpressionNode->getLeftOperandExpression())->isTheSameAs($leftOperandExpressionNode->reveal());
-        $this->assert($resultExpressionNode->getOperator())->isTheSameAs('+');
-        $this->assert($resultExpressionNode->getRightOperandExpression())->isTheSameAs($rightOperandExpressionNode->reveal());
+        self::assertInstanceOf(BinaryArithmeticExpressionNode::class, $resultExpressionNode);
+        self::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
+        self::assertSame('+', $resultExpressionNode->getOperator());
+        self::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
+    }
+
+    public function testLoadReturnsAnUnknownExpressionNodeWhenParseFails()
+    {
+        $config = ['my' => 'invalid config'];
+        $this->configParser->parseArguments($config, Argument::any())
+            ->willThrow(new ArgumentParseException('Oh no, the arg parse failed!'));
+
+        $resultExpressionNode = $this->loader->load($config);
+
+        self::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('binary-arithmetic');
+        self::assertSame('binary-arithmetic', $this->loader->getType());
     }
 }

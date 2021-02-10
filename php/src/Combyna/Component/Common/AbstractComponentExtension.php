@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-abstract class AbstractComponentExtension extends Extension
+abstract class AbstractComponentExtension extends Extension implements ComponentExtensionInterface
 {
     /**
      * @var ComponentInterface
@@ -43,7 +43,14 @@ abstract class AbstractComponentExtension extends Extension
      */
     public function load(array $configs, ContainerBuilder $containerBuilder)
     {
-        $fileLocator = new FileLocator($this->component->getDirectory() . '/Resources/config');
+        $configDirPath = $this->component->getDirectory() . '/Resources/config';
+
+        if (!is_dir($configDirPath . '/services')) {
+            // Component does not have any service definition config files
+            return;
+        }
+
+        $fileLocator = new FileLocator($configDirPath);
         $loader = new DirectoryLoader($containerBuilder, $fileLocator);
         $loader->setResolver(new LoaderResolver([
             new YamlFileLoader($containerBuilder, $fileLocator),

@@ -11,6 +11,7 @@
 
 namespace Combyna\Component\Common\DependencyInjection\Compiler;
 
+use Combyna\Component\Common\ComponentExtensionInterface;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
@@ -55,7 +56,9 @@ class MergeExtensionConfigurationPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         foreach ($this->extensions as $extension) {
-            if (!count($container->getExtensionConfig($extension->getAlias()))) {
+            if ($extension instanceof ComponentExtensionInterface &&
+                !count($container->getExtensionConfig($extension->getAlias()))
+            ) {
                 $container->loadFromExtension($extension->getAlias(), []);
             }
         }

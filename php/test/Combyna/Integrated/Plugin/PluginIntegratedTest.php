@@ -12,6 +12,7 @@
 namespace Combyna\Integrated\Plugin;
 
 use Combyna\CombynaBootstrap;
+use Combyna\Component\Common\ComponentExtensionInterface;
 use Combyna\Component\Framework\Originators;
 use Combyna\Component\Plugin\PluginInterface;
 use Combyna\Component\Plugin\SubPluginInterface;
@@ -20,7 +21,6 @@ use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 
 /**
  * Class PluginIntegratedTest
@@ -39,8 +39,8 @@ class PluginIntegratedTest extends TestCase
     public function setUp()
     {
         $this->plugin = $this->prophesize(PluginInterface::class);
-        /** @var ObjectProphecy|ExtensionInterface $pluginExtension */
-        $pluginExtension = $this->prophesize(ExtensionInterface::class);
+        /** @var ObjectProphecy|ComponentExtensionInterface $pluginExtension */
+        $pluginExtension = $this->prophesize(ComponentExtensionInterface::class);
         $pluginExtension->getAlias()->willReturn('Test');
         $pluginExtension->getNamespace()->willReturn('ns');
         $pluginExtension->load(Argument::type('array'), Argument::type(ContainerBuilder::class))
@@ -77,8 +77,8 @@ class PluginIntegratedTest extends TestCase
     {
         /** @var ObjectProphecy|SubPluginInterface $subPlugin */
         $subPlugin = $this->prophesize(SubPluginInterface::class);
-        /** @var ObjectProphecy|ExtensionInterface $subPluginExtension */
-        $subPluginExtension = $this->prophesize(ExtensionInterface::class);
+        /** @var ObjectProphecy|ComponentExtensionInterface $subPluginExtension */
+        $subPluginExtension = $this->prophesize(ComponentExtensionInterface::class);
         $subPluginExtension->getAlias()->willReturn('Test');
         $subPluginExtension->getNamespace()->willReturn('ns');
         $subPluginExtension->load(Argument::type('array'), Argument::type(ContainerBuilder::class))
@@ -109,8 +109,8 @@ class PluginIntegratedTest extends TestCase
     {
         /** @var ObjectProphecy|SubPluginInterface $subPlugin */
         $subPlugin = $this->prophesize(SubPluginInterface::class);
-        /** @var ObjectProphecy|ExtensionInterface $subPluginExtension */
-        $subPluginExtension = $this->prophesize(ExtensionInterface::class);
+        /** @var ObjectProphecy|ComponentExtensionInterface $subPluginExtension */
+        $subPluginExtension = $this->prophesize(ComponentExtensionInterface::class);
         $subPluginExtension->getAlias()->willReturn('Test');
         $subPluginExtension->getNamespace()->willReturn('ns');
         $subPluginExtension->load(Argument::type('array'), Argument::type(ContainerBuilder::class))

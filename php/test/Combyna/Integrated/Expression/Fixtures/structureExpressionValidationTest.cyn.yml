@@ -8,7 +8,7 @@ routes:
 
 page_views:
     my_view:
-        title: !expr 'Structure expression test'
+        title: "='Structure expression test'"
         description: A test of the structure expression feature
         widget:
             type: group
@@ -20,7 +20,7 @@ page_views:
                             my_attr_with_invalid_type: my_invalid_attr_type
                             my_attr_with_invalid_default:
                                 type: text
-                                default: '!expr my @ unparsable default expression'
+                                default: "=my @ unparsable default expression"
                             my_valid_attr: number
                     your_capture:
                         type: structure
@@ -28,23 +28,23 @@ page_views:
                             # Check that structure attribute defaults may be relied on
                             my_valid_attr_that_wont_have_a_value:
                                 type: number
-                                default: !expr 1001
+                                default: "=1001"
             children:
                 - type: gui.textbox
                   attributes:
-                      value: !expr 'Some default text'
+                      value: "='Some default text'"
                   captures:
                       set:
                           my_capture: >
-                              !expr {
+                              ={
                                   my_attr_with_invalid_type: widget_value('text'),
                                   my_attr_with_invalid_default: 1001,
                                   my_valid_attr: 'I am not valid as I am not a number'
                               }
                           # Check that empty structure values are allowed
                           your_capture: >
-                              !expr {}
+                              ={}
 
                 - type: text
                   text: >
-                      !expr 'Trying to fetch an undefined attr: ' ~ capture('my_capture').my_undefined_attr
+                      ='Trying to fetch an undefined attr: ' ~ capture('my_capture').my_undefined_attr

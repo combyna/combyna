@@ -70,7 +70,7 @@ class RouterState implements RouterStateInterface
      */
     public function withRoute(RouteInterface $route, StaticBagInterface $routeArgumentBag)
     {
-        if ($route === $this->route && $routeArgumentBag === $this->routeArgumentBag) {
+        if ($route === $this->route && $routeArgumentBag->equals($this->routeArgumentBag)) {
             // Route has not changed: no need to create a new state
             return $this;
         }

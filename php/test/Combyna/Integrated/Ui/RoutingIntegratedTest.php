@@ -23,6 +23,7 @@ use Combyna\Component\Renderer\Html\RenderedWidget;
 use Combyna\Component\Renderer\Html\TextNode;
 use Combyna\Component\Renderer\Html\WidgetRenderer\DelegatingWidgetRenderer;
 use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
+use Combyna\Component\Router\EventDispatcher\Event\RouteNavigatedEvent;
 use Combyna\Component\Signal\EventDispatcher\Event\SignalDispatchedEvent;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
@@ -185,6 +186,31 @@ class RoutingIntegratedTest extends TestCase
             "\n" .
             '</div>';
         self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+    }
+
+    public function testRenderAppDispatchesTheRouteNavigationEventAfterFollowingTheViewItemLink()
+    {
+        $lastEvent = null;
+        $this->combyna->onRouteNavigated(function (RouteNavigatedEvent $event) use (&$lastEvent) {
+            $lastEvent = $event;
+        });
+        $appState = $this->app->createInitialState();
+
+        $this->app->dispatchEvent(
+            $appState,
+            // This will actually dispatch from the gui.url_link widget _inside_ this compound gui.route_link one
+            $appState->getWidgetStatePathByTag('list_view.view_item_button'),
+            'gui',
+            'click',
+            [
+                'x' => 200,
+                'y' => 100
+            ]
+        );
+
+        /** @var RouteNavigatedEvent $lastEvent */
+        self::assertInstanceOf(RouteNavigatedEvent::class, $lastEvent);
+        self::assertSame('/item/item_1234', $lastEvent->getUrl());
     }
 
     public function testRenderAppDispatchesTheBroadcastSignalAfterNavigatingTheNavigableThingToTheItemPage()

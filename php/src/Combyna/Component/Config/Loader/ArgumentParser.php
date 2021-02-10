@@ -14,7 +14,6 @@ namespace Combyna\Component\Config\Loader;
 use Combyna\Component\Config\Exception\ArgumentMismatchExceptionInterface;
 use Combyna\Component\Config\Exception\ArgumentParseException;
 use Combyna\Component\Config\Parameter\ArgumentBag;
-use Combyna\Component\Config\Parameter\ArgumentBagInterface;
 use Combyna\Component\Config\Parameter\ExtraParameter;
 use Combyna\Component\Config\Parameter\ParameterInterface;
 use Combyna\Component\Config\Parameter\ParameterParserInterface;
@@ -43,12 +42,7 @@ class ArgumentParser implements ArgumentParserInterface
     }
 
     /**
-     * Parses a config array to an argument bag based on a list of parameter specifications
-     *
-     * @param array $config
-     * @param ParameterInterface[] $parameterList
-     * @return ArgumentBagInterface
-     * @throws ArgumentParseException Throws when an argument is missing or invalid
+     * {@inheritdoc}
      */
     public function parseArguments(array $config, array $parameterList)
     {
