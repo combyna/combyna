@@ -1,7 +1,7 @@
 Combyna
 =======
 
-[![Build Status](https://secure.travis-ci.org/combyna/combyna.png?branch=master)](http://travis-ci.org/combyna/combyna)
+[![Build Status](https://github.com/combyna/combyna/workflows/CI/badge.svg)](https://github.com/combyna/combyna/actions?query=workflow%3ACI)
 
 Build isomorphic apps using a declarative YAML- or JSON-based language.
 
