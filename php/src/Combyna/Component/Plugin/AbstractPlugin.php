@@ -13,6 +13,7 @@ namespace Combyna\Component\Plugin;
 
 use Combyna\Component\Common\AbstractComponent;
 use Combyna\Component\Config\YamlParser;
+use LogicException;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -68,6 +69,26 @@ abstract class AbstractPlugin extends AbstractComponent implements PluginInterfa
             foreach ($files as $path => $file) {
                 /** @var SplFileInfo $file */
                 $libraryConfig = $yamlParser->parse(file_get_contents($file->getPathname()));
+
+                $libraryName = $file->getBasename('.yml');
+
+                if (!isset($libraryConfig['name'])) {
+                    throw new LogicException(sprintf(
+                        'Missing "name" value for library "%s" in file "%s"',
+                        $libraryName,
+                        $file->getPathname()
+                    ));
+                }
+
+                if ($libraryConfig['name'] !== $libraryName) {
+                    throw new LogicException(sprintf(
+                        'Mismatched "name" value for library "%s" in file "%s", "%s" given',
+                        $libraryName,
+                        $file->getPathname(),
+                        $libraryConfig['name']
+                    ));
+                }
+
                 $libraryCollectionServiceDefinition->addMethodCall('addLibraryConfig', [$libraryConfig]);
             }
         }
