@@ -85,7 +85,7 @@ class BinaryArithmeticExpressionTest extends TestCase
     {
         $this->createExpression(BinaryArithmeticExpression::ADD);
 
-        $this->assert($this->expression->getType())->exactlyEquals('binary-arithmetic');
+        static::assertSame('binary-arithmetic', $this->expression->getType());
     }
 
     public function testToStaticCanAddTwoNumbersTogether()
@@ -94,8 +94,8 @@ class BinaryArithmeticExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(27);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(27, $resultStatic->toNative());
     }
 
     public function testToStaticCanSubtractTwoNumbersFromEachOther()
@@ -104,8 +104,8 @@ class BinaryArithmeticExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(24);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(24, $resultStatic->toNative());
     }
 
     public function testToStaticCanMultiplyTwoNumbersTogether()
@@ -114,8 +114,8 @@ class BinaryArithmeticExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(21);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(21, $resultStatic->toNative());
     }
 
     public function testToStaticCanDivideANumberByAnother()
@@ -124,15 +124,16 @@ class BinaryArithmeticExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(5);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(5, $resultStatic->toNative());
     }
 
     public function testToStaticThrowsLogicExceptionOnDivideByIntegerZero()
     {
         $this->createExpressionWithOperands(20, BinaryArithmeticExpression::DIVIDE, 0);
         
-        $this->setExpectedException(LogicException::class, 'Divide by zero - divisor operand should have been assured');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Divide by zero - divisor operand should have been assured');
 
         $this->expression->toStatic($this->evaluationContext->reveal());
     }
@@ -141,7 +142,8 @@ class BinaryArithmeticExpressionTest extends TestCase
     {
         $this->createExpressionWithOperands(20, BinaryArithmeticExpression::DIVIDE, .0);
 
-        $this->setExpectedException(LogicException::class, 'Divide by zero - divisor operand should have been assured');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Divide by zero - divisor operand should have been assured');
 
         $this->expression->toStatic($this->evaluationContext->reveal());
     }
@@ -150,8 +152,8 @@ class BinaryArithmeticExpressionTest extends TestCase
     {
         $this->createExpressionWithOperands(20, 'invalid_op', 4);
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'BinaryArithmeticExpression :: Invalid operator "invalid_op" provided'
         );
 

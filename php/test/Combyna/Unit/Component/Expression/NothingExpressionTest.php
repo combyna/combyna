@@ -42,17 +42,16 @@ class NothingExpressionTest extends TestCase
 
     public function testGetTypeReturnsTheNothingType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('nothing');
+        static::assertSame('nothing', $this->expression->getType());
     }
 
     public function testToNativeReturnsNull()
     {
-        $this->assert($this->expression->toNative())->isNull;
+        static::assertNull($this->expression->toNative());
     }
 
     public function testToStaticReturnsItself()
     {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        static::assertSame($this->expression, $this->expression->toStatic($this->evaluationContext->reveal()));
     }
 }

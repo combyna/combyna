@@ -25,7 +25,7 @@ use Combyna\Component\Type\Exotic\ExoticTypeTypeDeterminerFactoryInterface;
 use Combyna\Component\Type\StaticType;
 use Combyna\Component\Type\TypeInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -127,9 +127,8 @@ class RoutingValidationIntegratedTest extends TestCase
 
     public function testRoutesAndRelatedWidgetsAndBuiltinsAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             // Test that native functions' implementations must be installed
             'ACT node [environment].[library:routing_test].[native-function:create_custom_exotic] - Native function "create_custom_exotic" for library "routing_test" was never installed. :: ' .
 

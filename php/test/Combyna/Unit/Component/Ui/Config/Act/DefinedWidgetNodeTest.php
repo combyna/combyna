@@ -101,45 +101,53 @@ class DefinedWidgetNodeTest extends TestCase
 
     public function testGetAttributeExpressionBag()
     {
-        $this->assert($this->node->getAttributeExpressionBag())
-            ->exactlyEquals($this->attributeExpressionBagNode->reveal());
+        static::assertSame(
+            $this->attributeExpressionBagNode->reveal(),
+            $this->node->getAttributeExpressionBag()
+        );
     }
 
     public function testGetChildWidgets()
     {
-        $this->assert($this->node->getChildWidgets())
-            ->exactlyEquals([$this->childWidgetNode1->reveal(), $this->childWidgetNode2->reveal()]);
+        static::assertSame(
+            [$this->childWidgetNode1->reveal(), $this->childWidgetNode2->reveal()],
+            $this->node->getChildWidgets()
+        );
     }
 
     public function testGetLibraryName()
     {
-        $this->assert($this->node->getLibraryName())->exactlyEquals('my_lib');
+        static::assertSame('my_lib', $this->node->getLibraryName());
     }
 
     public function testGetName()
     {
-        $this->assert($this->node->getName())->exactlyEquals('my-widget');
+        static::assertSame('my-widget', $this->node->getName());
     }
 
     public function testGetTags()
     {
-        $this->assert($this->node->getTags())->exactlyEquals(['my_app.some_interesting_widget']);
+        static::assertSame(['my_app.some_interesting_widget'], $this->node->getTags());
     }
 
     public function testGetTriggers()
     {
-        $this->assert($this->node->getTriggers())
-            ->exactlyEquals([$this->triggerNode1->reveal(), $this->triggerNode2->reveal()]);
+        static::assertSame(
+            [$this->triggerNode1->reveal(), $this->triggerNode2->reveal()],
+            $this->node->getTriggers()
+        );
     }
 
     public function testGetVisibilityExpression()
     {
-        $this->assert($this->node->getVisibilityExpression())
-            ->exactlyEquals($this->visibilityExpressionNode->reveal());
+        static::assertSame(
+            $this->visibilityExpressionNode->reveal(),
+            $this->node->getVisibilityExpression()
+        );
     }
 
     public function testGetWidgetDefinitionName()
     {
-        $this->assert($this->node->getWidgetDefinitionName())->exactlyEquals('my_widget');
+        static::assertSame('my_widget', $this->node->getWidgetDefinitionName());
     }
 }

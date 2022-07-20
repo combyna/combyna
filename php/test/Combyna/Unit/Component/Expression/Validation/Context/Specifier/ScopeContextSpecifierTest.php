@@ -56,7 +56,7 @@ class ScopeContextSpecifierTest extends TestCase
         $this->specifier->defineVariable('from-var', $typeDeterminerFromVariable->reveal());
         $this->specifier->defineBagStaticsAsVariables($fixedStaticBagModelNode->reveal());
 
-        self::assertSame(
+        static::assertSame(
             [
                 'from-var' => $typeDeterminerFromVariable->reveal(),
                 'first-static' => $typeDeterminerFromFirstStatic->reveal(),
@@ -80,8 +80,8 @@ class ScopeContextSpecifierTest extends TestCase
         $oldTypeDeterminerFromVariable = $this->prophesize(TypeDeterminerInterface::class);
         $this->specifier->defineVariable('your-var', $oldTypeDeterminerFromVariable->reveal());
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Scope already has a variable "your-var"'
         );
 
@@ -96,7 +96,7 @@ class ScopeContextSpecifierTest extends TestCase
         $this->specifier->defineVariable('first-var', $firstVariableTypeDeterminer->reveal());
         $this->specifier->defineVariable('second-var', $secondVariableTypeDeterminer->reveal());
 
-        self::assertSame(
+        static::assertSame(
             [
                 'first-var' => $firstVariableTypeDeterminer->reveal(),
                 'second-var' => $secondVariableTypeDeterminer->reveal()
@@ -110,8 +110,8 @@ class ScopeContextSpecifierTest extends TestCase
         $oldVariableTypeDeterminer = $this->prophesize(TypeDeterminerInterface::class);
         $this->specifier->defineVariable('my-var', $oldVariableTypeDeterminer->reveal());
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Scope already has a variable "my-var"'
         );
 

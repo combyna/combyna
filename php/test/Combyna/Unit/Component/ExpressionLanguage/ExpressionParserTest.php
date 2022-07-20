@@ -41,29 +41,29 @@ class ExpressionParserTest extends TestCase
      */
     public function testParseReturnsExpectedAstForAnExpression($expression, array $expectedAst)
     {
-        $this->assert($this->parser->parse($expression))->equals($expectedAst);
+        static::assertEquals($expectedAst, $this->parser->parse($expression));
     }
 
     public function testParseReturnsNativeIntegerForIntegerLiterals()
     {
-        $this->assert($this->parser->parse('21'))->exactlyEquals([
+        static::assertSame([
             'type' => 'number',
             'number' => 21
-        ]);
+        ], $this->parser->parse('21'));
     }
 
     public function testParseReturnsNativeFloatForFloatLiterals()
     {
-        $this->assert($this->parser->parse('199.1234'))->exactlyEquals([
+        static::assertSame([
             'type' => 'number',
             'number' => 199.1234
-        ]);
+        ], $this->parser->parse('199.1234'));
     }
 
     public function testParseThrowsExceptionWhenUnableToParseExpression()
     {
-        $this->setExpectedException(
-            ParseFailedException::class,
+        $this->expectException(ParseFailedException::class);
+        $this->expectExceptionMessage(
             'Could not parse expression string "@@@!! [Not] a valid - expression !!"'
         );
 

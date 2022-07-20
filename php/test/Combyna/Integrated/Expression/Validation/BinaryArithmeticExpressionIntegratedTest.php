@@ -106,8 +106,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
 
         $type = $rootValidationContext->getExpressionResultType($expressionNode);
 
-        $this->assert($type)->isAnInstanceOf(StaticType::class);
-        $this->assert($type->getSummary())->exactlyEquals('number');
+        static::assertInstanceOf(StaticType::class, $type);
+        static::assertSame('number', $type->getSummary());
     }
 
     public function testLeftOperandMustEvaluateToANumber()
@@ -118,9 +118,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(3)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - left operand would get [text], expects [number]'
         );
@@ -136,9 +135,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new TextExpressionNode('not a number')
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - right operand would get [text], expects [number]'
         );
@@ -154,7 +152,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(2)
         );
 
-        // No exception expected
+        // No exception expected.
+        $this->expectNotToPerformAssertions();
 
         $this->nodeValidator->validate($expressionNode, $this->appNode)->throwIfViolated();
     }
@@ -167,9 +166,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(0)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - Division by zero'
         );
@@ -189,9 +187,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             )
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - divisor (right operand) expects "assured", got "binary-arithmetic"'
         );
@@ -207,9 +204,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(2)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - Invalid operator "not-a-valid-op" provided'
         );
@@ -225,9 +221,8 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             new UnknownExpressionTypeNode('right-unknown-type')
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic]' .
             ' - left operand would get [unknown<Expression type "left-unknown-type">], expects [number]. :: ' .
 

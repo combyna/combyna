@@ -15,8 +15,8 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -75,9 +75,8 @@ class CaptureValidationIntegratedTest extends TestCase
 
     public function testCapturesAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             // Test that captures must be set
             'ACT node [app].[page-view].[view:my_view].[widget-group:root]' .
             ' - Capture "a_capture_that_doesnt_get_set" should be set exactly once, but was set 0 time(s). :: ' .

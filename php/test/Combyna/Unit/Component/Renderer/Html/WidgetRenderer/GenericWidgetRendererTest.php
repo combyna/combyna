@@ -99,12 +99,12 @@ class GenericWidgetRendererTest extends TestCase
 
     public function testGetWidgetDefinitionLibraryNameFetchesTheCorrectName()
     {
-        self::assertSame('my_lib', $this->renderer->getWidgetDefinitionLibraryName());
+        static::assertSame('my_lib', $this->renderer->getWidgetDefinitionLibraryName());
     }
 
     public function testGetWidgetDefinitionNameFetchesTheCorrectName()
     {
-        self::assertSame('my_widget', $this->renderer->getWidgetDefinitionName());
+        static::assertSame('my_widget', $this->renderer->getWidgetDefinitionName());
     }
 
     public function testRenderWidgetReturnsAValidGenericNodeWhenNoRootChildNameIsSet()
@@ -115,8 +115,8 @@ class GenericWidgetRendererTest extends TestCase
             $this->program->reveal()
         );
 
-        self::assertInstanceOf(GenericNode::class, $node);
-        self::assertEquals(
+        static::assertInstanceOf(GenericNode::class, $node);
+        static::assertEquals(
             [
                 'type' => 'generic',
                 'library' => 'my_lib',
@@ -160,8 +160,8 @@ class GenericWidgetRendererTest extends TestCase
             $this->program->reveal()
         );
 
-        self::assertInstanceOf(GenericNode::class, $node);
-        self::assertEquals(
+        static::assertInstanceOf(GenericNode::class, $node);
+        static::assertEquals(
             [
                 'type' => 'generic',
                 'library' => 'my_lib',
@@ -186,8 +186,8 @@ class GenericWidgetRendererTest extends TestCase
     {
         $this->widgetState = $this->prophesize(WidgetStateInterface::class);
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Renderer must receive a my_lib.my_widget widget state'
         );
 
@@ -203,8 +203,8 @@ class GenericWidgetRendererTest extends TestCase
         $this->widgetState->getWidgetDefinitionLibraryName()
             ->willReturn('wrong_lib');
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Renderer must receive a my_lib.my_widget widget state'
         );
 
@@ -220,8 +220,8 @@ class GenericWidgetRendererTest extends TestCase
         $this->widgetState->getWidgetDefinitionName()
             ->willReturn('wrong_widget');
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Renderer must receive a my_lib.my_widget widget state'
         );
 

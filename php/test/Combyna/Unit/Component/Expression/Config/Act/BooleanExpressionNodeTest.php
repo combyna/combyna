@@ -47,6 +47,8 @@ class BooleanExpressionNodeTest extends TestCase
      */
     public function testConstructorAllowsValidBooleans($boolean)
     {
+        $this->expectNotToPerformAssertions();
+
         new BooleanExpressionNode($boolean);
     }
 
@@ -68,8 +70,8 @@ class BooleanExpressionNodeTest extends TestCase
      */
     public function testConstructorThrowsExceptionWhenNonBooleanGiven($nonBoolean, $type)
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'BooleanExpressionNode expects a boolean, ' . $type . ' given'
         );
 
@@ -91,16 +93,16 @@ class BooleanExpressionNodeTest extends TestCase
 
     public function testGetTypeReturnsTheBooleanType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('boolean');
+        static::assertSame('boolean', $this->expression->getType());
     }
 
     public function testToNativeReturnsTheNativeBooleanValueWhenTrue()
     {
-        $this->assert((new BooleanExpressionNode(true))->toNative())->isTrue;
+        static::assertTrue((new BooleanExpressionNode(true))->toNative());
     }
 
     public function testToNativeReturnsTheNativeBooleanValueWhenFalse()
     {
-        $this->assert((new BooleanExpressionNode(false))->toNative())->isFalse;
+        static::assertFalse((new BooleanExpressionNode(false))->toNative());
     }
 }

@@ -16,7 +16,7 @@ use Combyna\Component\Common\ComponentExtensionInterface;
 use Combyna\Component\Framework\Originators;
 use Combyna\Component\Plugin\PluginInterface;
 use Combyna\Component\Plugin\SubPluginInterface;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -66,11 +66,9 @@ class PluginIntegratedTest extends TestCase
 
         $container = $combynaBootstrap->getContainerBuilder();
 
-        $this->assert($container)->isAnInstanceOf(ContainerInterface::class);
-        $this->assert($container->getParameter('my-test-parameter-from-extension'))
-            ->exactlyEquals('my test value from extension');
-        $this->assert($container->getParameter('my-test-parameter-from-compiler-pass'))
-            ->exactlyEquals('my test value from compiler pass');
+        static::assertInstanceOf(ContainerInterface::class, $container);
+        static::assertSame('my test value from extension', $container->getParameter('my-test-parameter-from-extension'));
+        static::assertSame('my test value from compiler pass', $container->getParameter('my-test-parameter-from-compiler-pass'));
     }
 
     public function testSubPluginsAreLoadedForASupportedOriginator()
@@ -100,9 +98,8 @@ class PluginIntegratedTest extends TestCase
 
         $container = $combynaBootstrap->getContainerBuilder();
 
-        $this->assert($container)->isAnInstanceOf(ContainerInterface::class);
-        $this->assert($container->getParameter('my-test-parameter-from-sub-plugin-compiler-pass'))
-            ->exactlyEquals('my test value from sub-plugin compiler pass');
+        static::assertInstanceOf(ContainerInterface::class, $container);
+        static::assertSame('my test value from sub-plugin compiler pass', $container->getParameter('my-test-parameter-from-sub-plugin-compiler-pass'));
     }
 
     public function testSubPluginsAreNotLoadedForAnUnsupportedOriginator()
@@ -132,8 +129,7 @@ class PluginIntegratedTest extends TestCase
 
         $container = $combynaBootstrap->getContainerBuilder();
 
-        $this->assert($container)->isAnInstanceOf(ContainerInterface::class);
-        $this->assert($container->hasParameter('my-test-parameter-from-sub-plugin-compiler-pass'))
-            ->isFalse;
+        static::assertInstanceOf(ContainerInterface::class, $container);
+        static::assertFalse($container->hasParameter('my-test-parameter-from-sub-plugin-compiler-pass'));
     }
 }

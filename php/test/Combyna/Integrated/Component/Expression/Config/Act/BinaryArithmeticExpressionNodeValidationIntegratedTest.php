@@ -127,6 +127,9 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             new NumberExpressionNode(2)
         );
 
+        // No exception expected.
+        $this->expectNotToPerformAssertions();
+
         // Should not throw, as divisor can statically be read as const(2), which is non-zero
         $this->nodeValidator->validate($expressionNode, $this->appNode)->throwIfViolated();
     }
@@ -149,6 +152,9 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             new TextExpressionNode(' - it was zero, oops')
         );
 
+        // No exception expected.
+        $this->expectNotToPerformAssertions();
+
         // Should not throw, as divisor is assured as non-zero
         $this->nodeValidator->validate($expressionNode, $this->appNode)->throwIfViolated();
     }
@@ -164,9 +170,8 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             new NumberExpressionNode(0)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic] - Division by zero'
         );
 
@@ -185,9 +190,8 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             new NumberExpressionNode(.0)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic] - Division by zero'
         );
 
@@ -210,9 +214,8 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             )
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[binary-arithmetic] - divisor (right operand) expects "assured", got "binary-arithmetic"'
         );
 
@@ -240,9 +243,8 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             new TextExpressionNode(' - it did not meet the assurance, oops')
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[guard].[binary-arithmetic] - divisor (right operand) expects "non-zero-number" constraint, got "the-wrong-constraint"'
         );
 

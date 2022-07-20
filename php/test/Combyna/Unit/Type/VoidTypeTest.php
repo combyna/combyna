@@ -57,12 +57,12 @@ class VoidTypeTest extends TestCase
         $theirSubType1->isAllowedByVoidType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByVoidType(Argument::is($this->type))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsFalseIfOneOfItsSubTypesIsNotAllowedByUs()
@@ -76,12 +76,12 @@ class VoidTypeTest extends TestCase
         $theirSubType1->isAllowedByVoidType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByVoidType(Argument::is($this->type))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticAlwaysReturnsFalse()
@@ -89,7 +89,7 @@ class VoidTypeTest extends TestCase
         /** @var ObjectProphecy|StaticInterface $static */
         $static = $this->prophesize(StaticInterface::class);
 
-        $this->assert($this->type->allowsStatic($static->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStatic($static->reveal()));
     }
 
     public function testAllowsStaticListTypeAlwaysReturnsFalse()
@@ -99,21 +99,21 @@ class VoidTypeTest extends TestCase
         /** @var ObjectProphecy|TypeInterface $theirElementType */
         $theirElementType = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsStaticListType($candidateType->reveal(), $theirElementType->reveal())
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticTypeAlwaysReturnsFalse()
     {
         $candidateType = new StaticType(StaticInterface::class, $this->validationContext->reveal());
 
-        $this->assert($this->type->allowsStaticType($candidateType))->isFalse;
+        static::assertFalse($this->type->allowsStaticType($candidateType));
     }
 
     public function testGetSummaryReturnsTheCorrectString()
     {
-        $this->assert($this->type->getSummary())->exactlyEquals('void<my context>');
+        static::assertSame('void<my context>', $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeJustReturnsTheMultipleType()
@@ -130,7 +130,7 @@ class VoidTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->exactlyEquals($otherType->reveal());
+        static::assertSame($otherType->reveal(), $result);
     }
 
     public function testMergeWithStaticListTypeJustReturnsTheStaticList()
@@ -142,7 +142,7 @@ class VoidTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->exactlyEquals($otherType->reveal());
+        static::assertSame($otherType->reveal(), $result);
     }
 
     public function testMergeWithStaticTypeJustReturnsTheStaticType()
@@ -151,6 +151,6 @@ class VoidTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($staticType);
 
-        $this->assert($result)->exactlyEquals($staticType);
+        static::assertSame($staticType, $result);
     }
 }

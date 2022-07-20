@@ -70,24 +70,24 @@ class NonZeroNumberAssuranceTest extends TestCase
 
     public function testDefinesStaticReturnsTrueForTheSpecifiedName()
     {
-        $this->assert($this->assurance->definesStatic('my-static'))->isTrue;
+        static::assertTrue($this->assurance->definesStatic('my-static'));
     }
 
     public function testDefinesStaticReturnsFalseForAnotherName()
     {
-        $this->assert($this->assurance->definesStatic('not-my-static'))->isFalse;
+        static::assertFalse($this->assurance->definesStatic('not-my-static'));
     }
 
     public function testGetConstraintReturnsCorrectValue()
     {
-        $this->assert($this->assurance->getConstraint())->exactlyEquals(NonZeroNumberAssurance::TYPE);
+        static::assertSame(NonZeroNumberAssurance::TYPE, $this->assurance->getConstraint());
     }
 
     public function testEvaluateReturnsTrueWhenTheExpressionEvaluatesToANonZeroNumber()
     {
-        $this->assert(
+        static::assertTrue(
             $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
-        )->isTrue;
+        );
     }
 
     public function testEvaluateStoresTheStaticInTheBagWhenItEvaluatesToANonZeroIntegerNumber()
@@ -110,18 +110,18 @@ class NonZeroNumberAssuranceTest extends TestCase
     {
         $this->resultStatic->toNative()->willReturn(0);
 
-        $this->assert(
+        static::assertFalse(
             $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
-        )->isFalse;
+        );
     }
 
     public function testEvaluateReturnsFalseWhenTheExpressionEvaluatesToFloatZero()
     {
         $this->resultStatic->toNative()->willReturn(.0);
 
-        $this->assert(
+        static::assertFalse(
             $this->assurance->evaluate($this->evaluationContext->reveal(), $this->staticBag->reveal())
-        )->isFalse;
+        );
     }
 
     public function testEvaluateDoesNotStoreAnyStaticInTheBagWhenTheExpressionEvaluatesToZero()
@@ -140,8 +140,8 @@ class NonZeroNumberAssuranceTest extends TestCase
         $this->inputExpression->toStatic(Argument::is($this->evaluationContext->reveal()))
             ->willReturn($textStatic->reveal());
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'NonZeroNumberAssurance should receive a number, but got "text"'
         );
 

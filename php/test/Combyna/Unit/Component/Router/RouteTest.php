@@ -55,8 +55,7 @@ class RouteTest extends TestCase
         ]);
         $this->parameterBagModel->assertValidStaticBag($argumentBag)->shouldBeCalled();
 
-        $this->assert($this->route->generateUrl($argumentBag->reveal()))
-            ->exactlyEquals('/my/url/pattern/with/my_first_segment/and/my_second_segment');
+        static::assertSame('/my/url/pattern/with/my_first_segment/and/my_second_segment', $this->route->generateUrl($argumentBag->reveal()));
     }
 
     public function testGenerateUrlReturnsCorrectUrlWhenUrlHasNoParameterPlaceholders()
@@ -71,13 +70,11 @@ class RouteTest extends TestCase
             'my_page_view'
         );
 
-        $this->assert($this->route->generateUrl($argumentBag->reveal()))
-            ->exactlyEquals('/my/url/pattern/with/no/parameters');
+        static::assertSame('/my/url/pattern/with/no/parameters', $this->route->generateUrl($argumentBag->reveal()));
     }
 
     public function testGetUrlPatternReturnsThePattern()
     {
-        $this->assert($this->route->getUrlPattern())
-            ->exactlyEquals('/my/url/pattern/with/{param1}/and/{param2}');
+        static::assertSame('/my/url/pattern/with/{param1}/and/{param2}', $this->route->getUrlPattern());
     }
 }

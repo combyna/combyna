@@ -84,7 +84,7 @@ class ComparisonExpressionTest extends TestCase
     {
         $this->createExpression(ComparisonExpression::EQUAL_CASE_INSENSITIVE);
 
-        $this->assert($this->expression->getType())->exactlyEquals('comparison');
+        static::assertSame('comparison', $this->expression->getType());
     }
 
     public function testToStaticMatchesTwoEqualIntegers()
@@ -93,8 +93,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertTrue($resultStatic->toNative());
     }
 
     public function testToStaticDoesNotMatchTwoUnequalIntegers()
@@ -103,8 +103,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isFalse;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertFalse($resultStatic->toNative());
     }
 
     public function testToStaticMatchesTwoEqualFloats()
@@ -113,8 +113,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertTrue($resultStatic->toNative());
     }
 
     public function testToStaticDoesNotMatchTwoUnequalFloats()
@@ -123,8 +123,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isFalse;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertFalse($resultStatic->toNative());
     }
 
     public function testToStaticMatchesAnIntegerAndEqualFloat()
@@ -133,8 +133,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertTrue($resultStatic->toNative());
     }
 
     public function testToStaticDoesNotMatchAnIntegerAndUnequalFloat()
@@ -143,8 +143,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isFalse;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertFalse($resultStatic->toNative());
     }
 
     public function testToStaticMatchesTwoTextsOfDifferentCaseCaseInsensitively()
@@ -153,8 +153,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertTrue($resultStatic->toNative());
     }
 
     public function testToStaticDoesNotMatchTwoDifferentTextsCaseInsensitively()
@@ -163,8 +163,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isFalse;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertFalse($resultStatic->toNative());
     }
 
     public function testToStaticMatchesTwoIdenticalTextsOfSameCaseCaseSensitively()
@@ -173,8 +173,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertTrue($resultStatic->toNative());
     }
 
     public function testToStaticDoesNotMatchTwoSameTextsOfDifferentCaseCaseSensitively()
@@ -183,8 +183,8 @@ class ComparisonExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($resultStatic->toNative())->isFalse;
+        static::assertInstanceOf(BooleanExpression::class, $resultStatic);
+        static::assertFalse($resultStatic->toNative());
     }
 
     /**

@@ -79,8 +79,8 @@ class StaticListExpressionTest extends TestCase
 
         $result = $this->expression->concatenate();
 
-        $this->assert($result)->isAnInstanceOf(TextExpression::class);
-        $this->assert($result->toNative())->exactlyEquals('concatenated element contents');
+        static::assertInstanceOf(TextExpression::class, $result);
+        static::assertSame('concatenated element contents', $result->toNative());
     }
 
     public function testElementsMatchReturnsTrueWhenExpected()
@@ -89,7 +89,7 @@ class StaticListExpressionTest extends TestCase
         $candidateElementType = $this->prophesize(TypeInterface::class);
         $this->staticList->elementsMatch(Argument::is($candidateElementType->reveal()))->willReturn(true);
 
-        $this->assert($this->expression->elementsMatch($candidateElementType->reveal()))->isTrue;
+        static::assertTrue($this->expression->elementsMatch($candidateElementType->reveal()));
     }
 
     public function testElementsMatchReturnsFalseWhenExpected()
@@ -98,12 +98,12 @@ class StaticListExpressionTest extends TestCase
         $candidateElementType = $this->prophesize(TypeInterface::class);
         $this->staticList->elementsMatch(Argument::is($candidateElementType->reveal()))->willReturn(false);
 
-        $this->assert($this->expression->elementsMatch($candidateElementType->reveal()))->isFalse;
+        static::assertFalse($this->expression->elementsMatch($candidateElementType->reveal()));
     }
 
     public function testGetTypeReturnsTheStaticListType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('static-list');
+        static::assertSame('static-list', $this->expression->getType());
     }
 
     public function testMapReturnsANewStaticListExpressionWithInnerListMapped()
@@ -123,25 +123,27 @@ class StaticListExpressionTest extends TestCase
             Argument::is($this->evaluationContext->reveal())
         )->willReturn($resultList->reveal());
 
-        $this->assert($this->expression->map(
-            'my_item',
-            'my_item_index',
-            $mapExpression->reveal(),
-            $this->evaluationContext->reveal()
-        ))->isTheSameAs($resultListExpression->reveal());
+        static::assertSame(
+            $resultListExpression->reveal(),
+            $this->expression->map(
+                'my_item',
+                'my_item_index',
+                $mapExpression->reveal(),
+                $this->evaluationContext->reveal()
+            )
+        );
     }
 
     public function testToNativeReturnsTheNativeArrayValue()
     {
         $this->staticList->toArray()->willReturn(['first', 'second']);
 
-        $this->assert($this->expression->toNative())->exactlyEquals(['first', 'second']);
+        static::assertSame(['first', 'second'], $this->expression->toNative());
     }
 
     public function testToStaticReturnsItself()
     {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        static::assertSame($this->expression, $this->expression->toStatic($this->evaluationContext->reveal()));
     }
 
     public function testWithElementsReturnsTheSameListExpressionObjectWhenAllAndOnlySpecifiedStaticsAreAlreadyPresent()
@@ -155,7 +157,7 @@ class StaticListExpressionTest extends TestCase
         $this->staticList->withElements([$firstElement, $secondElement])
             ->willReturn($this->staticList);
 
-        self::assertSame($staticListExpression, $staticListExpression->withElements([$firstElement, $secondElement]));
+        static::assertSame($staticListExpression, $staticListExpression->withElements([$firstElement, $secondElement]));
     }
 
     public function testWithElementsReturnsANewListWhenAtLeastOneStaticIsNotAlreadyPresent()
@@ -175,7 +177,7 @@ class StaticListExpressionTest extends TestCase
 
         $newStaticListExpression = $staticListExpression->withElements([$firstElement, $secondElement, $newElement]);
 
-        self::assertNotSame($staticListExpression, $newStaticListExpression);
-        self::assertSame($newElement, $newStaticListExpression->getElementStatics()[2]);
+        static::assertNotSame($staticListExpression, $newStaticListExpression);
+        static::assertSame($newElement, $newStaticListExpression->getElementStatics()[2]);
     }
 }

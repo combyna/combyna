@@ -73,7 +73,7 @@ class ConcatenationExpressionTest extends TestCase
 
     public function testGetType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('concatenation');
+        static::assertSame('concatenation', $this->expression->getType());
     }
 
     public function testToStaticReturnsTheConcatenatedTextExpressionFromTheList()
@@ -89,8 +89,8 @@ class ConcatenationExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(TextExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals('my concatenated text');
+        static::assertInstanceOf(TextExpression::class, $resultStatic);
+        static::assertSame('my concatenated text', $resultStatic->toNative());
     }
 
     public function testToStaticThrowsLogicExceptionWhenListExpressionEvaluatesToANonStaticListExpression()
@@ -101,8 +101,8 @@ class ConcatenationExpressionTest extends TestCase
         $this->operandListExpression->toStatic(Argument::is($this->subEvaluationContext->reveal()))
             ->willReturn($operandListStatic->reveal());
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'ConcatenationExpression :: List can only evaluate to a static-list, but got a(n) "number"'
         );
 

@@ -178,8 +178,8 @@ class StaticStructureTypeIntegratedTest extends TestCase
             $this->evaluationContext
         );
 
-        self::assertInstanceOf(StaticStructureExpression::class, $coercedStatic);
-        self::assertEquals(
+        static::assertInstanceOf(StaticStructureExpression::class, $coercedStatic);
+        static::assertEquals(
             [
                 'human' => [
                     'first-name' => 'human name',
@@ -217,8 +217,8 @@ class StaticStructureTypeIntegratedTest extends TestCase
 
         $coercedStatic = $this->type->coerceStatic($structureStatic, $this->evaluationContext);
 
-        self::assertInstanceOf(StaticStructureExpression::class, $coercedStatic);
-        self::assertEquals(
+        static::assertInstanceOf(StaticStructureExpression::class, $coercedStatic);
+        static::assertEquals(
             [
                 'human' => [
                     'first-name' => 'human name',

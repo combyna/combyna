@@ -79,10 +79,10 @@ class ComparisonExpressionLoaderTest extends TestCase
 
         $resultExpressionNode = $this->loader->load($config);
 
-        self::assertInstanceOf(ComparisonExpressionNode::class, $resultExpressionNode);
-        self::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
-        self::assertSame('+', $resultExpressionNode->getOperator());
-        self::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
+        static::assertInstanceOf(ComparisonExpressionNode::class, $resultExpressionNode);
+        static::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
+        static::assertSame('+', $resultExpressionNode->getOperator());
+        static::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
     }
 
     public function testLoadReturnsAnUnknownExpressionNodeWhenParseFails()
@@ -93,11 +93,11 @@ class ComparisonExpressionLoaderTest extends TestCase
 
         $resultExpressionNode = $this->loader->load($config);
 
-        self::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
+        static::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('comparison');
+        static::assertSame('comparison', $this->loader->getType());
     }
 }

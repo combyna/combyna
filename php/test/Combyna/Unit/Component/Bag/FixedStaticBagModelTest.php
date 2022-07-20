@@ -414,8 +414,8 @@ class FixedStaticBagModelTest extends TestCase
     {
         $dynamicActNodeAdopter = $this->prophesize(DynamicActNodeAdopterInterface::class);
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'Bag model does not define static "my-undefined-static"'
         );
 

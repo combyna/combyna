@@ -49,28 +49,28 @@ class BinaryArithmeticExpressionNodeTest extends TestCase
     {
         $this->createExpressionNode(BinaryArithmeticExpression::ADD);
 
-        $this->assert($this->node->getLeftOperandExpression())->isTheSameAs($this->leftOperandExpressionNode->reveal());
+        static::assertSame($this->leftOperandExpressionNode->reveal(), $this->node->getLeftOperandExpression());
     }
 
     public function testGetOperatorFetchesTheOperator()
     {
         $this->createExpressionNode(BinaryArithmeticExpression::MULTIPLY);
 
-        $this->assert($this->node->getOperator())->exactlyEquals(BinaryArithmeticExpression::MULTIPLY);
+        static::assertSame(BinaryArithmeticExpression::MULTIPLY, $this->node->getOperator());
     }
 
     public function testGetRightOperandExpressionFetchesTheExpression()
     {
         $this->createExpressionNode(BinaryArithmeticExpression::ADD);
 
-        $this->assert($this->node->getRightOperandExpression())->isTheSameAs($this->rightOperandExpressionNode->reveal());
+        static::assertSame($this->rightOperandExpressionNode->reveal(), $this->node->getRightOperandExpression());
     }
 
     public function testGetType()
     {
         $this->createExpressionNode(BinaryArithmeticExpression::ADD);
 
-        $this->assert($this->node->getType())->exactlyEquals('binary-arithmetic');
+        static::assertSame('binary-arithmetic', $this->node->getType());
     }
 
     /**

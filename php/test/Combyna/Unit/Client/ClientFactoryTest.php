@@ -120,7 +120,7 @@ class ClientFactoryTest extends TestCase
             ['app' => 'yep']
         );
 
-        $this->assert($client)->isAnInstanceOf(Client::class);
+        static::assertInstanceOf(Client::class, $client);
     }
 
     public function testCreateClientCreatesTheAppCorrectly()
@@ -154,7 +154,7 @@ class ClientFactoryTest extends TestCase
         $serviceContainer = $this->prophesize(ContainerInterface::class);
         $this->combyna->getContainer()->willReturn($serviceContainer);
 
-        $this->assert($this->factory->getContainer())->exactlyEquals($serviceContainer->reveal());
+        static::assertSame($serviceContainer->reveal(), $this->factory->getContainer());
     }
 
     public function testOnBroadcastSignalAsksCombynaToAddTheListener()

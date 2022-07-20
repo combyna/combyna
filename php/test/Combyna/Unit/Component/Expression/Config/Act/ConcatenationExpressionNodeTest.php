@@ -51,23 +51,23 @@ class ConcatenationExpressionNodeTest extends TestCase
 
     public function testGetGlueExpressionFetchesTheExpressionWhenSet()
     {
-        $this->assert($this->node->getGlueExpression())->isTheSameAs($this->glueExpressionNode->reveal());
+        static::assertSame($this->glueExpressionNode->reveal(), $this->node->getGlueExpression());
     }
 
     public function testGetGlueExpressionReturnsNullWhenNotSet()
     {
         $node = new ConcatenationExpressionNode($this->operandListExpressionNode->reveal());
 
-        $this->assert($node->getGlueExpression())->isNull;
+        static::assertNull($node->getGlueExpression());
     }
 
     public function testGetOperandListExpressionFetchesTheExpressionWhenSet()
     {
-        $this->assert($this->node->getOperandListExpression())->isTheSameAs($this->operandListExpressionNode->reveal());
+        static::assertSame($this->operandListExpressionNode->reveal(), $this->node->getOperandListExpression());
     }
 
     public function testGetType()
     {
-        $this->assert($this->node->getType())->exactlyEquals('concatenation');
+        static::assertSame('concatenation', $this->node->getType());
     }
 }

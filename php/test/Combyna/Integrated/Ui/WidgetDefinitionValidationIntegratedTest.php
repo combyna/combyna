@@ -15,8 +15,8 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -76,9 +76,8 @@ class WidgetDefinitionValidationIntegratedTest extends TestCase
 
     public function testWidgetDefinitionsAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [environment].[library:widget_definitions].[primitive-widget-def:my_invalid_lib_primitive].[fixed-static-bag-model].[fixed-static-definition:my_invalid_primitive_attr]' .
             ' - Expected type not to be unresolved, but it was: unknown<No loader is registered for types of type "my_invalid_primitive_attr_type">. :: ' .
 

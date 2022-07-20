@@ -74,12 +74,12 @@ class StaticListTest extends TestCase
 
     public function testConcatenateJoinsTheElementsTogetherCastedToNativeStrings()
     {
-        self::assertSame('first element,2,third element', $this->staticList->concatenate(','));
+        static::assertSame('first element,2,third element', $this->staticList->concatenate(','));
     }
 
     public function testListIsCountable()
     {
-        self::assertSame(3, count($this->staticList));
+        static::assertSame(3, count($this->staticList));
     }
 
     public function testElementsMatchReturnsTrueForATypeThatMatchesAllTheElements()
@@ -93,7 +93,7 @@ class StaticListTest extends TestCase
             $validationContext->reveal()
         );
 
-        self::assertTrue($this->staticList->elementsMatch($type));
+        static::assertTrue($this->staticList->elementsMatch($type));
     }
 
     public function testElementsMatchReturnsFalseForATypeThatMatchesNoneOfTheElements()
@@ -101,7 +101,7 @@ class StaticListTest extends TestCase
         $validationContext = $this->prophesize(ValidationContextInterface::class);
         $type = new StaticType(BooleanExpression::class, $validationContext->reveal());
 
-        self::assertFalse($this->staticList->elementsMatch($type));
+        static::assertFalse($this->staticList->elementsMatch($type));
     }
 
     public function testElementsMatchReturnsFalseForATypeThatMatchesOnlySomeOfTheElements()
@@ -115,27 +115,29 @@ class StaticListTest extends TestCase
             $validationContext->reveal()
         );
 
-        self::assertFalse($this->staticList->elementsMatch($type));
+        static::assertFalse($this->staticList->elementsMatch($type));
     }
 
     public function testGetElementStaticReturnsTheStaticAtThatIndex()
     {
         $elementStatic = $this->staticList->getElementStatic(2);
 
-        self::assertInstanceOf(StaticInterface::class, $elementStatic);
-        self::assertSame('third element', $elementStatic->toNative());
+        static::assertInstanceOf(StaticInterface::class, $elementStatic);
+        static::assertSame('third element', $elementStatic->toNative());
     }
 
     public function testGetElementStaticThrowsExceptionWhenNonIntIndexIsGiven()
     {
-        $this->setExpectedException(InvalidArgumentException::class, 'Index must be an int, string given');
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Index must be an int, string given');
 
         $this->staticList->getElementStatic('my invalid index');
     }
 
     public function testGetElementStaticThrowsExceptionWhenIndexIsOutOfBounds()
     {
-        $this->setExpectedException(OutOfBoundsException::class, 'Index is out of bounds');
+        $this->expectException(OutOfBoundsException::class);
+        $this->expectExceptionMessage('Index is out of bounds');
 
         $this->staticList->getElementStatic(100);
     }
@@ -184,7 +186,7 @@ class StaticListTest extends TestCase
             $evaluationContext->reveal()
         );
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 '1::first element',
                 '2::2',
@@ -226,25 +228,25 @@ class StaticListTest extends TestCase
             $evaluationContext->reveal()
         );
 
-        self::assertCount(3, $result);
+        static::assertCount(3, $result);
 
-        self::assertSame(0, $result[0]['index']);
-        self::assertEquals(1, $result[0]['ctx']->getVariable('my_index')->toNative());
-        self::assertEquals('first element', $result[0]['ctx']->getVariable('my_item')->toNative());
-        self::assertSame('first element', $result[0]['static']->toNative());
-        self::assertSame(1, $result[1]['index']);
-        self::assertEquals(2, $result[1]['ctx']->getVariable('my_index')->toNative());
-        self::assertEquals(2, $result[1]['ctx']->getVariable('my_item')->toNative());
-        self::assertSame(2, $result[1]['static']->toNative());
-        self::assertSame(2, $result[2]['index']);
-        self::assertEquals(3, $result[2]['ctx']->getVariable('my_index')->toNative());
-        self::assertEquals('third element', $result[2]['ctx']->getVariable('my_item')->toNative());
-        self::assertSame('third element', $result[2]['static']->toNative());
+        static::assertSame(0, $result[0]['index']);
+        static::assertEquals(1, $result[0]['ctx']->getVariable('my_index')->toNative());
+        static::assertEquals('first element', $result[0]['ctx']->getVariable('my_item')->toNative());
+        static::assertSame('first element', $result[0]['static']->toNative());
+        static::assertSame(1, $result[1]['index']);
+        static::assertEquals(2, $result[1]['ctx']->getVariable('my_index')->toNative());
+        static::assertEquals(2, $result[1]['ctx']->getVariable('my_item')->toNative());
+        static::assertSame(2, $result[1]['static']->toNative());
+        static::assertSame(2, $result[2]['index']);
+        static::assertEquals(3, $result[2]['ctx']->getVariable('my_index')->toNative());
+        static::assertEquals('third element', $result[2]['ctx']->getVariable('my_item')->toNative());
+        static::assertSame('third element', $result[2]['static']->toNative());
     }
 
     public function testToArrayReturnsTheExpectedNativeArray()
     {
-        self::assertEquals(
+        static::assertEquals(
             ['first element', 2, 'third element'],
             $this->staticList->toArray()
         );
@@ -260,7 +262,7 @@ class StaticListTest extends TestCase
             [$firstElement, $secondElement]
         );
 
-        self::assertSame($staticList, $staticList->withElements([$firstElement, $secondElement]));
+        static::assertSame($staticList, $staticList->withElements([$firstElement, $secondElement]));
     }
 
     public function testWithElementsReturnsANewListWhenAtLeastOneStaticIsNotAlreadyPresent()
@@ -276,7 +278,7 @@ class StaticListTest extends TestCase
 
         $newStaticList = $staticList->withElements([$firstElement, $secondElement, $newElement]);
 
-        self::assertNotSame($staticList, $newStaticList);
-        self::assertSame($newElement, $newStaticList->getElementStatic(2));
+        static::assertNotSame($staticList, $newStaticList);
+        static::assertSame($newElement, $newStaticList->getElementStatic(2));
     }
 }

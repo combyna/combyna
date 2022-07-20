@@ -99,12 +99,12 @@ class AnyTypeTest extends TestCase
         $theirSubType1 = $this->prophesize(TypeInterface::class);
         $theirSubType2 = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsTrue()
@@ -114,9 +114,9 @@ class AnyTypeTest extends TestCase
         /** @var ObjectProphecy|TypeInterface $elementType */
         $elementType = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticTypeReturnsTrue()
@@ -124,21 +124,22 @@ class AnyTypeTest extends TestCase
         /** @var ObjectProphecy|StaticType $candidateType */
         $candidateType = $this->prophesize(StaticType::class);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isTrue;
+        static::assertTrue($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testCoerceNativeJustReturnsAnExistingStatic()
     {
         $static = $this->prophesize(StaticInterface::class);
 
-        $this->assert(
+        static::assertSame(
+            $static->reveal(),
             $this->type->coerceNative(
                 $static->reveal(),
                 $this->staticExpressionFactory,
                 $this->bagFactory,
                 $this->evaluationContext->reveal()
             )
-        )->exactlyEquals($static->reveal());
+        );
     }
 
     public function testCoerceNativeCoercesABooleanToABooleanExpression()
@@ -150,8 +151,8 @@ class AnyTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($static->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $static);
+        static::assertTrue($static->toNative());
     }
 
     public function testCoerceNativeCoercesAnIntegerToANumberExpression()
@@ -163,8 +164,8 @@ class AnyTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($static->toNative())->exactlyEquals(21);
+        static::assertInstanceOf(NumberExpression::class, $static);
+        static::assertSame(21, $static->toNative());
     }
 
     public function testCoerceNativeCoercesAFloatToANumberExpression()
@@ -176,8 +177,8 @@ class AnyTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($static->toNative())->exactlyEquals(1001.4);
+        static::assertInstanceOf(NumberExpression::class, $static);
+        static::assertSame(1001.4, $static->toNative());
     }
 
     public function testCoerceNativeCoercesAStringToATextExpression()
@@ -189,8 +190,8 @@ class AnyTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(TextExpression::class);
-        $this->assert($static->toNative())->exactlyEquals('hello world!');
+        static::assertInstanceOf(TextExpression::class, $static);
+        static::assertSame('hello world!', $static->toNative());
     }
 
     public function testCoerceNativeCoercesNullToANothingExpression()
@@ -202,7 +203,7 @@ class AnyTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NothingExpression::class);
+        static::assertInstanceOf(NothingExpression::class, $static);
     }
 
     public function testCoerceNativeCoercesAnEmptyArrayToAnEmptyListExpression()
@@ -215,8 +216,8 @@ class AnyTypeTest extends TestCase
         );
 
         /** @var StaticListExpression $static */
-        $this->assert($static)->isAnInstanceOf(StaticListExpression::class);
-        $this->assert(empty($static->getElementStatics()))->isTrue;
+        static::assertInstanceOf(StaticListExpression::class, $static);
+        static::assertEmpty($static->getElementStatics());
     }
 
     public function testCoerceNativeCoercesAnIndexedArrayWithTwoNumbersToAListExpressionWithTwoNumbers()
@@ -229,12 +230,12 @@ class AnyTypeTest extends TestCase
         );
 
         /** @var StaticListExpression $static */
-        $this->assert($static)->isAnInstanceOf(StaticListExpression::class);
+        static::assertInstanceOf(StaticListExpression::class, $static);
         $statics = $static->getElementStatics();
-        $this->assert($statics[0])->isAnInstanceOf(NumberExpression::class);
-        $this->assert($statics[0]->toNative())->exactlyEquals(21);
-        $this->assert($statics[1])->isAnInstanceOf(NumberExpression::class);
-        $this->assert($statics[1]->toNative())->exactlyEquals(1004);
+        static::assertInstanceOf(NumberExpression::class, $statics[0]);
+        static::assertSame(21, $statics[0]->toNative());
+        static::assertInstanceOf(NumberExpression::class, $statics[1]);
+        static::assertSame(1004, $statics[1]->toNative());
     }
 
     public function testCoerceNativeCoercesAnAssociativeArrayWithAStringAndNumberToAStructureExpression()
@@ -250,17 +251,17 @@ class AnyTypeTest extends TestCase
         );
 
         /** @var StaticStructureExpression $static */
-        $this->assert($static)->isAnInstanceOf(StaticStructureExpression::class);
+        static::assertInstanceOf(StaticStructureExpression::class, $static);
         $staticBag = $static->getAttributeStaticBag();
-        $this->assert($staticBag->getStatic('my_string'))->isAnInstanceOf(TextExpression::class);
-        $this->assert($staticBag->getStatic('my_string')->toNative())->exactlyEquals('hello!');
-        $this->assert($staticBag->getStatic('my_number'))->isAnInstanceOf(NumberExpression::class);
-        $this->assert($staticBag->getStatic('my_number')->toNative())->exactlyEquals(42);
+        static::assertInstanceOf(TextExpression::class, $staticBag->getStatic('my_string'));
+        static::assertSame('hello!', $staticBag->getStatic('my_string')->toNative());
+        static::assertInstanceOf(NumberExpression::class, $staticBag->getStatic('my_number'));
+        static::assertSame(42, $staticBag->getStatic('my_number')->toNative());
     }
 
     public function testGetSummaryReturnsTheCorrectString()
     {
-        $this->assert($this->type->getSummary())->exactlyEquals('*');
+        static::assertSame('*', $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeReturnsANewMultipleTypeWithBothSetsOfSubTypesCombined()
@@ -277,10 +278,10 @@ class AnyTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
             '*|their-sub-type-1|their-sub-type-2'
-        );
+        , $result->getSummary());
     }
 
     public function testMergeWithStaticListTypeReturnsANewMultipleTypeWithListTypeAddedAsASubType()
@@ -293,10 +294,10 @@ class AnyTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
             '*|list<their-element-type>'
-        );
+        , $result->getSummary());
     }
 
     public function testMergeWithStaticTypeReturnsANewMultipleTypeWithStaticTypeAddedAsASubType()
@@ -307,9 +308,9 @@ class AnyTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
             '*|their-type'
-        );
+        , $result->getSummary());
     }
 }

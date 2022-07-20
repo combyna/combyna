@@ -33,17 +33,16 @@ class EventDefinitionNotReferencedExceptionTest extends TestCase
 
     public function testGetEventDefinitionNameReturnsTheDefinitionName()
     {
-        $this->assert($this->exception->getEventDefinitionName())->exactlyEquals('my_event');
+        static::assertSame('my_event', $this->exception->getEventDefinitionName());
     }
 
     public function testGetLibraryNameReturnsTheLibraryName()
     {
-        $this->assert($this->exception->getLibraryName())->exactlyEquals('my_lib');
+        static::assertSame('my_lib', $this->exception->getLibraryName());
     }
 
     public function testGetMessageReturnsTheCorrectMessage()
     {
-        $this->assert($this->exception->getMessage())
-            ->exactlyEquals('Event definition "my_event" for library "my_lib" is not referenced');
+        static::assertSame('Event definition "my_event" for library "my_lib" is not referenced', $this->exception->getMessage());
     }
 }

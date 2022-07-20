@@ -51,12 +51,12 @@ class UnresolvedTypeTest extends TestCase
         $theirSubType1 = $this->prophesize(TypeInterface::class);
         $theirSubType2 = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsFalse()
@@ -66,9 +66,9 @@ class UnresolvedTypeTest extends TestCase
         /** @var ObjectProphecy|TypeInterface $elementType */
         $elementType = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticTypeReturnsFalse()
@@ -76,12 +76,12 @@ class UnresolvedTypeTest extends TestCase
         /** @var ObjectProphecy|StaticType $candidateType */
         $candidateType = $this->prophesize(StaticType::class);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testGetSummaryReturnsTheCorrectString()
     {
-        $this->assert($this->type->getSummary())->exactlyEquals('unknown<my context>');
+        static::assertSame('unknown<my context>', $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeReturnsANewMultipleTypeWithBothSetsOfSubTypesCombined()
@@ -98,9 +98,10 @@ class UnresolvedTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'unknown<my context>|their-sub-type-1|their-sub-type-2'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'unknown<my context>|their-sub-type-1|their-sub-type-2',
+            $result->getSummary()
         );
     }
 
@@ -114,9 +115,10 @@ class UnresolvedTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'unknown<my context>|list<their-element-type>'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'unknown<my context>|list<their-element-type>',
+            $result->getSummary()
         );
     }
 
@@ -128,9 +130,10 @@ class UnresolvedTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'unknown<my context>|their-type'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'unknown<my context>|their-type',
+            $result->getSummary()
         );
     }
 }

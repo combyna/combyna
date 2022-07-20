@@ -57,8 +57,8 @@ class NumberExpressionLoaderTest extends TestCase
 
         $numberExpression = $this->loader->load($config);
 
-        $this->assert($numberExpression)->isAnInstanceOf(NumberExpressionNode::class);
-        $this->assert($numberExpression->toNative())->exactlyEquals($number);
+        static::assertInstanceOf(NumberExpressionNode::class, $numberExpression);
+        static::assertSame($number, $numberExpression->toNative());
     }
 
     /**
@@ -74,6 +74,6 @@ class NumberExpressionLoaderTest extends TestCase
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('number');
+        static::assertSame('number', $this->loader->getType());
     }
 }

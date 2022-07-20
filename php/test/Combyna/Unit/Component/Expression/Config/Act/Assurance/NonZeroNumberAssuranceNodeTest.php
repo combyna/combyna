@@ -11,7 +11,6 @@
 
 namespace Combyna\Unit\Component\Expression\Config\Act\Assurance;
 
-use Combyna\Component\Expression\Assurance\AssuranceInterface;
 use Combyna\Component\Expression\Assurance\NonZeroNumberAssurance;
 use Combyna\Component\Expression\Config\Act\Assurance\NonZeroNumberAssuranceNode;
 use Combyna\Component\Expression\Config\Act\ExpressionNodeInterface;
@@ -51,11 +50,11 @@ class NonZeroNumberAssuranceNodeTest extends TestCase
 
     public function testGetConstraintReturnsCorrectValue()
     {
-        $this->assert($this->node->getConstraint())->exactlyEquals(NonZeroNumberAssurance::TYPE);
+        static::assertSame(NonZeroNumberAssurance::TYPE, $this->node->getConstraint());
     }
 
     public function testGetRequiredAssuredStaticNamesReturnsAnArrayWithJustTheStaticName()
     {
-        $this->assert($this->node->getAssuredStaticName())->exactlyEquals('my-static');
+        static::assertSame('my-static', $this->node->getAssuredStaticName());
     }
 }

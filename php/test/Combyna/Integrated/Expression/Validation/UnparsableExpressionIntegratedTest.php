@@ -15,7 +15,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 
 /**
  * Class UnparsableExpressionIntegratedTest
@@ -62,9 +62,8 @@ class UnparsableExpressionIntegratedTest extends TestCase
 
     public function testExpressionsAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             // Check that the result type for an unparsable expression is unknown
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[text-widget]' .
             ' - text would get [unknown<Unparsable expression: this @ is most definitely [ an invalid } expression #>], expects [text]. :: ' .

@@ -47,6 +47,9 @@ class BooleanExpressionTest extends TestCase
      */
     public function testConstructorAllowsValidBooleans($boolean)
     {
+        // No exception expected.
+        $this->expectNotToPerformAssertions();
+
         new BooleanExpression($boolean);
     }
 
@@ -68,8 +71,8 @@ class BooleanExpressionTest extends TestCase
      */
     public function testConstructorThrowsExceptionWhenNonBooleanGiven($nonBoolean, $type)
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'BooleanExpression expects a boolean, ' . $type . ' given'
         );
 
@@ -91,22 +94,21 @@ class BooleanExpressionTest extends TestCase
 
     public function testGetTypeReturnsTheBooleanType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('boolean');
+        static::assertSame('boolean', $this->expression->getType());
     }
 
     public function testToNativeReturnsTheNativeBooleanValueWhenTrue()
     {
-        $this->assert((new BooleanExpression(true))->toNative())->isTrue;
+        static::assertTrue((new BooleanExpression(true))->toNative());
     }
 
     public function testToNativeReturnsTheNativeBooleanValueWhenFalse()
     {
-        $this->assert((new BooleanExpression(false))->toNative())->isFalse;
+        static::assertFalse((new BooleanExpression(false))->toNative());
     }
 
     public function testToStaticReturnsItself()
     {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        static::assertSame($this->expression, $this->expression->toStatic($this->evaluationContext->reveal()));
     }
 }

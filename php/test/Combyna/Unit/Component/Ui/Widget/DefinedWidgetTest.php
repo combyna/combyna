@@ -102,6 +102,6 @@ class DefinedWidgetTest extends TestCase
 
     public function testGetTriggersReturnsTheTriggerCollection()
     {
-        self::assertSame($this->triggerCollection->reveal(), $this->widget->getTriggers());
+        static::assertSame($this->triggerCollection->reveal(), $this->widget->getTriggers());
     }
 }

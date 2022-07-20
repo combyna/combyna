@@ -60,10 +60,10 @@ class ArgumentParserIntegratedTest extends TestCase
             new NamedParameter('my_second_param', new TextParameterType('second param'))
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
-        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('first value', $argumentBag->getNamedStringArgument('my_first_param'));
+        static::assertSame('second value', $argumentBag->getNamedStringArgument('my_second_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsReturnsCorrectArgumentBagWhenOnlyExplicitPositionalTextArguments()
@@ -78,10 +78,10 @@ class ArgumentParserIntegratedTest extends TestCase
             new PositionalParameter('my_second_param', new TextParameterType('second param'))
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
-        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('first value', $argumentBag->getNamedStringArgument('my_first_param'));
+        static::assertSame('second value', $argumentBag->getNamedStringArgument('my_second_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsReturnsCorrectArgumentBagWhenExtraArgumentsAreAllowed()
@@ -97,18 +97,18 @@ class ArgumentParserIntegratedTest extends TestCase
             new ExtraParameter()
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_explicit_param'))->exactlyEquals('explicit value');
-        $this->assert($argumentBag->getExtraArguments())->equals([
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('explicit value', $argumentBag->getNamedStringArgument('my_explicit_param'));
+        static::assertEquals([
             'some_other_arg' => 21,
             'another_arg' => 1001
-        ]);
+        ], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsThrowsExceptionWhenExtraArgumentsAreDisallowed()
     {
-        $this->setExpectedException(
-            ArgumentParseException::class,
+        $this->expectException(ArgumentParseException::class);
+        $this->expectExceptionMessage(
             'Extra arguments not allowed: [some_extra_arg]'
         );
 
@@ -139,10 +139,10 @@ class ArgumentParserIntegratedTest extends TestCase
             )
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
-        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('the default value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('required value', $argumentBag->getNamedStringArgument('my_required_param'));
+        static::assertSame('the default value', $argumentBag->getNamedStringArgument('my_optional_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsReturnsDefaultForOptionalArgumentsSetToNull()
@@ -163,10 +163,10 @@ class ArgumentParserIntegratedTest extends TestCase
             )
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
-        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('the default value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('required value', $argumentBag->getNamedStringArgument('my_required_param'));
+        static::assertSame('the default value', $argumentBag->getNamedStringArgument('my_optional_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsReturnsThePassedArgumentForASpecifiedOptionalArguments()
@@ -187,16 +187,16 @@ class ArgumentParserIntegratedTest extends TestCase
             )
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_required_param'))->exactlyEquals('required value');
-        $this->assert($argumentBag->getNamedStringArgument('my_optional_param'))->exactlyEquals('optional but specified value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('required value', $argumentBag->getNamedStringArgument('my_required_param'));
+        static::assertSame('optional but specified value', $argumentBag->getNamedStringArgument('my_optional_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForNamedTextParameter()
     {
-        $this->setExpectedException(
-            ArgumentParseException::class,
+        $this->expectException(ArgumentParseException::class);
+        $this->expectExceptionMessage(
             'Wrong type of value given for argument "my_param": expected text for a param, got integer(21111)'
         );
 
@@ -211,8 +211,8 @@ class ArgumentParserIntegratedTest extends TestCase
 
     public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForPositionalTextParameter()
     {
-        $this->setExpectedException(
-            ArgumentParseException::class,
+        $this->expectException(ArgumentParseException::class);
+        $this->expectExceptionMessage(
             'Wrong type of value given for argument "my_param (#0)": expected text for a param, got integer(21111)'
         );
 
@@ -225,8 +225,8 @@ class ArgumentParserIntegratedTest extends TestCase
 
     public function testParseArgumentsThrowsExceptionWhenTextArgumentIsOfIncorrectTypeForExpressionParameter()
     {
-        $this->setExpectedException(
-            ArgumentParseException::class,
+        $this->expectException(ArgumentParseException::class);
+        $this->expectExceptionMessage(
             'Wrong type of value given for argument "my_param": expected an expression for a param, got integer(21111)'
         );
 

@@ -56,12 +56,12 @@ class AssuredExpressionLoaderTest extends TestCase
 
         $assuredExpression = $this->loader->load($config);
 
-        $this->assert($assuredExpression)->isAnInstanceOf(AssuredExpressionNode::class);
-        $this->assert($assuredExpression->getAssuredStaticName())->exactlyEquals('my-assured-static');
+        static::assertInstanceOf(AssuredExpressionNode::class, $assuredExpression);
+        static::assertSame('my-assured-static', $assuredExpression->getAssuredStaticName());
     }
 
     public function testGetBuiltinNameReturnsTheCorrectName()
     {
-        $this->assert($this->loader->getBuiltinName())->exactlyEquals('assured');
+        static::assertSame('assured', $this->loader->getBuiltinName());
     }
 }

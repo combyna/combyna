@@ -15,8 +15,8 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

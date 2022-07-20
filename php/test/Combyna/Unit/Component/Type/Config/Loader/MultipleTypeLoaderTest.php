@@ -80,7 +80,7 @@ class MultipleTypeLoaderTest extends TestCase
 
     public function testGetTypesReturnsOnlyTheMultipleTypeName()
     {
-        $this->assert($this->loader->getTypes())->exactlyEquals(['multiple']);
+        static::assertSame(['multiple'], $this->loader->getTypes());
     }
 
     public function testLoadReturnsAMultipleTypeDeterminerWithAllSubTypesLoaded()
@@ -102,10 +102,10 @@ class MultipleTypeLoaderTest extends TestCase
 
         $determiner = $this->loader->load(['type' => 'multiple', 'types' => ['my_type', 'your_type']]);
 
-        $this->assert($determiner)->isAnInstanceOf(MultipleTypeDeterminer::class);
+        static::assertInstanceOf(MultipleTypeDeterminer::class, $determiner);
         $multipleType = $determiner->determine($this->validationContext->reveal());
-        $this->assert($multipleType)->isAnInstanceOf(MultipleType::class);
-        $this->assert($multipleType->getSummary())->exactlyEquals('my-type-summary|your-type-summary');
+        static::assertInstanceOf(MultipleType::class, $multipleType);
+        static::assertSame('my-type-summary|your-type-summary', $multipleType->getSummary());
     }
 
     public function testLoadReturnsPresolvedUnresolvedTypeWhenConfigParserThrowsException()
@@ -115,8 +115,7 @@ class MultipleTypeLoaderTest extends TestCase
 
         $determiner = $this->loader->load(['some_arg' => 21]);
 
-        $this->assert($determiner)->isAnInstanceOf(UnresolvedTypeDeterminer::class);
-        $this->assert($determiner->determine($this->validationContext->reveal())->getSummary())
-            ->exactlyEquals('unknown<Some issue parsing sub-types>');
+        static::assertInstanceOf(UnresolvedTypeDeterminer::class, $determiner);
+        static::assertSame('unknown<Some issue parsing sub-types>', $determiner->determine($this->validationContext->reveal())->getSummary());
     }
 }

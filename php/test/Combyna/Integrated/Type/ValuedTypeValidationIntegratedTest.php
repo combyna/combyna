@@ -16,7 +16,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -69,9 +69,8 @@ class ValuedTypeValidationIntegratedTest extends TestCase
     {
         $appConfig = $this->yamlParser->parse(file_get_contents(__DIR__ . '/Fixtures/valuedTypeValidationTest.cyn.yml'));
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             // Test that a valued type's value expression must be valid
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[fixed-static-bag-model].[fixed-static-definition:a_single_valued_type_with_invalid_value_expression]' .
             ' - Expected type not to be unresolved, but it was: unknown<Impure value expression given for valued type>. :: ' .

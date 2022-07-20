@@ -93,8 +93,8 @@ class StaticTypeTest extends TestCase
 
     public function testCannotBeUsedToMatchAStaticListExpression()
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'StaticListExpression must be matched with a StaticListType, not a StaticType'
         );
 
@@ -103,8 +103,8 @@ class StaticTypeTest extends TestCase
 
     public function testCannotBeUsedToMatchANonStaticExpression()
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'StaticType must be passed a static expression class'
         );
 
@@ -123,12 +123,12 @@ class StaticTypeTest extends TestCase
         $theirSubType1->isAllowedByStaticType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByStaticType(Argument::is($this->type))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsFalseIfOneOfItsSubTypesIsNotAllowedByUs()
@@ -143,12 +143,12 @@ class StaticTypeTest extends TestCase
         $theirSubType1->isAllowedByStaticType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByStaticType(Argument::is($this->type))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticReturnsTrueWhenStaticIsInstanceOfClass()
@@ -157,7 +157,7 @@ class StaticTypeTest extends TestCase
         /** @var ObjectProphecy|NumberExpression $static */
         $static = $this->prophesize(NumberExpression::class);
 
-        $this->assert($this->type->allowsStatic($static->reveal()))->isTrue;
+        static::assertTrue($this->type->allowsStatic($static->reveal()));
     }
 
     public function testAllowsStaticReturnsFalseWhenStaticIsNotAnInstanceOfClass()
@@ -166,7 +166,7 @@ class StaticTypeTest extends TestCase
         /** @var ObjectProphecy|TextExpression $static */
         $static = $this->prophesize(TextExpression::class);
 
-        $this->assert($this->type->allowsStatic($static->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStatic($static->reveal()));
     }
 
     public function testAllowsStaticListTypeAlwaysReturnsFalse()
@@ -177,9 +177,9 @@ class StaticTypeTest extends TestCase
         /** @var ObjectProphecy|TypeInterface $theirElementType */
         $theirElementType = $this->prophesize(TypeInterface::class);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsStaticListType($candidateType->reveal(), $theirElementType->reveal())
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticTypeReturnsTrueWhenBothMatchTheSameStaticClass()
@@ -187,7 +187,7 @@ class StaticTypeTest extends TestCase
         $this->createType(TextExpression::class);
         $candidateType = new StaticType(TextExpression::class, $this->validationContext->reveal());
 
-        $this->assert($this->type->allowsStaticType($candidateType))->isTrue;
+        static::assertTrue($this->type->allowsStaticType($candidateType));
     }
 
     public function testAllowsStaticTypeReturnsFalseWhenCandidateTypeMatchesADifferentStaticClass()
@@ -195,7 +195,7 @@ class StaticTypeTest extends TestCase
         $this->createType(TextExpression::class);
         $candidateType = new StaticType(NumberExpression::class, $this->validationContext->reveal());
 
-        $this->assert($this->type->allowsStaticType($candidateType))->isFalse;
+        static::assertFalse($this->type->allowsStaticType($candidateType));
     }
 
     public function testCoerceNativeJustReturnsAnExistingCompatibleStatic()
@@ -203,14 +203,15 @@ class StaticTypeTest extends TestCase
         $this->createType(TextExpression::class);
         $static = $this->prophesize(TextExpression::class);
 
-        $this->assert(
+        static::assertSame(
+            $static->reveal(),
             $this->type->coerceNative(
                 $static->reveal(),
                 $this->staticExpressionFactory,
                 $this->bagFactory,
                 $this->evaluationContext->reveal()
             )
-        )->exactlyEquals($static->reveal());
+        );
     }
 
     public function testCoerceNativeCoercesABooleanToABooleanExpression()
@@ -223,16 +224,16 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(BooleanExpression::class);
-        $this->assert($static->toNative())->isTrue;
+        static::assertInstanceOf(BooleanExpression::class, $static);
+        static::assertTrue($static->toNative());
     }
 
     public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForBoolean()
     {
         $this->createType(BooleanExpression::class);
 
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Expected boolean, got integer'
         );
 
@@ -254,15 +255,15 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NothingExpression::class);
+        static::assertInstanceOf(NothingExpression::class, $static);
     }
 
     public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForNothing()
     {
         $this->createType(NothingExpression::class);
 
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Expected null, got string'
         );
 
@@ -284,8 +285,8 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($static->toNative())->exactlyEquals(21);
+        static::assertInstanceOf(NumberExpression::class, $static);
+        static::assertSame(21, $static->toNative());
     }
 
     public function testCoerceNativeCoercesAFloatToANumberExpression()
@@ -298,8 +299,8 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($static->toNative())->exactlyEquals(1001.4);
+        static::assertInstanceOf(NumberExpression::class, $static);
+        static::assertSame(1001.4, $static->toNative());
     }
 
     public function testCoerceNativeCoercesANumericStringToANumberExpression()
@@ -312,16 +313,16 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($static->toNative())->exactlyEquals(1001.4);
+        static::assertInstanceOf(NumberExpression::class, $static);
+        static::assertSame(1001.4, $static->toNative());
     }
 
     public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForNumber()
     {
         $this->createType(NumberExpression::class);
 
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Expected int, float or numeric string, got string'
         );
 
@@ -343,16 +344,16 @@ class StaticTypeTest extends TestCase
             $this->evaluationContext->reveal()
         );
 
-        $this->assert($static)->isAnInstanceOf(TextExpression::class);
-        $this->assert($static->toNative())->exactlyEquals('hello world!');
+        static::assertInstanceOf(TextExpression::class, $static);
+        static::assertSame('hello world!', $static->toNative());
     }
 
     public function testCoerceNativeThrowsWhenIncompatibleNativeIsGivenForText()
     {
         $this->createType(TextExpression::class);
 
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Expected string, got integer'
         );
 
@@ -371,7 +372,7 @@ class StaticTypeTest extends TestCase
     {
         $this->createType($staticClass);
 
-        $this->assert($this->type->getSummary())->exactlyEquals($expectedType);
+        static::assertSame($expectedType, $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeReturnsANewMultipleTypeWithThisStaticAdded()
@@ -389,8 +390,8 @@ class StaticTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals('number|their-sub-type-1|their-sub-type-2');
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame('number|their-sub-type-1|their-sub-type-2', $result->getSummary());
     }
 
     public function testMergeWithStaticListTypeReturnsAMultipleTypeWithStaticAndStaticList()
@@ -404,8 +405,8 @@ class StaticTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals('number|list<text>');
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame('number|list<text>', $result->getSummary());
     }
 
     public function testMergeWithStaticTypeReturnsThisTypeWhenBothAreEquivalent()
@@ -416,7 +417,7 @@ class StaticTypeTest extends TestCase
             new StaticType(TextExpression::class, $this->validationContext->reveal())
         );
 
-        $this->assert($result)->exactlyEquals($this->type);
+        static::assertSame($this->type, $result);
     }
 
     public function testMergeWithStaticTypeReturnsANewMultipleTypeWithBothStatics()
@@ -426,8 +427,8 @@ class StaticTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals('text|number');
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame('text|number', $result->getSummary());
     }
 
     /**

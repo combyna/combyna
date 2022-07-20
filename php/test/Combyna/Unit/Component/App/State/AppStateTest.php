@@ -48,8 +48,7 @@ class AppStateTest extends TestCase
         $this->programState->getWidgetStatePathByTag('my_tag')
             ->willReturn($widgetStatePath);
 
-        $this->assert($this->appState->getWidgetStatePathByTag('my_tag'))
-            ->exactlyEquals($widgetStatePath->reveal());
+        static::assertSame($widgetStatePath->reveal(), $this->appState->getWidgetStatePathByTag('my_tag'));
     }
 
     public function testGetWidgetStatePathsByTagDelegatesToTheProgramState()
@@ -62,11 +61,13 @@ class AppStateTest extends TestCase
                 $widgetStatePath2
             ]);
 
-        $this->assert($this->appState->getWidgetStatePathsByTag('my_tag'))
-            ->exactlyEquals([
+        static::assertSame(
+            [
                 $widgetStatePath1->reveal(),
                 $widgetStatePath2->reveal()
-            ]);
+            ],
+            $this->appState->getWidgetStatePathsByTag('my_tag')
+        );
     }
 
     public function testWithProgramStateReturnsANewAppStateWhenProgramStateDiffers()
@@ -75,15 +76,15 @@ class AppStateTest extends TestCase
 
         $resultingAppState = $this->appState->withProgramState($differentProgramState->reveal());
 
-        $this->assert($resultingAppState)->isAnInstanceOf(AppStateInterface::class);
-        $this->assert($resultingAppState)->doesNotExactlyEqual($this->appState);
-        $this->assert($resultingAppState->getProgramState())->exactlyEquals($differentProgramState->reveal());
+        static::assertInstanceOf(AppStateInterface::class, $resultingAppState);
+        static::assertNotSame($this->appState, $resultingAppState);
+        static::assertSame($differentProgramState->reveal(), $resultingAppState->getProgramState());
     }
 
     public function testWithProgramStateReturnsTheSameAppStateWhenProgramStateIsIdentical()
     {
         $resultingAppState = $this->appState->withProgramState($this->programState->reveal());
 
-        $this->assert($resultingAppState)->exactlyEquals($this->appState);
+        static::assertSame($this->appState, $resultingAppState);
     }
 }

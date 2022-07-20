@@ -143,8 +143,14 @@ class PrimitiveWidgetDefinitionTest extends TestCase
             ->willReturn($this->firstValueStatic);
         $this->valueBagModel->getStaticType('first_value')->willReturn($firstValueType);
 
-        $this->assert($this->definition->getWidgetValue('first_value', ['path', 'to'], $this->evaluationContext->reveal()))
-            ->isTheSameAs($this->firstValueStatic->reveal());
+        static::assertSame(
+            $this->firstValueStatic->reveal(),
+            $this->definition->getWidgetValue(
+                'first_value',
+                ['path', 'to'],
+                $this->evaluationContext->reveal()
+            )
+        );
     }
 
     public function testGetWidgetValueCoercesANativeFromTheProviderToAStatic()
@@ -159,17 +165,27 @@ class PrimitiveWidgetDefinitionTest extends TestCase
             ->willReturn($this->coercedValueStatic);
         $this->valueBagModel->getStaticType('second_value')->willReturn($secondValueType);
 
-        $this->assert($this->definition->getWidgetValue('second_value', ['path', 'to'], $this->evaluationContext->reveal()))
-            ->isTheSameAs($this->coercedValueStatic->reveal());
+        static::assertSame(
+            $this->coercedValueStatic->reveal(),
+            $this->definition->getWidgetValue(
+                'second_value',
+                ['path', 'to'],
+                $this->evaluationContext->reveal()
+            )
+        );
     }
 
     public function testGetWidgetValueThrowsExceptionWhenValueHasNoProvider()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'No provider was installed for widget value "value_with_no_provider"'
         );
 
-        $this->definition->getWidgetValue('value_with_no_provider', ['path', 'to'], $this->evaluationContext->reveal());
+        $this->definition->getWidgetValue(
+            'value_with_no_provider',
+            ['path', 'to'],
+            $this->evaluationContext->reveal()
+        );
     }
 }

@@ -157,7 +157,7 @@ class ArrayRendererTest extends TestCase
 
     public function testRenderViewsReturnsCorrectArrayStructure()
     {
-        self::assertEquals(
+        static::assertEquals(
             [
                 [
                     'type' => 'my-first-type',

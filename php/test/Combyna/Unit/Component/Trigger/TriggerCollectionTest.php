@@ -62,7 +62,7 @@ class TriggerCollectionTest extends TestCase
 
     public function testGetAllReturnsAllTriggers()
     {
-        self::assertSame(
+        static::assertSame(
             [$this->trigger1->reveal(), $this->trigger2->reveal()],
             $this->collection->getAll()
         );
@@ -70,7 +70,7 @@ class TriggerCollectionTest extends TestCase
 
     public function testGetByEventNameReturnsAMatchingTrigger()
     {
-        self::assertEquals(
+        static::assertEquals(
             $this->trigger2->reveal(),
             $this->collection->getByEventName('second_lib', 'second_event')
         );
@@ -78,8 +78,8 @@ class TriggerCollectionTest extends TestCase
 
     public function testGetByEventNameThrowsWhenNoSuchTriggerExists()
     {
-        $this->setExpectedException(
-            TriggerNotFoundException::class,
+        $this->expectException(TriggerNotFoundException::class);
+        $this->expectExceptionMessage(
             'Collection does not contain a trigger for event "undefined_event" of library "first_lib"'
         );
 
@@ -88,23 +88,23 @@ class TriggerCollectionTest extends TestCase
 
     public function testHasByEventNameReturnsTrueForAMatchingTrigger()
     {
-        self::assertTrue($this->collection->hasByEventName('second_lib', 'second_event'));
+        static::assertTrue($this->collection->hasByEventName('second_lib', 'second_event'));
     }
 
     public function testHasByEventNameReturnsFalseWhenNoSuchTriggerExists()
     {
-        self::assertFalse($this->collection->hasByEventName('first_lib', 'undefined_event'));
+        static::assertFalse($this->collection->hasByEventName('first_lib', 'undefined_event'));
     }
 
     public function testIsEmptyReturnsTrueForAnEmptyCollection()
     {
         $this->collection = new TriggerCollection([]);
 
-        self::assertTrue($this->collection->isEmpty());
+        static::assertTrue($this->collection->isEmpty());
     }
 
     public function testIsEmptyReturnsFalseForANonEmptyCollection()
     {
-        self::assertFalse($this->collection->isEmpty());
+        static::assertFalse($this->collection->isEmpty());
     }
 }

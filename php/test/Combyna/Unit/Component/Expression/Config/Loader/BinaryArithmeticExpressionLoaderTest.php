@@ -79,10 +79,10 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
 
         $resultExpressionNode = $this->loader->load($config);
 
-        self::assertInstanceOf(BinaryArithmeticExpressionNode::class, $resultExpressionNode);
-        self::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
-        self::assertSame('+', $resultExpressionNode->getOperator());
-        self::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
+        static::assertInstanceOf(BinaryArithmeticExpressionNode::class, $resultExpressionNode);
+        static::assertSame($leftOperandExpressionNode->reveal(), $resultExpressionNode->getLeftOperandExpression());
+        static::assertSame('+', $resultExpressionNode->getOperator());
+        static::assertSame($rightOperandExpressionNode->reveal(), $resultExpressionNode->getRightOperandExpression());
     }
 
     public function testLoadReturnsAnUnknownExpressionNodeWhenParseFails()
@@ -93,11 +93,11 @@ class BinaryArithmeticExpressionLoaderTest extends TestCase
 
         $resultExpressionNode = $this->loader->load($config);
 
-        self::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
+        static::assertInstanceOf(UnknownExpressionNode::class, $resultExpressionNode);
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        self::assertSame('binary-arithmetic', $this->loader->getType());
+        static::assertSame('binary-arithmetic', $this->loader->getType());
     }
 }

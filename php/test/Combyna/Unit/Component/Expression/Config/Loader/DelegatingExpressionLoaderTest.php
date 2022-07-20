@@ -83,7 +83,7 @@ class DelegatingExpressionLoaderTest extends TestCase
         $this->firstSubLoader->load(['type' => 'first_type', 'my_arg' => 21])
             ->willReturn($node);
 
-        self::assertSame($node->reveal(), $this->loader->load(['type' => 'first_type', 'my_arg' => 21]));
+        static::assertSame($node->reveal(), $this->loader->load(['type' => 'first_type', 'my_arg' => 21]));
     }
 
     public function testLoadReturnsTheExpressionNodeFromSubLoaderAfterParsingFormula()
@@ -94,7 +94,7 @@ class DelegatingExpressionLoaderTest extends TestCase
         $this->firstSubLoader->load(['type' => 'first_type', 'left' => 21, 'right' => 4])
             ->willReturn($node);
 
-        self::assertSame($node->reveal(), $this->loader->load('=21 * 4'));
+        static::assertSame($node->reveal(), $this->loader->load('=21 * 4'));
     }
 
     public function testLoadTrimsWhitespaceFromExpressionFormula()
@@ -106,7 +106,7 @@ class DelegatingExpressionLoaderTest extends TestCase
             ->willReturn($node);
 
         // Note that expression formula string is surrounded by whitespace
-        self::assertSame($node->reveal(), $this->loader->load('    =21 * 4    '));
+        static::assertSame($node->reveal(), $this->loader->load('    =21 * 4    '));
     }
 
     public function testLoadReturnsAnUnparsableExpressionNodeViaItsSubLoaderWhenStringWithoutFormulaPrefix()
@@ -118,7 +118,7 @@ class DelegatingExpressionLoaderTest extends TestCase
         ])
             ->willReturn($node);
 
-        self::assertSame($node->reveal(), $this->loader->load('not a valid formula'));
+        static::assertSame($node->reveal(), $this->loader->load('not a valid formula'));
     }
 
     public function testLoadReturnsAnUnparsableExpressionNodeViaItsSubLoaderWhenFormulaParseFails()
@@ -132,7 +132,7 @@ class DelegatingExpressionLoaderTest extends TestCase
         ])
             ->willReturn($node);
 
-        self::assertSame($node->reveal(), $this->loader->load('=not valid even with prefix'));
+        static::assertSame($node->reveal(), $this->loader->load('=not valid even with prefix'));
     }
 
     public function testLoadReturnsAnUnparsableExpressionNodeViaItsSubLoaderWhenNotArrayOrString()
@@ -144,22 +144,22 @@ class DelegatingExpressionLoaderTest extends TestCase
         ])
             ->willReturn($node);
 
-        self::assertSame($node->reveal(), $this->loader->load(4567));
+        static::assertSame($node->reveal(), $this->loader->load(4567));
     }
 
     public function testLoadReturnsAnUnknownExpressionTypeNodeWhenTypeElementIsMissing()
     {
         $node = $this->loader->load(['my_arg' => 21]);
 
-        self::assertInstanceOf(UnknownExpressionTypeNode::class, $node);
-        self::assertNull($node->getUnknownType());
+        static::assertInstanceOf(UnknownExpressionTypeNode::class, $node);
+        static::assertNull($node->getUnknownType());
     }
 
     public function testLoadReturnsAnUnknownExpressionTypeNodeWhenNoLoaderIsRegisteredForType()
     {
         $node = $this->loader->load(['type' => 'my_unknown_type', 'my_arg' => 21]);
 
-        self::assertInstanceOf(UnknownExpressionTypeNode::class, $node);
-        self::assertSame('my_unknown_type', $node->getUnknownType());
+        static::assertInstanceOf(UnknownExpressionTypeNode::class, $node);
+        static::assertSame('my_unknown_type', $node->getUnknownType());
     }
 }

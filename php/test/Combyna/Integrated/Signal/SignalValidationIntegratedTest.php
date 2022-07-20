@@ -15,7 +15,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -68,9 +68,8 @@ class SignalValidationIntegratedTest extends TestCase
 
     public function testSignalDefinitionAndUsesAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             // Test that signal payload statics being set must be defined by the signal definition
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[defined-widget:0].[act-node].[trigger:gui.click].[signal]' .
             ' - Payload does not define a static with name "an_undefined_static". :: ' .

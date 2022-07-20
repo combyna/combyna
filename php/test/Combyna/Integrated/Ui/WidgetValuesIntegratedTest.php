@@ -15,9 +15,9 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
+use Combyna\Harness\TestCase;
 use Combyna\Integrated\Ui\Fixtures\PokableButtonValueProviders;
 use Combyna\Integrated\Ui\Fixtures\PokableButtonWidgetRenderer;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -85,7 +85,7 @@ class WidgetValuesIntegratedTest extends TestCase
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "0"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterPokingThePokableButton()
@@ -109,7 +109,7 @@ HTML;
                 '<button name="combyna-widget-my_view-root-3-root">Add me</button>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheAddableButton()
@@ -133,6 +133,6 @@ HTML;
     Value of the pokable button: ""<button name="combyna-widget-my_view-root-1">My pokable button</button>Value of the addable button: "61"<button name="combyna-widget-my_view-root-3-root">Add me</button>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

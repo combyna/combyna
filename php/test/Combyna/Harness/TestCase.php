@@ -12,14 +12,14 @@
 namespace Combyna\Harness;
 
 use Closure;
-use Concise\Core\TestCase as ConciseTestCase;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 /**
  * Class TestCase
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class TestCase extends ConciseTestCase
+class TestCase extends PHPUnitTestCase
 {
     public function noBind(Closure $closure)
     {

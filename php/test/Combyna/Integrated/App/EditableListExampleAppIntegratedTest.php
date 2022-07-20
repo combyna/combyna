@@ -15,8 +15,8 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -84,7 +84,7 @@ class EditableListExampleAppIntegratedTest extends TestCase
     <div>Items: <hr>Add another: <input name="combyna-widget-item_viewer-root-contents-4" type="text" value="&lt;Enter some text&gt;"><button name="combyna-widget-item_viewer-root-contents-5">Add item</button></div>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterAddingTwoNewItemsViaTheUi()
@@ -127,6 +127,6 @@ HTML;
     <div>Items: <div>(1)First: (item_viewer-root-contents-4)</div><div>(2)Second: (item_viewer-root-contents-4)</div><hr>Add another: <input name="combyna-widget-item_viewer-root-contents-4" type="text" value="&lt;Enter some text&gt;"><button name="combyna-widget-item_viewer-root-contents-5">Add item</button></div>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

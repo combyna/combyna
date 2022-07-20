@@ -72,12 +72,12 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($theirSubType1->reveal()))->willReturn(true);
         $this->ourSubType1->allows(Argument::is($theirSubType2->reveal()))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsFalseWhenNeitherOfOurSubTypesAllowsOneOfTheirSubTypes()
@@ -91,12 +91,12 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($theirSubType2->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($theirSubType2->reveal()))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isFalse;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsTrueWhenEachOfOurSubTypesAllowsEachOfTheirSubTypesInOrder()
@@ -110,12 +110,12 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($theirSubType2->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($theirSubType2->reveal()))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsTrueWhenEachOfOurSubTypesAllowsEachOfTheirSubTypesOutOfOrder()
@@ -130,12 +130,12 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType2->allows(Argument::is($theirSubType1->reveal()))->willReturn(true);
         $this->ourSubType2->allows(Argument::is($theirSubType2->reveal()))->willReturn(false);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsTrueWhenOurFirstSubTypeAllowsTheListType()
@@ -148,9 +148,9 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(true);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(false);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsTrueWhenOurSecondSubTypeAllowsTheListType()
@@ -163,9 +163,9 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsFalseWhenNeitherOfOurSubTypesAllowsTheListType()
@@ -178,9 +178,9 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticTypeReturnsTrueWhenOurFirstSubTypeAllowsTheStaticType()
@@ -191,7 +191,7 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(true);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(false);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isTrue;
+        static::assertTrue($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testAllowsStaticTypeReturnsTrueWhenOurSecondSubTypeAllowsTheStaticType()
@@ -202,7 +202,7 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(true);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isTrue;
+        static::assertTrue($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testAllowsStaticTypeReturnsFalseWhenNeitherOfOurSubTypesAllowsTheStaticType()
@@ -213,7 +213,7 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->allows(Argument::is($candidateType->reveal()))->willReturn(false);
         $this->ourSubType2->allows(Argument::is($candidateType->reveal()))->willReturn(false);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testGetSummaryReturnsTheCorrectString()
@@ -221,7 +221,7 @@ class MultipleTypeTest extends TestCase
         $this->ourSubType1->getSummary()->willReturn('sub-type-1');
         $this->ourSubType2->getSummary()->willReturn('sub-type-2');
 
-        $this->assert($this->type->getSummary())->exactlyEquals('sub-type-1|sub-type-2');
+        static::assertSame('sub-type-1|sub-type-2', $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeReturnsANewMultipleTypeWithBothSetsOfSubTypesCombined()
@@ -241,9 +241,10 @@ class MultipleTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'our-sub-type-1|our-sub-type-2|their-sub-type-1|their-sub-type-2'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'our-sub-type-1|our-sub-type-2|their-sub-type-1|their-sub-type-2',
+            $result->getSummary()
         );
     }
 
@@ -260,9 +261,10 @@ class MultipleTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'our-sub-type-1|our-sub-type-2|list<their-element-type>'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'our-sub-type-1|our-sub-type-2|list<their-element-type>',
+            $result->getSummary()
         );
     }
 
@@ -277,9 +279,10 @@ class MultipleTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'our-sub-type-1|our-sub-type-2|their-type'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'our-sub-type-1|our-sub-type-2|their-type',
+            $result->getSummary()
         );
     }
 }

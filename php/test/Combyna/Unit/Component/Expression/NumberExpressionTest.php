@@ -47,6 +47,8 @@ class NumberExpressionTest extends TestCase
      */
     public function testConstructorAllowsValidNumbers($number)
     {
+        $this->expectNotToPerformAssertions();
+
         new NumberExpression($number);
     }
 
@@ -68,8 +70,8 @@ class NumberExpressionTest extends TestCase
      */
     public function testConstructorThrowsExceptionWhenNonNumberGiven($nonNumber, $type)
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'NumberExpression expects a float or int, ' . $type . ' given'
         );
 
@@ -90,17 +92,16 @@ class NumberExpressionTest extends TestCase
 
     public function testGetTypeReturnsTheNumberType()
     {
-        $this->assert($this->expression->getType())->exactlyEquals('number');
+        static::assertSame('number', $this->expression->getType());
     }
 
     public function testToNativeReturnsTheNativeNumberValue()
     {
-        $this->assert($this->expression->toNative())->exactlyEquals(21);
+        static::assertSame(21, $this->expression->toNative());
     }
 
     public function testToStaticReturnsItself()
     {
-        $this->assert($this->expression->toStatic($this->evaluationContext->reveal()))
-            ->exactlyEquals($this->expression);
+        static::assertSame($this->expression, $this->expression->toStatic($this->evaluationContext->reveal()));
     }
 }

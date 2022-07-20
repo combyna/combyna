@@ -96,15 +96,15 @@ class BasicExpressionNodePromoterTest extends TestCase
 
         $this->expressionFactory->createFunctionExpression(Argument::cetera())
             ->will($this->noBind(function (array $args) use ($argumentBag, $functionExpression, $resultType) {
-                $this->assert($args[0])->exactlyEquals('my_lib');
-                $this->assert($args[1])->exactlyEquals('my_func');
-                $this->assert($args[2])->exactlyEquals($argumentBag->reveal());
+                static::assertSame('my_lib', $args[0]);
+                static::assertSame('my_func', $args[1]);
+                static::assertSame($argumentBag->reveal(), $args[2]);
                 // Use the resolved result type for the function using its arguments for this call
-                $this->assert($args[3])->exactlyEquals($resultType);
+                static::assertSame($resultType, $args[3]);
                 return $functionExpression;
             }))
             ->shouldBeCalledOnce();
-        $this->assert($this->promoter->promote($node->reveal()))->exactlyEquals($functionExpression->reveal());
+        static::assertSame($functionExpression->reveal(), $this->promoter->promote($node->reveal()));
     }
 
     public function testPromoteFunctionExpressionIsCorrectForProductionMode()
@@ -124,14 +124,14 @@ class BasicExpressionNodePromoterTest extends TestCase
 
         $this->expressionFactory->createFunctionExpression(Argument::cetera())
             ->will($this->noBind(function (array $args) use ($argumentBag, $functionExpression) {
-                $this->assert($args[0])->exactlyEquals('my_lib');
-                $this->assert($args[1])->exactlyEquals('my_func');
-                $this->assert($args[2])->exactlyEquals($argumentBag->reveal());
+                static::assertSame('my_lib', $args[0]);
+                static::assertSame('my_func', $args[1]);
+                static::assertSame($argumentBag->reveal(), $args[2]);
                 // Allow any return type in production mode
-                $this->assert($args[3])->isAnInstanceOf(AnyType::class);
+                static::assertInstanceOf(AnyType::class, $args[3]);
                 return $functionExpression;
             }))
             ->shouldBeCalledOnce();
-        $this->assert($this->promoter->promote($node->reveal()))->exactlyEquals($functionExpression->reveal());
+        static::assertSame($functionExpression->reveal(), $this->promoter->promote($node->reveal()));
     }
 }

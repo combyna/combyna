@@ -139,9 +139,8 @@ class AppValidationIntegratedTest extends TestCase
             []
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [app].[page-view].[fixed-static-bag-model].[fixed-static-definition:invalid-attr]' .
             ' - default expression would get [unknown<Expression type "invalid-type-for-page-attr">], expects [text]. :: ' .
 

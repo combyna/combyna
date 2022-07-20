@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -75,6 +75,6 @@ class CompoundWidgetIntegratedTest extends TestCase
             '    Outer text: OUTER Inner text: Hi inner, from outer (OUTER)! HI FROM OUTER' .
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

@@ -49,28 +49,28 @@ class ComparisonExpressionNodeTest extends TestCase
     {
         $this->createExpressionNode(ComparisonExpression::UNEQUAL_CASE_INSENSITIVE);
 
-        $this->assert($this->node->getLeftOperandExpression())->isTheSameAs($this->leftOperandExpressionNode->reveal());
+        static::assertSame($this->leftOperandExpressionNode->reveal(), $this->node->getLeftOperandExpression());
     }
 
     public function testGetOperatorFetchesTheOperator()
     {
         $this->createExpressionNode(ComparisonExpression::UNEQUAL_CASE_INSENSITIVE);
 
-        $this->assert($this->node->getOperator())->isTheSameAs(ComparisonExpression::UNEQUAL_CASE_INSENSITIVE);
+        static::assertSame(ComparisonExpression::UNEQUAL_CASE_INSENSITIVE, $this->node->getOperator());
     }
 
     public function testGetRightOperandExpressionFetchesTheExpression()
     {
         $this->createExpressionNode(ComparisonExpression::UNEQUAL_CASE_INSENSITIVE);
 
-        $this->assert($this->node->getRightOperandExpression())->isTheSameAs($this->rightOperandExpressionNode->reveal());
+        static::assertSame($this->rightOperandExpressionNode->reveal(), $this->node->getRightOperandExpression());
     }
 
     public function testGetType()
     {
         $this->createExpressionNode(ComparisonExpression::EQUAL_CASE_INSENSITIVE);
 
-        $this->assert($this->node->getType())->exactlyEquals('comparison');
+        static::assertSame('comparison', $this->node->getType());
     }
 
     /**

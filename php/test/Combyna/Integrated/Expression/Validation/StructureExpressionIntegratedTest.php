@@ -15,7 +15,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -68,9 +68,8 @@ class StructureExpressionIntegratedTest extends TestCase
 
     public function testStructureExpressionsAndTypesAreValidated()
     {
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [app].[page-view].[view:my_view].[widget-group:root].[fixed-static-bag-model].[fixed-static-definition:my_capture].[type:structure].[fixed-static-bag-model].[fixed-static-definition:my_attr_with_invalid_type]' .
             ' - Expected type not to be unresolved, but it was: unknown<No loader is registered for types of type "my_invalid_attr_type">. :: ' .
 

@@ -79,7 +79,7 @@ class TriggerRendererTest extends TestCase
         $widget->getTriggers()
             ->willReturn($triggerCollection->reveal());
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 ['library' => 'first_lib', 'event' => 'first_event'],
                 ['library' => 'second_lib', 'event' => 'second_event'],
@@ -94,8 +94,8 @@ class TriggerRendererTest extends TestCase
         $this->program->getWidgetByPath(['path', 'to', 'my-widget'])
             ->willReturn($widget->reveal());
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             sprintf(
                 'Expected a %s, got a %s',
                 DefinedWidgetInterface::class,

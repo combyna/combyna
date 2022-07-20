@@ -72,7 +72,7 @@ class BuiltinExpressionLoaderTest extends TestCase
 
         $resultExpression = $this->loader->load($config);
 
-        $this->assert($resultExpression)->exactlyEquals($expressionFromSubLoader->reveal());
+        static::assertSame($expressionFromSubLoader->reveal(), $resultExpression);
     }
 
     public function testLoadReturnsUnknownExpressionNodeWhenNoMatchingLoaderIsInstalled()
@@ -84,11 +84,11 @@ class BuiltinExpressionLoaderTest extends TestCase
             'named-arguments' => []
         ]);
 
-        $this->assert($resultExpression)->isAnInstanceOf(UnknownExpressionNode::class);
+        static::assertInstanceOf(UnknownExpressionNode::class, $resultExpression);
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('builtin');
+        static::assertSame('builtin', $this->loader->getType());
     }
 }

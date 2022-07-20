@@ -147,8 +147,8 @@ class StaticStructureTypeTest extends TestCase
 
     public function testCoerceNativeThrowsWhenNonArrayOrObjectIsGiven()
     {
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Static structure type expects an array or stdClass instance, integer given'
         );
 
@@ -162,8 +162,8 @@ class StaticStructureTypeTest extends TestCase
 
     public function testCoerceNativeThrowsWhenNonStdclassObjectIsGiven()
     {
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Static structure type expects an array or stdClass instance, instance of ArrayIterator given'
         );
 
@@ -179,8 +179,9 @@ class StaticStructureTypeTest extends TestCase
 
     public function testGetSummaryReturnsTheCorrectString()
     {
-        $this->assert($this->type->getSummary())->exactlyEquals(
-            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>'
+        static::assertSame(
+            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>',
+            $this->type->getSummary()
         );
     }
 
@@ -198,9 +199,10 @@ class StaticStructureTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|their-sub-type-1|their-sub-type-2'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|their-sub-type-1|their-sub-type-2',
+            $result->getSummary()
         );
     }
 
@@ -214,9 +216,10 @@ class StaticStructureTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $elementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|list<their-element-type>'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|list<their-element-type>',
+            $result->getSummary()
         );
     }
 
@@ -228,9 +231,10 @@ class StaticStructureTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|their-type'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'structure<{human: structure<{first-name: text, second-name: text}>, dog: structure<{name: text, food: text}>}>|their-type',
+            $result->getSummary()
         );
     }
 }

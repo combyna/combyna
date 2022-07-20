@@ -42,11 +42,11 @@ class NothingExpressionNodeTest extends TestCase
 
     public function testGetTypeReturnsTheNothingType()
     {
-        $this->assert($this->node->getType())->exactlyEquals('nothing');
+        static::assertSame('nothing', $this->node->getType());
     }
 
     public function testToNativeReturnsTheNull()
     {
-        $this->assert($this->node->toNative())->isNull;
+        static::assertNull($this->node->toNative());
     }
 }

@@ -83,8 +83,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
 
         $type = $rootValidationContext->getExpressionResultType($expressionNode);
 
-        $this->assert($type)->isAnInstanceOf(StaticType::class);
-        $this->assert($type->getSummary())->exactlyEquals('boolean');
+        static::assertInstanceOf(StaticType::class, $type);
+        static::assertSame('boolean', $type->getSummary());
     }
 
     public function testForEqualOperationOperandsMustBothEvaluateToTheSameScalarType()
@@ -95,9 +95,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(3)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "text" and "number" do not both match just one of the provided allowed result types' .
             ', allowed types are: "boolean", "number", "text"'
@@ -114,9 +113,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(3) // Not text
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "boolean" and "number" do not both match just one of the provided allowed result types' .
             ', allowed types are: "text"'
@@ -133,9 +131,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new BooleanExpressionNode(false)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "text" and "boolean" do not both match just one of the provided allowed result types' .
             ', allowed types are: "number"'
@@ -152,9 +149,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new BooleanExpressionNode(false)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "text" and "boolean" do not both match just one of the provided allowed result types' .
             ', allowed types are: "number"'
@@ -171,9 +167,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(3)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "text" and "number" do not both match just one of the provided allowed result types' .
             ', allowed types are: "boolean", "number", "text"'
@@ -190,9 +185,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(3) // Not text
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "boolean" and "number" do not both match just one of the provided allowed result types' .
             ', allowed types are: "text"'
@@ -209,9 +203,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new NumberExpressionNode(2)
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - Invalid operator "not-a-valid-op" provided'
         );
@@ -227,9 +220,8 @@ class ComparisonExpressionIntegratedTest extends TestCase
             new UnknownExpressionTypeNode('right-unknown-type')
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[comparison]' .
             ' - operands "unknown<Expression type "left-unknown-type">" and "unknown<Expression type "right-unknown-type">" do not both match just one of the provided allowed result types, allowed types are: "boolean", "number", "text". :: ' .
 

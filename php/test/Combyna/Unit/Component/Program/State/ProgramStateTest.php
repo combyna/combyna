@@ -84,8 +84,7 @@ class ProgramStateTest extends TestCase
         $this->pageViewState->getWidgetStatePathsByTag('my_tag')
             ->willReturn([$widgetStatePath]);
 
-        $this->assert($this->programState->getWidgetStatePathByTag('my_tag'))
-            ->exactlyEquals($widgetStatePath->reveal());
+        static::assertSame($widgetStatePath->reveal(), $this->programState->getWidgetStatePathByTag('my_tag'));
     }
 
     public function testGetWidgetStatePathsByTagFetchesMatchingPathsFromThePageViewState()
@@ -95,11 +94,13 @@ class ProgramStateTest extends TestCase
         $this->pageViewState->getWidgetStatePathsByTag('my_tag')
             ->willReturn([$widgetStatePath1, $widgetStatePath2]);
 
-        $this->assert($this->programState->getWidgetStatePathsByTag('my_tag'))
-            ->exactlyEquals([
+        static::assertSame(
+            [
                 $widgetStatePath1->reveal(),
                 $widgetStatePath2->reveal()
-            ]);
+            ],
+            $this->programState->getWidgetStatePathsByTag('my_tag')
+        );
     }
 
     public function testGetWidgetStatePathByTagFetchesAMatchingPathFromTheSecondOverlayViewState()
@@ -108,8 +109,7 @@ class ProgramStateTest extends TestCase
         $this->visibleOverlayViewState2->getWidgetStatePathsByTag('my_tag')
             ->willReturn([$widgetStatePath]);
 
-        $this->assert($this->programState->getWidgetStatePathByTag('my_tag'))
-            ->exactlyEquals($widgetStatePath->reveal());
+        static::assertSame($widgetStatePath->reveal(), $this->programState->getWidgetStatePathByTag('my_tag'));
     }
 
     public function testGetWidgetStatePathsByTagFetchesMatchingPathsFromTheSecondOverlayViewState()
@@ -119,11 +119,13 @@ class ProgramStateTest extends TestCase
         $this->visibleOverlayViewState2->getWidgetStatePathsByTag('my_tag')
             ->willReturn([$widgetStatePath1, $widgetStatePath2]);
 
-        $this->assert($this->programState->getWidgetStatePathsByTag('my_tag'))
-            ->exactlyEquals([
+        static::assertSame(
+            [
                 $widgetStatePath1->reveal(),
                 $widgetStatePath2->reveal()
-            ]);
+            ],
+            $this->programState->getWidgetStatePathsByTag('my_tag')
+        );
     }
 
     public function testWithPageViewStateReturnsANewProgramStateWhenPageViewStateDiffers()
@@ -132,15 +134,15 @@ class ProgramStateTest extends TestCase
 
         $resultingProgramState = $this->programState->withPageViewState($differentPageViewState->reveal());
 
-        $this->assert($resultingProgramState)->isAnInstanceOf(ProgramStateInterface::class);
-        $this->assert($resultingProgramState)->doesNotExactlyEqual($this->programState);
-        $this->assert($resultingProgramState->getPageViewState())->exactlyEquals($differentPageViewState->reveal());
+        static::assertInstanceOf(ProgramStateInterface::class, $resultingProgramState);
+        static::assertNotSame($this->programState, $resultingProgramState);
+        static::assertSame($differentPageViewState->reveal(), $resultingProgramState->getPageViewState());
     }
 
     public function testWithPageViewStateReturnsTheSameProgramStateWhenPageViewStateIsIdentical()
     {
         $resultingProgramState = $this->programState->withPageViewState($this->pageViewState->reveal());
 
-        $this->assert($resultingProgramState)->exactlyEquals($this->programState);
+        static::assertSame($this->programState, $resultingProgramState);
     }
 }

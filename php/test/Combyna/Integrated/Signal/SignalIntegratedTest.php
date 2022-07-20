@@ -16,7 +16,7 @@ use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
 use Combyna\Component\Signal\EventDispatcher\Event\SignalDispatchedEvent;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -82,7 +82,7 @@ class SignalIntegratedTest extends TestCase
                 '(Nothing has been dispatched yet)' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheImplicitNonBroadcasterButton()
@@ -110,7 +110,7 @@ class SignalIntegratedTest extends TestCase
                 'From the implicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheImplicitNonBroadcasterButton()
@@ -132,7 +132,7 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        self::assertNull($lastEvent);
+        static::assertNull($lastEvent);
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheExplicitNonBroadcasterButton()
@@ -160,7 +160,7 @@ class SignalIntegratedTest extends TestCase
                 'From the explicit non-broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsNoSignalEventAfterClickingTheExplicitNonBroadcasterButton()
@@ -182,7 +182,7 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        self::assertNull($lastEvent);
+        static::assertNull($lastEvent);
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingTheBroadcasterButton()
@@ -210,7 +210,7 @@ class SignalIntegratedTest extends TestCase
                 'From the broadcaster' . // Current text display
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testDispatchEventEmitsASignalEventAfterClickingTheBroadcasterButton()
@@ -232,6 +232,6 @@ class SignalIntegratedTest extends TestCase
             ]
         );
 
-        self::assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
+        static::assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
     }
 }

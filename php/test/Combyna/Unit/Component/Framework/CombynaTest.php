@@ -170,14 +170,14 @@ class CombynaTest extends TestCase
     {
         $app = $this->combyna->createApp(['my_app' => true], $this->environmentNode->reveal());
 
-        self::assertSame($this->app->reveal(), $app);
+        static::assertSame($this->app->reveal(), $app);
     }
 
     public function testCreateAppShouldReturnACorrectlyLoadedThenPromotedAppWhenNotGivenAnExistingEnvironment()
     {
         $app = $this->combyna->createApp(['my_app' => true]);
 
-        self::assertSame($this->app->reveal(), $app);
+        static::assertSame($this->app->reveal(), $app);
     }
 
     public function testCreateAppShouldValidateTheAppWhenInDevelopmentMode()
@@ -220,7 +220,7 @@ class CombynaTest extends TestCase
             ]
         ]);
 
-        self::assertSame($this->environmentNode->reveal(), $environmentNode);
+        static::assertSame($this->environmentNode->reveal(), $environmentNode);
     }
 
     public function testCreateEnvironmentShouldDispatchAnEventWithTheLoadedEnvironmentNode()
@@ -230,8 +230,8 @@ class CombynaTest extends TestCase
                 /** @var EnvironmentLoadedEvent $event */
                 list(, $event) = $args;
 
-                $this->assert($event)->isAnInstanceOf(EnvironmentLoadedEvent::class);
-                $this->assert($event->getEnvironmentNode())->exactlyEquals($this->environmentNode->reveal());
+                static::assertInstanceOf(EnvironmentLoadedEvent::class, $event);
+                static::assertSame($this->environmentNode->reveal(), $event->getEnvironmentNode());
             }));
 
         $this->combyna->createEnvironment();
@@ -239,7 +239,7 @@ class CombynaTest extends TestCase
 
     public function testGetContainerFetchesTheServiceContainer()
     {
-        $this->assert($this->combyna->getContainer())->exactlyEquals($this->serviceContainer->reveal());
+        static::assertSame($this->serviceContainer->reveal(), $this->combyna->getContainer());
     }
 
     public function testOnBroadcastSignalAddsTheListenerForTheCorrectEvent()
@@ -273,8 +273,8 @@ class CombynaTest extends TestCase
     {
         $this->combyna->createApp(['my_app' => true], $this->environmentNode->reveal());
 
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'Unable to switch to production mode, as an app has already been created'
         );
 

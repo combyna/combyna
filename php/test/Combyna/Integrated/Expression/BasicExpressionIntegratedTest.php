@@ -217,9 +217,9 @@ class BasicExpressionIntegratedTest extends TestCase
 
         $resultStatic = $expression->toStatic($evaluationContext);
 
-        self::assertInstanceOf(TextExpression::class, $resultStatic);
-        $this->assert($resultStatic->toNative())->exactlyEquals(
+        static::assertInstanceOf(TextExpression::class, $resultStatic);
+        static::assertSame(
             '14 is my result - it was zero, oops - insensitively equal 1=20:2=100 and done'
-        );
+        , $resultStatic->toNative());
     }
 }

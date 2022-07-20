@@ -59,13 +59,13 @@ class ExpressionBagTest extends TestCase
 
     public function testGetExpressionReturnsTheCorrectExpression()
     {
-        $this->assert($this->bag->getExpression('second-expr'))->exactlyEquals($this->expression2->reveal());
+        static::assertSame($this->expression2->reveal(), $this->bag->getExpression('second-expr'));
     }
 
     public function testGetExpressionThrowsWhenNoExpressionExistsInBagWithGivenName()
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Expression bag contains no "an-undefined-expr" expression'
         );
 
@@ -74,16 +74,16 @@ class ExpressionBagTest extends TestCase
 
     public function testGetExpressionNamesReturnsNamesOfAllExpressionsInBag()
     {
-        $this->assert($this->bag->getExpressionNames())->exactlyEquals(['first-expr', 'second-expr']);
+        static::assertSame(['first-expr', 'second-expr'], $this->bag->getExpressionNames());
     }
 
     public function testHasExpressionReturnsTrueWhenExpressionIsDefinedInBag()
     {
-        $this->assert($this->bag->hasExpression('first-expr'))->isTrue;
+        static::assertTrue($this->bag->hasExpression('first-expr'));
     }
 
     public function testHasExpressionReturnsFalseWhenExpressionIsNotDefinedInBag()
     {
-        $this->assert($this->bag->hasExpression('an-undefined-expr'))->isFalse;
+        static::assertFalse($this->bag->hasExpression('an-undefined-expr'));
     }
 }

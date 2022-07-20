@@ -110,12 +110,12 @@ class StaticListTypeTest extends TestCase
         $theirSubType1->isAllowedByStaticListType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByStaticListType(Argument::is($this->type))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isTrue;
+        );
     }
 
     public function testAllowsMultipleTypeReturnsFalseIfOneOfItsSubTypesIsNotAllowedByUs()
@@ -129,12 +129,12 @@ class StaticListTypeTest extends TestCase
         $theirSubType1->isAllowedByStaticListType(Argument::is($this->type))->willReturn(true);
         $theirSubType2->isAllowedByStaticListType(Argument::is($this->type))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsMultipleType($candidateType->reveal(), [
                 $theirSubType1->reveal(),
                 $theirSubType2->reveal()
             ])
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticReturnsFalseForANonStaticListExpressionStatic()
@@ -142,7 +142,7 @@ class StaticListTypeTest extends TestCase
         /** @var ObjectProphecy|NumberExpression $candidateType */
         $candidateType = $this->prophesize(NumberExpression::class);
 
-        $this->assert($this->type->allowsStatic($candidateType->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStatic($candidateType->reveal()));
     }
 
     public function testAllowsStaticReturnsTrueWhenStaticListExpressionGivenAndElementTypesMatch()
@@ -151,7 +151,7 @@ class StaticListTypeTest extends TestCase
         $candidateType = $this->prophesize(StaticListExpression::class);
         $candidateType->elementsMatch(Argument::is($this->elementType->reveal()))->willReturn(true);
 
-        $this->assert($this->type->allowsStatic($candidateType->reveal()))->isTrue;
+        static::assertTrue($this->type->allowsStatic($candidateType->reveal()));
     }
 
     public function testAllowsStaticReturnsFalseWhenStaticListExpressionGivenButElementTypesDoNotMatch()
@@ -160,7 +160,7 @@ class StaticListTypeTest extends TestCase
         $static = $this->prophesize(StaticListExpression::class);
         $static->elementsMatch(Argument::is($this->elementType->reveal()))->willReturn(false);
 
-        $this->assert($this->type->allowsStatic($static->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStatic($static->reveal()));
     }
 
     public function testAllowsStaticListTypeReturnsTrueWhenOurElementTypeAllowsTheirElementType()
@@ -171,9 +171,9 @@ class StaticListTypeTest extends TestCase
         $elementType = $this->prophesize(TypeInterface::class);
         $this->elementType->allows(Argument::is($elementType->reveal()))->willReturn(true);
 
-        $this->assert(
+        static::assertTrue(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isTrue;
+        );
     }
 
     public function testAllowsStaticListTypeReturnsFalseWhenOurElementTypeDoesNotAllowTheirElementType()
@@ -184,9 +184,9 @@ class StaticListTypeTest extends TestCase
         $elementType = $this->prophesize(TypeInterface::class);
         $this->elementType->allows(Argument::is($elementType->reveal()))->willReturn(false);
 
-        $this->assert(
+        static::assertFalse(
             $this->type->allowsStaticListType($candidateType->reveal(), $elementType->reveal())
-        )->isFalse;
+        );
     }
 
     public function testAllowsStaticTypeAlwaysReturnsFalse()
@@ -194,7 +194,7 @@ class StaticListTypeTest extends TestCase
         /** @var ObjectProphecy|StaticType $candidateType */
         $candidateType = $this->prophesize(StaticType::class);
 
-        $this->assert($this->type->allowsStaticType($candidateType->reveal()))->isFalse;
+        static::assertFalse($this->type->allowsStaticType($candidateType->reveal()));
     }
 
     public function testCoerceNativeCoercesAndReturnsAnExistingAllowedListStatic()
@@ -217,14 +217,15 @@ class StaticListTypeTest extends TestCase
         $this->elementType->coerceStatic($element2, $this->evaluationContext)
             ->willReturn($element2);
 
-        $this->assert(
+        static::assertSame(
+            $staticListExpression,
             $this->type->coerceNative(
                 $staticListExpression,
                 $this->staticExpressionFactory,
                 $this->bagFactory,
                 $this->evaluationContext->reveal()
             )
-        )->exactlyEquals($staticListExpression);
+        );
     }
 
     public function testCoerceNativeThrowsForAnIncompatibleExistingStatic()
@@ -241,8 +242,8 @@ class StaticListTypeTest extends TestCase
         $this->elementType->getSummary()
             ->willReturn('my type summary');
 
-        $this->setExpectedException(
-            IncompatibleNativeForCoercionException::class,
+        $this->expectException(IncompatibleNativeForCoercionException::class);
+        $this->expectExceptionMessage(
             'Static of type "static-list" was given, expected a native or matching static of type "list<my type summary>"'
         );
 
@@ -281,10 +282,10 @@ class StaticListTypeTest extends TestCase
         );
 
         /** @var StaticListExpression $static */
-        $this->assert($static)->isAnInstanceOf(StaticListExpression::class);
+        static::assertInstanceOf(StaticListExpression::class, $static);
         $statics = $static->getElementStatics();
-        $this->assert($statics[0])->exactlyEquals($coercedElement1);
-        $this->assert($statics[1])->exactlyEquals($coercedElement2);
+        static::assertSame($coercedElement1, $statics[0]);
+        static::assertSame($coercedElement2, $statics[1]);
     }
 
     public function testCoerceStaticThrowsWhenNonStaticListExpressionIsGiven()
@@ -292,8 +293,8 @@ class StaticListTypeTest extends TestCase
         $nonListStatic = $this->prophesize(TextExpression::class);
         $evaluationContext = $this->prophesize(EvaluationContextInterface::class);
 
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             sprintf(
                 'Expected a %s, got %s',
                 StaticListExpression::class,
@@ -310,7 +311,7 @@ class StaticListTypeTest extends TestCase
     {
         $this->elementType->getSummary()->willReturn('our-element-type');
 
-        $this->assert($this->type->getSummary())->exactlyEquals('list<our-element-type>');
+        static::assertSame('list<our-element-type>', $this->type->getSummary());
     }
 
     public function testMergeWithMultipleTypeReturnsANewMultipleTypeWithThisStaticAdded()
@@ -328,9 +329,10 @@ class StaticListTypeTest extends TestCase
             $theirSubType2->reveal()
         ]);
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'list<our-element-type>|their-sub-type-1|their-sub-type-2'
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame(
+            'list<our-element-type>|their-sub-type-1|their-sub-type-2',
+            $result->getSummary()
         );
     }
 
@@ -348,9 +350,10 @@ class StaticListTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticListType($otherType->reveal(), $theirElementType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(StaticListType::class);
-        $this->assert($result->getSummary())->exactlyEquals(
-            'list<our-element-type|their-element-type>'
+        static::assertInstanceOf(StaticListType::class, $result);
+        static::assertSame(
+            'list<our-element-type|their-element-type>',
+            $result->getSummary()
         );
     }
 
@@ -363,7 +366,7 @@ class StaticListTypeTest extends TestCase
 
         $result = $this->type->mergeWithStaticType($otherType->reveal());
 
-        $this->assert($result)->isAnInstanceOf(MultipleType::class);
-        $this->assert($result->getSummary())->exactlyEquals('list<our-element-type>|their-static-type');
+        static::assertInstanceOf(MultipleType::class, $result);
+        static::assertSame('list<our-element-type>|their-static-type', $result->getSummary());
     }
 }

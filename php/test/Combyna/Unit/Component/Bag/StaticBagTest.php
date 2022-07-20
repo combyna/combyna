@@ -53,13 +53,13 @@ class StaticBagTest extends TestCase
 
     public function testGetStaticReturnsTheCorrectStatic()
     {
-        self::assertSame($this->static2->reveal(), $this->bag->getStatic('second-static'));
+        static::assertSame($this->static2->reveal(), $this->bag->getStatic('second-static'));
     }
 
     public function testGetStaticThrowsWhenNoStaticExistsInBagWithGivenName()
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Static bag contains no "an-undefined-static" static'
         );
 
@@ -68,24 +68,24 @@ class StaticBagTest extends TestCase
 
     public function testGetStaticNamesReturnsTheNames()
     {
-        self::assertEquals(['first-static', 'second-static'], $this->bag->getStaticNames());
+        static::assertEquals(['first-static', 'second-static'], $this->bag->getStaticNames());
     }
 
     public function testHasStaticReturnsTrueWhenStaticIsDefinedInBag()
     {
-        self::assertTrue($this->bag->hasStatic('first-static'));
+        static::assertTrue($this->bag->hasStatic('first-static'));
     }
 
     public function testHasStaticReturnsFalseWhenStaticIsNotDefinedInBag()
     {
-        self::assertFalse($this->bag->hasStatic('an-undefined-static'));
+        static::assertFalse($this->bag->hasStatic('an-undefined-static'));
     }
 
     public function testWithStaticsReturnsTheSameBagWhenProvidedNewStaticsArrayIsEmpty()
     {
         $newBag = $this->bag->withStatics([]);
 
-        self::assertSame($this->bag, $newBag);
+        static::assertSame($this->bag, $newBag);
     }
 
     public function testWithStaticsReturnsANewBagWithAllWhenADifferentStaticIsProvided()
@@ -96,10 +96,10 @@ class StaticBagTest extends TestCase
             'new-static' => $newStatic->reveal()
         ]);
 
-        self::assertInstanceOf(StaticBagInterface::class, $newBag);
-        self::assertSame($this->static1->reveal(), $newBag->getStatic('first-static'));
-        self::assertSame($this->static2->reveal(), $newBag->getStatic('second-static'));
-        self::assertSame($newStatic->reveal(), $newBag->getStatic('new-static'));
+        static::assertInstanceOf(StaticBagInterface::class, $newBag);
+        static::assertSame($this->static1->reveal(), $newBag->getStatic('first-static'));
+        static::assertSame($this->static2->reveal(), $newBag->getStatic('second-static'));
+        static::assertSame($newStatic->reveal(), $newBag->getStatic('new-static'));
     }
 
     public function testWithStaticsGivesPrecedenceToNewStatics()
@@ -110,8 +110,8 @@ class StaticBagTest extends TestCase
             'first-static' => $newFirstStatic->reveal()
         ]);
 
-        self::assertInstanceOf(StaticBagInterface::class, $newBag);
-        self::assertSame($newFirstStatic->reveal(), $newBag->getStatic('first-static'));
-        self::assertSame($this->static2->reveal(), $newBag->getStatic('second-static'));
+        static::assertInstanceOf(StaticBagInterface::class, $newBag);
+        static::assertSame($newFirstStatic->reveal(), $newBag->getStatic('first-static'));
+        static::assertSame($this->static2->reveal(), $newBag->getStatic('second-static'));
     }
 }

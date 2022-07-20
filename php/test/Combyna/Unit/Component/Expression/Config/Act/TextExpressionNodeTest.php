@@ -47,6 +47,8 @@ class TextExpressionNodeTest extends TestCase
      */
     public function testConstructorAllowsValidStrings($string)
     {
+        $this->expectNotToPerformAssertions();
+
         new TextExpressionNode($string);
     }
 
@@ -68,8 +70,8 @@ class TextExpressionNodeTest extends TestCase
      */
     public function testConstructorThrowsExceptionWhenNonStringGiven($nonString, $type)
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'TextExpressionNode expects a string, ' . $type . ' given'
         );
 
@@ -91,11 +93,11 @@ class TextExpressionNodeTest extends TestCase
 
     public function testGetTypeReturnsTheTextType()
     {
-        $this->assert($this->node->getType())->exactlyEquals('text');
+        static::assertSame('text', $this->node->getType());
     }
 
     public function testToNativeReturnsTheNativeTextString()
     {
-        $this->assert($this->node->toNative())->exactlyEquals('this is my string');
+        static::assertSame('this is my string', $this->node->toNative());
     }
 }

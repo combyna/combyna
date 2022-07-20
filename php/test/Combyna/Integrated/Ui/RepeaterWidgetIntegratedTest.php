@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -80,7 +80,7 @@ class RepeaterWidgetIntegratedTest extends TestCase
                 '<button name="combyna-widget-item_viewer-root-3-2-0">Select item "third"</button>' .
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppDisplaysTheSelectedItemAfterSelecting()
@@ -109,6 +109,6 @@ class RepeaterWidgetIntegratedTest extends TestCase
                 '<button name="combyna-widget-item_viewer-root-3-2-0">Select item "third"</button>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

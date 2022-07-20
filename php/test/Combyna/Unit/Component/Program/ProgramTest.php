@@ -130,8 +130,8 @@ class ProgramTest extends TestCase
 
     public function testGetWidgetByPathThrowsExceptionWhenTryingToFetchAViewFromALibrary()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'Only apps can define views for now, but tried to fetch view with name "my_view" for library "my_lib"'
         );
 
@@ -140,7 +140,7 @@ class ProgramTest extends TestCase
 
     public function testGetWidgetByPathCanFetchWidgetsInsideAPageViewRoot()
     {
-        self::assertSame(
+        static::assertSame(
             $this->widgetInsideViewRoot->reveal(),
             $this->program->getWidgetByPath(
                 ['app', WidgetStatePathInterface::VIEW_PATH_TYPE, 'my_view', 'root', 'my_widget']
@@ -150,7 +150,7 @@ class ProgramTest extends TestCase
 
     public function testGetWidgetByPathCanFetchWidgetsInsideAWidgetDefinitionRoot()
     {
-        self::assertSame(
+        static::assertSame(
             $this->widgetInsideDefinitionRoot->reveal(),
             $this->program->getWidgetByPath([
                 'my_lib',
@@ -165,8 +165,8 @@ class ProgramTest extends TestCase
 
     public function testGetWidgetByPathThrowsExceptionWhenCompoundWidgetDefinitionPathUsesWrongRootName()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'Expected root widget for compound definition to be named "root" but it was "not_a_valid_root_name"'
         );
 
@@ -182,8 +182,8 @@ class ProgramTest extends TestCase
 
     public function testGetWidgetByPathThrowsExceptionForInvalidPathType()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'Invalid path type "my_invalid_path_type" given'
         );
 

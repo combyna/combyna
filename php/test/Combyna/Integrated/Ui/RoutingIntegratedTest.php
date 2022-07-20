@@ -28,8 +28,8 @@ use Combyna\Component\Signal\EventDispatcher\Event\SignalDispatchedEvent;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -159,7 +159,7 @@ class RoutingIntegratedTest extends TestCase
                 '<span>Label :: Navigate me</span>' .
                 "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppRendersTheItemPageViewAfterFollowingTheViewItemLink()
@@ -185,7 +185,7 @@ class RoutingIntegratedTest extends TestCase
                 '<a href="/">Go back home</a>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppDispatchesTheRouteNavigationEventAfterFollowingTheViewItemLink()
@@ -209,8 +209,8 @@ class RoutingIntegratedTest extends TestCase
         );
 
         /** @var RouteNavigatedEvent $lastEvent */
-        self::assertInstanceOf(RouteNavigatedEvent::class, $lastEvent);
-        self::assertSame('/item/item_1234', $lastEvent->getUrl());
+        static::assertInstanceOf(RouteNavigatedEvent::class, $lastEvent);
+        static::assertSame('/item/item_1234', $lastEvent->getUrl());
     }
 
     public function testRenderAppDispatchesTheBroadcastSignalAfterNavigatingTheNavigableThingToTheItemPage()
@@ -235,10 +235,10 @@ class RoutingIntegratedTest extends TestCase
         );
 
         /** @var SignalDispatchedEvent $lastEvent */
-        self::assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
-        self::assertSame('app', $lastEvent->getSignal()->getLibraryName());
-        self::assertSame('navigation_detected', $lastEvent->getSignal()->getName());
-        self::assertSame(
+        static::assertInstanceOf(SignalDispatchedEvent::class, $lastEvent);
+        static::assertSame('app', $lastEvent->getSignal()->getLibraryName());
+        static::assertSame('navigation_detected', $lastEvent->getSignal()->getName());
+        static::assertSame(
             'app.my_item_route',
             $lastEvent->getSignal()->getPayloadStatic('which_route')->toNative()
         );
@@ -260,7 +260,7 @@ class RoutingIntegratedTest extends TestCase
                 'Provided URL: (None)' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testTheAboutPageAllowsADynamicRouteAndArgumentsToBeProvidedViaSignal()
@@ -293,7 +293,7 @@ class RoutingIntegratedTest extends TestCase
                 'Provided URL: /item/item_123456' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testExceptionIsThrownOnAboutPageWhenInvalidDynamicRouteAndArgumentsProvidedViaSignal()
@@ -305,8 +305,8 @@ class RoutingIntegratedTest extends TestCase
             'my_about_route'
         );
 
-        $this->setExpectedException(
-            SignalDispatchFailedException::class,
+        $this->expectException(SignalDispatchFailedException::class);
+        $this->expectExceptionMessage(
             'Route "an_invalid_route" for library "app" does not exist'
         );
 

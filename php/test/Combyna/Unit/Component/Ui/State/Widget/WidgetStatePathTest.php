@@ -89,7 +89,7 @@ class WidgetStatePathTest extends TestCase
 
     public function testGetParentStateReturnsTheParentStateWhenAvailable()
     {
-        self::assertSame($this->parentState->reveal(), $this->path->getParentState());
+        static::assertSame($this->parentState->reveal(), $this->path->getParentState());
     }
 
     public function testGetParentStateThrowsExceptionWhenUnavailable()
@@ -98,8 +98,8 @@ class WidgetStatePathTest extends TestCase
             $this->currentState->reveal()
         ]);
 
-        $this->setExpectedException(
-            AncestorStateUnavailableException::class,
+        $this->expectException(AncestorStateUnavailableException::class);
+        $this->expectExceptionMessage(
             'Parent state unavailable'
         );
 
@@ -108,7 +108,7 @@ class WidgetStatePathTest extends TestCase
 
     public function testGetParentStateTypeReturnsTheTypeOfTheParentStateWhenAvailable()
     {
-        self::assertSame('parent-type', $this->path->getParentStateType());
+        static::assertSame('parent-type', $this->path->getParentStateType());
     }
 
     public function testGetParentStateTypeThrowsExceptionWhenUnavailable()
@@ -117,8 +117,8 @@ class WidgetStatePathTest extends TestCase
             $this->currentState->reveal()
         ]);
 
-        $this->setExpectedException(
-            AncestorStateUnavailableException::class,
+        $this->expectException(AncestorStateUnavailableException::class);
+        $this->expectExceptionMessage(
             'Parent state unavailable'
         );
 
@@ -127,7 +127,7 @@ class WidgetStatePathTest extends TestCase
 
     public function testGetWidgetPathReturnsCorrectPathWhenNoCompoundWidgetIsInvolved()
     {
-        self::assertEquals(
+        static::assertEquals(
             [
                 'app',
                 'view',
@@ -154,7 +154,7 @@ class WidgetStatePathTest extends TestCase
             $this->currentState->reveal()
         ]);
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 'my_lib', // Widget is inside a compound widget definition defined by this library
                 'widget',
@@ -183,7 +183,7 @@ class WidgetStatePathTest extends TestCase
             $this->currentState->reveal()
         ]);
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 'app', // Widget is not inside the definition so path should point to its place in the view
                 'view',
@@ -227,7 +227,7 @@ class WidgetStatePathTest extends TestCase
             $innermostPrimitiveWidgetState->reveal()
         ]);
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 'app', // Widget is not inside the definition so path should point to its place in the view
                 'view',
@@ -245,7 +245,7 @@ class WidgetStatePathTest extends TestCase
 
     public function testGetWidgetStatePathReturnsAListOfAllStateNames()
     {
-        self::assertEquals(
+        static::assertEquals(
             [
                 'grandparent',
                 'parent',
@@ -257,7 +257,7 @@ class WidgetStatePathTest extends TestCase
 
     public function testHasParentReturnsTrueWhenAtLeastAParentStateIsAvailable()
     {
-        self::assertTrue($this->path->hasParent());
+        static::assertTrue($this->path->hasParent());
     }
 
     public function testHasParentReturnsFalseWhenNoParentStateIsAvailable()
@@ -266,6 +266,6 @@ class WidgetStatePathTest extends TestCase
             $this->currentState->reveal()
         ]);
 
-        self::assertFalse($this->path->hasParent());
+        static::assertFalse($this->path->hasParent());
     }
 }

@@ -127,7 +127,7 @@ class EnvironmentNodePromoterTest extends TestCase
     {
         $environment = $this->promoter->promoteEnvironment($this->environmentNode->reveal());
 
-        $this->assert($environment)->exactlyEquals($this->environment->reveal());
+        static::assertSame($this->environment->reveal(), $environment);
     }
 
     public function testPromoteEnvironmentShouldSortTheLibrariesByDependenciesBeforePromoting()
@@ -156,7 +156,7 @@ class EnvironmentNodePromoterTest extends TestCase
 
         $environment = $this->promoter->promoteEnvironment($this->environmentNode->reveal());
 
-        $this->assert($log)->equals([
+        static::assertEquals([
             // Core library should be promoted and installed first, despite no other
             // libraries depending on it
             'promote library core',
@@ -167,6 +167,6 @@ class EnvironmentNodePromoterTest extends TestCase
             'install library my_second_lib',
             'promote library my_first_lib',
             'install library my_first_lib',
-        ]);
+        ], $log);
     }
 }

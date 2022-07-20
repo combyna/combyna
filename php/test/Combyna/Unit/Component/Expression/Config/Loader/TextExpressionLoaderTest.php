@@ -77,8 +77,8 @@ class TextExpressionLoaderTest extends TestCase
 
         $textExpressionNode = $this->loader->load($config);
 
-        $this->assert($textExpressionNode)->isAnInstanceOf(TextExpressionNode::class);
-        $this->assert($textExpressionNode->toNative())->exactlyEquals($text);
+        static::assertInstanceOf(TextExpressionNode::class, $textExpressionNode);
+        static::assertSame($text, $textExpressionNode->toNative());
     }
 
     /**
@@ -94,6 +94,6 @@ class TextExpressionLoaderTest extends TestCase
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('text');
+        static::assertSame('text', $this->loader->getType());
     }
 }

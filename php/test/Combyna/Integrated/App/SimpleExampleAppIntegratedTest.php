@@ -15,7 +15,7 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -76,7 +76,7 @@ class SimpleExampleAppIntegratedTest extends TestCase
     <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Click a button"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingAButtonLocatedByTag()
@@ -101,7 +101,7 @@ HTML;
     <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterClickingAButtonLocatedByPath()
@@ -126,6 +126,6 @@ HTML;
     <div>Click one of the buttons to change the text: <input name="combyna-widget-list-root-contents-1" type="text" value="Goodbye!"><button name="combyna-widget-list-root-contents-2">Set text to "Hello!"</button><button name="combyna-widget-list-root-contents-3">Set text to "Goodbye!"</button></div>
 </div>
 HTML;
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

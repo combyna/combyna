@@ -91,13 +91,13 @@ class ConcatenationExpressionLoaderTest extends TestCase
 
         $resultExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultExpressionNode)->isAnInstanceOf(ConcatenationExpressionNode::class);
-        $this->assert($resultExpressionNode->getOperandListExpression())->isTheSameAs($listExpression->reveal());
-        $this->assert($resultExpressionNode->getGlueExpression())->isTheSameAs($glueExpression->reveal());
+        static::assertInstanceOf(ConcatenationExpressionNode::class, $resultExpressionNode);
+        static::assertSame($listExpression->reveal(), $resultExpressionNode->getOperandListExpression());
+        static::assertSame($glueExpression->reveal(), $resultExpressionNode->getGlueExpression());
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('concatenation');
+        static::assertSame('concatenation', $this->loader->getType());
     }
 }

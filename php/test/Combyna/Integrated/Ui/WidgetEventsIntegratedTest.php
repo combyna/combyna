@@ -25,7 +25,7 @@ use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
-use Concise\Core\TestCase;
+use Combyna\Harness\TestCase;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -149,7 +149,7 @@ class WidgetEventsIntegratedTest extends TestCase
                 '<div>Label :: Switch me!</div>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterSwitchingTheSwitchableThing()
@@ -176,15 +176,15 @@ class WidgetEventsIntegratedTest extends TestCase
                 '<div>Label :: Switch me!</div>' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testExceptionIsThrownWhenAnUnreferencedEventIsDispatchedForTheSwitchableThingWidget()
     {
         $appState = $this->app->createInitialState();
 
-        $this->setExpectedException(
-            EventDispatchFailedException::class,
+        $this->expectException(EventDispatchFailedException::class);
+        $this->expectExceptionMessage(
             'Event definition "an_invalid_event" for library "widget_events" is not referenced by widget "switchable_thing" for library "widget_events"'
         );
 
@@ -203,8 +203,8 @@ class WidgetEventsIntegratedTest extends TestCase
     {
         $appState = $this->app->createInitialState();
 
-        $this->setExpectedException(
-            EventDispatchFailedException::class,
+        $this->expectException(EventDispatchFailedException::class);
+        $this->expectExceptionMessage(
             'Native value for required static "how" is missing from array'
         );
 

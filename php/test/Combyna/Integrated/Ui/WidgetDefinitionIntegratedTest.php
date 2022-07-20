@@ -24,8 +24,8 @@ use Combyna\Component\Renderer\Html\WidgetRenderer\WidgetRendererInterface;
 use Combyna\Component\Ui\State\Widget\DefinedWidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use InvalidArgumentException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 

@@ -69,10 +69,10 @@ class ArgumentParserTest extends TestCase
             new NamedParameter('my_second_param', new TextParameterType('second param'))
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_first_param'))->exactlyEquals('first value');
-        $this->assert($argumentBag->getNamedStringArgument('my_second_param'))->exactlyEquals('second value');
-        $this->assert($argumentBag->getExtraArguments())->equals([]);
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('first value', $argumentBag->getNamedStringArgument('my_first_param'));
+        static::assertSame('second value', $argumentBag->getNamedStringArgument('my_second_param'));
+        static::assertEquals([], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsReturnsCorrectArgumentBagWhenExtraArgumentsAreAllowed()
@@ -88,18 +88,18 @@ class ArgumentParserTest extends TestCase
             new ExtraParameter()
         ]);
 
-        $this->assert($argumentBag)->isAnInstanceOf(ArgumentBag::class);
-        $this->assert($argumentBag->getNamedStringArgument('my_explicit_param'))->exactlyEquals('explicit value');
-        $this->assert($argumentBag->getExtraArguments())->equals([
+        static::assertInstanceOf(ArgumentBag::class, $argumentBag);
+        static::assertSame('explicit value', $argumentBag->getNamedStringArgument('my_explicit_param'));
+        static::assertEquals([
             'some_other_arg' => 21,
             'another_arg' => 1001
-        ]);
+        ], $argumentBag->getExtraArguments());
     }
 
     public function testParseArgumentsThrowsExceptionWhenExtraArgumentsAreDisallowed()
     {
-        $this->setExpectedException(
-            ArgumentParseException::class,
+        $this->expectException(ArgumentParseException::class);
+        $this->expectExceptionMessage(
             'Extra arguments not allowed: [some_extra_arg]'
         );
 

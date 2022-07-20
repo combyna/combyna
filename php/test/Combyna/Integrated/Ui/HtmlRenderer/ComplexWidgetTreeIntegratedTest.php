@@ -247,6 +247,6 @@ class ComplexWidgetTreeIntegratedTest extends TestCase
     Some of my text here - [¯\_(ツ)_/¯] Click this button: <div><button name="combyna-widget-my_view-root-1-root-2-contents">Click me</button></div><Repeated #1 - "First"><Repeated #2 - "Second">
 </div>
 HTML;
-        self::assertSame($expectedHtml, $renderedHtml);
+        static::assertSame($expectedHtml, $renderedHtml);
     }
 }

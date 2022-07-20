@@ -84,8 +84,7 @@ class DelegatingTypeLoaderTest extends TestCase
         $this->myTypeLoader->load(['type' => 'my_type', 'some_arg' => 21])
             ->willReturn($this->resultingTypeDeterminer->reveal());
 
-        $this->assert($this->loader->load(['type' => 'my_type', 'some_arg' => 21]))
-            ->exactlyEquals($this->resultingTypeDeterminer->reveal());
+        static::assertSame($this->resultingTypeDeterminer->reveal(), $this->loader->load(['type' => 'my_type', 'some_arg' => 21]));
     }
 
     public function testLoadDelegatesToTheDelegateeWhenJustATypeNameIsGiven()
@@ -93,8 +92,7 @@ class DelegatingTypeLoaderTest extends TestCase
         $this->myTypeLoader->load(['type' => 'my_type'])
             ->willReturn($this->resultingTypeDeterminer->reveal());
 
-        $this->assert($this->loader->load('my_type'))
-            ->exactlyEquals($this->resultingTypeDeterminer->reveal());
+        static::assertSame($this->resultingTypeDeterminer->reveal(), $this->loader->load('my_type'));
     }
 
     public function testLoadDelegatesToTheMultipleTypeLoaderWhenAPipeSeparatedShorthandIsGiven()
@@ -102,17 +100,18 @@ class DelegatingTypeLoaderTest extends TestCase
         $this->multipleTypeLoader->load(['type' => 'multiple', 'types' => ['my_type', 'your_type']])
             ->willReturn($this->resultingTypeDeterminer->reveal());
 
-        $this->assert($this->loader->load('my_type|your_type'))
-            ->exactlyEquals($this->resultingTypeDeterminer->reveal());
+        static::assertSame($this->resultingTypeDeterminer->reveal(), $this->loader->load('my_type|your_type'));
     }
 
     public function testLoadReturnsPresolvedUnresolvedTypeWhenNoRelevantTypeLoaderIsRegistered()
     {
         $determiner = $this->loader->load('some_undefined_type');
 
-        $this->assert($determiner)->isAnInstanceOf(UnresolvedTypeDeterminer::class);
-        $this->assert($determiner->determine($this->validationContext->reveal())->getSummary())
-            ->exactlyEquals('unknown<No loader is registered for types of type "some_undefined_type">');
+        static::assertInstanceOf(UnresolvedTypeDeterminer::class, $determiner);
+        static::assertSame(
+            'unknown<No loader is registered for types of type "some_undefined_type">',
+            $determiner->determine($this->validationContext->reveal())->getSummary()
+        );
     }
 
     public function testLoadReturnsPresolvedUnresolvedTypeWhenConfigParserThrowsException()
@@ -122,8 +121,10 @@ class DelegatingTypeLoaderTest extends TestCase
 
         $determiner = $this->loader->load(['some_arg' => 21]);
 
-        $this->assert($determiner)->isAnInstanceOf(UnresolvedTypeDeterminer::class);
-        $this->assert($determiner->determine($this->validationContext->reveal())->getSummary())
-            ->exactlyEquals('unknown<Some issue parsing type name>');
+        static::assertInstanceOf(UnresolvedTypeDeterminer::class, $determiner);
+        static::assertSame(
+            'unknown<Some issue parsing type name>',
+            $determiner->determine($this->validationContext->reveal())->getSummary()
+        );
     }
 }

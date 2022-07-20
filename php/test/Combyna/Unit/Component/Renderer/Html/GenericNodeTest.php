@@ -58,7 +58,7 @@ class GenericNodeTest extends TestCase
             $rootChildNode->reveal()
         );
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 'type' => 'generic',
                 'library' => 'some_lib',
@@ -91,7 +91,7 @@ class GenericNodeTest extends TestCase
             null
         );
 
-        self::assertEquals(
+        static::assertEquals(
             [
                 'type' => 'generic',
                 'library' => 'some_lib',

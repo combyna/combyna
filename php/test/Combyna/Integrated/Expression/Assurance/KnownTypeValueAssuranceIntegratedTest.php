@@ -15,8 +15,8 @@ use Combyna\Component\App\AppInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\HtmlRenderer;
+use Combyna\Harness\TestCase;
 use Combyna\Test\Ui\TestGuiWidgetProviders;
-use Concise\Core\TestCase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -86,7 +86,7 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'The capture is not a number, so it cannot be doubled' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterSettingTheNumberTextboxTo40()
@@ -120,7 +120,7 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'Double is: 80.' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 
     public function testRenderAppReturnsTheCorrectHtmlAfterSettingTheNumberTextboxToADifferentNumber()
@@ -154,6 +154,6 @@ class KnownTypeValueAssuranceIntegratedTest extends TestCase
             'The capture is not a number, so it cannot be doubled' .
             "\n" .
             '</div>';
-        self::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
     }
 }

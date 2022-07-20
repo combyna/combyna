@@ -138,15 +138,15 @@ class StaticListTypeIntegratedTest extends TestCase
 
         $coercedStatic = $listType->coerceStatic($listStatic, $evaluationContext);
 
-        self::assertInstanceOf(StaticListExpression::class, $coercedStatic);
-        self::assertCount(2, $coercedStatic->getElementStatics());
-        self::assertSame(
+        static::assertInstanceOf(StaticListExpression::class, $coercedStatic);
+        static::assertCount(2, $coercedStatic->getElementStatics());
+        static::assertSame(
             'element 1, first-attr',
             $coercedStatic->getElementStatics()[0]
                 ->getAttributeStatic('first-attr')
                 ->toNative()
         );
-        self::assertSame(
+        static::assertSame(
             // NB: The default expression should have been evaluated and used,
             //     because the first element didn't specify a value for second-attr (see above)
             'default for second-attr',
@@ -154,13 +154,13 @@ class StaticListTypeIntegratedTest extends TestCase
                 ->getAttributeStatic('second-attr')
                 ->toNative()
         );
-        self::assertSame(
+        static::assertSame(
             'element 2, first-attr',
             $coercedStatic->getElementStatics()[1]
                 ->getAttributeStatic('first-attr')
                 ->toNative()
         );
-        self::assertSame(
+        static::assertSame(
             'element 2, second-attr',
             $coercedStatic->getElementStatics()[1]
                 ->getAttributeStatic('second-attr')

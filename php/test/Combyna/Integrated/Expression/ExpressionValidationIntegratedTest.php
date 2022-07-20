@@ -188,9 +188,8 @@ class ExpressionValidationIntegratedTest extends TestCase
             )
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[conditional].[comparison]' .
             ' - operands "boolean" and "text" do not both match just one of the provided allowed result types, ' .
             'allowed types are: "boolean", "number", "text". :: ' .

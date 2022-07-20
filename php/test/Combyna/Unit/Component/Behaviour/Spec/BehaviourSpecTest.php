@@ -98,7 +98,7 @@ class BehaviourSpecTest extends TestCase
 
         $specs = $this->spec->getDescendantSpecsWithQuery($querySpecifier->reveal());
 
-        self::assertSame([$this->spec], $specs);
+        static::assertSame([$this->spec], $specs);
     }
 
     public function testGetDescendantSpecsWithQueryReturnsTheCurrentSpecWhenOnlyAConstraintMakesQuery()
@@ -112,6 +112,6 @@ class BehaviourSpecTest extends TestCase
 
         $specs = $this->spec->getDescendantSpecsWithQuery($querySpecifier->reveal());
 
-        self::assertSame([$this->spec], $specs);
+        static::assertSame([$this->spec], $specs);
     }
 }

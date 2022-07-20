@@ -32,6 +32,9 @@ class ContainerIntegratedTest extends TestCase
         global $combynaBootstrap; // Use the one from bootstrap.php so that all the test plugins are loaded etc.
         $container = $combynaBootstrap->createContainer();
 
+        // No exception expected.
+        $this->expectNotToPerformAssertions();
+
         // Try to get the service to ensure it can be constructed
         $container->get($serviceId);
     }

@@ -104,7 +104,7 @@ class ConversionExpressionTest extends TestCase
     {
         $this->createExpression(ConversionExpression::NUMBER_TO_TEXT);
 
-        $this->assert($this->expression->getType())->exactlyEquals('conversion');
+        static::assertSame('conversion', $this->expression->getType());
     }
 
     public function testToStaticConvertsAnIntegerToText()
@@ -113,8 +113,8 @@ class ConversionExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(TextExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals('21');
+        static::assertInstanceOf(TextExpression::class, $resultStatic);
+        static::assertSame('21', $resultStatic->toNative());
     }
 
     public function testToStaticConvertsAFloatToText()
@@ -123,8 +123,8 @@ class ConversionExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(TextExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals('1001.423');
+        static::assertInstanceOf(TextExpression::class, $resultStatic);
+        static::assertSame('1001.423', $resultStatic->toNative());
     }
 
     public function testToStaticConvertsAStringContainingAnIntegerToAnInteger()
@@ -133,8 +133,8 @@ class ConversionExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(321);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(321, $resultStatic->toNative());
     }
 
     public function testToStaticConvertsAStringContainingAFloatToAFloat()
@@ -143,8 +143,8 @@ class ConversionExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(987.654);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(987.654, $resultStatic->toNative());
     }
 
     public function testToStaticConvertsAStringThatDoesNotContainANumberToIntegerZero()
@@ -153,14 +153,14 @@ class ConversionExpressionTest extends TestCase
 
         $resultStatic = $this->expression->toStatic($this->evaluationContext->reveal());
 
-        $this->assert($resultStatic)->isAnInstanceOf(NumberExpression::class);
-        $this->assert($resultStatic->toNative())->exactlyEquals(0);
+        static::assertInstanceOf(NumberExpression::class, $resultStatic);
+        static::assertSame(0, $resultStatic->toNative());
     }
 
     public function testToStaticThrowsForNumberToTextConversionWhenOperandIsNotANumberExpression()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'ConversionExpression :: Input can only evaluate to a number static ' .
             'for number->text conversion, but got a(n) "text"'
         );
@@ -172,8 +172,8 @@ class ConversionExpressionTest extends TestCase
 
     public function testToStaticThrowsForTextToNumberConversionWhenOperandIsNotATextExpression()
     {
-        $this->setExpectedException(
-            LogicException::class,
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage(
             'ConversionExpression :: Input can only evaluate to a text static ' .
             'for text->number conversion, but got a(n) "number"'
         );

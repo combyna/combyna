@@ -88,15 +88,15 @@ class MapExpressionLoaderTest extends TestCase
 
         $resultMapExpressionNode = $this->loader->load($config);
 
-        $this->assert($resultMapExpressionNode)->isAnInstanceOf(MapExpressionNode::class);
-        $this->assert($resultMapExpressionNode->getMapExpression())->isTheSameAs($mapExpression->reveal());
-        $this->assert($resultMapExpressionNode->getListExpression())->isTheSameAs($listExpression->reveal());
-        $this->assert($resultMapExpressionNode->getIndexVariableName())->equals('my_index');
-        $this->assert($resultMapExpressionNode->getItemVariableName())->equals('my_item');
+        static::assertInstanceOf(MapExpressionNode::class, $resultMapExpressionNode);
+        static::assertSame($mapExpression->reveal(), $resultMapExpressionNode->getMapExpression());
+        static::assertSame($listExpression->reveal(), $resultMapExpressionNode->getListExpression());
+        static::assertEquals('my_index', $resultMapExpressionNode->getIndexVariableName());
+        static::assertEquals('my_item', $resultMapExpressionNode->getItemVariableName());
     }
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('map');
+        static::assertSame('map', $this->loader->getType());
     }
 }

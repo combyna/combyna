@@ -62,7 +62,7 @@ class RenderedWidgetTest extends TestCase
 
     public function testToArrayReturnsTheCorrectAssociativeArrayStructure()
     {
-        $this->assert($this->renderedWidget->toArray())->equals([
+        static::assertEquals([
             'type' => 'widget',
             'library' => 'my-library',
             'widget' => 'my-widget',
@@ -71,11 +71,11 @@ class RenderedWidgetTest extends TestCase
                 'tag' => 'span',
                 'path' => ['my-view', 'root', 'stuff']
             ]
-        ]);
+        ], $this->renderedWidget->toArray());
     }
 
     public function testToHtmlReturnsTheRenderedHtmlOfTheRootElement()
     {
-        $this->assert($this->renderedWidget->toHtml())->exactlyEquals('<div>My root element</div>');
+        static::assertSame('<div>My root element</div>', $this->renderedWidget->toHtml());
     }
 }

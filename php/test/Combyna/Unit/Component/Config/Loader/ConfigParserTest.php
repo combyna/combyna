@@ -59,8 +59,7 @@ class ConfigParserTest extends TestCase
         $requiredType,
         $expectedResult
     ) {
-        $this->assert($this->parser->getElement($config, $key, $context, $requiredType))
-            ->exactlyEquals($expectedResult);
+        static::assertSame($expectedResult, $this->parser->getElement($config, $key, $context, $requiredType));
     }
 
     /**
@@ -158,7 +157,8 @@ class ConfigParserTest extends TestCase
         $requiredType,
         $expectedException
     ) {
-        $this->setExpectedException(InvalidArgumentException::class, $expectedException);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedException);
 
         $this->parser->getElement($config, $key, $context, $requiredType);
     }
@@ -183,8 +183,8 @@ class ConfigParserTest extends TestCase
 
     public function testGetElementThrowsExceptionWhenElementIsMissing()
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Missing required "missing-key" config for my context'
         );
 
@@ -208,8 +208,7 @@ class ConfigParserTest extends TestCase
         $requiredType,
         $expectedResult
     ) {
-        $this->assert($this->parser->getOptionalElement($config, $key, $context, $defaultValue, $requiredType))
-            ->exactlyEquals($expectedResult);
+        static::assertSame($expectedResult, $this->parser->getOptionalElement($config, $key, $context, $defaultValue, $requiredType));
     }
 
     /**
@@ -327,7 +326,8 @@ class ConfigParserTest extends TestCase
         $requiredType,
         $expectedException
     ) {
-        $this->setExpectedException(InvalidArgumentException::class, $expectedException);
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage($expectedException);
 
         $this->parser->getOptionalElement($config, $key, $context, $defaultValue, $requiredType);
     }
@@ -366,7 +366,8 @@ class ConfigParserTest extends TestCase
             ]
         )->willReturn($argumentBag);
 
-        $this->assert(
+        static::assertSame(
+            $argumentBag->reveal(),
             $this->parser->parseArguments(
                 ['my' => 'config'],
                 [
@@ -374,19 +375,17 @@ class ConfigParserTest extends TestCase
                     $parameter2->reveal()
                 ]
             )
-        )->exactlyEquals($argumentBag->reveal());
+        );
     }
 
     public function testToArrayReturnsAnArrayPassedIn()
     {
-        $this->assert($this->parser->toArray([21, 'my_key' => 'my value']))
-            ->exactlyEquals([21, 'my_key' => 'my value']);
+        static::assertSame([21, 'my_key' => 'my value'], $this->parser->toArray([21, 'my_key' => 'my value']));
     }
 
     public function testToArrayReturnsAnEmptyArrayWhenNullGiven()
     {
-        $this->assert($this->parser->toArray(null))
-            ->exactlyEquals([]);
+        static::assertSame([], $this->parser->toArray(null));
     }
 
     /**
@@ -396,8 +395,8 @@ class ConfigParserTest extends TestCase
      */
     public function testToArrayThrowsWhenNonArrayAndNonNullGiven($value, $type)
     {
-        $this->setExpectedException(
-            InvalidArgumentException::class,
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage(
             'Config should be null or array but is of type "' . $type . '"'
         );
 

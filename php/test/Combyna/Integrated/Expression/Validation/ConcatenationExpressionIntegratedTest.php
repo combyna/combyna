@@ -88,8 +88,8 @@ class ConcatenationExpressionIntegratedTest extends TestCase
 
         $type = $rootValidationContext->getExpressionResultType($expressionNode);
 
-        $this->assert($type)->isAnInstanceOf(StaticType::class);
-        $this->assert($type->getSummary())->exactlyEquals('text');
+        static::assertInstanceOf(StaticType::class, $type);
+        static::assertSame('text', $type->getSummary());
     }
 
     public function testTheOperandListExpressionCanOnlyEvaluateToAListOfNumbersOrTexts()
@@ -103,9 +103,8 @@ class ConcatenationExpressionIntegratedTest extends TestCase
             )
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[concatenation]' .
             ' - operand list would get [list<boolean|nothing>], expects [list<text|number>]'
         );
@@ -119,9 +118,8 @@ class ConcatenationExpressionIntegratedTest extends TestCase
             new UnknownExpressionTypeNode('my-unknown-expr-type')
         );
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [detached].[concatenation]' .
             ' - operand list would get [unknown<Expression type "my-unknown-expr-type">], expects [list<text|number>]'
         );

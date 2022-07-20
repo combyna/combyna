@@ -57,8 +57,8 @@ class BooleanExpressionLoaderTest extends TestCase
 
         $booleanExpressionNode = $this->loader->load($config);
 
-        $this->assert($booleanExpressionNode)->isAnInstanceOf(BooleanExpressionNode::class);
-        $this->assert($booleanExpressionNode->toNative())->exactlyEquals($boolean);
+        static::assertInstanceOf(BooleanExpressionNode::class, $booleanExpressionNode);
+        static::assertSame($boolean, $booleanExpressionNode->toNative());
     }
 
     /**
@@ -74,6 +74,6 @@ class BooleanExpressionLoaderTest extends TestCase
 
     public function testGetTypeReturnsTheCorrectType()
     {
-        $this->assert($this->loader->getType())->exactlyEquals('boolean');
+        static::assertSame('boolean', $this->loader->getType());
     }
 }

@@ -68,7 +68,7 @@ class HtmlElementTest extends TestCase
 
     public function testToArrayReturnsTheCorrectAssociativeArrayStructure()
     {
-        $this->assert($this->htmlElement->toArray())->equals([
+        static::assertEquals([
             'type' => 'element',
             'tag' => 'section',
             'path' => ['my-view', 'root', 'my-child'],
@@ -86,7 +86,7 @@ class HtmlElementTest extends TestCase
                     'tag' => 'second-child-tag'
                 ]
             ]
-        ]);
+        ], $this->htmlElement->toArray());
     }
 
     public function testToHtmlReturnsTheCorrectHtml()
@@ -97,7 +97,7 @@ class HtmlElementTest extends TestCase
             '<second-child-tag is-too></second-child-tag>' .
             '</section>';
 
-        $this->assert($this->htmlElement->toHtml())->exactlyEquals($expectedHtml);
+        static::assertSame($expectedHtml, $this->htmlElement->toHtml());
     }
 
     /**
@@ -106,7 +106,8 @@ class HtmlElementTest extends TestCase
      */
     public function testToHtmlThrowsWhenSelfClosingElementsHaveChildren($tagName)
     {
-        $this->setExpectedException(LogicException::class, '<' . $tagName . '> elements should have no children');
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('<' . $tagName . '> elements should have no children');
 
         $this->htmlElement = new HtmlElement(
             $tagName,
@@ -146,7 +147,7 @@ class HtmlElementTest extends TestCase
             ]
         );
 
-        $this->assert($this->htmlElement->toHtml())->exactlyEquals($expectedHtml);
+        static::assertSame($expectedHtml, $this->htmlElement->toHtml());
     }
 
     /**

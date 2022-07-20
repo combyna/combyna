@@ -72,14 +72,13 @@ class EventDefinitionReferenceCollectionTest extends TestCase
 
     public function testGetDefinitionByNameFetchesViaEnvironmentWhenReferenceIsInCollection()
     {
-        $this->assert($this->collection->getDefinitionByName('my_lib', 'my_event'))
-            ->exactlyEquals($this->definition1->reveal());
+        static::assertSame($this->definition1->reveal(), $this->collection->getDefinitionByName('my_lib', 'my_event'));
     }
 
     public function testGetDefinitionByNameThrowsExceptionWhenReferenceNotInCollection()
     {
-        $this->setExpectedException(
-            EventDefinitionNotReferencedException::class,
+        $this->expectException(EventDefinitionNotReferencedException::class);
+        $this->expectExceptionMessage(
             'Event definition "an_unsupported_event" for library "any_lib" is not referenced'
         );
 

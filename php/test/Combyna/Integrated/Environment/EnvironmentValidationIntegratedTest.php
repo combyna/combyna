@@ -211,9 +211,8 @@ class EnvironmentValidationIntegratedTest extends TestCase
         );
         $environmentNode->installNativeFunction('my_lib', 'my_func', function () {});
 
-        $this->setExpectedException(
-            ValidationFailureException::class,
-
+        $this->expectException(ValidationFailureException::class);
+        $this->expectExceptionMessage(
             'ACT node [environment].[library:my_lib].[event-definition:my_event].[fixed-static-bag-model].[fixed-static-definition:my-invalid-payload-static]' .
             ' - Expected type not to be unresolved, but it was: unknown<invalid event payload static type>. :: ' .
 

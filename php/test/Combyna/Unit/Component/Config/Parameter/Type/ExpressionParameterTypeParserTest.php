@@ -56,7 +56,7 @@ class ExpressionParameterTypeParserTest extends TestCase
      */
     public function testArgumentIsValid($value, $expectedResult)
     {
-        self::assertSame($expectedResult, $this->parser->argumentIsValid($this->parameterType->reveal(), $value));
+        static::assertSame($expectedResult, $this->parser->argumentIsValid($this->parameterType->reveal(), $value));
     }
 
     public function argumentIsValid_dataProvider()
@@ -81,6 +81,6 @@ class ExpressionParameterTypeParserTest extends TestCase
 
         $result = $this->parser->parseArgument($this->parameterType->reveal(), 'my string');
 
-        self::assertSame($resultExpressionNode->reveal(), $result);
+        static::assertSame($resultExpressionNode->reveal(), $result);
     }
 }
