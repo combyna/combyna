@@ -131,7 +131,7 @@ class CombynaBootstrap implements CombynaBootstrapInterface
         $this->compiledContainerNamespace = $compiledContainerNamespace !== null ?
             $compiledContainerNamespace :
             'Combyna\Container';
-        $this->containerCachePath = $relativeCachePath . '/' . $originator;
+        $this->containerCachePath = $rootPath . '/' . $relativeCachePath . '/' . $originator;
         $this->debug = $debug;
         $this->originator = $originator;
 
