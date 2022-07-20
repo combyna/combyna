@@ -25,6 +25,8 @@ use Combyna\Component\Router\Validation\Constraint\RouteExistsConstraint;
  */
 class HomeNode extends AbstractActNode
 {
+    const TYPE = 'home';
+
     /**
      * @var ExpressionBagNode
      */
