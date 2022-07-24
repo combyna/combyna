@@ -89,7 +89,7 @@ abstract class AbstractPlugin extends AbstractComponent implements PluginInterfa
                     ));
                 }
 
-                $libraryCollectionServiceDefinition->addMethodCall('addLibraryConfig', [$libraryConfig]);
+                $libraryCollectionServiceDefinition->addMethodCall('addLibraryConfig', [$libraryName, $libraryConfig]);
             }
         }
     }
