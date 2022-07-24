@@ -1,64 +1,7 @@
 {
   "version": "0.0.1",
   "name": "combyna",
-  "browserify": {
-    "transform": [
-      "phpify"
-    ]
-  },
-  "phpify": {
-    "phpToJS": {
-      "include": [
-        "php/dist/**/*.php",
-        "php/src/**/*.php",
-        "vendor/autoload.php",
-        "vendor/composer/**/*.php",
-        "!vendor/symfony/config/",
-        "vendor/symfony/config/**/*.php",
-        "!vendor/symfony/config/Tests/**",
-        "vendor/symfony/dependency-injection/**/*.php",
-        "!vendor/symfony/dependency-injection/Compiler/",
-        "!vendor/symfony/dependency-injection/Tests/**",
-        "!vendor/symfony/dependency-injection/ContainerAwareTrait.php",
-        "!vendor/symfony/dependency-injection/Dumper/PhpDumper.php",
-        "!vendor/symfony/dependency-injection/Loader/XmlFileLoader.php",
-        "vendor/symfony/event-dispatcher/**/*.php",
-        "!vendor/symfony/event-dispatcher/Tests/**",
-        "vendor/symfony/routing/**/*.php",
-        "!vendor/symfony/routing/",
-        "!vendor/symfony/routing/Tests/**",
-        "!vendor/symfony/routing/RouterInterface.php",
-        "vendor/symfony/translation/**/*.php",
-        "!vendor/symfony/translation/Tests/**",
-        "!vendor/symfony/translation/Util/ArrayConverter.php"
-      ],
-      "sync": true
-    }
-  },
   "dependencies": {
-    "dotphp": "^3.4.0",
-    "phpruntime": "^5.9.2-experimental.5",
-    "react": "^16.7.0",
-    "react-dom": "^16.7.0"
-  },
-  "devDependencies": {
-    "babel-core": "^6.26.3",
-    "babel-loader": "^6.4.1",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-react": "^6.24.1",
-    "browserify": "^13.1.0",
-    "happypack": "^4.0.0",
-    "phpify": "^4.0.1-experimental.4",
-    "source-map-loader": "^0.2.4",
-    "transform-loader": "^0.2.4",
-    "webpack": "^2.7.0"
-  },
-  "scripts": {
-    "build:release:client": "mkdir -p dist && cd dist && browserify ../js/client --outfile ./client.js",
-    "build:debug:client": "mkdir -p dist && cd dist && browserify --debug ../js/client --outfile ./client.js",
-    "server:node": "dotphp php/server.php",
-    "server:zend": "php php/server.php",
-    "dev:watch": "webpack --watch --devtool source-map"
+    "dotphp": "^3.7.1"
   }
 }
