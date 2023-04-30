@@ -48,9 +48,14 @@ class RouterFactory implements RouterFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function createRoute($name, $urlPattern, FixedStaticBagModelInterface $parameterBagModel, $pageViewName)
-    {
-        return new Route($name, $urlPattern, $parameterBagModel, $pageViewName);
+    public function createRoute(
+        $libraryName,
+        $routeName,
+        $urlPattern,
+        FixedStaticBagModelInterface $parameterBagModel,
+        $pageViewName
+    ) {
+        return new Route($libraryName, $routeName, $urlPattern, $parameterBagModel, $pageViewName);
     }
 
     /**

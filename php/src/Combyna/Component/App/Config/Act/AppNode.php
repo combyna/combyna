@@ -99,7 +99,7 @@ class AppNode extends AbstractActNode implements RootNodeInterface
 
         // Index routes by name to simplify lookups
         foreach ($routeNodes as $routeNode) {
-            $this->routeNodes[$routeNode->getName()] = $routeNode;
+            $this->routeNodes[$routeNode->getRouteName()] = $routeNode;
         }
 
         // Index signal definitions by name to simplify lookups

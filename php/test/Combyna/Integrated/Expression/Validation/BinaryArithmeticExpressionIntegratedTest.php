@@ -16,6 +16,7 @@ use Combyna\Component\App\Config\Act\HomeNode;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\Config\Act\BinaryArithmeticExpressionNode;
 use Combyna\Component\Expression\Config\Act\NumberExpressionNode;
@@ -69,6 +70,7 @@ class BinaryArithmeticExpressionIntegratedTest extends TestCase
             [],
             [
                 new RouteNode(
+                    LibraryInterface::APP,
                     'home',
                     '/',
                     new FixedStaticBagModelNode([]),

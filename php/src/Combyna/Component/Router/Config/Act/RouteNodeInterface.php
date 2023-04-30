@@ -22,11 +22,18 @@ use Combyna\Component\Config\Act\ActNodeInterface;
 interface RouteNodeInterface extends ActNodeInterface
 {
     /**
-     * Fetches the unique name of this route
+     * Fetches the name of the library this route belongs to.
      *
      * @return string
      */
-    public function getName();
+    public function getLibraryName();
+
+    /**
+     * Fetches the unique name of this route.
+     *
+     * @return string
+     */
+    public function getRouteName();
 
     /**
      * Fetches the name of the page view that should be rendered for this route

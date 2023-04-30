@@ -11,18 +11,20 @@
 
 namespace Combyna\Client;
 
+use Combyna\Component\Common\Exception\Exception;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
 use Combyna\Component\Ui\Environment\Library\GenericWidgetValueProviderInterface;
 use Combyna\Component\Validator\Exception\ValidationFailureException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ClientFactory
+ * Class ClientProvider.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ClientFactory
+class ClientProvider
 {
     /**
      * @var ArrayRenderer
@@ -30,9 +32,19 @@ class ClientFactory
     private $arrayRenderer;
 
     /**
+     * @var bool
+     */
+    private $clientProvided = false;
+
+    /**
      * @var Combyna
      */
     private $combyna;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    private $eventDispatcher;
 
     /**
      * @var GenericWidgetValueProviderInterface
@@ -40,17 +52,20 @@ class ClientFactory
     private $widgetValueProvider;
 
     /**
+     * @param EventDispatcherInterface $eventDispatcher
      * @param Combyna $combyna
      * @param ArrayRenderer $arrayRenderer
      * @param GenericWidgetValueProviderInterface $widgetValueProvider
      */
     public function __construct(
+        EventDispatcherInterface $eventDispatcher,
         Combyna $combyna,
         ArrayRenderer $arrayRenderer,
         GenericWidgetValueProviderInterface $widgetValueProvider
     ) {
         $this->arrayRenderer = $arrayRenderer;
         $this->combyna = $combyna;
+        $this->eventDispatcher = $eventDispatcher;
         $this->widgetValueProvider = $widgetValueProvider;
     }
 
@@ -77,10 +92,23 @@ class ClientFactory
      */
     public function createClient(array $environmentConfig, array $appConfig)
     {
+        if ($this->clientProvided) {
+            throw new Exception('Client was already provided');
+        }
+
+        $this->clientProvided = true;
+
         $environmentNode = $this->combyna->createEnvironment($environmentConfig);
         $app = $this->combyna->createApp($appConfig, $environmentNode);
+        $initialAppState = $app->createInitialState();
 
-        return new Client($this->arrayRenderer, $app);
+        return new Client(
+            $this->eventDispatcher,
+            $this->combyna,
+            $this->arrayRenderer,
+            $app,
+            $initialAppState
+        );
     }
 
     /**
@@ -92,26 +120,6 @@ class ClientFactory
     public function getContainer()
     {
         return $this->combyna->getContainer();
-    }
-
-    /**
-     * Adds a callback to be called when any broadcast signal is dispatched
-     *
-     * @param callable $callback
-     */
-    public function onBroadcastSignal(callable $callback)
-    {
-        $this->combyna->onBroadcastSignal($callback);
-    }
-
-    /**
-     * Adds a callback to be called when any route is navigated to
-     *
-     * @param callable $callback
-     */
-    public function onRouteNavigated(callable $callback)
-    {
-        $this->combyna->onRouteNavigated($callback);
     }
 
     /**

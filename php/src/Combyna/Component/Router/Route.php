@@ -24,7 +24,12 @@ class Route implements RouteInterface
     /**
      * @var string
      */
-    private $name;
+    private $libraryName;
+
+    /**
+     * @var string
+     */
+    private $routeName;
 
     /**
      * @var string
@@ -42,16 +47,23 @@ class Route implements RouteInterface
     private $urlPattern;
 
     /**
-     * @param string $name
+     * @param string $libraryName
+     * @param string $routeName
      * @param string $urlPattern
      * @param FixedStaticBagModelInterface $parameterBagModel
      * @param string $pageViewName
      */
-    public function __construct($name, $urlPattern, FixedStaticBagModelInterface $parameterBagModel, $pageViewName)
-    {
-        $this->name = $name;
+    public function __construct(
+        $libraryName,
+        $routeName,
+        $urlPattern,
+        FixedStaticBagModelInterface $parameterBagModel,
+        $pageViewName
+    ) {
+        $this->libraryName = $libraryName;
         $this->pageViewName = $pageViewName;
         $this->parameterBagModel = $parameterBagModel;
+        $this->routeName = $routeName;
         $this->urlPattern = $urlPattern;
     }
 
@@ -84,9 +96,9 @@ class Route implements RouteInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getLibraryName()
     {
-        return $this->name;
+        return $this->libraryName;
     }
 
     /**
@@ -103,6 +115,14 @@ class Route implements RouteInterface
     public function getParameterBagModel()
     {
         return $this->parameterBagModel;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteName()
+    {
+        return $this->routeName;
     }
 
     /**

@@ -31,7 +31,7 @@ class RouteCollection implements RouteCollectionInterface
     public function __construct(array $routes)
     {
         foreach ($routes as $route) {
-            $this->routeByName[$route->getName()] = $route;
+            $this->routeByName[$route->getRouteName()] = $route;
         }
     }
 

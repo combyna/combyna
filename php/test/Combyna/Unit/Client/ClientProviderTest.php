@@ -13,8 +13,9 @@ namespace Combyna\Unit\Client;
 
 use Closure;
 use Combyna\Client\Client;
-use Combyna\Client\ClientFactory;
+use Combyna\Client\ClientProvider;
 use Combyna\Component\App\AppInterface;
+use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
 use Combyna\Component\Framework\Combyna;
 use Combyna\Component\Renderer\Html\ArrayRenderer;
@@ -23,13 +24,14 @@ use Combyna\Harness\TestCase;
 use Prophecy\Argument;
 use Prophecy\Prophecy\ObjectProphecy;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
- * Class ClientFactoryTest
+ * Class ClientProviderTest.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class ClientFactoryTest extends TestCase
+class ClientProviderTest extends TestCase
 {
     /**
      * @var ObjectProphecy|AppInterface
@@ -52,9 +54,14 @@ class ClientFactoryTest extends TestCase
     private $environmentNode;
 
     /**
-     * @var ClientFactory
+     * @var ObjectProphecy|EventDispatcherInterface
      */
-    private $factory;
+    private $eventDispatcher;
+
+    /**
+     * @var ClientProvider
+     */
+    private $provider;
 
     /**
      * @var ObjectProphecy|GenericWidgetValueProviderInterface
@@ -67,6 +74,7 @@ class ClientFactoryTest extends TestCase
         $this->arrayRenderer = $this->prophesize(ArrayRenderer::class);
         $this->combyna = $this->prophesize(Combyna::class);
         $this->environmentNode = $this->prophesize(EnvironmentNode::class);
+        $this->eventDispatcher = $this->prophesize(EventDispatcherInterface::class);
         $this->widgetValueProvider = $this->prophesize(GenericWidgetValueProviderInterface::class);
 
         $this->combyna
@@ -84,7 +92,8 @@ class ClientFactoryTest extends TestCase
         $this->combyna->onRouteNavigated(Argument::type(Closure::class))->willReturn();
         $this->combyna->useProductionMode()->willReturn();
 
-        $this->factory = new ClientFactory(
+        $this->provider = new ClientProvider(
+            $this->eventDispatcher->reveal(),
             $this->combyna->reveal(),
             $this->arrayRenderer->reveal(),
             $this->widgetValueProvider->reveal()
@@ -95,7 +104,7 @@ class ClientFactoryTest extends TestCase
     {
         $myCallable = function () {};
 
-        $this->factory->addWidgetValueProvider(
+        $this->provider->addWidgetValueProvider(
             'my_library',
             'my_widget',
             'my_value',
@@ -112,7 +121,10 @@ class ClientFactoryTest extends TestCase
 
     public function testCreateClientReturnsANewClient()
     {
-        $client = $this->factory->createClient(
+        $initialState = $this->prophesize(AppStateInterface::class);
+        $this->app->createInitialState()->willReturn($initialState);
+
+        $client = $this->provider->createClient(
             ['libraries' => [
                 ['lib' => 1],
                 ['lib' => 2]
@@ -121,11 +133,15 @@ class ClientFactoryTest extends TestCase
         );
 
         static::assertInstanceOf(Client::class, $client);
+        static::assertSame($initialState->reveal(), $client->getCurrentAppState());
     }
 
     public function testCreateClientCreatesTheAppCorrectly()
     {
-        $this->factory->createClient(
+        $initialState = $this->prophesize(AppStateInterface::class);
+        $this->app->createInitialState()->willReturn($initialState);
+
+        $this->provider->createClient(
             ['libraries' => [
                 ['lib' => 1],
                 ['lib' => 2]
@@ -154,32 +170,12 @@ class ClientFactoryTest extends TestCase
         $serviceContainer = $this->prophesize(ContainerInterface::class);
         $this->combyna->getContainer()->willReturn($serviceContainer);
 
-        static::assertSame($serviceContainer->reveal(), $this->factory->getContainer());
-    }
-
-    public function testOnBroadcastSignalAsksCombynaToAddTheListener()
-    {
-        $callback = function () {};
-
-        $this->factory->onBroadcastSignal($callback);
-
-        $this->combyna->onBroadcastSignal(Argument::is($callback))
-            ->shouldHaveBeenCalledOnce();
-    }
-
-    public function testOnRouteNavigatedAsksCombynaToAddTheListener()
-    {
-        $callback = function () {};
-
-        $this->factory->onRouteNavigated($callback);
-
-        $this->combyna->onRouteNavigated(Argument::is($callback))
-            ->shouldHaveBeenCalledOnce();
+        static::assertSame($serviceContainer->reveal(), $this->provider->getContainer());
     }
 
     public function testUseProductionModeAsksCombynaToUseProduction()
     {
-        $this->factory->useProductionMode();
+        $this->provider->useProductionMode();
 
         $this->combyna->useProductionMode()->shouldHaveBeenCalled();
     }

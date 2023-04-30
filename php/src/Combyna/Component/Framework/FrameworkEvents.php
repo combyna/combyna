@@ -20,5 +20,7 @@ namespace Combyna\Component\Framework;
  */
 final class FrameworkEvents
 {
+    const APP_STATE_UPDATED = 'combyna.app_state_updated';
+
     const ENVIRONMENT_LOADED = 'combyna.environment_loaded';
 }

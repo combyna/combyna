@@ -195,7 +195,7 @@ class PageView implements PageViewInterface
         $rootWidgetName = array_shift($names);
 
         if ($rootWidgetName !== 'root') {
-            throw new LogicException('Root widget state for a view must be named "root"');
+            throw new LogicException('Root widget for a view must be named "root"');
         }
 
         if (count($names) === 0) {

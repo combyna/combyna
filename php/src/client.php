@@ -25,4 +25,4 @@ $combynaBootstrap = new CombynaBootstrap();
 
 $container = $combynaBootstrap->createContainer();
 
-return $container->get('combyna.client_factory');
+return $container->get('combyna.client_provider');

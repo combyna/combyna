@@ -189,7 +189,17 @@ class Combyna
     }
 
     /**
-     * Adds a callback to be called when any broadcast signal is dispatched
+     * Adds a callback to be called when the app state changes.
+     *
+     * @param callable $callback
+     */
+    public function onAppStateUpdated(callable $callback)
+    {
+        $this->eventDispatcher->addListener(FrameworkEvents::APP_STATE_UPDATED, $callback);
+    }
+
+    /**
+     * Adds a callback to be called when any broadcast signal is dispatched.
      *
      * @param callable $callback
      */
@@ -199,7 +209,7 @@ class Combyna
     }
 
     /**
-     * Adds a callback to be called when any route is navigated to
+     * Adds a callback to be called when any route is navigated to.
      *
      * @param callable $callback
      */

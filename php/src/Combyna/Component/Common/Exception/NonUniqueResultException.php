@@ -11,12 +11,10 @@
 
 namespace Combyna\Component\Common\Exception;
 
-use Exception;
-
 /**
- * Class NonUniqueResultException
+ * Class NonUniqueResultException.
  *
- * Thrown when a single result was expected but multiple results were found
+ * Thrown when a single result was expected but multiple results were found.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */

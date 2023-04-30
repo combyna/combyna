@@ -12,12 +12,12 @@
 namespace Combyna\Component\Common\Exception;
 
 /**
- * Class NotFoundException.
+ * Class Exception.
  *
- * Thrown when a result was expected but none was found.
+ * Base class for all Combyna exceptions.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class NotFoundException extends Exception
+class Exception extends \Exception
 {
 }

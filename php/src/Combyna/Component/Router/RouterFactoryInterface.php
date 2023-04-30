@@ -24,15 +24,22 @@ use Combyna\Component\Signal\SignalDefinitionRepositoryInterface;
 interface RouterFactoryInterface
 {
     /**
-     * Creates a new Route
+     * Creates a new Route.
      *
-     * @param string $name
+     * @param string $libraryName
+     * @param string $routeName
      * @param string $urlPattern
      * @param FixedStaticBagModelInterface $parameterBagModel
      * @param string $pageViewName
      * @return RouteInterface
      */
-    public function createRoute($name, $urlPattern, FixedStaticBagModelInterface $parameterBagModel, $pageViewName);
+    public function createRoute(
+        $libraryName,
+        $routeName,
+        $urlPattern,
+        FixedStaticBagModelInterface $parameterBagModel,
+        $pageViewName
+    );
 
     /**
      * Creates a new RouteCollection

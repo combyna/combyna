@@ -29,7 +29,7 @@ class RouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * @var string
      */
-    private $name;
+    private $libraryName;
 
     /**
      * @var string
@@ -44,19 +44,31 @@ class RouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * @var string
      */
+    private $routeName;
+
+    /**
+     * @var string
+     */
     private $urlPattern;
 
     /**
-     * @param string $name
+     * @param string $libraryName
+     * @param string $routeName
      * @param string $urlPattern
      * @param FixedStaticBagModelNodeInterface $parameterBagModelNode
      * @param string $pageViewName
      */
-    public function __construct($name, $urlPattern, FixedStaticBagModelNodeInterface $parameterBagModelNode, $pageViewName)
-    {
-        $this->name = $name;
+    public function __construct(
+        $libraryName,
+        $routeName,
+        $urlPattern,
+        FixedStaticBagModelNodeInterface $parameterBagModelNode,
+        $pageViewName
+    ) {
+        $this->libraryName = $libraryName;
         $this->pageViewName = $pageViewName;
         $this->parameterBagModelNode = $parameterBagModelNode;
+        $this->routeName = $routeName;
         $this->urlPattern = $urlPattern;
     }
 
@@ -84,15 +96,23 @@ class RouteNode extends AbstractActNode implements RouteNodeInterface
      */
     public function getIdentifier()
     {
-        return $this->getType() . ':' . $this->name;
+        return $this->getType() . ':' . $this->routeName;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getLibraryName()
     {
-        return $this->name;
+        return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteName()
+    {
+        return $this->routeName;
     }
 
     /**

@@ -1,4 +1,4 @@
 services:
-    combyna.client_factory:
-        class: Combyna\Client\ClientFactory
+    combyna.client_provider:
+        class: Combyna\Client\ClientProvider
         autowire: true

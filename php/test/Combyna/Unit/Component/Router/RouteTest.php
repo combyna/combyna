@@ -39,6 +39,7 @@ class RouteTest extends TestCase
         $this->parameterBagModel = $this->prophesize(FixedStaticBagModelInterface::class);
 
         $this->route = new Route(
+            'my_lib',
             'my_route',
             '/my/url/pattern/with/{param1}/and/{param2}',
             $this->parameterBagModel->reveal(),
@@ -64,6 +65,7 @@ class RouteTest extends TestCase
         $argumentBag->toNativeArray()->willReturn([]);
         $this->parameterBagModel->assertValidStaticBag($argumentBag)->shouldBeCalled();
         $this->route = new Route(
+            'my_lib',
             'my_route',
             '/my/url/pattern/with/no/parameters',
             $this->parameterBagModel->reveal(),
@@ -71,6 +73,16 @@ class RouteTest extends TestCase
         );
 
         static::assertSame('/my/url/pattern/with/no/parameters', $this->route->generateUrl($argumentBag->reveal()));
+    }
+
+    public function testGetLibraryNameReturnsTheName()
+    {
+        static::assertSame('my_lib', $this->route->getLibraryName());
+    }
+
+    public function testGetRouteNameReturnsTheName()
+    {
+        static::assertSame('my_route', $this->route->getRouteName());
     }
 
     public function testGetUrlPatternReturnsThePattern()

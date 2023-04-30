@@ -53,8 +53,12 @@ class RouteNodePromoter
         $routes = [];
 
         foreach ($routeNodes as $routeNode) {
-            $routes[$routeNode->getName()] = $this->routerFactory->createRoute(
-                $routeNode->getName(),
+            // Note that the routes are indexed by name only, so they must all
+            // belong to the same library.
+            // TODO: Validate this?
+            $routes[$routeNode->getRouteName()] = $this->routerFactory->createRoute(
+                $routeNode->getLibraryName(),
+                $routeNode->getRouteName(),
                 $routeNode->getUrlPattern(),
                 $this->bagNodePromoter->promoteFixedStaticBagModel(
                     $routeNode->getParameterBagModel()

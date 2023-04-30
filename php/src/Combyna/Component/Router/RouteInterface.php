@@ -37,11 +37,11 @@ interface RouteInterface
     public function generateUrl(StaticBagInterface $argumentBag);
 
     /**
-     * Fetches the unique name of this route within the app
+     * Fetches the name of the library this route belongs to.
      *
      * @return string
      */
-    public function getName();
+    public function getLibraryName();
 
     /**
      * Fetches the name of the page view to display for this route
@@ -56,6 +56,13 @@ interface RouteInterface
      * @return FixedStaticBagModelInterface
      */
     public function getParameterBagModel();
+
+    /**
+     * Fetches the unique name of this route within its library.
+     *
+     * @return string
+     */
+    public function getRouteName();
 
     /**
      * Fetches the URL pattern for this route

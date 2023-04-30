@@ -12,14 +12,12 @@
 namespace Combyna\Component\Router\Config\Loader;
 
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
-use Combyna\Component\Bag\Config\Loader\FixedStaticBagModelLoaderInterface;
 use Combyna\Component\Config\Exception\ArgumentParseException;
 use Combyna\Component\Config\Loader\ConfigParserInterface;
 use Combyna\Component\Config\Parameter\CallbackOptionalParameter;
 use Combyna\Component\Config\Parameter\NamedParameter;
 use Combyna\Component\Config\Parameter\Type\FixedStaticBagModelParameterType;
 use Combyna\Component\Config\Parameter\Type\StringParameterType;
-use Combyna\Component\Environment\Config\Loader\Library\LibraryLoaderInterface;
 use Combyna\Component\Router\Config\Act\InvalidRouteNode;
 use Combyna\Component\Router\Config\Act\RouteNode;
 
@@ -36,28 +34,11 @@ class RouteCollectionLoader implements RouteCollectionLoaderInterface
     private $configParser;
 
     /**
-     * @var FixedStaticBagModelLoaderInterface
-     */
-    private $fixedStaticBagModelLoader;
-
-    /**
-     * @var LibraryLoaderInterface
-     */
-    private $libraryLoader;
-
-    /**
      * @param ConfigParserInterface $configParser
-     * @param LibraryLoaderInterface $libraryLoader
-     * @param FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader
      */
-    public function __construct(
-        ConfigParserInterface $configParser,
-        LibraryLoaderInterface $libraryLoader,
-        FixedStaticBagModelLoaderInterface $fixedStaticBagModelLoader
-    ) {
+    public function __construct(ConfigParserInterface $configParser)
+    {
         $this->configParser = $configParser;
-        $this->fixedStaticBagModelLoader = $fixedStaticBagModelLoader;
-        $this->libraryLoader = $libraryLoader;
     }
 
     /**
@@ -87,7 +68,7 @@ class RouteCollectionLoader implements RouteCollectionLoaderInterface
         $parameterBagModelNode = $parsedArgumentBag->getNamedFixedStaticBagModelArgument('parameters');
         $pageViewName = $parsedArgumentBag->getNamedStringArgument('page_view');
 
-        return new RouteNode($routeName, $urlPattern, $parameterBagModelNode, $pageViewName);
+        return new RouteNode($libraryName, $routeName, $urlPattern, $parameterBagModelNode, $pageViewName);
     }
 
     /**

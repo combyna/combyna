@@ -82,7 +82,15 @@ class InvalidRouteNode extends AbstractActNode implements RouteNodeInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getLibraryName()
+    {
+        return $this->libraryName;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getRouteName()
     {
         return $this->routeName;
     }

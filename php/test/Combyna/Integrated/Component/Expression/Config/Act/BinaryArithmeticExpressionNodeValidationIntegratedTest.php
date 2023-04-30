@@ -9,7 +9,7 @@
  * https://github.com/combyna/combyna/raw/master/MIT-LICENSE.txt
  */
 
-namespace Combyna\Integrated\Expression;
+namespace Combyna\Integrated\Component\Expression\Config\Act;
 
 use Combyna\Component\App\Config\Act\AppNode;
 use Combyna\Component\App\Config\Act\HomeNode;
@@ -17,6 +17,7 @@ use Combyna\Component\Bag\BagFactory;
 use Combyna\Component\Bag\Config\Act\ExpressionBagNode;
 use Combyna\Component\Bag\Config\Act\FixedStaticBagModelNode;
 use Combyna\Component\Environment\Config\Act\EnvironmentNode;
+use Combyna\Component\Environment\Library\LibraryInterface;
 use Combyna\Component\Expression\BinaryArithmeticExpression;
 use Combyna\Component\Expression\Config\Act\Assurance\AssuranceNodeInterface;
 use Combyna\Component\Expression\Config\Act\Assurance\NonZeroNumberAssuranceNode;
@@ -90,6 +91,7 @@ class BinaryArithmeticExpressionNodeValidationIntegratedTest extends TestCase
             [],
             [
                 new RouteNode(
+                    LibraryInterface::APP,
                     'home',
                     '/',
                     new FixedStaticBagModelNode([]),
