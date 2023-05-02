@@ -36,6 +36,14 @@ class AppState implements AppStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getPageTitle()
+    {
+        return $this->programState->getPageViewState()->getTitle();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getProgramState()
     {
         return $this->programState;

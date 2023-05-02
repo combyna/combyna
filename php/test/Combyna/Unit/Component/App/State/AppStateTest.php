@@ -14,6 +14,7 @@ namespace Combyna\Unit\Component\App\State;
 use Combyna\Component\App\State\AppState;
 use Combyna\Component\App\State\AppStateInterface;
 use Combyna\Component\Program\State\ProgramStateInterface;
+use Combyna\Component\Ui\State\View\PageViewStateInterface;
 use Combyna\Component\Ui\State\Widget\WidgetStatePathInterface;
 use Combyna\Harness\TestCase;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -40,6 +41,15 @@ class AppStateTest extends TestCase
         $this->programState = $this->prophesize(ProgramStateInterface::class);
 
         $this->appState = new AppState($this->programState->reveal());
+    }
+
+    public function testGetPageTitleGetsTitleFromVisibleViewState()
+    {
+        $pageViewState = $this->prophesize(PageViewStateInterface::class);
+        $pageViewState->getTitle()->willReturn('My page title');
+        $this->programState->getPageViewState()->willReturn($pageViewState);
+
+        static::assertSame('My page title', $this->appState->getPageTitle());
     }
 
     public function testGetWidgetStatePathByTagDelegatesToTheProgramState()

@@ -47,6 +47,11 @@ class PageViewState implements PageViewStateInterface
     private $storeState;
 
     /**
+     * @var string
+     */
+    private $title;
+
+    /**
      * @var PageViewInterface
      */
     private $view;
@@ -59,6 +64,7 @@ class PageViewState implements PageViewStateInterface
     /**
      * @param UiStateFactoryInterface $stateFactory
      * @param PageViewInterface $view
+     * @param string $title
      * @param RouterStateInterface $routerState
      * @param ViewStoreStateInterface $storeState
      * @param WidgetStateInterface $rootWidgetState
@@ -67,6 +73,7 @@ class PageViewState implements PageViewStateInterface
     public function __construct(
         UiStateFactoryInterface $stateFactory,
         PageViewInterface $view,
+        $title,
         RouterStateInterface $routerState,
         ViewStoreStateInterface $storeState,
         WidgetStateInterface $rootWidgetState,
@@ -76,6 +83,7 @@ class PageViewState implements PageViewStateInterface
         $this->routerState = $routerState;
         $this->stateFactory = $stateFactory;
         $this->storeState = $storeState;
+        $this->title = $title;
 
         // FIXME: Remove references from state objects back to the entities like this!
         $this->view = $view;
@@ -126,6 +134,14 @@ class PageViewState implements PageViewStateInterface
     /**
      * {@inheritdoc}
      */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType()
     {
         return self::TYPE;
@@ -169,37 +185,17 @@ class PageViewState implements PageViewStateInterface
     public function withRootWidgetState(WidgetStateInterface $newRootWidgetState)
     {
         if ($this->rootWidgetState === $newRootWidgetState) {
-            // We already have the provided sub-states, no need to create a new view state
+            // We already have the provided root widget state, no need to create a new view state.
             return $this;
         }
 
-        // Otherwise create a new page view state, but with the new store state
+        // Otherwise create a new page view state, but with the new root widget state.
         return new self(
             $this->stateFactory,
             $this->view,
+            $this->title,
             $this->routerState,
             $this->storeState,
-            $newRootWidgetState,
-            $this->viewAttributeStaticBag
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function withState(ViewStoreStateInterface $newStoreState, WidgetStateInterface $newRootWidgetState)
-    {
-        if ($this->storeState === $newStoreState && $this->rootWidgetState === $newRootWidgetState) {
-            // We already have the provided sub-states, no need to create a new view state
-            return $this;
-        }
-
-        // Otherwise create a new page view state, but with the new store state
-        return new self(
-            $this->stateFactory,
-            $this->view,
-            $this->routerState,
-            $newStoreState,
             $newRootWidgetState,
             $this->viewAttributeStaticBag
         );
@@ -211,16 +207,39 @@ class PageViewState implements PageViewStateInterface
     public function withStoreState(ViewStoreStateInterface $newStoreState)
     {
         if ($this->storeState === $newStoreState) {
-            // We already have the provided store state, no need to create a new view state
+            // We already have the provided store state, no need to create a new view state.
             return $this;
         }
 
-        // Otherwise create a new page view state, but with the new store state
+        // Otherwise create a new page view state, but with the new store state.
         return new self(
             $this->stateFactory,
             $this->view,
+            $this->title,
             $this->routerState,
             $newStoreState,
+            $this->rootWidgetState,
+            $this->viewAttributeStaticBag
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function withTitle($title)
+    {
+        if ($this->title === $title) {
+            // We already have the provided title, no need to create a new view state.
+            return $this;
+        }
+
+        // Otherwise create a new page view state, but with the new title.
+        return new self(
+            $this->stateFactory,
+            $this->view,
+            $title,
+            $this->routerState,
+            $this->storeState,
             $this->rootWidgetState,
             $this->viewAttributeStaticBag
         );

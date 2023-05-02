@@ -118,9 +118,10 @@ interface UiStateFactoryInterface
     public function createNullViewStoreState($storeViewName);
 
     /**
-     * Creates a PageViewState
+     * Creates a PageViewState.
      *
      * @param PageViewInterface $view
+     * @param string $title
      * @param RouterStateInterface $routerState
      * @param ViewStoreStateInterface $storeState
      * @param WidgetStateInterface $renderedRootWidget
@@ -129,6 +130,7 @@ interface UiStateFactoryInterface
      */
     public function createPageViewState(
         PageViewInterface $view,
+        $title,
         RouterStateInterface $routerState,
         ViewStoreStateInterface $storeState,
         WidgetStateInterface $renderedRootWidget,

@@ -28,6 +28,13 @@ interface AppStateInterface
     const TYPE = AppNode::TYPE;
 
     /**
+     * Fetches the title of the current page view.
+     *
+     * @return string
+     */
+    public function getPageTitle();
+
+    /**
      * Fetches the internal program state from this external app state
      *
      * @return ProgramStateInterface

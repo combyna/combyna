@@ -154,8 +154,11 @@ class PageView implements PageViewInterface
             $this->uiEvaluationContextFactory
         );
 
+        $title = $this->titleExpression->toStatic($rootViewEvaluationContext)->toNative();
+
         return $this->uiStateFactory->createPageViewState(
             $this,
+            $title,
             $routerState,
             $storeState,
             $rootWidgetState,
@@ -215,8 +218,6 @@ class PageView implements PageViewInterface
         ProgramInterface $program,
         EnvironmentInterface $environment
     ) {
-        $originalPageViewState = $pageViewState;
-
         $evaluationContext = $this->createEvaluationContext(
             $program->getRootEvaluationContext(),
             $this->uiEvaluationContextFactory,
@@ -230,33 +231,14 @@ class PageView implements PageViewInterface
             $evaluationContext
         );
 
+        // TODO: Store has updated - rerender all widgets in the view, but maintain
+        //       the state of any stores where the widget was visible before and remains visible now.
+
         $pageViewState = $pageViewState->withStoreState($newStoreState);
 
         // TODO: Now broadcast the signal to all widget stores' signal handlers
 
-        if ($pageViewState !== $originalPageViewState) {
-            // Store has updated - rerender all widgets in the view, but maintain
-            // the state of any stores where the widget was visible before and remains visible now
-
-            // Create a new evaluation context with the updated page view state
-            $evaluationContext = $this->createEvaluationContext(
-                $program->getRootEvaluationContext(),
-                $this->uiEvaluationContextFactory,
-                $pageViewState->getRouterState(),
-                $pageViewState
-            );
-
-            $newRootWidgetState = $this->rootWidget->reevaluateState(
-                $pageViewState->getRootWidgetState(),
-                $evaluationContext,
-                $this->uiEvaluationContextFactory
-            );
-
-            // TODO: Just use a ->withRootWidgetState(...) method - we already have the new store state from above
-            return $pageViewState->withState($newStoreState, $newRootWidgetState);
-        }
-
-        return $pageViewState;
+        return $this->reevaluateState($pageViewState, $evaluationContext, $this->uiEvaluationContextFactory);
     }
 
     /**
@@ -291,12 +273,16 @@ class PageView implements PageViewInterface
             $oldState
         );
 
+        $newTitle = $this->titleExpression->toStatic($evaluationContext)->toNative();
+
         $newRootWidgetState = $this->rootWidget->reevaluateState(
             $oldState->getRootWidgetState(),
             $evaluationContext,
             $this->uiEvaluationContextFactory
         );
 
-        return $oldState->withRootWidgetState($newRootWidgetState);
+        return $oldState
+            ->withTitle($newTitle)
+            ->withRootWidgetState($newRootWidgetState);
     }
 }

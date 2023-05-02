@@ -128,6 +128,7 @@ class UiStateFactory implements UiStateFactoryInterface
      */
     public function createPageViewState(
         PageViewInterface $view,
+        $title,
         RouterStateInterface $routerState,
         ViewStoreStateInterface $storeState,
         WidgetStateInterface $renderedRootWidget,
@@ -136,6 +137,7 @@ class UiStateFactory implements UiStateFactoryInterface
         return new PageViewState(
             $this,
             $view,
+            $title,
             $routerState,
             $storeState,
             $renderedRootWidget,

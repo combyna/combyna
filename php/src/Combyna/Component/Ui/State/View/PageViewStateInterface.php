@@ -33,8 +33,15 @@ interface PageViewStateInterface extends ViewStateInterface
     public function getRouterState();
 
     /**
+     * Fetches the current title of the page.
+     *
+     * @return string
+     */
+    public function getTitle();
+
+    /**
      * Either creates a new page view state with the specified root widget state
-     * or just returns the current one, if it already has the same state
+     * or just returns the current one, if it already has the same state.
      *
      * @param WidgetStateInterface $newRootWidgetState
      * @return PageViewStateInterface
@@ -42,21 +49,20 @@ interface PageViewStateInterface extends ViewStateInterface
     public function withRootWidgetState(WidgetStateInterface $newRootWidgetState);
 
     /**
-     * Either creates a new page view state with the specified store and root widget states
-     * or just returns the current one, if it already has the same states
-     *
-     * @param ViewStoreStateInterface $newStoreState
-     * @param WidgetStateInterface $newRootWidgetState
-     * @return PageViewStateInterface
-     */
-    public function withState(ViewStoreStateInterface $newStoreState, WidgetStateInterface $newRootWidgetState);
-
-    /**
      * Either creates a new page view state with the specified store state
-     * or just returns the current one, if it already has the same state
+     * or just returns the current one, if it already has the same state.
      *
      * @param ViewStoreStateInterface $newStoreState
      * @return PageViewStateInterface
      */
     public function withStoreState(ViewStoreStateInterface $newStoreState);
+
+    /**
+     * Either creates a new page view state with the specified title
+     * or just returns the current one, if it already has the same title.
+     *
+     * @param string $title
+     * @return PageViewStateInterface
+     */
+    public function withTitle($title);
 }
