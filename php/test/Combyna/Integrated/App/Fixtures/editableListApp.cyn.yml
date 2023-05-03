@@ -22,7 +22,7 @@ routes:
 page_views:
     item_viewer:
         attributes: ~
-        title: "='Editable list demo'"
+        title: "='Editable list demo with ' ~ view_query('get_item_count') ~ ' item(s)'"
         description: A list of items that may be added to
         widget:
             type: gui.box
@@ -81,6 +81,9 @@ page_views:
                     default: "=[]"
             commands: ~
             queries:
+                get_item_count:
+                    parameters: ~
+                    expression: "=list.count(list: slot('item_list'))"
                 get_item_list:
                     parameters: ~
                     expression: "=slot('item_list')"

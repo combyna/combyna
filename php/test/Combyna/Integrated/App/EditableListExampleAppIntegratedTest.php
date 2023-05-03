@@ -75,7 +75,7 @@ class EditableListExampleAppIntegratedTest extends TestCase
         $this->app = $this->combyna->createApp($appConfig, $this->environment);
     }
 
-    public function testRenderAppReturnsTheCorrectHtmlOnInitialLoad()
+    public function testAppRendersCorrectlyOnInitialLoad()
     {
         $appState = $this->app->createInitialState();
 
@@ -85,9 +85,10 @@ class EditableListExampleAppIntegratedTest extends TestCase
 </div>
 HTML;
         static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame('Editable list demo with 0 item(s)', $appState->getPageTitle());
     }
 
-    public function testRenderAppReturnsTheCorrectHtmlAfterAddingTwoNewItemsViaTheUi()
+    public function testAppRendersCorrectlyAfterAddingTwoNewItemsViaTheUi()
     {
         $appState = $this->app->createInitialState();
 
@@ -128,5 +129,6 @@ HTML;
 </div>
 HTML;
         static::assertSame($expectedHtml, $this->htmlRenderer->renderApp($appState, $this->app));
+        static::assertSame('Editable list demo with 2 item(s)', $appState->getPageTitle());
     }
 }

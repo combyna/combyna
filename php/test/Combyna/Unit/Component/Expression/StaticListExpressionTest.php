@@ -83,6 +83,13 @@ class StaticListExpressionTest extends TestCase
         static::assertSame('concatenated element contents', $result->toNative());
     }
 
+    public function testCountReturnsTheCountOfTheStaticList()
+    {
+        $this->staticList->count()->willReturn(21);
+
+        static::assertSame(21, $this->expression->count());
+    }
+
     public function testElementsMatchReturnsTrueWhenExpected()
     {
         /** @var ObjectProphecy|TypeInterface $candidateElementType */

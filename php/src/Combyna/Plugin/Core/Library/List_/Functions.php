@@ -14,11 +14,12 @@ namespace Combyna\Plugin\Core\Library\List_;
 use Combyna\Component\Bag\BagFactoryInterface;
 use Combyna\Component\Environment\Library\NativeFunctionLocator;
 use Combyna\Component\Environment\Library\NativeFunctionProviderInterface;
+use Combyna\Component\Expression\NumberExpression;
 use Combyna\Component\Expression\StaticExpressionFactoryInterface;
 use Combyna\Component\Expression\StaticListExpression;
 
 /**
- * Class Functions
+ * Class Functions.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
@@ -47,7 +48,7 @@ class Functions implements NativeFunctionProviderInterface
     }
 
     /**
-     * Merges all the elements from every list provided into one final list
+     * Merges all the elements from every list provided into one final list.
      *
      * @param StaticListExpression $listsToConcatenate
      * @return StaticListExpression
@@ -67,6 +68,17 @@ class Functions implements NativeFunctionProviderInterface
     }
 
     /**
+     * Fetches the number of elements in the given list.
+     *
+     * @param StaticListExpression $list
+     * @return NumberExpression
+     */
+    public function count(StaticListExpression $list)
+    {
+        return $this->staticExpressionFactory->createNumberExpression(count($list));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getNativeFunctionLocators()
@@ -77,6 +89,12 @@ class Functions implements NativeFunctionProviderInterface
                 'concat',
                 [$this, 'concat'],
                 ['lists']
+            ),
+            new NativeFunctionLocator(
+                'list',
+                'count',
+                [$this, 'count'],
+                ['list']
             )
         ];
     }

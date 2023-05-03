@@ -14,15 +14,16 @@ namespace Combyna\Component\Expression;
 use Combyna\Component\Bag\StaticListInterface;
 use Combyna\Component\Expression\Evaluation\EvaluationContextInterface;
 use Combyna\Component\Type\TypeInterface;
+use Countable;
 
 /**
- * Class StaticListExpression
+ * Class StaticListExpression.
  *
- * Represents a list of static values
+ * Represents a list of static values.
  *
  * @author Dan Phillimore <dan@ovms.co>
  */
-class StaticListExpression extends AbstractStaticExpression
+class StaticListExpression extends AbstractStaticExpression implements Countable
 {
     const TYPE = 'static-list';
 
@@ -47,7 +48,7 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
-     * Returns a text static with all elements of the list concatenated together
+     * Returns a text static with all elements of the list concatenated together.
      *
      * @param string $glue
      * @return TextExpression
@@ -58,7 +59,15 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
-     * Returns true if all the elements of this list match the provided type, false otherwise
+     * {@inheritdoc}
+     */
+    public function count()
+    {
+        return count($this->staticList);
+    }
+
+    /**
+     * Returns true if all the elements of this list match the provided type, false otherwise.
      *
      * @param TypeInterface $type
      * @return bool
@@ -78,7 +87,7 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
-     * Fetches all statics in this list
+     * Fetches all statics in this list.
      *
      * @return StaticInterface[]
      */
@@ -98,7 +107,7 @@ class StaticListExpression extends AbstractStaticExpression
         foreach ($this->staticList->getElementStatics() as $index => $elementStatic) {
             $summaries[] = $elementStatic->getSummary();
 
-            // Only capture a summary for the first few elements to keep it short-ish
+            // Only capture a summary for the first few elements to keep it short-ish.
             if ($index > 3) {
                 $elementsWereTruncated = true;
                 break;
@@ -107,13 +116,13 @@ class StaticListExpression extends AbstractStaticExpression
 
         return sprintf(
             '[%s]',
-            // Add an ellipsis to show that we had to truncate the element summaries when applicable
+            // Add an ellipsis to show that we had to truncate the element summaries when applicable.
             join(',', $summaries) . ($elementsWereTruncated ? ',...' : '')
         );
     }
 
     /**
-     * Maps this static list to another, transforming each element with the given expression
+     * Maps this static list to another, transforming each element with the given expression.
      *
      * @param string $itemVariableName
      * @param string|null $indexVariableName
@@ -138,7 +147,7 @@ class StaticListExpression extends AbstractStaticExpression
     }
 
     /**
-     * Maps this static list to a native array, transforming each element with the given callback
+     * Maps this static list to a native array, transforming each element with the given callback.
      *
      * @param string $itemVariableName
      * @param string|null $indexVariableName
@@ -171,7 +180,7 @@ class StaticListExpression extends AbstractStaticExpression
         $newStaticList = $this->staticList->withElements($elementStatics);
 
         if ($newStaticList === $this->staticList) {
-            // List already contained all the statics - nothing to do
+            // List already contained all the statics - nothing to do.
             return $this;
         }
 
